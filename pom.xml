@@ -148,6 +148,9 @@
 						<exclude>**/colors.txt</exclude>
 						<exclude>**/lib*.so*</exclude>
 						<exclude>**/.qmake.stash</exclude>
+						<exclude>**/moc_*.cpp</exclude>
+						<exclude>**/moc_*.h</exclude>
+						<exclude>**/qrc_jaqumal.cpp</exclude>
 					</excludes>
 				</configuration>
 
