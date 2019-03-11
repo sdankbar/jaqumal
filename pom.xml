@@ -1,0 +1,164 @@
+<!--
+
+    The MIT License
+    Copyright © 2019 Stephen Dankbar
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.sdankbar.jaqumal</groupId>
+	<artifactId>parent</artifactId>
+	<version>0.5-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Jaqumal</name>
+	<description>Java library for using QML</description>
+	<url>https://github.com/sdankbar/Jaqumal</url>
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<url>https://github.com/sdankbar/Jaqumal/blob/master/LICENSE</url>
+		</license>
+	</licenses>
+
+	<modules>
+		<module>library</module>
+		<module>examples</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<java.version>1.9</java.version>
+
+		<jna.version>4.5.1</jna.version>
+		<commons.io.version>2.5</commons.io.version>
+		<guava.version>25.1-jre</guava.version>
+		
+		<commons.lang.version>3.8.1</commons.lang.version>
+		<commons.math.version>3.6.1</commons.math.version>
+		<log4j.version>2.11.1</log4j.version>
+		<junit.version>4.12</junit.version>
+		
+		<maven.compiler.version>3.8.0</maven.compiler.version>
+		<license.plugin.version>3.0</license.plugin.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>net.java.dev.jna</groupId>
+				<artifactId>jna</artifactId>
+				<version>${jna.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.java.dev.jna</groupId>
+				<artifactId>jna-platform</artifactId>
+				<version>${jna.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons.io.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons.lang.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-math3</artifactId>
+				<version>${commons.math.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>${license.plugin.version}</version>
+				<configuration>
+					<header>com/mycila/maven/plugin/license/templates/MIT.txt</header>
+					<mapping>
+						<qml>JAVADOC_STYLE</qml>
+						<pro>SCRIPT_STYLE</pro>
+					</mapping>
+					<properties>
+						<owner>Stephen Dankbar</owner>
+						<project.inceptionYear>2019</project.inceptionYear>
+					</properties>
+					<excludes>
+						<exclude>**/README</exclude>
+						<exclude>**/LICENSE</exclude>
+						<exclude>**/*.qmlc</exclude>
+						<exclude>**/Makefile</exclude>
+						<exclude>**/*.user</exclude>
+						<exclude>**/*.o</exclude>
+						<exclude>**/qmldir</exclude>
+						<exclude>**/*.qrc</exclude>
+						<exclude>**/colors.txt</exclude>
+						<exclude>**/lib*.so*</exclude>
+						<exclude>**/.qmake.stash</exclude>
+					</excludes>
+				</configuration>
+
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,7 @@
+/Makefile
+*.pro.user*
+/libs/
+/objs/
+qrc_*.cpp
+/mocs/
+/.qmake.stash
