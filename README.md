@@ -85,7 +85,7 @@ Events and callbacks are how Java receives data from QML.  The EventBuilder QML 
 
 There are also built-in Event types provided by this library.  Code can register to receive a callback when those types of events are created using the EventDispatcher as well.
 
-NOTE: Care should be taken when modifying a model from inside the callback that the model changed.  This may lead to undefined behavior.
+NOTE: Care should be taken when modifying a model from inside a model changed callback.  This may lead to undefined behavior.
 
 ##### Threading
 
