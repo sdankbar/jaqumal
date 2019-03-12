@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -139,6 +140,24 @@ public class JQMLApplication<EType> {
 	public void execute() {
 		eventLoopThread.set(Thread.currentThread());
 
+		final AtomicBoolean shutdownRunning = new AtomicBoolean(false);
+		final Thread shutdownThread = new Thread() {
+
+			@Override
+			public void run() {
+				shutdownRunning.set(true);
+				try {
+					executor.submit(() -> ApiInstance.LIB_INSTANCE.quitQApplication());
+				} catch (final RejectedExecutionException e) {
+					log.debug("Executor has already been shutdown");
+				}
+				while (eventLoopThread.get() != null || SINGLETON_EXISTS.get()) {
+					Thread.yield();
+				}
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(shutdownThread);
+
 		ApiInstance.LIB_INSTANCE.execQApplication();
 		eventLoopThread.set(null);
 
@@ -151,7 +170,7 @@ public class JQMLApplication<EType> {
 		}
 		fileMonitors.clear();
 
-		executor.shutdown();
+		executor.shutdownNow();
 		try {
 			executor.awaitTermination(1, TimeUnit.SECONDS);
 		} catch (final InterruptedException e) {
@@ -159,6 +178,12 @@ public class JQMLApplication<EType> {
 		}
 
 		delete();
+
+		if (!shutdownRunning.get()) {
+			Runtime.getRuntime().removeShutdownHook(shutdownThread);
+		}
+
+		log.info("JQMLApplication.execute() complete");
 	}
 
 	/**
