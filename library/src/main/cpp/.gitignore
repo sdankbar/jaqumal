@@ -5,3 +5,5 @@
 qrc_*.cpp
 /mocs/
 /.qmake.stash
+/object_script.Jaqumal.Debug
+/object_script.Jaqumal.Release

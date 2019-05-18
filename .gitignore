@@ -1,2 +1,4 @@
-/.settings/
-/.project
+/**/.settings/
+/**/.project
+/**/.classpath
+/**/Makefile*
