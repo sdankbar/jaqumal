@@ -240,7 +240,7 @@ void GenericObjectModel::callbackListeners(const QString& key, const QVariant& n
     if (!callbacks.empty())
     {
         int32_t l;
-        std::auto_ptr<char> data(fromQVariant(newValue, l, true));
+        std::unique_ptr<char> data(fromQVariant(newValue, l, true));
         for (const auto& f: callbacks)
         {
             f(key.toStdString().c_str(), data.get(), l);
