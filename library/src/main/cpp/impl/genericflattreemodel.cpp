@@ -860,16 +860,25 @@ void GenericFlatTreeModel::updateFlatData(std::deque<int32_t>& indicies, int32_t
         }
         else if (list.size() > m_flatData.size())
         {
-            m_flatData.swap(list);
+            // Gained a row
             int32_t newIndex = treeIndexToFlatIndex(indicies);
             beginInsertRows(QModelIndex(), newIndex, newIndex);
+            m_flatData.swap(list);
             endInsertRows();
         }
-        else
+        else if (list.size() < m_flatData.size())
         {
+            // Lost a row
+            int32_t removedIndex = 0;
+            for (; removedIndex < list.size(); ++removedIndex)
+            {
+                if (m_flatData[removedIndex] != list[removedIndex])
+                {
+                    break;
+                }
+            }
+            beginRemoveRows(QModelIndex(), removedIndex, removedIndex);
             m_flatData.swap(list);
-            int32_t newIndex = treeIndexToFlatIndex(indicies);
-            beginRemoveRows(QModelIndex(), newIndex, newIndex);
             endRemoveRows();
         }
     }

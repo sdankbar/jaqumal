@@ -28,7 +28,7 @@ See pom.xml for details of the Java libraries used
 
 MIT
 
-# Adding Jaqumal to your build
+# Adding Jaqumal to your build - Linux
 
 Jaqumal contains a C++ library so must it be built before it can be used.  Assuming a clean Cent OS 7 install, the
 following must be installed/configured before building.
@@ -44,6 +44,35 @@ following must be installed/configured before building.
 * Download Qt 5.11 or newer from https://www.qt.io/download and install it
 * Add the path to the Qt binaries, such as qmake, to the PATH variable
      * May need to add the path to the Qt libraries to the LD_LIBRARY_PATH variable 
+
+Change directories to the root of the Jaqumal git repository and run the following commands.
+
+- mvn -DskipTests install
+- mvn install
+
+The first attempt to build must skip tests so that the C++ library, which is used in the unit tests, is available.
+
+Then add the following to the pom.xml to be able to use Jaqumal.
+
+
+```
+<dependency>
+	<groupId>com.github.sdankbar.jaqumal</groupId>
+	<artifactId>library</artifactId>
+	<version>${current.version}</version>
+</dependency>
+```
+ 
+# Adding Jaqumal to your build - Windows
+
+Jaqumal contains a C++ library so must it be built before it can be used.  The
+following must be installed/configured before building.
+
+* Install JDK 9 or newer
+* Install maven
+* Download Qt 5.11 or newer from https://www.qt.io/download and install the MinGW 64 bit version.  Also install MinGW 64 compiler as well.
+* Add the path to the Qt binaries and libaries, such as qmake and Qt's dlls, to the Path variable
+* Add the path to the MinGW64 bit binaries, such as g++, to the Path variable.
 
 Change directories to the root of the Jaqumal git repository and run the following commands.
 
