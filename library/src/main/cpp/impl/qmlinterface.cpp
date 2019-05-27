@@ -27,6 +27,7 @@
 #include <QTimer>
 #include <QDateTime>
 #include <QUuid>
+#include <QFont>
 #include <iostream>
 #include <functional>
 
@@ -152,6 +153,28 @@ void setSharedMemory(char* cppToJava, int32_t length)
     cppToJavaMemLength = length;
 }
 
+const char* getQFontToString(const char* family, int pointSize, int pixelSize, bool bold, bool italic, bool overline,
+            bool strikeout, bool underline, int fontWeight)
+{
+    QFont f(family);
+    if (pointSize > 0) {
+        f.setPointSize(pointSize);
+    } else if (pixelSize > 0) {
+        f.setPixelSize(pixelSize);
+    }
+
+    f.setBold(bold);
+    f.setItalic(italic);
+    f.setOverline(overline);
+    f.setStrikeOut(strikeout);
+    f.setUnderline(underline);
+    f.setWeight(fontWeight);
+
+    static std::string ret;
+    ret = f.toString().toStdString();
+    return ret.c_str();
+}
+
 std::vector<QVariant> toQVariantList(void* data, uint32_t count)
 {
     std::vector<QVariant> vec;
@@ -265,21 +288,29 @@ QVariant toQVariant(void* data, int32_t& size)
     }
     case STRING: {
         int32_t length = *((int32_t*)(buffer + 1));
-        QString str= QString::fromUtf8(buffer + 5, length);
+        QString str = QString::fromUtf8(buffer + 5, length);
         size = 1 + 4 + length;
         return QVariant(str);
     }
     case URL: {
         int32_t length = *((int32_t*)(buffer + 1));
-        QString str= QString::fromUtf8(buffer + 5, length);
+        QString str = QString::fromUtf8(buffer + 5, length);
         size = 1 + 4 + length;
         return QVariant(QUrl(str));
     }
     case UUID: {
         int32_t length = *((int32_t*)(buffer + 1));
-        QString str= QString::fromUtf8(buffer + 5, length);
+        QString str = QString::fromUtf8(buffer + 5, length);
         size = 1 + 4 + length;
         return QVariant(QUuid(str));
+    }
+    case FONT: {
+        int32_t length = *((int32_t*)(buffer + 1));
+        QString str = QString::fromUtf8(buffer + 5, length);
+        size = 1 + 4 + length;
+        QFont f;
+        f.fromString(str);
+        return QVariant(f);
     }
     default:
         size = 0;
@@ -447,6 +478,17 @@ char* fromQVariant(const QVariant& var, int32_t& length, bool allocateMem)
     }
     case QVariant::Uuid: {
         QString str = var.toUuid().toString();
+        QByteArray array = str.toUtf8();
+        length = 1 + 4 + array.length();
+        char* ptr = alloc(length, allocateMem);
+        ptr[0] = URL;
+        *(int32_t*)(ptr+1) = array.size();
+        memcpy(ptr + 5, array.data(), array.size());
+        return ptr;
+    }
+    case QVariant::Font: {
+        QFont f = var.value<QFont>();
+        QString str = f.toString();
         QByteArray array = str.toUtf8();
         length = 1 + 4 + array.length();
         char* ptr = alloc(length, allocateMem);

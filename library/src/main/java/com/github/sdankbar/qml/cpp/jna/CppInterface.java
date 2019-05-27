@@ -113,6 +113,13 @@ public interface CppInterface extends Library {
 	void execQApplication();
 
 	/**
+	 * \return The value of QFront::toString() after returning QFont constructed
+	 * from the various parameters passed to this function.
+	 */
+	String getQFontToString(String family, int pointSize, int pixelSize, boolean bold, boolean italic, boolean overline,
+			boolean strikeout, boolean underline, int fontWeight);
+
+	/**
 	 * Invokes a callback on the Qt thread.
 	 *
 	 * @param callback The callback to call. Caller is responsible to ensuring the

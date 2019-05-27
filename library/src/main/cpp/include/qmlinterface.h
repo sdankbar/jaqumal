@@ -46,6 +46,9 @@ extern void invokeWithDelay(void c(), int32_t milliseconds);
 extern void cleanupMemory(void* ptr);
 
 extern void setSharedMemory(char* cppToJava, int32_t length);
+
+extern const char* getQFontToString(const char* family, int pointSize, int pixelSize, bool bold, bool italic, bool overline,
+            bool strikeout, bool underline, int fontWeight);
 }
 
 enum Type
@@ -66,7 +69,8 @@ enum Type
     LINE,
     RECTANGLE,
     COLOR,
-    IMAGE
+    IMAGE,
+    FONT
 };
 
 QVariant toQVariant(void* data, int32_t& size);

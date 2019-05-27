@@ -78,7 +78,6 @@
 				<activeByDefault>false</activeByDefault>
 				<os>
 					<family>Linux</family>
-					<arch>x64</arch>
 				</os>
 			</activation>
 			<build>

@@ -42,9 +42,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
+import com.google.common.base.Preconditions;
 
 /**
  * Corresponding Java class for QVariant on the C++ side. Used to pass data of
@@ -174,7 +173,13 @@ public class JVariant {
 		 * image height, width * height * 4 bytes containing uncompressed ARGB pixel
 		 * data.
 		 */
-		IMAGE
+		IMAGE,
+		/**
+		 * JFont
+		 *
+		 * UTF-8
+		 */
+		FONT
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(JVariant.class);
@@ -286,6 +291,12 @@ public class JVariant {
 			buffer.get(array);
 			final String s = new String(array, StandardCharsets.UTF_8);
 			return Optional.of(new JVariant(UUID.fromString(s)));
+		}
+		case FONT: {
+			final byte[] array = new byte[buffer.getInt()];
+			buffer.get(array);
+			final String s = new String(array, StandardCharsets.UTF_8);
+			return Optional.of(new JVariant(JFont.fromString(s)));
 		}
 		default:
 			return Optional.empty();
@@ -442,6 +453,16 @@ public class JVariant {
 	}
 
 	/**
+	 * Constructs a new JVariant from a JFont.
+	 *
+	 * @param v The variant's value.
+	 */
+	public JVariant(final JFont v) {
+		type = Type.FONT;
+		obj = Objects.requireNonNull(v, "v is null");
+	}
+
+	/**
 	 * Constructs a new JVariant from a Line2D.
 	 *
 	 * @param v The variant's value.
@@ -585,6 +606,15 @@ public class JVariant {
 	public float asFloat() {
 		Preconditions.checkArgument(type == Type.FLOAT, "Wrong type, type is {}", type);
 		return ((Float) obj).floatValue();
+	}
+
+	/**
+	 * @return The JVariant's value as a JFont.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not Font
+	 */
+	public JFont asFont() {
+		Preconditions.checkArgument(type == Type.FONT, "Wrong type, type is {}", type);
+		return (JFont) obj;
 	}
 
 	/**
@@ -927,6 +957,15 @@ public class JVariant {
 		}
 		case UUID: {
 			final UUID v = (UUID) obj;
+			final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
+			checkSize(reuse, 1 + 4 + utf8.length);
+			buffer.put((byte) type.ordinal());
+			buffer.putInt(utf8.length);
+			buffer.put(utf8);
+			break;
+		}
+		case FONT: {
+			final JFont v = (JFont) obj;
 			final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
 			checkSize(reuse, 1 + 4 + utf8.length);
 			buffer.put((byte) type.ordinal());
