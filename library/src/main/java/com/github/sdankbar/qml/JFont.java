@@ -146,7 +146,7 @@ public class JFont {
 	public static JFont fromString(final String str) {
 		Objects.requireNonNull(str, "str is null");
 
-		if (str.matches("\\w*,\\d+,\\d+,\\d+,\\d+,\\d+,\\d+,\\d+,\\d+,\\d+")) {
+		if (str.matches("\\w*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
 			return new JFont(str);
 		} else {
 			throw new IllegalArgumentException(str + " is not a valid font string");
@@ -157,6 +157,46 @@ public class JFont {
 
 	private JFont(final String toStr) {
 		fontToString = toStr;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final JFont other = (JFont) obj;
+		if (fontToString == null) {
+			if (other.fontToString != null) {
+				return false;
+			}
+		} else if (!fontToString.equals(other.fontToString)) {
+			return false;
+		}
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fontToString == null) ? 0 : fontToString.hashCode());
+		return result;
 	}
 
 	@Override

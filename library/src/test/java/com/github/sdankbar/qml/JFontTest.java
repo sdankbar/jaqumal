@@ -23,6 +23,7 @@
 package com.github.sdankbar.qml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
@@ -46,6 +47,17 @@ public class JFontTest {
 			final JFont f = JFont.builder().setFamily("Arial").setPointSize(20).setWeight(Weight.ExtraBold).build();
 			assertEquals("Arial,20,-1,5,81,0,0,0,0,0", f.toString());
 		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void fromStringFailure() {
+		JFont.fromString("Arial,20,-1,5,81,0,0,0,0,");
+	}
+
+	@Test
+	public void fromStringSuccess() {
+		assertNotNull(JFont.fromString("Arial,20,-1,5,81,0,0,0,0,0"));
+		assertNotNull(JFont.fromString(",20,-1,5,81,0,0,0,0,0"));
 	}
 
 }
