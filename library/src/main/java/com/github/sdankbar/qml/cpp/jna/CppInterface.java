@@ -117,7 +117,9 @@ public interface CppInterface extends Library {
 	 * from the various parameters passed to this function.
 	 */
 	String getQFontToString(String family, int pointSize, int pixelSize, boolean bold, boolean italic, boolean overline,
-			boolean strikeout, boolean underline, int fontWeight);
+			boolean strikeout, boolean underline, boolean fixedPitch, boolean kerning, int fontWeight,
+			double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
+			int hintingPreference, int stretch, int style, String styleName, int styleHint, int styleStrategy);
 
 	/**
 	 * Invokes a callback on the Qt thread.

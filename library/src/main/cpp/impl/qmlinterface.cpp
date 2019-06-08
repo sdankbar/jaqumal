@@ -154,7 +154,9 @@ void setSharedMemory(char* cppToJava, int32_t length)
 }
 
 const char* getQFontToString(const char* family, int pointSize, int pixelSize, bool bold, bool italic, bool overline,
-            bool strikeout, bool underline, int fontWeight)
+                             bool strikeout, bool underline, bool fixedPitch, bool kerning, int fontWeight,
+                             double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
+                             int hintingPreference, int stretch, int style, const char* styleName, int styleHint, int styleStrategy)
 {
     QFont f(family);
     if (pointSize > 0) {
@@ -164,11 +166,23 @@ const char* getQFontToString(const char* family, int pointSize, int pixelSize, b
     }
 
     f.setBold(bold);
+    f.setFixedPitch(fixedPitch);
     f.setItalic(italic);
+    f.setKerning(kerning);
     f.setOverline(overline);
     f.setStrikeOut(strikeout);
     f.setUnderline(underline);
     f.setWeight(fontWeight);
+
+    f.setWordSpacing(wordSpacing);
+    f.setLetterSpacing(static_cast<QFont::SpacingType>(letterSpacingType), letteringSpacing);
+
+    f.setCapitalization(static_cast<QFont::Capitalization>(capitalization));
+    f.setHintingPreference(static_cast<QFont::HintingPreference>(hintingPreference));
+    f.setStretch(stretch);
+    f.setStyle(static_cast<QFont::Style>(style));
+    f.setStyleName(QString(styleName));
+    f.setStyleHint(static_cast<QFont::StyleHint>(styleHint), static_cast<QFont::StyleStrategy>(styleStrategy));
 
     static std::string ret;
     ret = f.toString().toStdString();

@@ -48,7 +48,9 @@ extern void cleanupMemory(void* ptr);
 extern void setSharedMemory(char* cppToJava, int32_t length);
 
 extern const char* getQFontToString(const char* family, int pointSize, int pixelSize, bool bold, bool italic, bool overline,
-            bool strikeout, bool underline, int fontWeight);
+                                    bool strikeout, bool underline, bool fixedPitch, bool kerning, int fontWeight,
+                                    double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
+                                    int hintingPreference, int stretch, int style, const char* styleName, int styleHint, int styleStrategy);
 }
 
 enum Type

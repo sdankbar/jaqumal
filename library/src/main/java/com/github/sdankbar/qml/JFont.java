@@ -1,6 +1,8 @@
 package com.github.sdankbar.qml;
 
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.google.common.base.Preconditions;
@@ -17,16 +19,32 @@ public class JFont {
 		private boolean overline = false;
 		private boolean strikeout = false;
 		private boolean underline = false;
+		private boolean fixedPitch = false;
+		private boolean kerning = false;
 
+		private double wordSpacing = 0;
+
+		private double letterSpacing = 0;
+		private SpacingType letterSpacingType = SpacingType.AbsoluteSpacing;
+
+		private Capitalization capitalization = Capitalization.MixedCase;
+		private HintingPreference hintingPreference = HintingPreference.PreferNoHinting;
+		private Stretch stretch = Stretch.Unstretched;
+		private Style style = Style.StyleNormal;
+		private String styleName = "";
+		private StyleHint styleHint = StyleHint.AnyStyle;
+		private final EnumSet<StyleStrategy> styleStrategy = EnumSet.of(StyleStrategy.PreferDefault);
 		private Weight fontWeight = Weight.Normal;
 
 		private Builder() {
-
+			// Empty Implementation
 		}
 
 		public JFont build() {
 			return new JFont(ApiInstance.LIB_INSTANCE.getQFontToString(family, pointSize, pixelSize, bold, italic,
-					overline, strikeout, underline, fontWeight.getValue()));
+					overline, strikeout, underline, fixedPitch, kerning, fontWeight.getValue(), wordSpacing,
+					letterSpacing, letterSpacingType.value, capitalization.value, hintingPreference.value,
+					stretch.value, style.value, styleName, styleHint.value, styleStrategyMask()));
 		}
 
 		public Builder setBold(final boolean b) {
@@ -34,26 +52,39 @@ public class JFont {
 			return this;
 		}
 
-		// TODO add setCapitalization
-		// setFixedPitch
-		// set hinitingPreference
-		// setKerning
-		// setLeterSpacing
-		// setOverline
-		// setStretch
-		// setStyle
-		// setStyleHint
-		// setStyleName
-		// setStyleStrategy
-		// setWordSpacing
+		public Builder setCapitalization(final Capitalization c) {
+			capitalization = Objects.requireNonNull(c, "c is null");
+			return this;
+		}
 
 		public Builder setFamily(final String family) {
 			this.family = Objects.requireNonNull(family, "family is null");
 			return this;
 		}
 
+		public Builder setFixedPitch(final boolean fixedPitch) {
+			this.fixedPitch = fixedPitch;
+			return this;
+		}
+
+		public Builder setHintingPreference(final HintingPreference h) {
+			hintingPreference = Objects.requireNonNull(h, "h is null");
+			return this;
+		}
+
 		public Builder setItalic(final boolean b) {
 			italic = b;
+			return this;
+		}
+
+		public Builder setKerning(final boolean kerning) {
+			this.kerning = kerning;
+			return this;
+		}
+
+		public Builder setLetterSpacing(final SpacingType t, final double s) {
+			letterSpacingType = Objects.requireNonNull(t, "t is null");
+			letterSpacing = s;
 			return this;
 		}
 
@@ -76,8 +107,30 @@ public class JFont {
 			return this;
 		}
 
+		public Builder setStretch(final Stretch s) {
+			stretch = Objects.requireNonNull(s, "s is null");
+			return this;
+		}
+
 		public Builder setStrikeout(final boolean b) {
 			strikeout = b;
+			return this;
+		}
+
+		public Builder setStyle(final Style s) {
+			style = Objects.requireNonNull(s, "s is null");
+			return this;
+		}
+
+		public Builder setStyleHint(final StyleHint h, final Set<StyleStrategy> s) {
+			styleHint = Objects.requireNonNull(h, "h is null");
+			styleStrategy.clear();
+			styleStrategy.addAll(Objects.requireNonNull(s, "s is null"));
+			return this;
+		}
+
+		public Builder setStyleName(final String n) {
+			styleName = Objects.requireNonNull(n, "n is null");
 			return this;
 		}
 
@@ -91,38 +144,123 @@ public class JFont {
 			return this;
 		}
 
+		public Builder setWordSpacing(final double s) {
+			wordSpacing = s;
+			return this;
+		}
+
+		private int styleStrategyMask() {
+			int mask = 0;
+			for (final StyleStrategy s : styleStrategy) {
+				mask = mask | s.value;
+			}
+			return mask;
+		}
+
 	}
 
 	public static enum Capitalization {
-		MixedCase, AllUppercase, AllLowercase, SmallCaps, Capitalize
+		MixedCase(0), AllUppercase(1), AllLowercase(2), SmallCaps(3), Capitalize(4);
+
+		private int value;
+
+		private Capitalization(final int v) {
+			value = v;
+		}
+
+		public int getValue() {
+			return value;
+		}
 	}
 
 	public static enum HintingPreference {
-		PreferDefaultHinting, PreferNoHinting, PreferVerticalHinting, PreferFullHinting
+		PreferDefaultHinting(0), PreferNoHinting(1), PreferVerticalHinting(2), PreferFullHinting(3);
+
+		private int value;
+
+		private HintingPreference(final int v) {
+			value = v;
+		}
+
+		public int getValue() {
+			return value;
+		}
 	}
 
 	public static enum SpacingType {
-		PercentageSpacing, AbsoluteSpacing
+		PercentageSpacing(0), AbsoluteSpacing(1);
+
+		private int value;
+
+		private SpacingType(final int v) {
+			value = v;
+		}
+
+		public int getValue() {
+			return value;
+		}
 	}
 
 	public static enum Stretch {
-		AnyStretch, UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Unstretched, SemiExpanded, Expanded,
-		ExtraExpanded, UltraExpanded
+		AnyStretch(0), UltraCondensed(50), ExtraCondensed(62), Condensed(75), SemiCondensed(87), Unstretched(100),
+		SemiExpanded(112), Expanded(125), ExtraExpanded(150), UltraExpanded(200);
+
+		private int value;
+
+		private Stretch(final int v) {
+			value = v;
+		}
+
+		public int getValue() {
+			return value;
+		}
 	}
 
 	public static enum Style {
-		StyleNormal, StyleItalic, StyleOblique
+		StyleNormal(0), StyleItalic(1), StyleOblique(2);
+
+		private int value;
+
+		private Style(final int v) {
+			value = v;
+		}
+
+		public int getValue() {
+			return value;
+		}
 	}
 
 	public static enum StyleHint {
-		AnyStyle, SansSerif, Helvetica, Serif, Times, TypeWriter, Courier, OldEnglish, Decorative, Monospace, Fantasy,
-		Cursive, System
+		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(3),
+		Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
+
+		private int value;
+
+		private StyleHint(final int v) {
+			value = v;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
 	}
 
 	public static enum StyleStrategy {
-		PreferDefault, PreferBitmap, PreferDevice, PreferOutline, ForceOutline, NoAntialias, NoSubpixelAntialias,
-		PreferAntialias, OpenGLCompatible, NoFontMerging, PreferNoShaping, PreferMatch, PreferQuality,
-		ForceIntegerMetrics
+		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(0x0010),
+		NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), OpenGLCompatible(0x0200),
+		NoFontMerging(0x8000), PreferNoShaping(0x1000), PreferMatch(0x0020), PreferQuality(0x0040),
+		ForceIntegerMetrics(0x0400);
+
+		private int value;
+
+		private StyleStrategy(final int v) {
+			value = v;
+		}
+
+		public int getValue() {
+			return value;
+		}
 	}
 
 	public static enum Weight {

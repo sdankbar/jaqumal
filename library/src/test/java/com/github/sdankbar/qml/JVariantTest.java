@@ -200,26 +200,26 @@ public class JVariantTest {
 	 */
 	@Test
 	public void font() {
-		final UUID v = UUID.randomUUID();
+		final JFont v = JFont.builder().setFamily("Arial").setBold(true).setPixelSize(20).build();
 
 		final JVariant v1 = new JVariant(v);
-		assertEquals(v, v1.asUUID());
-		assertEquals(v, v1.asType(UUID.class).get());
-		assertEquals(v, v1.asType(UUID.class, UUID.randomUUID()));
+		assertEquals(v, v1.asFont());
+		assertEquals(v, v1.asType(JFont.class).get());
+		assertEquals(v, v1.asType(JFont.class, JFont.builder().build()));
 
 		final SharedJavaCppMemory memory = new SharedJavaCppMemory(256);
 		v1.serialize(memory);
 		final ByteBuffer b = memory.getBuffer(0);
-		assertEquals(Type.UUID.ordinal(), b.get());
-		assertEquals(36, b.getInt());
-		final byte[] dst = new byte[36];
+		assertEquals(Type.FONT.ordinal(), b.get());
+		assertEquals(26, b.getInt());
+		final byte[] dst = new byte[26];
 		b.get(dst);
-		assertEquals(v, UUID.fromString(new String(dst)));
+		assertEquals(v, JFont.fromString(new String(dst)));
 
 		b.position(0);
 		final Optional<JVariant> v2 = JVariant.deserialize(b);
 		assertTrue(v2.isPresent());
-		assertEquals(v, v2.get().asUUID());
+		assertEquals(v, v2.get().asFont());
 	}
 
 	/**
@@ -578,25 +578,25 @@ public class JVariantTest {
 	 */
 	@Test
 	public void uuid() {
-		final JFont v = JFont.builder().setFamily("Arial").setBold(true).setPixelSize(20).build();
+		final UUID v = UUID.randomUUID();
 
 		final JVariant v1 = new JVariant(v);
-		assertEquals(v, v1.asFont());
-		assertEquals(v, v1.asType(JFont.class).get());
-		assertEquals(v, v1.asType(JFont.class, JFont.builder().build()));
+		assertEquals(v, v1.asUUID());
+		assertEquals(v, v1.asType(UUID.class).get());
+		assertEquals(v, v1.asType(UUID.class, UUID.randomUUID()));
 
 		final SharedJavaCppMemory memory = new SharedJavaCppMemory(256);
 		v1.serialize(memory);
 		final ByteBuffer b = memory.getBuffer(0);
-		assertEquals(Type.FONT.ordinal(), b.get());
-		assertEquals(26, b.getInt());
-		final byte[] dst = new byte[26];
+		assertEquals(Type.UUID.ordinal(), b.get());
+		assertEquals(36, b.getInt());
+		final byte[] dst = new byte[36];
 		b.get(dst);
-		assertEquals(v, JFont.fromString(new String(dst)));
+		assertEquals(v, UUID.fromString(new String(dst)));
 
 		b.position(0);
 		final Optional<JVariant> v2 = JVariant.deserialize(b);
 		assertTrue(v2.isPresent());
-		assertEquals(v, v2.get().asFont());
+		assertEquals(v, v2.get().asUUID());
 	}
 }
