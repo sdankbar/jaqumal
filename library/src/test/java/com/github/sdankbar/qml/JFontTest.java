@@ -66,6 +66,7 @@ public class JFontTest {
 			assertEquals(f.getFamily(), "Arial");
 			assertEquals(f.getPointSize(), 20);
 			assertEquals(f.getPixelSize(), -1);
+			assertEquals(f.getJFontMetrics().getAverageCharWidth(), 17);
 		}
 		{
 			final JFont f = JFont.builder().setFamily("Arial").setPixelSize(19).setWeight(Weight.ExtraBold).build();

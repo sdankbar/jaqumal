@@ -29,6 +29,7 @@
 #include <QUuid>
 #include <QFont>
 #include <QFontInfo>
+#include <QFontMetrics>
 #include <iostream>
 #include <functional>
 
@@ -225,6 +226,110 @@ extern const char* getQFontInfo(const char* fontToString)
     else
     {
         return "";
+    }
+}
+
+const char* getQFontMetrics(const char* fontToString)
+{
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        static std::string ret;
+        QFont f;
+        f.fromString(QString(fontToString));
+        const QFontMetrics metrics(f);
+        //  0           1             2      3      4          5          6           7               8            9           10         11          12
+        // ascent,averageCharWidth,descent,height,leading,lineSpacing,maxWidth,minLeftBearing,minRightBearing,overLinePos,strikeOutPos,underlinePos,xheight
+
+        const QString temp("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13");
+        ret = temp.arg(metrics.ascent())
+                .arg(metrics.averageCharWidth())
+                .arg(metrics.descent())
+                .arg(metrics.height())
+                .arg(metrics.leading())
+                .arg(metrics.lineSpacing())
+                .arg(metrics.maxWidth())
+                .arg(metrics.minLeftBearing())
+                .arg(metrics.minRightBearing())
+                .arg(metrics.overlinePos())
+                .arg(metrics.strikeOutPos())
+                .arg(metrics.underlinePos())
+                .arg(metrics.xHeight())
+                .toStdString();
+        return ret.c_str();
+    }
+    else
+    {
+        return "";
+    }
+}
+void* getBoundingRect(const char* fontToString, const char* text)
+{
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(QString(fontToString));
+        const QFontMetrics metrics(f);
+        QRect rect = metrics.boundingRect(QString(text));
+
+        static int ret[4];
+        ret[0] = rect.x();
+        ret[1] = rect.y();
+        ret[2] = rect.width();
+        ret[3] = rect.height();
+        return ret;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+void* getTightBoundingRect(const char* fontToString, const char* text)
+{
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(QString(fontToString));
+        const QFontMetrics metrics(f);
+        QRect rect = metrics.tightBoundingRect(QString(text));
+
+        static int ret[4];
+        ret[0] = rect.x();
+        ret[1] = rect.y();
+        ret[2] = rect.width();
+        ret[3] = rect.height();
+        return ret;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+int getStringWidth(const char* fontToString, const char* text)
+{
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(QString(fontToString));
+        const QFontMetrics metrics(f);
+        return metrics.width(QString(text));
+    }
+    else
+    {
+        return -1;
+    }
+}
+bool inFont(const char* fontToString, const int character)
+{
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(QString(fontToString));
+        const QFontMetrics metrics(f);
+        return metrics.inFont(static_cast<QChar>(character));
+    }
+    else
+    {
+        return false;
     }
 }
 

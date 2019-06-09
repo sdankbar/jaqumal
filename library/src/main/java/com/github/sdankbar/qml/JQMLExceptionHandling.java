@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jna.CppInterface.ExceptionCallback;
 import com.github.sdankbar.qml.exceptions.QMLException;
@@ -42,7 +44,8 @@ public class JQMLExceptionHandling {
 
 	private static QMLException lastException = null;
 
-	private static Callback exceptionCallback = new Callback();
+	private static final AtomicBoolean isRegistered = new AtomicBoolean(false);
+	private static final Callback exceptionCallback = new Callback();
 
 	/**
 	 * Checks and throws any pending exceptions created by the C++ layer.
@@ -59,7 +62,9 @@ public class JQMLExceptionHandling {
 	 * Registers this class with the C++ layer so it can create exceptions.
 	 */
 	public static void register() {
-		ApiInstance.LIB_INSTANCE.setExceptionCallback(exceptionCallback);
+		if (isRegistered.getAndSet(true)) {
+			ApiInstance.LIB_INSTANCE.setExceptionCallback(exceptionCallback);
+		}
 	}
 
 	private JQMLExceptionHandling() {

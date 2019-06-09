@@ -112,7 +112,11 @@ public interface CppInterface extends Library {
 	 */
 	void execQApplication();
 
+	Pointer getBoundingRect(String fontToString, String text);
+
 	String getQFontInfo(String fontToString);
+
+	String getQFontMetrics(String fontToString);
 
 	/**
 	 * \return The value of QFront::toString() after returning QFont constructed
@@ -122,6 +126,12 @@ public interface CppInterface extends Library {
 			boolean strikeout, boolean underline, boolean fixedPitch, boolean kerning, int fontWeight,
 			double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
 			int hintingPreference, int stretch, int style, String styleName, int styleHint, int styleStrategy);
+
+	int getStringWidth(String fontToString, String text);
+
+	Pointer getTightBoundingRect(String fontToString, String text);
+
+	boolean inFont(String fontToString, int character);
 
 	/**
 	 * Invokes a callback on the Qt thread.

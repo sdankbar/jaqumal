@@ -73,6 +73,10 @@ public class JQMLApplication<EType> {
 
 	private static AtomicBoolean SINGLETON_EXISTS = new AtomicBoolean();
 
+	static {
+		JQMLExceptionHandling.register();// Do very early so that exception handling is immediately available.
+	}
+
 	/**
 	 * Creates a new JQMLApplication. Only 1 can exist at a time in an address
 	 * space. If an attempt is made to make another, an IllegalStateException it
@@ -119,7 +123,6 @@ public class JQMLApplication<EType> {
 	private JQMLApplication(final String[] argv, final EventFactory<EType> factory) {
 		this.factory = Objects.requireNonNull(factory, "factory is null");
 		Objects.requireNonNull(argv, "argv is null");
-		JQMLExceptionHandling.register();// Do very early so that exception handling is immediately available.
 
 		ApiInstance.LIB_INSTANCE.createQApplication(argv.length, argv);
 		JQMLExceptionHandling.checkExceptions();

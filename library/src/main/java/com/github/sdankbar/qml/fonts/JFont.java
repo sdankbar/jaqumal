@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.google.common.base.Preconditions;
 
@@ -286,6 +287,10 @@ public class JFont {
 		}
 	}
 
+	static {
+		JQMLExceptionHandling.register();// Do very early so that exception handling is immediately available.
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -306,6 +311,7 @@ public class JFont {
 	private final int pixelSize;
 
 	private JFontInfo cachedInfo = null;
+	private JFontMetrics cachedMetrics = null;
 
 	private JFont(final String toStr) {
 		fontToString = toStr;
@@ -352,6 +358,13 @@ public class JFont {
 			cachedInfo = JFontInfo.fromString(ApiInstance.LIB_INSTANCE.getQFontInfo(fontToString));
 		}
 		return cachedInfo;
+	}
+
+	public JFontMetrics getJFontMetrics() {
+		if (cachedMetrics == null) {
+			cachedMetrics = JFontMetrics.from(fontToString, ApiInstance.LIB_INSTANCE.getQFontMetrics(fontToString));
+		}
+		return cachedMetrics;
 	}
 
 	public int getPixelSize() {
