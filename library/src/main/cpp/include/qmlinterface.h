@@ -51,6 +51,7 @@ extern const char* getQFontToString(const char* family, int pointSize, int pixel
                                     bool strikeout, bool underline, bool fixedPitch, bool kerning, int fontWeight,
                                     double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
                                     int hintingPreference, int stretch, int style, const char* styleName, int styleHint, int styleStrategy);
+extern const char* getQFontInfo(const char* fontToString);
 }
 
 enum Type

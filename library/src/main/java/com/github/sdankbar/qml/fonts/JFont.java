@@ -1,4 +1,4 @@
-package com.github.sdankbar.qml;
+package com.github.sdankbar.qml.fonts;
 
 import java.util.EnumSet;
 import java.util.Objects;
@@ -42,9 +42,9 @@ public class JFont {
 
 		public JFont build() {
 			return new JFont(ApiInstance.LIB_INSTANCE.getQFontToString(family, pointSize, pixelSize, bold, italic,
-					overline, strikeout, underline, fixedPitch, kerning, fontWeight.getValue(), wordSpacing,
-					letterSpacing, letterSpacingType.value, capitalization.value, hintingPreference.value,
-					stretch.value, style.value, styleName, styleHint.value, styleStrategyMask()));
+					overline, strikeout, underline, fixedPitch, kerning, fontWeight.value, wordSpacing, letterSpacing,
+					letterSpacingType.value, capitalization.value, hintingPreference.value, stretch.value, style.value,
+					styleName, styleHint.value, styleStrategyMask()));
 		}
 
 		public Builder setBold(final boolean b) {
@@ -167,10 +167,6 @@ public class JFont {
 		private Capitalization(final int v) {
 			value = v;
 		}
-
-		public int getValue() {
-			return value;
-		}
 	}
 
 	public static enum HintingPreference {
@@ -182,9 +178,6 @@ public class JFont {
 			value = v;
 		}
 
-		public int getValue() {
-			return value;
-		}
 	}
 
 	public static enum SpacingType {
@@ -194,10 +187,6 @@ public class JFont {
 
 		private SpacingType(final int v) {
 			value = v;
-		}
-
-		public int getValue() {
-			return value;
 		}
 	}
 
@@ -211,13 +200,23 @@ public class JFont {
 			value = v;
 		}
 
-		public int getValue() {
-			return value;
-		}
 	}
 
 	public static enum Style {
 		StyleNormal(0), StyleItalic(1), StyleOblique(2);
+
+		static Style fromValue(final int v) {
+			switch (v) {
+			case 0:
+				return StyleNormal;
+			case 1:
+				return StyleItalic;
+			case 2:
+				return StyleOblique;
+			default:
+				throw new IllegalArgumentException();
+			}
+		}
 
 		private int value;
 
@@ -225,23 +224,41 @@ public class JFont {
 			value = v;
 		}
 
-		public int getValue() {
-			return value;
-		}
 	}
 
 	public static enum StyleHint {
 		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(3),
 		Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
 
+		static StyleHint fromValue(final int v) {
+			switch (v) {
+			case 0:
+				return SansSerif;
+			case 1:
+				return Serif;
+			case 2:
+				return Courier;
+			case 3:
+				return Decorative;
+			case 4:
+				return System;
+			case 5:
+				return AnyStyle;
+			case 6:
+				return Cursive;
+			case 7:
+				return Monospace;
+			case 8:
+				return Fantasy;
+			default:
+				throw new IllegalArgumentException();
+			}
+		}
+
 		private int value;
 
 		private StyleHint(final int v) {
 			value = v;
-		}
-
-		public int getValue() {
-			return value;
 		}
 
 	}
@@ -257,10 +274,6 @@ public class JFont {
 		private StyleStrategy(final int v) {
 			value = v;
 		}
-
-		public int getValue() {
-			return value;
-		}
 	}
 
 	public static enum Weight {
@@ -270,10 +283,6 @@ public class JFont {
 
 		private Weight(final int v) {
 			value = v;
-		}
-
-		public int getValue() {
-			return value;
 		}
 	}
 
@@ -292,9 +301,19 @@ public class JFont {
 	}
 
 	private final String fontToString;
+	private final String family;
+	private final int pointSize;
+	private final int pixelSize;
+
+	private JFontInfo cachedInfo = null;
 
 	private JFont(final String toStr) {
 		fontToString = toStr;
+		final String[] tokens = fontToString.split(",");
+		Preconditions.checkArgument(tokens.length == 10, "FontToString is not 10 comma separated values");
+		family = tokens[0];
+		pointSize = Integer.parseInt(tokens[1]);
+		pixelSize = Integer.parseInt(tokens[2]);
 	}
 
 	/*
@@ -322,6 +341,25 @@ public class JFont {
 			return false;
 		}
 		return true;
+	}
+
+	public String getFamily() {
+		return family;
+	}
+
+	public JFontInfo getJFontInfo() {
+		if (cachedInfo == null) {
+			cachedInfo = JFontInfo.fromString(ApiInstance.LIB_INSTANCE.getQFontInfo(fontToString));
+		}
+		return cachedInfo;
+	}
+
+	public int getPixelSize() {
+		return pixelSize;
+	}
+
+	public int getPointSize() {
+		return pointSize;
 	}
 
 	/*

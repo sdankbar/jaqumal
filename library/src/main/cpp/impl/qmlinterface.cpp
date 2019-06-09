@@ -28,6 +28,7 @@
 #include <QDateTime>
 #include <QUuid>
 #include <QFont>
+#include <QFontInfo>
 #include <iostream>
 #include <functional>
 
@@ -158,35 +159,73 @@ const char* getQFontToString(const char* family, int pointSize, int pixelSize, b
                              double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
                              int hintingPreference, int stretch, int style, const char* styleName, int styleHint, int styleStrategy)
 {
-    QFont f(family);
-    if (pointSize > 0) {
-        f.setPointSize(pointSize);
-    } else if (pixelSize > 0) {
-        f.setPixelSize(pixelSize);
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        QFont f(family);
+        if (pointSize > 0) {
+            f.setPointSize(pointSize);
+        } else if (pixelSize > 0) {
+            f.setPixelSize(pixelSize);
+        }
+
+        f.setBold(bold);
+        f.setFixedPitch(fixedPitch);
+        f.setItalic(italic);
+        f.setKerning(kerning);
+        f.setOverline(overline);
+        f.setStrikeOut(strikeout);
+        f.setUnderline(underline);
+        f.setWeight(fontWeight);
+
+        f.setWordSpacing(wordSpacing);
+        f.setLetterSpacing(static_cast<QFont::SpacingType>(letterSpacingType), letteringSpacing);
+
+        f.setCapitalization(static_cast<QFont::Capitalization>(capitalization));
+        f.setHintingPreference(static_cast<QFont::HintingPreference>(hintingPreference));
+        f.setStretch(stretch);
+        f.setStyle(static_cast<QFont::Style>(style));
+        f.setStyleName(QString(styleName));
+        f.setStyleHint(static_cast<QFont::StyleHint>(styleHint), static_cast<QFont::StyleStrategy>(styleStrategy));
+
+        static std::string ret;
+        ret = f.toString().toStdString();
+        return ret.c_str();
     }
+    else
+    {
+        return "";
+    }
+}
 
-    f.setBold(bold);
-    f.setFixedPitch(fixedPitch);
-    f.setItalic(italic);
-    f.setKerning(kerning);
-    f.setOverline(overline);
-    f.setStrikeOut(strikeout);
-    f.setUnderline(underline);
-    f.setWeight(fontWeight);
+extern const char* getQFontInfo(const char* fontToString)
+{
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        static std::string ret;
+        QFont f;
+        f.fromString(QString(fontToString));
+        const QFontInfo info(f);
+        //  0         1         2         3        4          5           6      7        8     9             10       11
+        // Family, pointSize, pixelSize, bold, exactMatch, fixedPitch, italic, rawMode, style, styleHint, styleName, weight
 
-    f.setWordSpacing(wordSpacing);
-    f.setLetterSpacing(static_cast<QFont::SpacingType>(letterSpacingType), letteringSpacing);
+        const QString temp("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12");
+        ret = temp.arg(info.family()).arg(info.pointSize()).arg(info.pixelSize())
+                .arg(info.bold())
+                .arg(info.exactMatch())
+                .arg(info.fixedPitch())
+                .arg(info.italic())
+                .arg(info.rawMode())
+                .arg(info.style())
+                .arg(info.styleHint())
+                .arg(info.styleName())
+                .arg(info.weight()).toStdString();
 
-    f.setCapitalization(static_cast<QFont::Capitalization>(capitalization));
-    f.setHintingPreference(static_cast<QFont::HintingPreference>(hintingPreference));
-    f.setStretch(stretch);
-    f.setStyle(static_cast<QFont::Style>(style));
-    f.setStyleName(QString(styleName));
-    f.setStyleHint(static_cast<QFont::StyleHint>(styleHint), static_cast<QFont::StyleStrategy>(styleStrategy));
-
-    static std::string ret;
-    ret = f.toString().toStdString();
-    return ret.c_str();
+        return ret.c_str();
+    }
+    else
+    {
+        return "";
+    }
 }
 
 std::vector<QVariant> toQVariantList(void* data, uint32_t count)
@@ -319,12 +358,19 @@ QVariant toQVariant(void* data, int32_t& size)
         return QVariant(QUuid(str));
     }
     case FONT: {
-        int32_t length = *((int32_t*)(buffer + 1));
-        QString str = QString::fromUtf8(buffer + 5, length);
-        size = 1 + 4 + length;
-        QFont f;
-        f.fromString(str);
-        return QVariant(f);
+        if (checkQMLLibrary()) // QTBUG-27024
+        {
+            int32_t length = *((int32_t*)(buffer + 1));
+            QString str = QString::fromUtf8(buffer + 5, length);
+            size = 1 + 4 + length;
+            QFont f;
+            f.fromString(str);
+            return QVariant(f);
+        }
+        else
+        {
+            return QVariant();
+        }
     }
     default:
         size = 0;

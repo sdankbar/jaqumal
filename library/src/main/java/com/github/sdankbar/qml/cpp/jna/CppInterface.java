@@ -112,6 +112,8 @@ public interface CppInterface extends Library {
 	 */
 	void execQApplication();
 
+	String getQFontInfo(String fontToString);
+
 	/**
 	 * \return The value of QFront::toString() after returning QFont constructed
 	 * from the various parameters passed to this function.

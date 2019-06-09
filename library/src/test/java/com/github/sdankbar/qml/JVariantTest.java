@@ -42,10 +42,14 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.junit.After;
 import org.junit.Test;
 
+import com.github.sdankbar.qml.JFontTest.EventProcessor;
 import com.github.sdankbar.qml.JVariant.Type;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
+import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.fonts.JFont;
 
 /**
  * Tests the JVariant class.
@@ -117,6 +121,11 @@ public class JVariantTest {
 		final Optional<JVariant> v2 = JVariant.deserialize(b);
 		assertTrue(v2.isPresent());
 		assertArrayEquals(array, v2.get().asByteArray());
+	}
+
+	@After
+	public void cleanup() {
+		JQMLApplication.delete();
 	}
 
 	/**
@@ -200,6 +209,9 @@ public class JVariantTest {
 	 */
 	@Test
 	public void font() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+
 		final JFont v = JFont.builder().setFamily("Arial").setBold(true).setPixelSize(20).build();
 
 		final JVariant v1 = new JVariant(v);
