@@ -77,9 +77,9 @@ void setGenericObjectModelDataMulti(void* tempPointer, void* data, int32_t* role
     if (checkQMLLibrary())
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
-        std::vector<QVariant> variants = toQVariantList(data, valueCount);
+        std::vector<QVariant> variants = toQVariantList(data, static_cast<uint32_t>(valueCount));
         std::vector<int32_t> roleIndicies;
-        roleIndicies.reserve(valueCount);
+        roleIndicies.reserve(static_cast<uint32_t>(valueCount));
         for (int32_t i = 0; i < valueCount; ++i)
         {
             roleIndicies.push_back(roleIndex[i]);
@@ -144,7 +144,8 @@ GenericObjectModel::GenericObjectModel(const std::vector<QString>& roles)
     : QQmlPropertyMap(this, nullptr),
       m_roleMap(roles)
 {
-    for (uint32_t i = 0; i < roles.size(); ++i)
+    const int32_t size = static_cast<int32_t>(roles.size());
+    for (int32_t i = 0; i < size; ++i)
     {
         setData(QVariant(), i);
     }
@@ -155,7 +156,7 @@ QVariant GenericObjectModel::getData(int32_t roleIndex) const
 {
     if (0 <= roleIndex && static_cast<uint32_t>(roleIndex) < m_roleMap.size())
     {
-        return value(m_roleMap[roleIndex]);
+        return value(m_roleMap[static_cast<uint32_t>(roleIndex)]);
     }
     else
     {
@@ -173,7 +174,7 @@ void GenericObjectModel::setData(const QVariant& data, int32_t roleIndex)
 {
     if (0 <= roleIndex && static_cast<uint32_t>(roleIndex) < m_roleMap.size())
     {
-        const QString& role = m_roleMap[roleIndex];
+        const QString& role = m_roleMap[static_cast<uint32_t>(roleIndex)];
         if (value(role) != data)
         {
             insert(role, data);
@@ -207,6 +208,11 @@ void GenericObjectModel::setData(const std::vector<QVariant>& data, const std::v
     }
 }
 
+QVariant GenericObjectModel::getData(const QString& propertyName) const
+{
+    return value(propertyName);
+}
+
 void GenericObjectModel::clear(int32_t roleIndex)
 {
     setData(QVariant(), roleIndex);
@@ -216,7 +222,7 @@ void GenericObjectModel::clear()
 {
     for (uint32_t i = 0; i < m_roleMap.size(); ++i)
     {
-        clear(i);
+        clear(static_cast<int32_t>(i));
     }
 }
 

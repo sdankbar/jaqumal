@@ -51,6 +51,7 @@ public:
     void setData(const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
     Q_INVOKABLE void setData(const QVariant& data, const QString& propertyName);
 
+    Q_INVOKABLE QVariant getData(const QString& propertyName) const;
     QVariant getData(int32_t roleIndex) const;
     char* getDataSerialized(int32_t roleIndex, int32_t& length) const;
 
