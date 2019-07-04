@@ -53,7 +53,7 @@ public class SharedJavaCppMemory {
 	 * @return A ByteBuffer view of this SharedJavaCppMemory object's memory.
 	 */
 	public ByteBuffer getBuffer(final int position) {
-		return buffer.position(position);
+		return (ByteBuffer) buffer.position(position);
 	}
 
 	/**

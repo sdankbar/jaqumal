@@ -12,7 +12,7 @@ It does this by providing generic model types that are then available to QML scr
 
 ##### Java Dependencies
 
-Java 9 or newer and uses Maven to build
+Java 8 or newer and uses Maven to build
 
 See pom.xml for details of the Java libraries used
 
@@ -33,12 +33,12 @@ MIT
 Jaqumal contains a C++ library so must it be built before it can be used.  Assuming a clean Cent OS 7 install, the
 following must be installed/configured before building.
 
-* sudo yum install java-11-openjdk-devel (Java 9 or 10 can be installed instead)
+* sudo yum install java-11-openjdk-devel (Java 8, 9, or 10 can be installed instead)
 * sudo yum install maven
 * sudo alternatives --config java
-     * Select java 9 or newer
+     * Select java 8 or newer
 * sudo alternatives --config javac
-     * Select java 9 or newer
+     * Select java 8 or newer
 * sudo yum install gcc-c++
 * sudo yum install mesa-libGL-devel
 * Download Qt 5.11 or newer from https://www.qt.io/download and install it
@@ -68,7 +68,7 @@ Then add the following to the pom.xml to be able to use Jaqumal.
 Jaqumal contains a C++ library so must it be built before it can be used.  The
 following must be installed/configured before building.
 
-* Install JDK 9 or newer
+* Install JDK 8 or newer
 * Install maven
 * Download Qt 5.11 or newer from https://www.qt.io/download and install the MinGW 64 bit version.  Also install MinGW 64 compiler as well.
 * Add the path to the Qt binaries and libaries, such as qmake and Qt's dlls, to the Path variable

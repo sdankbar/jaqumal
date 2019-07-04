@@ -24,6 +24,7 @@ package com.github.sdankbar.qml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Test;
@@ -50,6 +51,7 @@ public class JFontTest {
 	@Test
 	public void builder() {
 		final String[] args = new String[0];
+		@SuppressWarnings("unused")
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		{
 			final JFont f = JFont.builder().build();
@@ -66,7 +68,7 @@ public class JFontTest {
 			assertEquals(f.getFamily(), "Arial");
 			assertEquals(f.getPointSize(), 20);
 			assertEquals(f.getPixelSize(), -1);
-			assertEquals(f.getJFontMetrics().getAverageCharWidth(), 17);
+			assertTrue(f.getJFontMetrics().getAverageCharWidth() > 10);
 		}
 		{
 			final JFont f = JFont.builder().setFamily("Arial").setPixelSize(19).setWeight(Weight.ExtraBold).build();
@@ -85,16 +87,24 @@ public class JFontTest {
 		JQMLApplication.delete();
 	}
 
+	/**
+	 *
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void fromStringFailure() {
 		final String[] args = new String[0];
+		@SuppressWarnings("unused")
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		JFont.fromString("Arial,20,-1,5,81,0,0,0,0,");
 	}
 
+	/**
+	 *
+	 */
 	@Test
 	public void fromStringSuccess() {
 		final String[] args = new String[0];
+		@SuppressWarnings("unused")
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		assertNotNull(JFont.fromString("Arial,20,-1,5,81,0,0,0,0,0"));
 		assertNotNull(JFont.fromString(",20,-1,5,81,0,0,0,0,0"));

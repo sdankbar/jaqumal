@@ -28,21 +28,11 @@ import static org.junit.Assert.assertNotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.Test;
 
-import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
-import com.github.sdankbar.qml.eventing.builtin.ButtonActivateEvent;
-import com.github.sdankbar.qml.eventing.builtin.ButtonClickEvent;
-import com.github.sdankbar.qml.eventing.builtin.KeyModifier;
-import com.github.sdankbar.qml.eventing.builtin.MouseButton;
-import com.github.sdankbar.qml.eventing.builtin.MouseClickEvent;
-import com.github.sdankbar.qml.eventing.builtin.MouseWheelEvent;
-import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
-import com.github.sdankbar.qml.eventing.builtin.TextInputAcceptedEvent;
-import com.github.sdankbar.qml.eventing.builtin.TextInputEditingFinishedEvent;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent.EventType;
+import com.google.common.collect.ImmutableSet;
 
 /**
  *
@@ -132,9 +122,9 @@ public class BuiltinEventTest {
 	 */
 	@Test
 	public void testKeyModifier() {
-		assertEquals(Set.of(), KeyModifier.fromMask(0));
+		assertEquals(ImmutableSet.of(), KeyModifier.fromMask(0));
 
-		assertEquals(Set.of(KeyModifier.SHIFT, KeyModifier.CONTROL), KeyModifier.fromMask(0x06000000));
+		assertEquals(ImmutableSet.of(KeyModifier.SHIFT, KeyModifier.CONTROL), KeyModifier.fromMask(0x06000000));
 	}
 
 	/**
@@ -142,8 +132,8 @@ public class BuiltinEventTest {
 	 */
 	@Test
 	public void testMouseButton() {
-		assertEquals(Set.of(), MouseButton.fromMask(0));
-		assertEquals(Set.of(MouseButton.LEFT, MouseButton.RIGHT), MouseButton.fromMask(3));
+		assertEquals(ImmutableSet.of(), MouseButton.fromMask(0));
+		assertEquals(ImmutableSet.of(MouseButton.LEFT, MouseButton.RIGHT), MouseButton.fromMask(3));
 
 		assertEquals(Optional.empty(), MouseButton.fromFlag(0));
 		assertEquals(Optional.of(MouseButton.MIDDLE), MouseButton.fromFlag(4));
@@ -159,8 +149,8 @@ public class BuiltinEventTest {
 		assertEquals(1, e.getX());
 		assertEquals(2, e.getY());
 		assertEquals(MouseButton.LEFT, e.getButton());
-		assertEquals(Set.of(MouseButton.LEFT), e.getButtons());
-		assertEquals(Set.of(), e.getModifiers());
+		assertEquals(ImmutableSet.of(MouseButton.LEFT), e.getButtons());
+		assertEquals(ImmutableSet.of(), e.getModifiers());
 
 		final Processor p = new Processor();
 		e.handle(p);
@@ -176,8 +166,8 @@ public class BuiltinEventTest {
 		assertEquals("A", e.getObjectName());
 		assertEquals(2, e.getX());
 		assertEquals(3, e.getY());
-		assertEquals(Set.of(MouseButton.LEFT), e.getButtons());
-		assertEquals(Set.of(), e.getModifiers());
+		assertEquals(ImmutableSet.of(MouseButton.LEFT), e.getButtons());
+		assertEquals(ImmutableSet.of(), e.getModifiers());
 		assertEquals(70, e.getAngleDeltaX());
 		assertEquals(71, e.getAngleDeltaY());
 

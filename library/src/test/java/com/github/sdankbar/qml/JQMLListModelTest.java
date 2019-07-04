@@ -38,12 +38,9 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
-
-import com.github.sdankbar.qml.JQMLApplication;
-import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Tests JQMLListModel.
@@ -264,8 +261,8 @@ public class JQMLListModelTest {
 		model.add(new JVariant(3), Roles.R3);
 
 		assertFalse(model.contains(null));
-		assertTrue(model.contains(Map.of(Roles.R1, new JVariant(1))));
-		assertFalse(model.contains(Map.of(Roles.R5, new JVariant(5))));
+		assertTrue(model.contains(ImmutableMap.of(Roles.R1, new JVariant(1))));
+		assertFalse(model.contains(ImmutableMap.of(Roles.R5, new JVariant(5))));
 	}
 
 	/**
@@ -281,10 +278,10 @@ public class JQMLListModelTest {
 		model.add(new JVariant(3), Roles.R3);
 
 		assertFalse(model.contains(null));
-		assertTrue(
-				model.containsAll(Arrays.asList(Map.of(Roles.R1, new JVariant(1)), Map.of(Roles.R3, new JVariant(3)))));
-		assertFalse(model.containsAll(Arrays.asList(Map.of(Roles.R1, new JVariant(1)),
-				Map.of(Roles.R5, new JVariant(5)), Map.of(Roles.R3, new JVariant(3)))));
+		assertTrue(model.containsAll(
+				Arrays.asList(ImmutableMap.of(Roles.R1, new JVariant(1)), ImmutableMap.of(Roles.R3, new JVariant(3)))));
+		assertFalse(model.containsAll(Arrays.asList(ImmutableMap.of(Roles.R1, new JVariant(1)),
+				ImmutableMap.of(Roles.R5, new JVariant(5)), ImmutableMap.of(Roles.R3, new JVariant(3)))));
 	}
 
 	/**
@@ -381,8 +378,8 @@ public class JQMLListModelTest {
 		model.add(new JVariant(3), Roles.R3);
 
 		assertEquals(-1, model.indexOf(null));
-		assertEquals(0, model.indexOf(Map.of(Roles.R1, new JVariant(1))));
-		assertEquals(1, model.indexOf(Map.of(Roles.R3, new JVariant(3))));
+		assertEquals(0, model.indexOf(ImmutableMap.of(Roles.R1, new JVariant(1))));
+		assertEquals(1, model.indexOf(ImmutableMap.of(Roles.R3, new JVariant(3))));
 	}
 
 	/**
@@ -519,9 +516,9 @@ public class JQMLListModelTest {
 
 		int count = 0;
 		for (final Map<Roles, JVariant> m : model) {
-			if (m.equals(Map.of(Roles.R1, new JVariant(1)))) {
+			if (m.equals(ImmutableMap.of(Roles.R1, new JVariant(1)))) {
 				// Empty Implementation
-			} else if (m.equals(Map.of(Roles.R2, new JVariant(2)))) {
+			} else if (m.equals(ImmutableMap.of(Roles.R2, new JVariant(2)))) {
 				// Empty Implementation
 			} else {
 				assertTrue(false);
@@ -545,8 +542,8 @@ public class JQMLListModelTest {
 		model.add(new JVariant(1), Roles.R1);
 
 		assertEquals(-1, model.lastIndexOf(null));
-		assertEquals(1, model.lastIndexOf(Map.of(Roles.R1, new JVariant(1))));
-		assertEquals(-1, model.lastIndexOf(Map.of(Roles.R1, new JVariant(2))));
+		assertEquals(1, model.lastIndexOf(ImmutableMap.of(Roles.R1, new JVariant(1))));
+		assertEquals(-1, model.lastIndexOf(ImmutableMap.of(Roles.R1, new JVariant(2))));
 	}
 
 	/**
@@ -565,9 +562,9 @@ public class JQMLListModelTest {
 		final ListIterator<Map<Roles, JVariant>> iter = model.listIterator();
 		while (iter.hasNext()) {
 			final Map<Roles, JVariant> m = iter.next();
-			if (m.equals(Map.of(Roles.R1, new JVariant(1)))) {
+			if (m.equals(ImmutableMap.of(Roles.R1, new JVariant(1)))) {
 				// Empty Implementation
-			} else if (m.equals(Map.of(Roles.R2, new JVariant(2)))) {
+			} else if (m.equals(ImmutableMap.of(Roles.R2, new JVariant(2)))) {
 				// Empty Implementation
 			} else {
 				assertTrue(false);
@@ -588,7 +585,7 @@ public class JQMLListModelTest {
 		final ListIterator<Map<Roles, JVariant>> iter2 = model.listIterator(1);
 		while (iter2.hasNext()) {
 			final Map<Roles, JVariant> m = iter2.next();
-			if (m.equals(Map.of(Roles.R2, new JVariant(2)))) {
+			if (m.equals(ImmutableMap.of(Roles.R2, new JVariant(2)))) {
 				// Empty Implementation
 			} else {
 				assertTrue(false);
@@ -613,8 +610,8 @@ public class JQMLListModelTest {
 
 		assertEquals(2, model.size());
 
-		assertTrue(model.removeAll(Arrays.asList(Map.of(Roles.R1, new JVariant(1)), Map.of(Roles.R3, new JVariant(3)),
-				Map.of(Roles.R5, new JVariant(5)))));
+		assertTrue(model.removeAll(Arrays.asList(ImmutableMap.of(Roles.R1, new JVariant(1)),
+				ImmutableMap.of(Roles.R3, new JVariant(3)), ImmutableMap.of(Roles.R5, new JVariant(5)))));
 
 		assertEquals(0, model.size());
 	}
@@ -662,11 +659,11 @@ public class JQMLListModelTest {
 
 		assertEquals(2, model.size());
 
-		assertTrue(model.remove(Map.of(Roles.R1, new JVariant(1))));
+		assertTrue(model.remove(ImmutableMap.of(Roles.R1, new JVariant(1))));
 
 		assertEquals(1, model.size());
 
-		assertFalse(model.remove(Map.of(Roles.R3, new JVariant(4))));
+		assertFalse(model.remove(ImmutableMap.of(Roles.R3, new JVariant(4))));
 
 		assertEquals(1, model.size());
 
@@ -692,8 +689,8 @@ public class JQMLListModelTest {
 
 		assertEquals(2, model.size());
 
-		assertTrue(
-				model.retainAll(Arrays.asList(Map.of(Roles.R1, new JVariant(1)), Map.of(Roles.R5, new JVariant(5)))));
+		assertTrue(model.retainAll(
+				Arrays.asList(ImmutableMap.of(Roles.R1, new JVariant(1)), ImmutableMap.of(Roles.R5, new JVariant(5)))));
 
 		assertEquals(1, model.size());
 	}
@@ -709,8 +706,8 @@ public class JQMLListModelTest {
 
 		assertEquals(0, model.size());
 
-		model.setData(0, Map.of(Roles.R1, new JVariant(1)));
-		model.get(0).putAll(Map.of(Roles.R3, new JVariant(3)));
+		model.setData(0, ImmutableMap.of(Roles.R1, new JVariant(1)));
+		model.get(0).putAll(ImmutableMap.of(Roles.R3, new JVariant(3)));
 
 		assertEquals(1, model.size());
 
@@ -729,8 +726,8 @@ public class JQMLListModelTest {
 
 		assertEquals(0, model.size());
 
-		model.setData(0, Map.of(Roles.R1, new JVariant(1)));
-		model.setData(0, Map.of(Roles.R3, new JVariant(3)));
+		model.setData(0, ImmutableMap.of(Roles.R1, new JVariant(1)));
+		model.setData(0, ImmutableMap.of(Roles.R3, new JVariant(3)));
 
 		assertEquals(1, model.size());
 
@@ -746,8 +743,8 @@ public class JQMLListModelTest {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
 
-		model.setData(0, Map.of(Roles.R1, new JVariant(1)));
-		model.setData(1, Map.of(Roles.R3, new JVariant(3)));
+		model.setData(0, ImmutableMap.of(Roles.R1, new JVariant(1)));
+		model.setData(1, ImmutableMap.of(Roles.R3, new JVariant(3)));
 
 		assertEquals(2, model.size());
 
@@ -814,9 +811,9 @@ public class JQMLListModelTest {
 		int count = 0;
 		for (final Object o : model.toArray()) {
 			final Map<Roles, JVariant> m = (Map<Roles, JVariant>) o;
-			if (m.equals(Map.of(Roles.R1, new JVariant(1)))) {
+			if (m.equals(ImmutableMap.of(Roles.R1, new JVariant(1)))) {
 				// Empty Implementation
-			} else if (m.equals(Map.of(Roles.R2, new JVariant(2)))) {
+			} else if (m.equals(ImmutableMap.of(Roles.R2, new JVariant(2)))) {
 				// Empty Implementation
 			} else {
 				assertTrue(false);
@@ -841,9 +838,9 @@ public class JQMLListModelTest {
 
 		int count = 0;
 		for (final Map<Roles, JVariant> m : model.toArray(new Map[2])) {
-			if (m.equals(Map.of(Roles.R1, new JVariant(1)))) {
+			if (m.equals(ImmutableMap.of(Roles.R1, new JVariant(1)))) {
 				// Empty Implementation
-			} else if (m.equals(Map.of(Roles.R2, new JVariant(2)))) {
+			} else if (m.equals(ImmutableMap.of(Roles.R2, new JVariant(2)))) {
 				// Empty Implementation
 			} else {
 				assertTrue(false);

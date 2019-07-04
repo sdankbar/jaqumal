@@ -123,6 +123,9 @@ public class JVariantTest {
 		assertArrayEquals(array, v2.get().asByteArray());
 	}
 
+	/**
+	 *
+	 */
 	@After
 	public void cleanup() {
 		JQMLApplication.delete();
@@ -210,6 +213,7 @@ public class JVariantTest {
 	@Test
 	public void font() {
 		final String[] args = new String[0];
+		@SuppressWarnings("unused")
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 
 		final JFont v = JFont.builder().setFamily("Arial").setBold(true).setPixelSize(20).build();
