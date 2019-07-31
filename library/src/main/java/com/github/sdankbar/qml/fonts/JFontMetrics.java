@@ -100,7 +100,7 @@ public class JFontMetrics {
 		if (p.equals(Pointer.NULL)) {
 			throw new IllegalStateException();
 		}
-		return new Rectangle2D.Double(p.getInt(0), p.getInt(1), p.getInt(2), p.getInt(3));
+		return new Rectangle2D.Double(p.getInt(0), p.getInt(4), p.getInt(8), p.getInt(12));
 	}
 
 	public int getDescent() {
@@ -145,7 +145,7 @@ public class JFontMetrics {
 		if (p.equals(Pointer.NULL)) {
 			throw new IllegalStateException();
 		}
-		return new Rectangle2D.Double(p.getInt(0), p.getInt(1), p.getInt(2), p.getInt(3));
+		return new Rectangle2D.Double(p.getInt(0), p.getInt(4), p.getInt(8), p.getInt(12));
 	}
 
 	public int getUnderlinePos() {
