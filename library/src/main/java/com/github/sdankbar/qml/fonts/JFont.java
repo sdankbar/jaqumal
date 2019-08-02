@@ -24,11 +24,13 @@ package com.github.sdankbar.qml.fonts;
 
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 
 public class JFont {
 
@@ -57,7 +59,7 @@ public class JFont {
 		private String styleName = "";
 		private StyleHint styleHint = StyleHint.AnyStyle;
 		private final EnumSet<StyleStrategy> styleStrategy = EnumSet.of(StyleStrategy.PreferDefault);
-		private Weight fontWeight = Weight.Normal;
+		private int fontWeight;
 
 		private Builder() {
 			// Empty Implementation
@@ -65,7 +67,7 @@ public class JFont {
 
 		public JFont build() {
 			return new JFont(ApiInstance.LIB_INSTANCE.getQFontToString(family, pointSize, pixelSize, bold, italic,
-					overline, strikeout, underline, fixedPitch, kerning, fontWeight.value, wordSpacing, letterSpacing,
+					overline, strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
 					letterSpacingType.value, capitalization.value, hintingPreference.value, stretch.value, style.value,
 					styleName, styleHint.value, styleStrategyMask()));
 		}
@@ -162,8 +164,14 @@ public class JFont {
 			return this;
 		}
 
+		public Builder setWeight(final int w) {
+			Preconditions.checkArgument(w >= 0, "Weight must be > 0");
+			fontWeight = w;
+			return this;
+		}
+
 		public Builder setWeight(final Weight w) {
-			fontWeight = Objects.requireNonNull(w, "w is null");
+			fontWeight = Objects.requireNonNull(w, "w is null").value;
 			return this;
 		}
 
@@ -328,9 +336,17 @@ public class JFont {
 	}
 
 	private final String fontToString;
-	private final String family;
-	private final int pointSize;
-	private final int pixelSize;
+
+	private final String family;// 0
+	private final int pointSize;// 1
+	private final int pixelSize;// 2
+	private final StyleHint styleHint;// 3
+	private final int weight;// 4
+	private final Style style;// 5
+	private final boolean underline;// 6
+	private final boolean strikeOut;// 7
+	private final boolean fixedPitch;// 8
+	private final Optional<String> styleName;
 
 	private JFontInfo cachedInfo = null;
 	private JFontMetrics cachedMetrics = null;
@@ -338,10 +354,23 @@ public class JFont {
 	private JFont(final String toStr) {
 		fontToString = toStr;
 		final String[] tokens = fontToString.split(",");
-		Preconditions.checkArgument(tokens.length == 10, "FontToString is not 10 comma separated values");
+		Preconditions.checkArgument(tokens.length == 10 || tokens.length == 11,
+				"FontToString is not 10 or 11 comma separated values");
 		family = tokens[0];
 		pointSize = Integer.parseInt(tokens[1]);
 		pixelSize = Integer.parseInt(tokens[2]);
+		styleHint = StyleHint.fromValue(Integer.parseInt(tokens[3]));
+		weight = Integer.parseInt(tokens[4]);
+		style = Style.fromValue(Integer.parseInt(tokens[5]));
+		underline = tokens[6].equals("1");
+		strikeOut = tokens[7].equals("1");
+		fixedPitch = tokens[8].equals("1");
+		// token[9] always false
+		if (tokens.length == 11) {
+			styleName = Optional.of(tokens[10]);
+		} else {
+			styleName = Optional.empty();
+		}
 	}
 
 	/*
@@ -408,6 +437,26 @@ public class JFont {
 		int result = 1;
 		result = prime * result + ((fontToString == null) ? 0 : fontToString.hashCode());
 		return result;
+	}
+
+	public Builder toBuilder() {
+		final Builder b = new Builder();
+		b.setFamily(family);// 0
+		if (pointSize > 0) {
+			b.setPointSize(pointSize); // 1
+		} else {
+			b.setPixelSize(pixelSize); // 2
+		}
+		b.setStyleHint(styleHint, ImmutableSet.of()); // 3
+		b.setWeight(weight); // 4
+		b.setStyle(style);// 5
+		b.setUnderline(underline);// 6
+		b.setStrikeout(strikeOut);// 7
+		b.setFixedPitch(fixedPitch);// 8
+		if (styleName.isPresent()) {
+			b.setStyleName(styleName.get());// 10
+		}
+		return b;
 	}
 
 	@Override

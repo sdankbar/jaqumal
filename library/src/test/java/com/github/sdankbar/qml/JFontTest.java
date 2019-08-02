@@ -27,6 +27,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -50,9 +51,6 @@ public class JFontTest {
 	 */
 	@Test
 	public void builder() {
-		final String[] args = new String[0];
-		@SuppressWarnings("unused")
-		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		{
 			final JFont f = JFont.builder().build();
 			assertEquals(",12,-1,5,50,0,0,0,0,0", f.toString());
@@ -92,9 +90,6 @@ public class JFontTest {
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void fromStringFailure() {
-		final String[] args = new String[0];
-		@SuppressWarnings("unused")
-		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		JFont.fromString("Arial,20,-1,5,81,0,0,0,0,");
 	}
 
@@ -103,11 +98,25 @@ public class JFontTest {
 	 */
 	@Test
 	public void fromStringSuccess() {
-		final String[] args = new String[0];
-		@SuppressWarnings("unused")
-		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		assertNotNull(JFont.fromString("Arial,20,-1,5,81,0,0,0,0,0"));
 		assertNotNull(JFont.fromString(",20,-1,5,81,0,0,0,0,0"));
+	}
+
+	/**
+	 *
+	 */
+	@Before
+	public void setup() {
+		JQMLApplication.create(new String[0], new NullEventFactory<>());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void test_toBuilder() {
+		final JFont f = JFont.builder().setFamily("Arial").setPointSize(20).setWeight(Weight.ExtraBold).build();
+		assertEquals(f.toString(), f.toBuilder().build().toString());
 	}
 
 }
