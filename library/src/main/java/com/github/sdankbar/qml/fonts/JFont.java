@@ -439,6 +439,10 @@ public class JFont {
 		return result;
 	}
 
+	public boolean isMonospacedFont() {
+		return getJFontMetrics().isMonospacedFont();
+	}
+
 	public Builder toBuilder() {
 		final Builder b = new Builder();
 		b.setFamily(family);// 0

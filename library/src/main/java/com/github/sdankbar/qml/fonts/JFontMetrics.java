@@ -65,6 +65,7 @@ public class JFontMetrics {
 	private final int strikeOutPos;
 	private final int underlinePos;
 	private final int xHeight;
+	private final boolean isMonospaced;
 
 	private JFontMetrics(final String fontToString, final int ascent, final int averageCharWidth, final int descent,
 			final int height, final int leading, final int lineSpacing, final int maxWidth, final int minLeftBearing,
@@ -84,6 +85,7 @@ public class JFontMetrics {
 		this.strikeOutPos = strikeOutPos;
 		this.underlinePos = underlinePos;
 		this.xHeight = xHeight;
+		isMonospaced = (averageCharWidth == maxWidth);
 	}
 
 	public int getAscent() {
@@ -163,5 +165,9 @@ public class JFontMetrics {
 
 	public boolean inFont(final char c) {
 		return ApiInstance.LIB_INSTANCE.inFont(fontToString, c);
+	}
+
+	public boolean isMonospacedFont() {
+		return isMonospaced;
 	}
 }
