@@ -283,6 +283,29 @@ void* getBoundingRect(const char* fontToString, const char* text)
         return nullptr;
     }
 }
+void* getBoundingRect2(const char* fontToString, int x, int y, int w, int h, int alignFlags, int textFlags,
+            const char* text)
+{
+    if (checkQMLLibrary()) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(QString(fontToString));
+        const QFontMetrics metrics(f);
+        const QRect bounds(x, y, w, h);
+        QRect rect = metrics.boundingRect(bounds, alignFlags | textFlags, QString(text));
+
+        static int ret[4];
+        ret[0] = rect.x();
+        ret[1] = rect.y();
+        ret[2] = rect.width();
+        ret[3] = rect.height();
+        return ret;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
 void* getTightBoundingRect(const char* fontToString, const char* text)
 {
     if (checkQMLLibrary()) // QTBUG-27024

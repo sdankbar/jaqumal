@@ -54,6 +54,8 @@ extern const char* getQFontToString(const char* family, int pointSize, int pixel
 extern const char* getQFontInfo(const char* fontToString);
 extern const char* getQFontMetrics(const char* fontToString);
 extern void* getBoundingRect(const char* fontToString, const char* text);
+extern void* getBoundingRect2(const char* fontToString, int x, int y, int w, int h, int alignFlags, int textFlags,
+            const char* text);
 extern void* getTightBoundingRect(const char* fontToString, const char* text);
 extern int getStringWidth(const char* fontToString, const char* text);
 extern bool inFont(const char* fontToString, const int character);

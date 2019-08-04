@@ -22,7 +22,9 @@
  */
 package com.github.sdankbar.qml.fonts;
 
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 import java.util.Objects;
 
 import com.github.sdankbar.qml.cpp.ApiInstance;
@@ -96,13 +98,28 @@ public class JFontMetrics {
 		return averageCharWidth;
 	}
 
-	public Rectangle2D getBoundingRect(final String text) {
+	public Rectangle getBoundingRect(final Rectangle constraint, final Collection<TextAlignment> alignmentFlags,
+			final Collection<TextFlag> textFlags, final String text) {
+		Objects.requireNonNull(text, "text is null");
+		Objects.requireNonNull(constraint, "constraint is null");
+		Objects.requireNonNull(alignmentFlags, "alignmentFlags is null");
+		Objects.requireNonNull(textFlags, "textFlags is null");
+		final Pointer p = ApiInstance.LIB_INSTANCE.getBoundingRect2(fontToString, constraint.x, constraint.y,
+				constraint.width, constraint.height, TextAlignment.setToFlags(alignmentFlags),
+				TextFlag.setToFlags(textFlags), text);
+		if (p.equals(Pointer.NULL)) {
+			throw new IllegalStateException();
+		}
+		return new Rectangle(p.getInt(0), p.getInt(4), p.getInt(8), p.getInt(12));
+	}
+
+	public Rectangle getBoundingRect(final String text) {
 		Objects.requireNonNull(text, "text is null");
 		final Pointer p = ApiInstance.LIB_INSTANCE.getBoundingRect(fontToString, text);
 		if (p.equals(Pointer.NULL)) {
 			throw new IllegalStateException();
 		}
-		return new Rectangle2D.Double(p.getInt(0), p.getInt(4), p.getInt(8), p.getInt(12));
+		return new Rectangle(p.getInt(0), p.getInt(4), p.getInt(8), p.getInt(12));
 	}
 
 	public int getDescent() {

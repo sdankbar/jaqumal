@@ -45,7 +45,6 @@ import java.util.regex.Pattern;
 import org.junit.After;
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JFontTest.EventProcessor;
 import com.github.sdankbar.qml.JVariant.Type;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -214,7 +213,7 @@ public class JVariantTest {
 	public void font() {
 		final String[] args = new String[0];
 		@SuppressWarnings("unused")
-		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLApplication<?> app = JQMLApplication.create(args, new NullEventFactory<>());
 
 		final JFont v = JFont.builder().setFamily("Arial").setBold(true).setPixelSize(20).build();
 

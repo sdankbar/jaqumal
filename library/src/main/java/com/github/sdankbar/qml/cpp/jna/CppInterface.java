@@ -114,6 +114,9 @@ public interface CppInterface extends Library {
 
 	Pointer getBoundingRect(String fontToString, String text);
 
+	Pointer getBoundingRect2(String fontToString, int x, int y, int w, int h, int alignFlags, int textFlags,
+			String text);
+
 	String getQFontInfo(String fontToString);
 
 	String getQFontMetrics(String fontToString);

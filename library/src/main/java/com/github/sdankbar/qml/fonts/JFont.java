@@ -59,7 +59,7 @@ public class JFont {
 		private String styleName = "";
 		private StyleHint styleHint = StyleHint.AnyStyle;
 		private final EnumSet<StyleStrategy> styleStrategy = EnumSet.of(StyleStrategy.PreferDefault);
-		private int fontWeight;
+		private int fontWeight = Weight.Normal.value;
 
 		private Builder() {
 			// Empty Implementation

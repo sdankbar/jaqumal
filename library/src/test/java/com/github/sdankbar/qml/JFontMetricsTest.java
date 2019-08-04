@@ -23,8 +23,8 @@
 package com.github.sdankbar.qml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import java.awt.Rectangle;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,11 +33,13 @@ import org.junit.Test;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.fonts.JFont;
 import com.github.sdankbar.qml.fonts.JFont.Weight;
+import com.github.sdankbar.qml.fonts.JFontMetrics;
+import com.google.common.collect.ImmutableSet;
 
 /**
- * Tests the JFont class.
+ * Tests the JFontMetrics class.
  */
-public class JFontTest {
+public class JFontMetricsTest {
 
 	/**
 	 *
@@ -45,28 +47,14 @@ public class JFontTest {
 	@Test
 	public void builder() {
 		{
-			final JFont f = JFont.builder().build();
-			assertEquals(",12,-1,5,50,0,0,0,0,0", f.toString());
-			assertEquals(f.getFamily(), "");
-			assertEquals(f.getPointSize(), 12);
-			assertEquals(f.getPixelSize(), -1);
-			assertEquals(f.getJFontInfo().getPointSize(), 12);
-			assertEquals(f.getJFontInfo().getPixelSize(), 16);
-		}
-		{
 			final JFont f = JFont.builder().setFamily("Arial").setPointSize(20).setWeight(Weight.ExtraBold).build();
-			assertEquals("Arial,20,-1,5,81,0,0,0,0,0", f.toString());
-			assertEquals(f.getFamily(), "Arial");
-			assertEquals(f.getPointSize(), 20);
-			assertEquals(f.getPixelSize(), -1);
-			assertTrue(f.getJFontMetrics().getAverageCharWidth() > 10);
-		}
-		{
-			final JFont f = JFont.builder().setFamily("Arial").setPixelSize(19).setWeight(Weight.ExtraBold).build();
-			assertEquals("Arial,-1,19,5,81,0,0,0,0,0", f.toString());
-			assertEquals(f.getFamily(), "Arial");
-			assertEquals(f.getPointSize(), -1);
-			assertEquals(f.getPixelSize(), 19);
+			final JFontMetrics metrics = f.getJFontMetrics();
+			assertEquals(new Rectangle(0, 0, 20, 31), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
+					ImmutableSet.of(), ImmutableSet.of(), "A"));
+			assertEquals(new Rectangle(0, 0, 20, 62), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
+					ImmutableSet.of(), ImmutableSet.of(), "A\nB"));
+			assertEquals(new Rectangle(0, 0, 39, 93), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
+					ImmutableSet.of(), ImmutableSet.of(), "AB\nC\nD"));
 		}
 	}
 
@@ -81,35 +69,8 @@ public class JFontTest {
 	/**
 	 *
 	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void fromStringFailure() {
-		JFont.fromString("Arial,20,-1,5,81,0,0,0,0,");
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void fromStringSuccess() {
-		assertNotNull(JFont.fromString("Arial,20,-1,5,81,0,0,0,0,0"));
-		assertNotNull(JFont.fromString(",20,-1,5,81,0,0,0,0,0"));
-	}
-
-	/**
-	 *
-	 */
 	@Before
 	public void setup() {
 		JQMLApplication.create(new String[0], new NullEventFactory<>());
 	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void test_toBuilder() {
-		final JFont f = JFont.builder().setFamily("Arial").setPointSize(20).setWeight(Weight.ExtraBold).build();
-		assertEquals(f.toString(), f.toBuilder().build().toString());
-	}
-
 }
