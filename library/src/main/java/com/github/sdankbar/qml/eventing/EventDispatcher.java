@@ -31,6 +31,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.cpp.ApiInstance;
+import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 
 /**
@@ -60,7 +63,8 @@ public class EventDispatcher<T> {
 
 	static private final int DEFAULT_ORDER = 0;
 
-	private static <P> void handle(final Event<P> e, final List<ProcessorPair<P>> list) {
+	private static <P> void handle(final Event<P> e, final List<ProcessorPair<P>> list,
+			final SharedJavaCppMemory javaToCppMemory) {
 		try {
 			for (final ProcessorPair<P> p : list) {
 				if (e.isConsumed()) {
@@ -68,6 +72,16 @@ public class EventDispatcher<T> {
 				} else {
 					e.handle(p.processor);
 				}
+			}
+
+			if (!e.isConsumed() && e.getClass().isInstance(QMLReceivableEvent.class)) {
+				final QMLReceivableEvent<P> castEvent = (QMLReceivableEvent<P>) e;
+				final Map<String, JVariant> args = castEvent.getParameters();
+				final int argsCount = args.size();
+				final String[] keys = args.keySet().toArray(new String[argsCount]);
+				JVariant.serialize(new ArrayList<>(args.values()), javaToCppMemory);
+				ApiInstance.LIB_INSTANCE.sendQMLEvent(castEvent.getClass().getSimpleName(), keys,
+						javaToCppMemory.getPointer(), argsCount);
 			}
 		} catch (final Exception excp) {
 			log.warn("Exception caught processing event " + e, excp);
@@ -77,6 +91,8 @@ public class EventDispatcher<T> {
 	private final Map<Class<? extends Event<T>>, List<ProcessorPair<T>>> processors = new HashMap<>();
 
 	private final Map<Class<? extends Event<BuiltinEventProcessor>>, List<ProcessorPair<BuiltinEventProcessor>>> builtInProcessors = new HashMap<>();
+
+	private final SharedJavaCppMemory javaToCppMemory = new SharedJavaCppMemory(16 * 1024 * 1024);
 
 	/**
 	 * Registers a processor for built in events of Class type. Order is the default
@@ -169,7 +185,7 @@ public class EventDispatcher<T> {
 			}
 		}
 
-		handle(e, list);
+		handle(e, list, javaToCppMemory);
 	}
 
 	/**
@@ -187,6 +203,6 @@ public class EventDispatcher<T> {
 			}
 		}
 
-		handle(e, list);
+		handle(e, list, javaToCppMemory);
 	}
 }

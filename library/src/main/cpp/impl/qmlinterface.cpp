@@ -23,6 +23,7 @@
 #include "qmlinterface.h"
 #include "qmllibobject.h"
 #include <eventbuilder.h>
+#include <eventdispatcher.h>
 #include <QQmlContext>
 #include <QTimer>
 #include <QDateTime>
@@ -65,6 +66,7 @@ void createQApplication(int32_t argc, char** argv)
     qRegisterMetaType<Callback>();
 
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
+    qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventDispatcher");
     qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
     qmlRegisterUncreatableType<GenericFlatTreeModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericFlatTreeModel", "Cannot create GenericFlatTreeModel");
     qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");
@@ -142,6 +144,21 @@ void setLoggingCallback(void c(int, const char*))
 void setExceptionCallback(void c(const char*))
 {
     exceptionHandler = c;
+}
+
+void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer, int keyValuesCount)
+{
+    if (checkQMLLibrary())
+    {
+        std::vector<QVariant> variants = toQVariantList(valuesPointer, static_cast<uint32_t>(keyValuesCount));
+        QVariantMap map;
+        for (uint32_t i = 0; i < static_cast<uint32_t>(keyValuesCount); ++i)
+        {
+            map.insert(QString(keys[i]), variants[i]);
+        }
+
+        EventDispatcher::sendToDispatchers(QString(eventName), map);
+    }
 }
 
 void cleanupMemory(void* ptr)

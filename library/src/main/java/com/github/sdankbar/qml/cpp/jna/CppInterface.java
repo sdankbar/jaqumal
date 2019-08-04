@@ -172,6 +172,8 @@ public interface CppInterface extends Library {
 	 */
 	void reloadQMLFile(String fileName);
 
+	void sendQMLEvent(String eventName, String[] keys, Pointer valuesPointer, int keyValuesCount);
+
 	/**
 	 * Sets the callback that the C++ side will call if an error condition is
 	 * encountered.

@@ -22,11 +22,14 @@
  */
 package com.github.sdankbar.examples.stoplight;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.eventing.QMLReceivableEvent;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 
@@ -40,11 +43,32 @@ public class App {
 	 *
 	 */
 	public static interface EventProcessor {
-		// Empty
+		/**
+		 * @param e Event to handle
+		 */
+		default void handle(final TestQMLEvent e) {
+			// Empty Implementation
+		}
 	}
 
 	private enum StopLightRoles {
 		lightColor;
+	}
+
+	private static class TestQMLEvent extends QMLReceivableEvent<EventProcessor> {
+
+		@Override
+		public Map<String, JVariant> getParameters() {
+			final Map<String, JVariant> temp = new HashMap<>();
+			temp.put("time", new JVariant(System.currentTimeMillis()));
+			return temp;
+		}
+
+		@Override
+		public void handle(final EventProcessor processor) {
+			processor.handle(this);
+		}
+
 	}
 
 	private static final String[] lightColors = { "green", "yellow", "red" };
@@ -80,6 +104,7 @@ public class App {
 					index = 0;
 					app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
 				}
+				app.getEventDispatcher().submit(new TestQMLEvent());
 			}
 		};
 		app.getQMLThreadExecutor().execute(r);

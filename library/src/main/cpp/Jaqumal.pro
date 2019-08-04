@@ -43,7 +43,8 @@ SOURCES += \
     impl/genericobjectmodel.cpp \
     impl/genericflattreemodel.cpp \
     impl/qmllogging.cpp \
-    impl/qmlinterface.cpp
+    impl/qmlinterface.cpp \
+    impl/eventdispatcher.cpp
 
 HEADERS += \
     include/qmllibobject.h \
@@ -52,7 +53,8 @@ HEADERS += \
     include/genericobjectmodel.h \
     include/genericflattreemodel.h \
     include/qmllogging.h \
-    include/qmlinterface.h
+    include/qmlinterface.h \
+    include/eventdispatcher.h
 
 DISTFILES += \
     resources/qmldir \

@@ -1,3 +1,4 @@
+
 /**
  * The MIT License
  * Copyright © 2019 Stephen Dankbar
@@ -38,7 +39,16 @@ Window {
         id: eventing
     }
 
-    Item{
+    EventDispatcher {
+        id: dispatch
+        allowedEvents: ["TestQMLEvent"]
+
+        onEventReceived: {
+            console.error("TEST EVENT: " + args.time)
+        }
+    }
+
+    Item {
         anchors.fill: parent
         focus: true
 
@@ -57,7 +67,7 @@ Window {
                     Rectangle {
                         width: 100
                         height: 100
-                        color:  "red"
+                        color: "red"
                         opacity: model.lightColor === "red" ? 1 : 0.2
                         radius: 50
                     }

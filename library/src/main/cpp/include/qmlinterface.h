@@ -40,6 +40,7 @@ extern void reloadQMLFile(const char* fileName);
 extern void addEventCallback(void c(const char*, void*, int32_t));
 extern void setLoggingCallback(void c(int, const char*));
 extern void setExceptionCallback(void c(const char*));
+void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer, int keyValuesCount);
 
 extern void invoke(void c());
 extern void invokeWithDelay(void c(), int32_t milliseconds);
