@@ -43,7 +43,7 @@ public:
 
 signals:
     void allowedEventsChanged();
-    void eventReceived(const QString& eventName, const QVariantMap& eventArgs);
+    void eventReceived(const QString& name, const QVariantMap& args);
 
 private:
 
