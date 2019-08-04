@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
 
@@ -164,7 +163,7 @@ public class JQMLScheduledExecutorServiceTest {
 		app.execute();
 
 		assertEquals(Integer.valueOf(1), f.get());
-		assertTrue((System.currentTimeMillis() - start) > 50);
+		assertTrue((System.currentTimeMillis() - start) >= 50);
 	}
 
 	/**
@@ -190,7 +189,7 @@ public class JQMLScheduledExecutorServiceTest {
 
 		assertEquals(0, latch.getCount());
 		final long delta = System.currentTimeMillis() - start;
-		assertTrue(delta > 150);
+		assertTrue(delta >= 150);
 	}
 
 	/**
@@ -216,7 +215,7 @@ public class JQMLScheduledExecutorServiceTest {
 
 		assertEquals(0, latch.getCount());
 		final long delta = System.currentTimeMillis() - start;
-		assertTrue(delta > 150);
+		assertTrue(delta >= 150);
 	}
 
 	/**
@@ -241,7 +240,7 @@ public class JQMLScheduledExecutorServiceTest {
 		Thread.sleep(100);
 
 		assertEquals(null, f.get());
-		assertTrue((System.currentTimeMillis() - start) > 50);
+		assertTrue((System.currentTimeMillis() - start) >= 50);
 	}
 
 	/**

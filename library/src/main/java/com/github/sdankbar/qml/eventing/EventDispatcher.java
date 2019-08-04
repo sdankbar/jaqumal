@@ -74,7 +74,7 @@ public class EventDispatcher<T> {
 				}
 			}
 
-			if (!e.isConsumed() && e.getClass().isInstance(QMLReceivableEvent.class)) {
+			if (!e.isConsumed() && QMLReceivableEvent.class.isInstance(e)) {
 				final QMLReceivableEvent<P> castEvent = (QMLReceivableEvent<P>) e;
 				final Map<String, JVariant> args = castEvent.getParameters();
 				final int argsCount = args.size();

@@ -44,7 +44,7 @@ Window {
         allowedEvents: ["TestQMLEvent"]
 
         onEventReceived: {
-            console.error("TEST EVENT: " + args.time)
+            log.info("TEST EVENT: " + args.time)
         }
     }
 
