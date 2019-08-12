@@ -23,6 +23,7 @@
 #include "eventbuilder.h"
 #include "iostream"
 #include <QColor>
+#include <QDateTime>
 
 std::vector<std::function<void(const char*, void*, int32_t)> > EventBuilder::EVENT_HANDLERS;
 
@@ -51,11 +52,11 @@ void EventBuilder::fireEvent(const QString& type)
         {
             func(type.toStdString().c_str(), memory, size);
         }
-        delete memory;
+        delete[] memory;
     }
     else
     {
-        std::cout << "No event handler registered" << std::endl;
+        std::cerr << "No event handler registered" << std::endl;
     }
     m_queuedArguements.clear();
 }
@@ -121,7 +122,7 @@ void EventBuilder::addBoolean(bool data)
 void EventBuilder::addInteger(qint32 data)
 {
     const uint32_t size = sizeof(data);
-    char* ptr = (char*)(&data);
+    const char* ptr = (const char*)(&data);
     for (uint32_t i = 0; i < size; ++i)
     {
         char byte = ptr[i];
@@ -131,7 +132,7 @@ void EventBuilder::addInteger(qint32 data)
 void EventBuilder::addLong(qint64 data)
 {
     const uint32_t size = sizeof(data);
-    char* ptr = (char*)(&data);
+    const char* ptr = (const char*)(&data);
     for (uint32_t i = 0; i < size; ++i)
     {
         char byte = ptr[i];
@@ -141,7 +142,7 @@ void EventBuilder::addLong(qint64 data)
 void EventBuilder::addFloat(float data)
 {
     const uint32_t size = sizeof(data);
-    char* ptr = (char*)(&data);
+    const char* ptr = (const char*)(&data);
     for (uint32_t i = 0; i < size; ++i)
     {
         char byte = ptr[i];
@@ -151,7 +152,7 @@ void EventBuilder::addFloat(float data)
 void EventBuilder::addDouble(double data)
 {
     const uint32_t size = sizeof(data);
-    char* ptr = (char*)(&data);
+    const char* ptr = (const char*)(&data);
     for (uint32_t i = 0; i < size; ++i)
     {
         char byte = ptr[i];
@@ -169,12 +170,105 @@ void EventBuilder::addString(const QString& data)
 }
 void EventBuilder::addColor(const QColor& data)
 {
-    qint32 argb = data.rgba();
+    quint32 argb = data.rgba();
     const uint32_t size = sizeof(argb);
-    char* ptr = (char*)(&argb);
+    const char* ptr = (const char*)(&argb);
     for (uint32_t i = 0; i < size; ++i)
     {
         char byte = ptr[i];
         m_queuedArguements.push_back(byte);
+    }
+}
+void EventBuilder::addRect(const QRect& data)
+{
+    {
+        const int32_t x = data.x();
+        const char* ptrX = (const char*)(&x);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrX[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+    {
+        const int32_t y = data.y();
+        const char* ptrY = (const char*)(&y);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrY[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+    {
+        const int32_t w = data.width();
+        const char* ptrW = (const char*)(&w);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrW[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+    {
+        const int32_t h = data.height();
+        const char* ptrH = (const char*)(&h);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrH[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+}
+void EventBuilder::addSize(const QSize& data)
+{
+    {
+        const int32_t w = data.width();
+        const char* ptrX = (const char*)(&w);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrX[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+    {
+        const int32_t h = data.height();
+        const char* ptrY = (const char*)(&h);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrY[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+}
+void EventBuilder::addDate(const QDateTime& data)
+{
+    {
+        const int64_t milli  = data.toMSecsSinceEpoch();
+        const char* ptr = (const char*)(&milli);
+        for (uint32_t i = 0; i < 8; ++i)
+        {
+            char byte = ptr[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+}
+void EventBuilder::addPoint(const QPoint& data)
+{
+    {
+        const int32_t x = data.x();
+        const char* ptrX = (const char*)(&x);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrX[i];
+            m_queuedArguements.push_back(byte);
+        }
+    }
+    {
+        const int32_t y = data.y();
+        const char* ptrY = (const char*)(&y);
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            char byte = ptrY[i];
+            m_queuedArguements.push_back(byte);
+        }
     }
 }

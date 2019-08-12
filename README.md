@@ -135,5 +135,4 @@ Provides an example of defining new Event types and sending and receiving those 
 * Create additional specialized models for each QtQuick type.
 * Improve support for setting values in a model on the QML side and listening for changes in Java.
 * Improve performance of the list and flattree models.
-* Expand Event functionality to allow Java to return a value to QML.
 * Write additional unit tests.

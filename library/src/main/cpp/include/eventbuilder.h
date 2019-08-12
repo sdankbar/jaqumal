@@ -61,6 +61,11 @@ public:
     Q_INVOKABLE void addDouble(double data);
     Q_INVOKABLE void addString(const QString& data);
     Q_INVOKABLE void addColor(const QColor& data);
+    Q_INVOKABLE void addRect(const QRect& data);
+    Q_INVOKABLE void addSize(const QSize& data);
+    Q_INVOKABLE void addDate(const QDateTime& data);
+    Q_INVOKABLE void addPoint(const QPoint& data);
+
 
 private:
 

@@ -23,8 +23,14 @@
 package com.github.sdankbar.qml.eventing;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -57,6 +63,13 @@ public class EventParser {
 	}
 
 	/**
+	 * @return The next 8 bytes as a Dimension.
+	 */
+	public Dimension getDimension() {
+		return new Dimension(buffer.getInt(), buffer.getInt());
+	}
+
+	/**
 	 * @return The next 8 bytes as a double.
 	 */
 	public double getDouble() {
@@ -71,6 +84,13 @@ public class EventParser {
 	}
 
 	/**
+	 * @return The next 8 bytes as an Instant.
+	 */
+	public Instant getInstant() {
+		return Instant.ofEpochMilli(buffer.getLong());
+	}
+
+	/**
 	 * @return The next 4 bytes as an integer.
 	 */
 	public int getInteger() {
@@ -82,6 +102,20 @@ public class EventParser {
 	 */
 	public long getLong() {
 		return buffer.getLong();
+	}
+
+	/**
+	 * @return The next 8 bytes as a Point2D.
+	 */
+	public Point2D getPoint() {
+		return new Point(buffer.getInt(), buffer.getInt());
+	}
+
+	/**
+	 * @return The next 16 bytes as a Rectangle2D.
+	 */
+	public Rectangle2D getRectangle() {
+		return new Rectangle(buffer.getInt(), buffer.getInt(), buffer.getInt(), buffer.getInt());
 	}
 
 	/**
