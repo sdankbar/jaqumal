@@ -32,13 +32,15 @@ class UserInputSimulator : public QObject
 public:
     explicit UserInputSimulator(QObject *parent = nullptr);
 
-    Q_INVOKABLE void keyPress(Qt::Key keyName, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
-    Q_INVOKABLE void keyRelease(Qt::Key keyName, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
-    Q_INVOKABLE void keyClick(Qt::Key keyName, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+    Q_INVOKABLE void keyPress(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
+    Q_INVOKABLE void keyRelease(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
+    Q_INVOKABLE void keyClick(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
 
 private:
 
-    QString keyToString(Qt::Key keyName, Qt::KeyboardModifiers modifiers) const;
+    QString keyToString(Qt::Key keyName,
+                        const Qt::KeyboardModifiers& modifiers,
+                        const QString& keyText) const;
 
     QQmlApplicationEngine* m_qmlEngine;
 };

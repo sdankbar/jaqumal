@@ -75,7 +75,6 @@ Window {
                     model: addPresetColor
                     width: 60
                     height: 50
-
                 }
 
                 JButton {
@@ -110,8 +109,8 @@ Window {
                         y: 2
 
                         onEditingFinished: {
-                            eventing.addInteger(index);
-                            eventing.addString(text);
+                            eventing.addInteger(index)
+                            eventing.addString(text)
                             eventing.fireEvent("PresetColorNameEdited")
                         }
 
@@ -121,7 +120,7 @@ Window {
                     }
                 }
                 Rectangle {
-                    width:50
+                    width: 50
                     height: parent.height
 
                     color: colorRGB
@@ -150,8 +149,8 @@ Window {
 
         onAccepted: {
             eventing.addInteger(editedColorIndex)
-            eventing.addColor(color);
-            eventing.fireEvent("PresetColorEdited");
+            eventing.addColor(color)
+            eventing.fireEvent("PresetColorEdited")
         }
     }
 }
