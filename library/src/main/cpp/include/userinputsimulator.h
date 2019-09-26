@@ -20,40 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.fonts;
+#ifndef USERINPUTSIMULATOR_H
+#define USERINPUTSIMULATOR_H
 
-import java.util.Collection;
-import java.util.Objects;
+#include <QObject>
+#include <QQmlApplicationEngine>
 
-public enum TextAlignment {
-	AlignLeft(0x0001), //
-	AlignRight(0x0002), //
-	AlignHCenter(0x0004), //
-	AlignJustify(0x0008), //
+class UserInputSimulator : public QObject
+{
+    Q_OBJECT
+public:
+    explicit UserInputSimulator(QObject *parent = nullptr);
 
-	AlignTop(0x0020), //
-	AlignBottom(0x0040), //
-	AlignVCenter(0x0080), //
+    Q_INVOKABLE void keyPress(Qt::Key keyName, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+    Q_INVOKABLE void keyRelease(Qt::Key keyName, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+    Q_INVOKABLE void keyClick(Qt::Key keyName, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
-	AlignCenter(AlignHCenter.flag | AlignVCenter.flag);
+private:
 
-	public static int setToFlags(final Collection<TextAlignment> set) {
-		Objects.requireNonNull(set, "set is null");
-		int combinedFlag = 0;
-		for (final TextAlignment t : set) {
-			Objects.requireNonNull(t, "Collection contains null");
-			combinedFlag = combinedFlag | t.flag;
-		}
-		return combinedFlag;
-	}
+    QString keyToString(Qt::Key keyName, Qt::KeyboardModifiers modifiers) const;
 
-	private final int flag;
+    QQmlApplicationEngine* m_qmlEngine;
+};
 
-	private TextAlignment(final int flag) {
-		this.flag = flag;
-	}
-
-	public int getFlagValue() {
-		return flag;
-	}
-}
+#endif // USERINPUTSIMULATOR_H

@@ -33,6 +33,7 @@
 #include <genericlistmodel.h>
 #include <genericflattreemodel.h>
 #include <qmllogging.h>
+#include <userinputsimulator.h>
 
 typedef std::function<void()> Callback;
 Q_DECLARE_METATYPE(Callback)
@@ -74,6 +75,8 @@ private:
     QMLLogging m_logging;
 
     QQmlApplicationEngine* m_qmlEngine;
+
+    UserInputSimulator m_uiSim;
 };
 
 

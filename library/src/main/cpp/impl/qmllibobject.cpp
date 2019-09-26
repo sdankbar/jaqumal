@@ -39,11 +39,13 @@ void signal_handler(int)
 QMLLibrary::QMLLibrary(int32_t& argc, char** argv) :
     m_qapp(new QApplication(argc, argv)),
     m_logging(),
-    m_qmlEngine(new QQmlApplicationEngine(m_qapp))
+    m_qmlEngine(new QQmlApplicationEngine(m_qapp)),
+    m_uiSim()
 {
     m_qmlEngine->rootContext()->setContextProperty("log", QVariant::fromValue(&m_logging));
+    m_qmlEngine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));
 
-    // Install SIGTERM signal handler
+    // Install SIGTERM signal handler so application can shutdown cleanly
     std::signal(SIGTERM, signal_handler);
 }
 
@@ -59,6 +61,7 @@ QMLLibrary::~QMLLibrary()
         m_qmlEngine = nullptr;
     }
 
+    // Cleanup signal handler.
     std::signal(SIGTERM, SIG_DFL);
 }
 

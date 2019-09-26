@@ -44,7 +44,8 @@ SOURCES += \
     impl/genericflattreemodel.cpp \
     impl/qmllogging.cpp \
     impl/qmlinterface.cpp \
-    impl/eventdispatcher.cpp
+    impl/eventdispatcher.cpp \
+    impl/userinputsimulator.cpp
 
 HEADERS += \
     include/qmllibobject.h \
@@ -54,7 +55,8 @@ HEADERS += \
     include/genericflattreemodel.h \
     include/qmllogging.h \
     include/qmlinterface.h \
-    include/eventdispatcher.h
+    include/eventdispatcher.h \
+    include/userinputsimulator.h
 
 DISTFILES += \
     resources/qmldir \
