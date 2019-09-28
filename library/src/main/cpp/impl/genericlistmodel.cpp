@@ -315,6 +315,36 @@ bool GenericListModel::setData(const QModelIndex &i, const QVariant &value, int 
     }
 }
 
+QVariantMap GenericListModel::getData(qint32 row) const
+{
+    QVariantMap map;
+    if (0 <= row && row < m_rowData.size())
+    {
+        const QHash<int, QVariant>& data = m_rowData[row];
+        for (const auto& k: m_roleNames.keys())
+        {
+            const QString roleName = m_roleNames.value(k);
+            map.insert(roleName, data.value(k));
+        }
+    }
+
+    return map;
+}
+
+QVariant GenericListModel::getData(qint32 row, const QString& propertyName) const
+{
+    if (0 <= row && row < m_rowData.size())
+    {
+        const QHash<int, QVariant>& data = m_rowData[row];
+        const int key = m_stringToIndexRoleMap.value(propertyName);
+        return data.value(key);
+    }
+    else
+    {
+        return QVariant();
+    }
+}
+
 QVariant GenericListModel::getRowData(qint32 row, int32_t roleIndex) const
 {
     if (row < m_rowData.size())

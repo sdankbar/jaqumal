@@ -65,6 +65,9 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     //
 
+    Q_INVOKABLE QVariantMap getData(qint32 row) const;
+    Q_INVOKABLE QVariant getData(qint32 row, const QString& propertyName) const;
+
     int32_t appendRowData(const QVariant& data, int32_t roleIndex);
     int32_t appendRowData(const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
