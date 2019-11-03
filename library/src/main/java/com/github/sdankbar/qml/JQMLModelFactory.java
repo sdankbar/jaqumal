@@ -36,6 +36,7 @@ import com.github.sdankbar.qml.exceptions.QMLThreadingException;
 import com.github.sdankbar.qml.models.flat_tree.FlatTreeAccessor;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.list.ListAccessor;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
@@ -225,6 +226,13 @@ public class JQMLModelFactory {
 		final JQMLTextInputModel m = new JQMLTextInputModel(name, this, app.getEventDispatcher());
 
 		return m;
+	}
+
+	@QtThread()
+	public JQMLXYSeriesModel createXYSeriesModel(final String name) {
+		JQMLUtilities.checkThread(eventLoopThread);
+
+		return new JQMLXYSeriesModel(name, this, app.getEventDispatcher());
 	}
 
 }

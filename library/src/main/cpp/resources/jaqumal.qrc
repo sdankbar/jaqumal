@@ -5,5 +5,6 @@
         <file>JButton.qml</file>
         <file>JTextInput.qml</file>
         <file>PerformanceMonitor.qml</file>
+        <file>JLineSeries.qml</file>
     </qresource>
 </RCC>
