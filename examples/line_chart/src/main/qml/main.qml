@@ -1,5 +1,4 @@
-
-
+﻿
 /**
  * The MIT License
  * Copyright © 2019 Stephen Dankbar
@@ -22,43 +21,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import QtQuick 2.0
+import QtQuick 2.10
+import QtQuick.Window 2.10
+import QtQuick.Controls 1.4
+import QtQuick.Dialogs 1.3
+import QtQuick.Controls.Styles 1.4
+import QtGraphicalEffects 1.0
 import QtCharts 2.3
 import com.github.sdankbar.jaqumal 0.4
 
-LineSeries {
-    id: internalSeries
-    property var model: null
+Window {
+    visible: true
+    width: 800
+    height: 600
+    x: 400
+    y: 400
+    title: qsTr("Line Chart")
+    id: mainWindow
 
-    onModelChanged: {
-        internal.populateSeries()
+    EventBuilder {
+        id: eventing
     }
 
-    Connections {
-        target: model
-        ignoreUnknownSignals: true
+    ChartView {
+        title: "Line"
+        anchors.fill: parent
+        antialiasing: true
 
-        onDataChanged: {
-            internal.populateSeries()
-        }
-        onRowsInserted: {
-            internal.populateSeries()
-        }
-        onRowsRemoved: {
-            internal.populateSeries()
-        }
-    }
+        JLineSeries {
+            name: "LineSeries"
+            model: lineSeries
 
-    QtObject {
-        id: internal
-
-        function populateSeries() {
-            internalSeries.removePoints(0, internalSeries.count)
-
-            for (var i = 0; i < model.rowCount(); ++i) {
-                var temp = model.getData(i)
-                internalSeries.append(temp.X, temp.Y)
+            /*XYPoint {
+                x: 0
+                y: 0
             }
+            XYPoint {
+                x: 1.1
+                y: 2.1
+            }
+            XYPoint {
+                x: 1.9
+                y: 3.3
+            }
+            XYPoint {
+                x: 2.1
+                y: 2.1
+            }
+            XYPoint {
+                x: 2.9
+                y: 4.9
+            }
+            XYPoint {
+                x: 3.4
+                y: 3.0
+            }
+            XYPoint {
+                x: 4.1
+                y: 3.3
+            }*/
         }
     }
 }

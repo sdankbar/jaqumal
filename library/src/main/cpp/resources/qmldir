@@ -1,5 +1,6 @@
 module com.github.sdankbar.jaqumal
 UtilFunc 0.4 UtilFunc.js
 JButton 0.4 JButton.qml
+JLineSeries 0.4 JLineSeries.qml
 JTextInput 0.4 JTextInput.qml
 PerformanceMonitor 0.4 PerformanceMonitor.qml

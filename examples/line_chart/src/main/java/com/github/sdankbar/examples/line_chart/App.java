@@ -1,5 +1,3 @@
-
-
 /**
  * The MIT License
  * Copyright © 2019 Stephen Dankbar
@@ -22,43 +20,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import QtQuick 2.0
-import QtCharts 2.3
-import com.github.sdankbar.jaqumal 0.4
+package com.github.sdankbar.examples.line_chart;
 
-LineSeries {
-    id: internalSeries
-    property var model: null
+import java.awt.geom.Point2D;
 
-    onModelChanged: {
-        internal.populateSeries()
-    }
+import com.github.sdankbar.qml.JQMLApplication;
+import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 
-    Connections {
-        target: model
-        ignoreUnknownSignals: true
+/**
+ * Example application that allow for editing a set of colors.
+ *
+ */
+public class App {
 
-        onDataChanged: {
-            internal.populateSeries()
-        }
-        onRowsInserted: {
-            internal.populateSeries()
-        }
-        onRowsRemoved: {
-            internal.populateSeries()
-        }
-    }
+	/**
+	 *
+	 *
+	 */
+	public static interface EventProcessor {
+		// Empty Implementation
+	}
 
-    QtObject {
-        id: internal
+	/**
+	 * @param args
+	 * @throws Exception
+	 */
+	public static void main(final String[] args) throws Exception {
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLXYSeriesModel model = app.getModelFactory().createXYSeriesModel("lineSeries");
 
-        function populateSeries() {
-            internalSeries.removePoints(0, internalSeries.count)
+		model.addPoint(new Point2D.Double(0, 0));
+		model.addPoint(new Point2D.Double(1, 1));
+		model.addPoint(new Point2D.Double(2, 2));
+		model.addPoint(new Point2D.Double(3, 3));
+		model.addPoint(new Point2D.Double(4, 4));
 
-            for (var i = 0; i < model.rowCount(); ++i) {
-                var temp = model.getData(i)
-                internalSeries.append(temp.X, temp.Y)
-            }
-        }
-    }
+		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
+
+		app.execute();
+	}
 }

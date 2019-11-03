@@ -163,7 +163,8 @@ public class JQMLScheduledExecutorServiceTest {
 		app.execute();
 
 		assertEquals(Integer.valueOf(1), f.get());
-		assertTrue((System.currentTimeMillis() - start) >= 50);
+		final long delta = (System.currentTimeMillis() - start);
+		assertTrue("delta=" + delta + " not >= 50", delta >= 50);
 	}
 
 	/**
@@ -189,7 +190,7 @@ public class JQMLScheduledExecutorServiceTest {
 
 		assertEquals(0, latch.getCount());
 		final long delta = System.currentTimeMillis() - start;
-		assertTrue(delta >= 150);
+		assertTrue("delta=" + delta + " not >= 150", delta >= 150);
 	}
 
 	/**
@@ -215,7 +216,7 @@ public class JQMLScheduledExecutorServiceTest {
 
 		assertEquals(0, latch.getCount());
 		final long delta = System.currentTimeMillis() - start;
-		assertTrue(delta >= 150);
+		assertTrue("delta=" + delta + " not >= 150", delta >= 150);
 	}
 
 	/**
