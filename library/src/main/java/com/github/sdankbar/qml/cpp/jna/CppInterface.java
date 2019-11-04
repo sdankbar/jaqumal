@@ -197,4 +197,6 @@ public interface CppInterface extends Library {
 	 * @param length    The size of the memory block cppToJava points to.
 	 */
 	void setSharedMemory(Pointer cppToJava, int length);
+
+	void unloadQML();
 }

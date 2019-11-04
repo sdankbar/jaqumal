@@ -104,6 +104,14 @@ void loadQMLFile(const char* fileName)
     }
 }
 
+void unloadQML()
+{
+    if (checkQMLLibrary())
+    {
+        QMLLibrary::library->unloadQML();
+    }
+}
+
 void reloadQMLFile(const char* fileName)
 {
     if (checkQMLLibrary())

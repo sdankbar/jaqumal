@@ -36,6 +36,7 @@ extern void deleteQApplication();
 extern void quitQApplication();
 
 extern void loadQMLFile(const char* fileName);
+extern void unloadQML();
 extern void reloadQMLFile(const char* fileName);
 extern void addEventCallback(void c(const char*, void*, int32_t));
 extern void setLoggingCallback(void c(int, const char*));

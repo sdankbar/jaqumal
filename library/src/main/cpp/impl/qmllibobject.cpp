@@ -121,7 +121,7 @@ void QMLLibrary::loadQMLFile(const QString& filePath)
     m_qmlEngine->load(filePath);
 }
 
-void QMLLibrary::reloadQMLFile(const QString& filePath)
+void QMLLibrary::unloadQML()
 {
     QList<QObject*> roots = m_qmlEngine->rootObjects();
     for (QObject* obj: roots)
@@ -134,7 +134,12 @@ void QMLLibrary::reloadQMLFile(const QString& filePath)
         }
     }
     m_qmlEngine->clearComponentCache();
-    m_qmlEngine->load(filePath);
+}
+
+void QMLLibrary::reloadQMLFile(const QString& filePath)
+{
+    unloadQML();
+    loadQMLFile(filePath);
 }
 
 void QMLLibrary::setLoggingCallback(void c(int, const char*))

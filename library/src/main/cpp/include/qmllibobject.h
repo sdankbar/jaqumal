@@ -54,6 +54,7 @@ public:
     Q_INVOKABLE void invoke(Callback callback);
 
     Q_INVOKABLE void loadQMLFile(const QString& filePath);
+    Q_INVOKABLE void unloadQML();
     Q_INVOKABLE void reloadQMLFile(const QString& filePath);
 
     // Create ObjectModel
