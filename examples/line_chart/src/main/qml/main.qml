@@ -44,42 +44,37 @@ Window {
     }
 
     ChartView {
+        id: chart
         title: "Line"
         anchors.fill: parent
         antialiasing: true
 
+        Keys.onDigit1Pressed: {
+            chart.zoomIn()
+        }
+        Keys.onDigit2Pressed: {
+            chart.zoomOut()
+        }
+        Keys.onUpPressed: {
+            chart.scrollUp(5)
+        }
+        Keys.onDownPressed: {
+            chart.scrollDown(5)
+        }
+        Keys.onLeftPressed: {
+            chart.scrollLeft(5)
+        }
+        Keys.onRightPressed: {
+            chart.scrollRight(5)
+        }
+
         JLineSeries {
             name: "LineSeries"
             model: lineSeries
+        }
 
-            /*XYPoint {
-                x: 0
-                y: 0
-            }
-            XYPoint {
-                x: 1.1
-                y: 2.1
-            }
-            XYPoint {
-                x: 1.9
-                y: 3.3
-            }
-            XYPoint {
-                x: 2.1
-                y: 2.1
-            }
-            XYPoint {
-                x: 2.9
-                y: 4.9
-            }
-            XYPoint {
-                x: 3.4
-                y: 3.0
-            }
-            XYPoint {
-                x: 4.1
-                y: 3.3
-            }*/
+        Component.onCompleted: {
+            chart.forceActiveFocus()
         }
     }
 }

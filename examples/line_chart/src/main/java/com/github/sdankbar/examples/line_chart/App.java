@@ -23,6 +23,8 @@
 package com.github.sdankbar.examples.line_chart;
 
 import java.awt.geom.Point2D;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -50,14 +52,20 @@ public class App {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLXYSeriesModel model = app.getModelFactory().createXYSeriesModel("lineSeries");
 
-		model.addPoint(new Point2D.Double(0, 0));
-		model.addPoint(new Point2D.Double(1, 1));
-		model.addPoint(new Point2D.Double(2, 2));
-		model.addPoint(new Point2D.Double(3, 3));
-		model.addPoint(new Point2D.Double(4, 4));
+		update(model);
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 
+		app.getQMLThreadExecutor().scheduleWithFixedDelay(() -> update(model), 2, 2, TimeUnit.SECONDS);
+
 		app.execute();
+	}
+
+	private static void update(final JQMLXYSeriesModel model) {
+		final Random r = new Random();
+		model.clearAllPoints();
+		for (int i = 0; i < 5; ++i) {
+			model.addPoint(new Point2D.Double(i, r.nextInt(10)));
+		}
 	}
 }
