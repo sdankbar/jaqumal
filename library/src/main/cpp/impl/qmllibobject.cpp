@@ -56,6 +56,17 @@ QMLLibrary::~QMLLibrary()
     if (m_qapp)
     {
         m_qapp->closeAllWindows();
+
+        QList<QObject*> roots = m_qmlEngine->rootObjects();
+        for (QObject* obj: roots)
+        {
+            QQuickWindow* window = qobject_cast<QQuickWindow*>(obj);
+            if (window)
+            {
+                delete window;
+            }
+        }
+
         delete m_qapp;
         m_qapp = nullptr;
         m_qmlEngine = nullptr;
