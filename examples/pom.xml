@@ -38,5 +38,6 @@
 	<modules>
 	    <module>color_editor</module>
 		<module>stoplight</module>
+		<module>line_chart</module>
 	</modules>
 </project>
