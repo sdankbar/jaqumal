@@ -26,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -38,11 +39,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.After;
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JQMLApplication;
-import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.exceptions.IllegalKeyException;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Tests the JQMLSingletonModel class.
@@ -80,11 +80,12 @@ public class JQMLSingletonModelTest {
 				EnumSet.allOf(Roles.class));
 
 		model.put(Roles.R1, new JVariant(1));
-		model.put(Roles.R3, new JVariant(3));
+		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
 
 		assertEquals(new JVariant(1), model.get(Roles.R1));
 		assertEquals(null, model.get(Roles.R2));
-		assertEquals(new JVariant(3), model.get(Roles.R3));
+		assertEquals(new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))),
+				model.get(Roles.R3));
 		assertEquals(null, model.get(Roles.R4));
 		assertEquals(null, model.get(Roles.R5));
 		try {

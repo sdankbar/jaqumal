@@ -82,7 +82,8 @@ enum Type
     RECTANGLE,
     COLOR,
     IMAGE,
-    FONT
+    FONT,
+    POLYLINE
 };
 
 QVariant toQVariant(void* data, int32_t& size);

@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.fonts.JFont;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Corresponding Java class for QVariant on the C++ side. Used to pass data of
@@ -180,7 +181,14 @@ public class JVariant {
 		 *
 		 * UTF-8
 		 */
-		FONT
+		FONT,
+		/**
+		 * ImmutableList<Point2D>
+		 *
+		 * 4 native endian order bytes for count and for each point 8 native endian
+		 * order bytes for x, 8 native endian order bytes for y
+		 */
+		POLYLINE
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(JVariant.class);
@@ -298,6 +306,14 @@ public class JVariant {
 			buffer.get(array);
 			final String s = new String(array, StandardCharsets.UTF_8);
 			return Optional.of(new JVariant(JFont.fromString(s)));
+		}
+		case POLYLINE: {
+			final int count = buffer.getInt();
+			final ImmutableList.Builder<Point2D> builder = ImmutableList.builder();
+			for (int i = 0; i < count; ++i) {
+				builder.add(new Point2D.Double(buffer.getDouble(), buffer.getDouble()));
+			}
+			return Optional.of(new JVariant(builder.build()));
 		}
 		default:
 			return Optional.empty();
@@ -420,6 +436,16 @@ public class JVariant {
 	 */
 	public JVariant(final Float v) {
 		type = Type.FLOAT;
+		obj = Objects.requireNonNull(v, "v is null");
+	}
+
+	/**
+	 * Constructs a new JVariant from a list of Point2D objects.
+	 *
+	 * @param v The variant's value.
+	 */
+	public JVariant(final ImmutableList<Point2D> v) {
+		type = Type.POLYLINE;
 		obj = Objects.requireNonNull(v, "v is null");
 	}
 
@@ -661,6 +687,17 @@ public class JVariant {
 	public Point2D asPoint() {
 		Preconditions.checkArgument(type == Type.POINT, "Wrong type, type is {}", type);
 		return (Point2D) obj;
+	}
+
+	/**
+	 * @return The JVariant's value as a list of Point2D objects.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not
+	 *                                  POLYLINE
+	 */
+	@SuppressWarnings("unchecked")
+	public ImmutableList<Point2D> asPolyline() {
+		Preconditions.checkArgument(type == Type.POLYLINE, "Wrong type, type is {}", type);
+		return (ImmutableList<Point2D>) obj;
 	}
 
 	/**
@@ -972,6 +1009,18 @@ public class JVariant {
 			buffer.put((byte) type.ordinal());
 			buffer.putInt(utf8.length);
 			buffer.put(utf8);
+			break;
+		}
+		case POLYLINE: {
+			@SuppressWarnings("unchecked")
+			final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
+			checkSize(reuse, 1 + 4 + list.size() * (8 + 8));
+			buffer.put((byte) type.ordinal());
+			buffer.putInt(list.size());
+			for (final Point2D p : list) {
+				buffer.putDouble(p.getX());
+				buffer.putDouble(p.getY());
+			}
 			break;
 		}
 		default: {

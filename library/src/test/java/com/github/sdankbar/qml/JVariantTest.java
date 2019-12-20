@@ -49,6 +49,7 @@ import com.github.sdankbar.qml.JVariant.Type;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.fonts.JFont;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Tests the JVariant class.
@@ -323,6 +324,83 @@ public class JVariantTest {
 		final Optional<JVariant> v2 = JVariant.deserialize(b);
 		assertTrue(v2.isPresent());
 		assertEquals(v, v2.get().asPoint());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void polygon_0() {
+		final JVariant v1 = new JVariant(ImmutableList.of());
+		assertEquals(ImmutableList.of(), v1.asPolyline());
+		assertEquals(ImmutableList.of(), v1.asType(ImmutableList.class).get());
+		assertEquals(ImmutableList.of(), v1.asType(ImmutableList.class, ImmutableList.of()));
+
+		final SharedJavaCppMemory memory = new SharedJavaCppMemory(256);
+		v1.serialize(memory);
+		final ByteBuffer b = memory.getBuffer(0);
+		assertEquals(Type.POLYLINE.ordinal(), b.get());
+		assertEquals(0, b.getInt());
+
+		b.position(0);
+		final Optional<JVariant> v2 = JVariant.deserialize(b);
+		assertTrue(v2.isPresent());
+		assertEquals(ImmutableList.of(), v2.get().asPolyline());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void polygon_1() {
+		final Point2D p1 = new Point2D.Double(33, 29);
+
+		final JVariant v1 = new JVariant(ImmutableList.of(p1));
+		assertEquals(ImmutableList.of(p1), v1.asPolyline());
+		assertEquals(ImmutableList.of(p1), v1.asType(ImmutableList.class).get());
+		assertEquals(ImmutableList.of(p1), v1.asType(ImmutableList.class, ImmutableList.of()));
+
+		final SharedJavaCppMemory memory = new SharedJavaCppMemory(256);
+		v1.serialize(memory);
+		final ByteBuffer b = memory.getBuffer(0);
+		assertEquals(Type.POLYLINE.ordinal(), b.get());
+		assertEquals(1, b.getInt());
+		assertEquals(33, b.getDouble(), 0.0001);
+		assertEquals(29, b.getDouble(), 0.0001);
+
+		b.position(0);
+		final Optional<JVariant> v2 = JVariant.deserialize(b);
+		assertTrue(v2.isPresent());
+		assertEquals(ImmutableList.of(p1), v2.get().asPolyline());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void polygon_2() {
+		final Point2D p1 = new Point2D.Double(33, 29);
+		final Point2D p2 = new Point2D.Double(34, 30);
+
+		final JVariant v1 = new JVariant(ImmutableList.of(p1, p2));
+		assertEquals(ImmutableList.of(p1, p2), v1.asPolyline());
+		assertEquals(ImmutableList.of(p1, p2), v1.asType(ImmutableList.class).get());
+		assertEquals(ImmutableList.of(p1, p2), v1.asType(ImmutableList.class, ImmutableList.of()));
+
+		final SharedJavaCppMemory memory = new SharedJavaCppMemory(256);
+		v1.serialize(memory);
+		final ByteBuffer b = memory.getBuffer(0);
+		assertEquals(Type.POLYLINE.ordinal(), b.get());
+		assertEquals(2, b.getInt());
+		assertEquals(33, b.getDouble(), 0.0001);
+		assertEquals(29, b.getDouble(), 0.0001);
+		assertEquals(34, b.getDouble(), 0.0001);
+		assertEquals(30, b.getDouble(), 0.0001);
+
+		b.position(0);
+		final Optional<JVariant> v2 = JVariant.deserialize(b);
+		assertTrue(v2.isPresent());
+		assertEquals(ImmutableList.of(p1, p2), v2.get().asPolyline());
 	}
 
 	/**

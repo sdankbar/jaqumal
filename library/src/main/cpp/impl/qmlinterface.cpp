@@ -525,6 +525,20 @@ QVariant toQVariant(void* data, int32_t& size)
             return QVariant();
         }
     }
+    case POLYLINE: {
+        int32_t length = *((int32_t*)(buffer + 1));
+        QPolygonF polygon;
+        polygon.resize(length);
+        double* workingPtr = (double*)(buffer + 1 + 4);
+        for (int32_t i = 0; i < length; ++i)
+        {
+            double x = *workingPtr;
+            double y = *workingPtr + 1;
+            polygon[i] = QPointF(x, y);
+            workingPtr += 2;
+        }
+        return QVariant(polygon);
+    }
     default:
         size = 0;
         return QVariant();
@@ -708,6 +722,22 @@ char* fromQVariant(const QVariant& var, int32_t& length, bool allocateMem)
         ptr[0] = URL;
         *(int32_t*)(ptr+1) = array.size();
         memcpy(ptr + 5, array.data(), array.size());
+        return ptr;
+    }
+    case QVariant::PolygonF: {
+        QPolygonF p = var.value<QPolygonF>();
+        length = 1 + 4 + p.size() * (8 + 8);
+        char* ptr = alloc(length, allocateMem);
+        ptr[0] = POLYLINE;
+        *(int*)(ptr+1) = p.size();
+
+        double* workingPtr = (double*) (ptr +  1 + 4);
+        for (int32_t i = 0; i < p.size(); ++i)
+        {
+            *workingPtr = p[i].x();
+            *(workingPtr + 1) = p[i].y();
+            workingPtr += 2;
+        }
         return ptr;
     }
     default:
