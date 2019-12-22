@@ -45,7 +45,8 @@ SOURCES += \
     impl/qmllogging.cpp \
     impl/qmlinterface.cpp \
     impl/eventdispatcher.cpp \
-    impl/userinputsimulator.cpp
+    impl/userinputsimulator.cpp \
+    impl/qmlimageprovider.cpp
 
 HEADERS += \
     include/qmllibobject.h \
@@ -56,7 +57,8 @@ HEADERS += \
     include/qmllogging.h \
     include/qmlinterface.h \
     include/eventdispatcher.h \
-    include/userinputsimulator.h
+    include/userinputsimulator.h \
+    include/qmlimageprovider.h
 
 DISTFILES += \
     resources/qmldir \

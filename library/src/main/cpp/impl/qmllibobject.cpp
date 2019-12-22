@@ -21,6 +21,7 @@
  * THE SOFTWARE.
  */
 #include "qmllibobject.h"
+#include "qmlimageprovider.h"
 #include <QQmlContext>
 #include <QQuickWindow>
 #include <iostream>
@@ -156,4 +157,9 @@ void QMLLibrary::reloadQMLFile(const QString& filePath)
 void QMLLibrary::setLoggingCallback(void c(int, const char*))
 {
     m_logging.setCallback(c);
+}
+
+void QMLLibrary::addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback)
+{
+    m_qmlEngine->addImageProvider(id, new QMLImageProvider(javaImageProviderCallback));
 }

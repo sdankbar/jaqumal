@@ -70,6 +70,8 @@ public:
 
     void setLoggingCallback(void c(int, const char*));
 
+    void addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback);
+
 private:
 
     QApplication* m_qapp;

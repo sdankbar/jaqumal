@@ -154,6 +154,16 @@ void setExceptionCallback(void c(const char*))
     exceptionHandler = c;
 }
 
+void addImageProvider(const char* id, void* c(const char*, int, int))
+{
+    if (checkQMLLibrary())
+    {
+        QMLLibrary::library->addImageProvider(
+            QString(id), 
+            std::function<void* (const char*, int , int)>(c));
+    }
+}
+
 void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer, int keyValuesCount)
 {
     if (checkQMLLibrary())

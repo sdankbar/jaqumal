@@ -62,6 +62,10 @@ public interface CppInterface extends Library {
 		void invoke(String exceptionMessage);
 	}
 
+	public interface ImageProviderCallback extends Callback {
+		Pointer invoke(String id, int w, int h);
+	}
+
 	/**
 	 * Interface for having Java code called from the Qt Event Loop Thread.
 	 */
@@ -93,6 +97,8 @@ public interface CppInterface extends Library {
 	 *          object is not garbage collected.
 	 */
 	void addEventCallback(EventCallback c);
+
+	public void addImageProvider(String id, ImageProviderCallback c);
 
 	/**
 	 * Creates a new QApplication.

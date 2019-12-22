@@ -49,6 +49,8 @@ import com.github.sdankbar.qml.eventing.EventParser;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventFactory;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.exceptions.QMLException;
+import com.github.sdankbar.qml.images.JQMLImageProvider;
+import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
 import com.sun.jna.Pointer;
 
 /**
@@ -115,6 +117,8 @@ public class JQMLApplication<EType> {
 
 	private final ScheduledExecutorService executor = new JQMLScheduledExecutorService();
 	private final JQMLModelFactory modelFactory;
+
+	private final List<JQMLImageProviderWrapper> imageProviders = new ArrayList<>();
 
 	@SuppressWarnings("unused")
 	// Used by C++ code
@@ -322,6 +326,11 @@ public class JQMLApplication<EType> {
 
 		ApiInstance.LIB_INSTANCE.quitQApplication();
 		JQMLExceptionHandling.checkExceptions();
+	}
+
+	@QtThread
+	public void registerImageProvider(final JQMLImageProvider provider, final String providerID) {
+		imageProviders.add(new JQMLImageProviderWrapper(providerID, provider));
 	}
 
 	/**
