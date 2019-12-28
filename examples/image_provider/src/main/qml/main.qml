@@ -1,3 +1,4 @@
+
 /**
  * The MIT License
  * Copyright © 2019 Stephen Dankbar
@@ -20,48 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "qmlimageprovider.h"
-#include "qmlinterface.h"
+import QtQuick 2.10
+import QtQuick.Window 2.10
+import QtQuick.Controls.Styles 1.4
+import QtGraphicalEffects 1.0
+import com.github.sdankbar.jaqumal 0.4
 
-QMLImageProvider::QMLImageProvider(std::function<void* (const char*, int, int)> callback) :
-    QQuickImageProvider(QQuickImageProvider::Image),
-    javaImageProviderCallback(callback)
-{
-    // Empty Implementation
-}
+Window {
+    visible: true
+    width: 110
+    height: 330
+    x: 400
+    y: 400
+    title: qsTr("ImageProvider")
 
-QMLImageProvider::~QMLImageProvider()
-{
-    // Empty Implementation
-}
+    Item {
+        anchors.fill: parent
+        focus: true
 
-QImage QMLImageProvider::requestImage(const QString& id, QSize* size, const QSize& requestedSize)
-{
-    int correctedWidth = 50;
-    int correctedHeight = 50;
-    if (requestedSize.width() > 0)
-    {
-      correctedWidth = requestedSize.width();
-    }
-    if (requestedSize.height() > 0)
-    {
-      correctedHeight = requestedSize.height();
-    }
-    
-    void* data = javaImageProviderCallback(id.toStdString().c_str(), correctedWidth, correctedHeight);
-    if (data != nullptr)
-    {
-        int dataLength = 0;
-        QVariant imageVar = toQVariant(data, dataLength);
-        QImage image = imageVar.value<QImage>();
-        if (size)
-        {
-            *size = image.size();
+        Rectangle {
+            anchors.fill: parent
+            color: "gray"
+
+            Column {
+                spacing: 10
+                anchors.fill: parent
+                anchors.margins: 5
+
+                Image {
+                    width: 100
+                    height: 100
+                    source: "image://test_provider/red"
+                }
+
+                Image {
+                    width: 100
+                    height: 100
+                    source: "image://test_provider/test.png"
+                }
+
+                Image {
+                    width: 100
+                    height: 100
+                    source: "image://test_provider/error"
+                }
+            }
         }
-        return image;
-    }
-    else
-    {
-        return QImage();
     }
 }

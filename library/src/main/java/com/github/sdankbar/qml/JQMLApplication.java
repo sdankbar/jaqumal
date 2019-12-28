@@ -328,6 +328,12 @@ public class JQMLApplication<EType> {
 		JQMLExceptionHandling.checkExceptions();
 	}
 
+	/**
+	 * Registers an image provider. See QQuickImageProvider.
+	 *
+	 * @param provider   The image provider.
+	 * @param providerID The ID of the image provider.
+	 */
 	@QtThread
 	public void registerImageProvider(final JQMLImageProvider provider, final String providerID) {
 		imageProviders.add(new JQMLImageProviderWrapper(providerID, provider));
