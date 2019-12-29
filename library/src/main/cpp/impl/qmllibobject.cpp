@@ -163,3 +163,8 @@ void QMLLibrary::addImageProvider(const QString& id, std::function<void* (const 
 {
     m_qmlEngine->addImageProvider(id, new QMLImageProvider(javaImageProviderCallback));
 }
+
+QList<QScreen*> QMLLibrary::getScreens()
+{
+    return m_qapp->screens();
+}

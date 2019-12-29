@@ -62,6 +62,8 @@ extern void* getBoundingRect2(const char* fontToString, int x, int y, int w, int
 extern void* getTightBoundingRect(const char* fontToString, const char* text);
 extern int getStringWidth(const char* fontToString, const char* text);
 extern bool inFont(const char* fontToString, const int character);
+
+extern void* getScreens();
 }
 
 enum Type

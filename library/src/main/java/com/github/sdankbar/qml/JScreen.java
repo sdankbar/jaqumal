@@ -49,4 +49,12 @@ public class JScreen {
 		return geometry;
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "JScreen [geometry=" + geometry + ", dpi=" + dpi + "]";
+	}
+
 }

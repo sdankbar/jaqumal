@@ -25,6 +25,7 @@ package com.github.sdankbar.qml;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -367,7 +368,8 @@ public class JQMLApplication<EType> {
 
 		final ImmutableList.Builder<JScreen> builder = ImmutableList.builderWithExpectedSize(count);
 
-		final ByteBuffer buffer = ptr.getByteBuffer(1, count * (8 + 4 * 4));
+		final ByteBuffer buffer = ptr.getByteBuffer(4, count * (8 + 4 * 4));
+		buffer.order(ByteOrder.nativeOrder());
 		for (int i = 0; i < count; ++i) {
 			final double dpi = buffer.getDouble();
 			final Rectangle2D rect = new Rectangle2D.Double(buffer.getInt(), buffer.getInt(), buffer.getInt(),

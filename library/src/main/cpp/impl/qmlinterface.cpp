@@ -31,6 +31,7 @@
 #include <QFont>
 #include <QFontInfo>
 #include <QFontMetrics>
+#include <QScreen>
 #include <iostream>
 #include <functional>
 
@@ -50,6 +51,24 @@ bool checkQMLLibrary()
         exceptionHandler("Attempted to use QApplication before QApplication was created");
         return false;
     }
+}
+
+void putByte(char*& ptr, char byte)
+{
+    *ptr = byte;
+    ptr = ptr + 1;
+}
+
+void putInt(char*& ptr, int32_t integer)
+{
+    *((int*)ptr) = integer;
+    ptr = ptr + 4;
+}
+
+void putDouble(char*& ptr, double real)
+{
+    *((double*)ptr) = real;
+    ptr = ptr + 8;
 }
 }
 
@@ -388,6 +407,36 @@ bool inFont(const char* fontToString, const int character)
     else
     {
         return false;
+    }
+}
+
+void* getScreens()
+{
+    if (checkQMLLibrary())
+    {
+        QList<QScreen*> screens = QMLLibrary::library->getScreens();
+        size_t bytesAllocated = 4 + screens.size() * (8 + 4 * 4);
+        char* retPtr = static_cast<char*>(malloc(bytesAllocated));
+        memset(retPtr, 0, bytesAllocated);
+
+        char* working = retPtr;
+        putInt(working, screens.size());
+        for (int i = 0; i < screens.size(); ++i)
+        {
+            putDouble(working, screens[i]->physicalDotsPerInch());
+
+            QRect geo = screens[i]->geometry();
+            putInt(working, geo.x());
+            putInt(working, geo.y());
+            putInt(working, geo.width());
+            putInt(working, geo.height());
+        }
+
+        return retPtr;
+    }
+    else
+    {
+        return nullptr;
     }
 }
 

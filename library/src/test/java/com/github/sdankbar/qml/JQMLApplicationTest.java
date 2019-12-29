@@ -29,8 +29,8 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JQMLButtonModelTest.EventProcessor;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.eventing.NullEventProcessor;
 
 /**
  * Tests the JQMLApplication class
@@ -52,17 +52,17 @@ public class JQMLApplicationTest {
 	@Test
 	public void test_getScreens() {
 		final String[] args = new String[0];
-		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLApplication<NullEventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 
 		final List<JScreen> list = app.screens();
 
 		assertTrue(!list.isEmpty());
 		for (int i = 0; i < list.size(); ++i) {
-			// assertTrue(list.get(i).getDpi() > 1);
-			// assertTrue(list.get(i).getGeometry().getX() >= 0);
-			// assertTrue(list.get(i).getGeometry().getY() >= 0);
-			// assertTrue(list.get(i).getGeometry().getWidth() > 0);
-			// assertTrue(list.get(i).getGeometry().getHeight() > 0);
+			assertTrue(list.get(i).getDpi() > 1);
+			assertTrue(list.get(i).getGeometry().getX() >= 0);
+			assertTrue(list.get(i).getGeometry().getY() >= 0);
+			assertTrue(list.get(i).getGeometry().getWidth() > 0);
+			assertTrue(list.get(i).getGeometry().getHeight() > 0);
 		}
 	}
 

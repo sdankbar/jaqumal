@@ -72,6 +72,8 @@ public:
 
     void addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback);
 
+    QList<QScreen*> getScreens();
+
 private:
 
     QApplication* m_qapp;
