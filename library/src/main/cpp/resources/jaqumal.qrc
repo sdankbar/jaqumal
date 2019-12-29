@@ -6,5 +6,6 @@
         <file>JTextInput.qml</file>
         <file>PerformanceMonitor.qml</file>
         <file>JLineSeries.qml</file>
+        <file>JPolyline.qml</file>
     </qresource>
 </RCC>
