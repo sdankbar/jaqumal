@@ -20,41 +20,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.cpp;
+package com.github.sdankbar.qml;
 
-import com.github.sdankbar.qml.cpp.jna.CppInterface;
-import com.github.sdankbar.qml.cpp.jna.flat_tree.FlatTreeQMLAPI;
-import com.github.sdankbar.qml.cpp.jna.list.ListQMLAPI;
-import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPI;
-import com.sun.jna.Native;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Test;
+
+import com.github.sdankbar.qml.JQMLButtonModelTest.EventProcessor;
+import com.github.sdankbar.qml.eventing.NullEventFactory;
 
 /**
- * Class initializes instances of the C++ APIs.
+ * Tests the JQMLApplication class
+ *
  */
-public class ApiInstance {
+public class JQMLApplicationTest {
 
 	/**
-	 * C++ API for interacting with a QApplication instance.
+	 *
 	 */
-	public static final CppInterface LIB_INSTANCE = Native.load("Jaqumal", CppInterface.class);
+	@After
+	public void cleanup() {
+		JQMLApplication.delete();
+	}
 
 	/**
-	 * C++ API for creating and modifying List models.
+	 *
 	 */
-	public static final ListQMLAPI LIST_LIB_INSTANCE = Native.load("Jaqumal", ListQMLAPI.class);
+	@Test
+	public void test_getScreens() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 
-	/**
-	 * C++ API for creating and modifying Flat Tree models.
-	 */
-	public static final FlatTreeQMLAPI FLAT_TREE_LIB_INSTANCE = Native.load("Jaqumal", FlatTreeQMLAPI.class);
+		final List<JScreen> list = app.screens();
 
-	/**
-	 * C++ API for creating and modifying Singleton models.
-	 */
-	public static final SingletonQMLAPI SINGLETON_LIB_INSTANCE = Native.load("Jaqumal", SingletonQMLAPI.class);
-
-	private ApiInstance() {
-		// Empty Implementation
+		assertTrue(!list.isEmpty());
+		for (int i = 0; i < list.size(); ++i) {
+			// assertTrue(list.get(i).getDpi() > 1);
+			// assertTrue(list.get(i).getGeometry().getX() >= 0);
+			// assertTrue(list.get(i).getGeometry().getY() >= 0);
+			// assertTrue(list.get(i).getGeometry().getWidth() > 0);
+			// assertTrue(list.get(i).getGeometry().getHeight() > 0);
+		}
 	}
 
 }

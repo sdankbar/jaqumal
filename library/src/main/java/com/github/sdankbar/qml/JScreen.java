@@ -20,41 +20,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.cpp;
+package com.github.sdankbar.qml;
 
-import com.github.sdankbar.qml.cpp.jna.CppInterface;
-import com.github.sdankbar.qml.cpp.jna.flat_tree.FlatTreeQMLAPI;
-import com.github.sdankbar.qml.cpp.jna.list.ListQMLAPI;
-import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPI;
-import com.sun.jna.Native;
+import java.awt.geom.Rectangle2D;
+import java.util.Objects;
 
-/**
- * Class initializes instances of the C++ APIs.
- */
-public class ApiInstance {
+public class JScreen {
 
-	/**
-	 * C++ API for interacting with a QApplication instance.
-	 */
-	public static final CppInterface LIB_INSTANCE = Native.load("Jaqumal", CppInterface.class);
+	private final Rectangle2D geometry;
+	private final double dpi;
+
+	public JScreen(final Rectangle2D geometry, final double dpi) {
+		this.geometry = Objects.requireNonNull(geometry, "geometry is null");
+		this.dpi = dpi;
+	}
 
 	/**
-	 * C++ API for creating and modifying List models.
+	 * @return the screen dots per inch.
 	 */
-	public static final ListQMLAPI LIST_LIB_INSTANCE = Native.load("Jaqumal", ListQMLAPI.class);
+	public double getDpi() {
+		return dpi;
+	}
 
 	/**
-	 * C++ API for creating and modifying Flat Tree models.
+	 * @return the screen geometry.
 	 */
-	public static final FlatTreeQMLAPI FLAT_TREE_LIB_INSTANCE = Native.load("Jaqumal", FlatTreeQMLAPI.class);
-
-	/**
-	 * C++ API for creating and modifying Singleton models.
-	 */
-	public static final SingletonQMLAPI SINGLETON_LIB_INSTANCE = Native.load("Jaqumal", SingletonQMLAPI.class);
-
-	private ApiInstance() {
-		// Empty Implementation
+	public Rectangle2D getGeometry() {
+		return geometry;
 	}
 
 }

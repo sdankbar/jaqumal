@@ -62,7 +62,18 @@ public interface CppInterface extends Library {
 		void invoke(String exceptionMessage);
 	}
 
+	/**
+	 * Interface for classes to be called when an image is requested.
+	 *
+	 */
 	public interface ImageProviderCallback extends Callback {
+		/**
+		 * @param id Identifier of the requested image
+		 * @param w  Requested width in pixels.
+		 * @param h  Requested height in pixels.
+		 * @return Pointer to the serialized image, see JVariant format. Pointer is null
+		 *         when image is not found.
+		 */
 		Pointer invoke(String id, int w, int h);
 	}
 
@@ -98,6 +109,12 @@ public interface CppInterface extends Library {
 	 */
 	void addEventCallback(EventCallback c);
 
+	/**
+	 * Registers a new image provider.
+	 *
+	 * @param id Identifier of the image provider.
+	 * @param c  The provider's callback.
+	 */
 	public void addImageProvider(String id, ImageProviderCallback c);
 
 	/**
@@ -136,10 +153,17 @@ public interface CppInterface extends Library {
 			double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
 			int hintingPreference, int stretch, int style, String styleName, int styleHint, int styleStrategy);
 
+	Pointer getScreens();
+
 	int getStringWidth(String fontToString, String text);
 
 	Pointer getTightBoundingRect(String fontToString, String text);
 
+	/**
+	 * @param fontToString Serialized font to test.
+	 * @param character    The character to test.
+	 * @return True if the font contains the character.
+	 */
 	boolean inFont(String fontToString, int character);
 
 	/**

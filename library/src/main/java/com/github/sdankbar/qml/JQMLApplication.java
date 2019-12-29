@@ -22,6 +22,7 @@
  */
 package com.github.sdankbar.qml;
 
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
@@ -51,6 +52,8 @@ import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.images.JQMLImageProvider;
 import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
+import com.google.common.collect.ImmutableList;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
@@ -351,6 +354,29 @@ public class JQMLApplication<EType> {
 
 		ApiInstance.LIB_INSTANCE.reloadQMLFile(filePath);
 		JQMLExceptionHandling.checkExceptions();
+	}
+
+	/**
+	 * @return List of the current screens. See QApplication::screens() and QScreen.
+	 */
+	@QtThread
+	public ImmutableList<JScreen> screens() {
+		final Pointer ptr = ApiInstance.LIB_INSTANCE.getScreens();
+
+		final int count = ptr.getInt(0);
+
+		final ImmutableList.Builder<JScreen> builder = ImmutableList.builderWithExpectedSize(count);
+
+		final ByteBuffer buffer = ptr.getByteBuffer(1, count * (8 + 4 * 4));
+		for (int i = 0; i < count; ++i) {
+			final double dpi = buffer.getDouble();
+			final Rectangle2D rect = new Rectangle2D.Double(buffer.getInt(), buffer.getInt(), buffer.getInt(),
+					buffer.getInt());
+			builder.add(new JScreen(rect, dpi));
+		}
+		Native.free(Pointer.nativeValue(ptr));
+
+		return builder.build();
 	}
 
 	private void verifyEventLoopThread() {
