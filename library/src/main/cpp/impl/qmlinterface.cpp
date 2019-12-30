@@ -581,6 +581,7 @@ QVariant toQVariant(void* data, int32_t& size)
         }
         else
         {
+            size = 0;
             return QVariant();
         }
     }
@@ -596,6 +597,7 @@ QVariant toQVariant(void* data, int32_t& size)
             polygon.append(QPointF(x, y));
             workingPtr += 2;
         }
+        size = 1 + 4 + length * (8 + 8);
         return QVariant::fromValue(polygon);
     }
     default:
