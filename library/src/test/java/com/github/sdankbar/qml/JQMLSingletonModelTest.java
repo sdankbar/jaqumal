@@ -146,7 +146,7 @@ public class JQMLSingletonModelTest {
 	/**
 	 *
 	 */
-	@SuppressWarnings("unlikely-arg-type")
+	@SuppressWarnings({ "unlikely-arg-type", "boxing" })
 	@Test
 	public void testContainsKey() {
 		final String[] args = new String[0];

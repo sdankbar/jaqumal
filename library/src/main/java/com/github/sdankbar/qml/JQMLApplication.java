@@ -54,7 +54,6 @@ import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.images.JQMLImageProvider;
 import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
 import com.google.common.collect.ImmutableList;
-import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
@@ -376,7 +375,6 @@ public class JQMLApplication<EType> {
 					buffer.getInt());
 			builder.add(new JScreen(rect, dpi));
 		}
-		Native.free(Pointer.nativeValue(ptr));
 
 		return builder.build();
 	}

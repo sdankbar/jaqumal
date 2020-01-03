@@ -25,11 +25,20 @@ package com.github.sdankbar.qml;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
 
+/**
+ * Details about a screen (ex. dimensions, dpi, etc.)
+ */
 public class JScreen {
 
 	private final Rectangle2D geometry;
 	private final double dpi;
 
+	/**
+	 * Constructor;
+	 *
+	 * @param geometry Screen's geometry
+	 * @param dpi      Screen's average dots per inch
+	 */
 	public JScreen(final Rectangle2D geometry, final double dpi) {
 		this.geometry = Objects.requireNonNull(geometry, "geometry is null");
 		this.dpi = dpi;

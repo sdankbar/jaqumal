@@ -61,13 +61,13 @@ void putByte(char*& ptr, char byte)
 
 void putInt(char*& ptr, int32_t integer)
 {
-    *((int*)ptr) = integer;
+    *(reinterpret_cast<int*>(ptr)) = integer;
     ptr = ptr + 4;
 }
 
 void putDouble(char*& ptr, double real)
 {
-    *((double*)ptr) = real;
+    *(reinterpret_cast<double*>(ptr)) = real;
     ptr = ptr + 8;
 }
 }
@@ -412,11 +412,13 @@ bool inFont(const char* fontToString, const int character)
 
 void* getScreens()
 {
+    static char* retPtr = nullptr;
     if (checkQMLLibrary())
     {
         QList<QScreen*> screens = QMLLibrary::library->getScreens();
-        size_t bytesAllocated = 4 + screens.size() * (8 + 4 * 4);
-        char* retPtr = static_cast<char*>(malloc(bytesAllocated));
+        size_t bytesAllocated = 4u + static_cast<size_t>(screens.size()) * (8u + 4u * 4u);
+        free(retPtr);
+        retPtr = reinterpret_cast<char*>(malloc(bytesAllocated));
         memset(retPtr, 0, bytesAllocated);
 
         char* working = retPtr;

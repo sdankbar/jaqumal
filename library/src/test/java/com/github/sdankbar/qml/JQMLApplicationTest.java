@@ -55,7 +55,6 @@ public class JQMLApplicationTest {
 		final JQMLApplication<NullEventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 
 		final List<JScreen> list = app.screens();
-
 		assertTrue(!list.isEmpty());
 		for (int i = 0; i < list.size(); ++i) {
 			assertTrue(list.get(i).getDpi() > 1);
@@ -64,6 +63,9 @@ public class JQMLApplicationTest {
 			assertTrue(list.get(i).getGeometry().getWidth() > 0);
 			assertTrue(list.get(i).getGeometry().getHeight() > 0);
 		}
+
+		// Ensure no memory corruption
+		app.screens();
 	}
 
 }
