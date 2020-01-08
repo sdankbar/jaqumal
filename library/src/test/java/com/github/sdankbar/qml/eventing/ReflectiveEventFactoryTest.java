@@ -34,6 +34,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -272,5 +273,89 @@ public class ReflectiveEventFactoryTest {
 		assertEquals(Instant.ofEpochMilli(212379), e.getF());
 		assertEquals(new Point(210, 1004), e.getG());
 		assertEquals(new Rectangle(5, 6, 7, 8), e.getH());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCreate_3() {
+		final ReflectiveEventFactory<AbstractEventProcessor> f = new ReflectiveEventFactory<>(
+				Arrays.asList(Event1.class, Event2.class));
+
+		{
+			final ByteBuffer buffer = ByteBuffer.allocate(64);
+			buffer.putInt(73);
+			buffer.putDouble(1.5);
+			buffer.put("ABCD".getBytes());
+			buffer.put((byte) 0);
+			buffer.position(0);
+			final EventParser parser = new EventParser(buffer);
+			final Event1 e = (Event1) f.create("Event1", parser);
+
+			assertEquals(73, e.getA());
+			assertEquals(1.5, e.getB(), 0.001);
+			assertEquals("ABCD", e.getC());
+		}
+		{
+			final ByteBuffer buffer = ByteBuffer.allocate(64);
+			buffer.put((byte) 1);
+			buffer.putFloat(1.5f);
+			buffer.putLong(92);
+			buffer.putInt(Color.cyan.getRGB());
+
+			buffer.putInt(4);
+			buffer.putInt(102);
+
+			buffer.putLong(212379);
+
+			buffer.putInt(210);
+			buffer.putInt(1004);
+
+			buffer.putInt(5);
+			buffer.putInt(6);
+			buffer.putInt(7);
+			buffer.putInt(8);
+
+			buffer.position(0);
+			final EventParser parser = new EventParser(buffer);
+			final Event2 e = (Event2) f.create("Event2", parser);
+
+			assertTrue(e.isA());
+			assertEquals(1.5, e.getB(), 0.001);
+			assertEquals(92, e.getC());
+			assertEquals(Color.CYAN, e.getD());
+			assertEquals(new Dimension(4, 102), e.getE());
+			assertEquals(Instant.ofEpochMilli(212379), e.getF());
+			assertEquals(new Point(210, 1004), e.getG());
+			assertEquals(new Rectangle(5, 6, 7, 8), e.getH());
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCreate_perf() {
+		final ReflectiveEventFactory<AbstractEventProcessor> f = new ReflectiveEventFactory<>(Event1.class);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.putInt(73);
+		buffer.putDouble(1.5);
+		buffer.put("ABCD".getBytes());
+		buffer.put((byte) 0);
+
+		final long start = System.currentTimeMillis();
+		final int iterations = 100000;
+		for (int i = 0; i < iterations; ++i) {
+			buffer.position(0);
+			final EventParser parser = new EventParser(buffer);
+			assertTrue(f.create("Event1", parser) != null);
+		}
+		final long end = System.currentTimeMillis();
+
+		final double seconds = (end - start) / 1000.0;
+		System.out.println("Created " + (iterations / seconds) + " events per second");
+
 	}
 }
