@@ -45,7 +45,7 @@ public class EventParser {
 	 * @param buffer ByteBuffer containing the Event's data in serialized format.
 	 */
 	public EventParser(final ByteBuffer buffer) {
-		this.buffer = Objects.requireNonNull(buffer);
+		this.buffer = Objects.requireNonNull(buffer, "buffer is null");
 	}
 
 	/**
