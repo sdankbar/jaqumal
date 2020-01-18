@@ -25,50 +25,94 @@ package com.github.sdankbar.qml.models.list;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.JVariant.Type;
-import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+/**
+ * Model that can be used for drawing scatter/line graphs with Qml Charts.
+ */
 public class JQMLXYSeriesModel {
 
-	public enum SeriesRoles {
-		X, //
+	/**
+	 * Valid keys for this model.
+	 */
+	private enum SeriesRoles {
+		/**
+		 * Graph X coordinate
+		 */
+		X,
+		/**
+		 * Graph Y coordinate
+		 */
 		Y;
 	}
 
 	private static ImmutableMap<SeriesRoles, JVariant> toMap(final Point2D p) {
+		Objects.requireNonNull(p, "p is null");
 		return ImmutableMap.of(SeriesRoles.X, new JVariant(p.getX()), SeriesRoles.Y, new JVariant(p.getY()));
 	}
 
 	private final JQMLListModel<SeriesRoles> model;
 
-	public JQMLXYSeriesModel(final String modelName, final JQMLModelFactory factory,
-			final EventDispatcher<?> dispatcher) {
+	/**
+	 * Constructs a new model.
+	 *
+	 * @param modelName The model's name.
+	 * @param factory   Model factory to make the list model that backs this model.
+	 */
+	public JQMLXYSeriesModel(final String modelName, final JQMLModelFactory factory) {
 		model = factory.createListModel(modelName, SeriesRoles.class);
 	}
 
+	/**
+	 * Appends a list of points to the graph.
+	 *
+	 * @param points The points to add.
+	 */
 	public void addAllPoints(final List<Point2D> points) {
+		Objects.requireNonNull(points, "points is null");
 		final ImmutableList<Map<SeriesRoles, JVariant>> dataList = points.stream().map(JQMLXYSeriesModel::toMap)
 				.collect(ImmutableList.toImmutableList());
 		model.addAll(dataList);
 	}
 
+	/**
+	 * Adds a point at index, shifting the existing point at index to the right.
+	 *
+	 * @param index Index to insert at.
+	 * @param p     Point to insert.
+	 */
 	public void addPoint(final int index, final Point2D p) {
 		model.add(index, toMap(p));
 	}
 
+	/**
+	 * Appends a point to the graph.
+	 *
+	 * @param p Point to add.
+	 */
 	public void addPoint(final Point2D p) {
 		model.add(toMap(p));
 	}
 
+	/**
+	 * Removes all points from the graph.
+	 */
 	public void clearAllPoints() {
 		model.clear();
 	}
 
+	/**
+	 * Removes the point at index from the graph.
+	 *
+	 * @param index Index of the point to remove.
+	 * @return The point that was removed or null if no point was removed.
+	 */
 	public Point2D removePoint(final int index) {
 		final Map<SeriesRoles, JVariant> oldData = model.remove(index);
 		if (oldData != null && oldData.containsKey(SeriesRoles.X) && oldData.containsKey(SeriesRoles.Y)) {

@@ -26,28 +26,39 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jna.CppInterface.ImageProviderCallback;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.sun.jna.Pointer;
 
+/**
+ * Wraps a JQMLImageProvider, allowing it to be called from C++.
+ */
 public class JQMLImageProviderWrapper implements ImageProviderCallback {
-
-	private static final Logger log = LoggerFactory.getLogger(JQMLImageProviderWrapper.class);
 
 	private final String id;
 	private final JQMLImageProvider provider;
 	private final SharedJavaCppMemory memory = new SharedJavaCppMemory(16 * 1024 * 1024);
 
+	/**
+	 * Constructs new wrapper.
+	 *
+	 * @param id       Identifier of the provider.
+	 * @param provider The provider to wrap.
+	 */
 	public JQMLImageProviderWrapper(final String id, final JQMLImageProvider provider) {
 		this.id = Objects.requireNonNull(id, "id null");
 		this.provider = Objects.requireNonNull(provider, "provider is null");
 
 		ApiInstance.LIB_INSTANCE.addImageProvider(id, this);
+	}
+
+	/**
+	 * @return This provider's identifier.
+	 */
+	public String getProviderID() {
+		return id;
 	}
 
 	@Override

@@ -25,8 +25,18 @@ package com.github.sdankbar.qml.images;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
+/**
+ * Interface for classes that provide QML with images.
+ */
 public interface JQMLImageProvider {
 
+	/**
+	 * Called when QML requests an image from this provider.
+	 *
+	 * @param id            The identifier of the image requested.
+	 * @param requestedSize The size of the requested image.
+	 * @return The requested image.
+	 */
 	BufferedImage requestImage(String id, Dimension requestedSize);
 
 }

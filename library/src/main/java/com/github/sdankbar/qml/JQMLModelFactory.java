@@ -33,6 +33,7 @@ import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.exceptions.QMLThreadingException;
+import com.github.sdankbar.qml.models.JQMLMapPool;
 import com.github.sdankbar.qml.models.flat_tree.FlatTreeAccessor;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
@@ -43,6 +44,7 @@ import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
 import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * The JQMLModelFactory allows for the creation of Singleton, List, and Tree
@@ -174,6 +176,44 @@ public class JQMLModelFactory {
 	}
 
 	/**
+	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
+	 *
+	 * @param name          Name of the model.
+	 * @param enumClass     Class of the Enum that is used as the new model's key.
+	 * @param initialValues Map of the initial values put into a model's item when
+	 *                      allocated and released.
+	 * @throws QMLThreadingException Thrown if not called from the Qt Thread once
+	 *                               JQMLApplication.execute() is called.
+	 * @throws QMLException          Thrown if a model already exists with name.
+	 * @return The new pool.
+	 */
+	@QtThread
+	public <K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
+			final ImmutableMap<K, JVariant> initialValues) {
+		final JQMLListModel<K> model = createListModel(name, enumClass);
+		return new JQMLMapPool<>(model, initialValues);
+	}
+
+	/**
+	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
+	 *
+	 * @param name          Name of the model.
+	 * @param keys          The set of keys that can be used by the new model.
+	 * @param initialValues Map of the initial values put into a model's item when
+	 *                      allocated and released.
+	 * @throws QMLThreadingException Thrown if not called from the Qt Thread once
+	 *                               JQMLApplication.execute() is called.
+	 * @throws QMLException          Thrown if a model already exists with name.
+	 * @return The new pool.
+	 */
+	@QtThread
+	public <K> JQMLMapPool<K> createPool(final String name, final Set<K> keys,
+			final ImmutableMap<K, JVariant> initialValues) {
+		final JQMLListModel<K> model = createListModel(name, keys);
+		return new JQMLMapPool<>(model, initialValues);
+	}
+
+	/**
 	 * Creates a new JQMLSingletonModel with Class<K> being its key.
 	 *
 	 * @param name      Name of the model.
@@ -228,11 +268,17 @@ public class JQMLModelFactory {
 		return m;
 	}
 
+	/**
+	 * Creates a new JQMLXYSeriesModel which can be used for line/scatter graphs.
+	 *
+	 * @param name The name of the model.
+	 * @return The new model.
+	 */
 	@QtThread()
 	public JQMLXYSeriesModel createXYSeriesModel(final String name) {
 		JQMLUtilities.checkThread(eventLoopThread);
 
-		return new JQMLXYSeriesModel(name, this, app.getEventDispatcher());
+		return new JQMLXYSeriesModel(name, this);
 	}
 
 }
