@@ -95,6 +95,8 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 			return parser.getRectangle();
 		} else if (c.equals(String.class)) {
 			return parser.getString();
+		} else if (c.equals(EventParser.class)) {
+			return parser;
 		} else {
 			throw new QMLException("Unknown parameter type in constructor");
 		}
@@ -154,9 +156,15 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 			Preconditions.checkArgument(c.getConstructors().length == 1, "Class must have exactly 1 constructor: ", c);
 			final MethodHandle h = lookup.unreflectConstructor(c.getConstructors()[0]);
 
-			for (final Class<?> arg : h.type().parameterList()) {
-				Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg),
+			if (h.type().parameterCount() == 1) {
+				final Class<?> arg = h.type().parameterType(0);
+				Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg) || arg.equals(EventParser.class),
 						"Class not supported as constructor parameter: ", arg);
+			} else {
+				for (final Class<?> arg : h.type().parameterList()) {
+					Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg),
+							"Class not supported as constructor parameter: ", arg);
+				}
 			}
 
 			return h;

@@ -61,6 +61,13 @@ public class ReflectiveEventFactoryTest {
 		default void handle(final Event2 e) {
 			// Empty Implementation
 		}
+
+		/**
+		 * @param e
+		 */
+		default void handle(final Event3 e) {
+			// Empty Implementation
+		}
 	}
 
 	/**
@@ -214,6 +221,53 @@ public class ReflectiveEventFactoryTest {
 
 	/**
 	 *
+	 *
+	 */
+	public static class Event3 extends Event<AbstractEventProcessor> {
+
+		private final int a;
+		private final double b;
+		private final String c;
+
+		/**
+		 * @param p
+		 */
+		public Event3(final EventParser p) {
+			a = p.getInteger();
+			b = p.getDouble();
+			c = p.getString();
+		}
+
+		/**
+		 * @return the a
+		 */
+		public int getA() {
+			return a;
+		}
+
+		/**
+		 * @return the b
+		 */
+		public double getB() {
+			return b;
+		}
+
+		/**
+		 * @return the c
+		 */
+		public String getC() {
+			return c;
+		}
+
+		@Override
+		public void handle(final AbstractEventProcessor processor) {
+			processor.handle(this);
+		}
+
+	}
+
+	/**
+	 *
 	 */
 	@Test
 	public void testCreate_1() {
@@ -330,6 +384,27 @@ public class ReflectiveEventFactoryTest {
 			assertEquals(new Point(210, 1004), e.getG());
 			assertEquals(new Rectangle(5, 6, 7, 8), e.getH());
 		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCreate_4() {
+		final ReflectiveEventFactory<AbstractEventProcessor> f = new ReflectiveEventFactory<>(Event3.class);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.putInt(73);
+		buffer.putDouble(1.5);
+		buffer.put("ABCD".getBytes());
+		buffer.put((byte) 0);
+		buffer.position(0);
+		final EventParser parser = new EventParser(buffer);
+		final Event3 e = (Event3) f.create("Event3", parser);
+
+		assertEquals(73, e.getA());
+		assertEquals(1.5, e.getB(), 0.001);
+		assertEquals("ABCD", e.getC());
 	}
 
 	/**
