@@ -365,7 +365,7 @@ public class JQMLApplication<EType> {
 
 		final int count = ptr.getInt(0);
 
-		final ImmutableList.Builder<JScreen> builder = ImmutableList.builderWithExpectedSize(count);
+		final ImmutableList.Builder<JScreen> builder = ImmutableList.builder();
 
 		final ByteBuffer buffer = ptr.getByteBuffer(4, count * (8 + 4 * 4));
 		buffer.order(ByteOrder.nativeOrder());
