@@ -208,7 +208,17 @@ public class JVariant {
 	 * Immutable JVariant containing 0 as a double.
 	 */
 	public static final JVariant NULL_DOUBLE = new JVariant(0.0);
-	
+
+	/**
+	 * Immutable JVariant containing true.
+	 */
+	public static final JVariant TRUE = new JVariant(true);
+
+	/**
+	 * Immutable JVariant containing false.
+	 */
+	public static final JVariant FALSE = new JVariant(false);
+
 	private static void checkSize(final SharedJavaCppMemory reuse, final int size) {
 		if (size > reuse.getSize()) {
 			throw new IllegalArgumentException("Serialized JVariant does not fit in shared memory");
@@ -350,12 +360,28 @@ public class JVariant {
 		}
 	}
 
+	/**
+	 * Returns a TRUE or FALSE JVariant. Does not allocate memory and thus has
+	 * better time and space performance compared to calling new JVariant(boolean).
+	 *
+	 * @param v The value of the JVariant to return.
+	 * @return a JVariant containing TRUE or FALSE to match the value of v.
+	 */
+	public static JVariant valueOf(final boolean v) {
+		if (v) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+
 	private final Type type;
 
 	private final Object obj;
 
 	/**
-	 * Constructs a new JVariant from a boolean.
+	 * Constructs a new JVariant from a boolean. Should prefer using valueOf to
+	 * avoid memory allocation.
 	 *
 	 * @param v The variant's value.
 	 */
@@ -365,7 +391,8 @@ public class JVariant {
 	}
 
 	/**
-	 * Constructs a new JVariant from a Boolean.
+	 * Constructs a new JVariant from a Boolean. Should prefer using valueOf to
+	 * avoid memory allocation.
 	 *
 	 * @param v The variant's value.
 	 */
