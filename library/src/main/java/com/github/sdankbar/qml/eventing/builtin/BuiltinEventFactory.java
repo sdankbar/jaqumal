@@ -51,6 +51,8 @@ public class BuiltinEventFactory implements EventFactory<BuiltinEventProcessor> 
 			return new TextInputEditingFinishedEvent(parser.getString());
 		case "Builtin-PerformanceEvent":
 			return new RenderEvent(PERF_EVENT_ARRAY[parser.getInteger()]);
+		case "ListSelectionChangedEvent":
+			return new ListSelectionChangedEvent(parser.getBoolean(), parser.getInteger(), parser.getString());
 		default:
 			return null;
 		}

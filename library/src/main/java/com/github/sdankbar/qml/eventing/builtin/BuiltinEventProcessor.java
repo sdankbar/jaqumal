@@ -46,6 +46,15 @@ public interface BuiltinEventProcessor {
 	}
 
 	/**
+	 * Called when a ListSelectionChangedEvent is generated.
+	 *
+	 * @param e The BuiltinEvent to handle.
+	 */
+	default void handle(final ListSelectionChangedEvent e) {
+		// Empty Implementation
+	}
+
+	/**
 	 * Called when a MouseClickEvent is generated.
 	 *
 	 * @param e The BuiltinEvent to handle.
@@ -89,5 +98,4 @@ public interface BuiltinEventProcessor {
 	default void handle(final TextInputEditingFinishedEvent e) {
 		// Empty Implementation
 	}
-
 }

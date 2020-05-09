@@ -37,16 +37,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.sun.jna.Pointer;
-
 import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jna.list.ListQMLAPIFast;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.sun.jna.Pointer;
 
 /**
  * A model that is available to QML. Represents a list of Maps from the key type
@@ -66,6 +65,8 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 	private final Map<String, Integer> indexLookup = new HashMap<>();
 
 	private final List<Map<K, JVariant>> mapRefs = new ArrayList<>();
+
+	private final List<ListListener<K>> listeners = new ArrayList<>();
 
 	/**
 	 * Constructor.
@@ -139,6 +140,8 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 				accessor.copy(newIndex), indexLookup);
 		mapRefs.add(temp);
 
+		fireAddEvent(mapRefs.size() - 1, temp);
+
 		return temp;
 	}
 
@@ -177,6 +180,8 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 
 		resetMapIndicies();
 
+		fireAddEvent(index, temp);
+
 		return temp;
 	}
 
@@ -207,6 +212,8 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 		mapRefs.add(index, temp);
 
 		resetMapIndicies();
+
+		fireAddEvent(index, temp);
 
 		return temp;
 	}
@@ -243,6 +250,8 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 		final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
 				accessor.copy(newIndex), indexLookup);
 		mapRefs.add(map);
+
+		fireAddEvent(mapRefs.size() - 1, map);
 
 		return map;
 	}
@@ -315,6 +324,12 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 			}
 		}
 		return true;
+	}
+
+	private void fireAddEvent(final int index, final Map<K, JVariant> map) {
+		for (final ListListener<K> l : listeners) {
+			l.added(index, map);
+		}
 	}
 
 	@Override
@@ -408,6 +423,14 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 	@Override
 	public ListIterator<Map<K, JVariant>> listIterator(final int index) {
 		return ImmutableList.copyOf(mapRefs).listIterator(index);
+	}
+
+	/**
+	 * @param l ListListener to receive callbacks on this list changing.
+	 */
+	public void registerListener(final ListListener<K> l) {
+		verifyEventLoopThread();
+		listeners.add(Objects.requireNonNull(l, "l is null"));
 	}
 
 	@Override
@@ -517,6 +540,9 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 			final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
 					accessor.copy(mapRefs.size()), indexLookup);
 			mapRefs.add(map);
+
+			fireAddEvent(mapRefs.size() - 1, map);
+
 			added = true;
 		}
 
@@ -579,6 +605,14 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 	@Override
 	public <T> T[] toArray(final T[] a) {
 		return mapRefs.toArray(a);
+	}
+
+	/**
+	 * @param l ListListener to unregister.
+	 */
+	public void unregisterListener(final ListListener<K> l) {
+		verifyEventLoopThread();
+		listeners.remove(l);
 	}
 
 }
