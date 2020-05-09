@@ -64,6 +64,7 @@ public class JVariantTest {
 		{
 			final JVariant v1 = new JVariant(true);
 			assertTrue(v1.asBoolean());
+			assertTrue(new JVariant(3).asBoolean(true));
 			assertTrue(v1.asType(Boolean.class).get().booleanValue());
 			assertTrue(v1.asType(Boolean.class, Boolean.FALSE).booleanValue());
 			assertFalse(v1.asType(Double.class).isPresent());
@@ -105,6 +106,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(array);
 		assertArrayEquals(array, v1.asByteArray());
+		assertArrayEquals(new JVariant(3).asByteArray(new byte[2]), new byte[2]);
 		assertArrayEquals(array, v1.asType(byte[].class).get());
 		assertArrayEquals(array, v1.asType(byte[].class, new byte[2]));
 
@@ -140,6 +142,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asColor());
+		assertEquals(new JVariant(3).asColor(Color.blue), Color.blue);
 		assertEquals(v, v1.asType(Color.class).get());
 		assertEquals(v, v1.asType(Color.class, Color.yellow));
 
@@ -164,6 +167,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asDateTime());
+		assertEquals(new JVariant(3).asDateTime(v), v);
 		assertEquals(v, v1.asType(Instant.class).get());
 		assertEquals(v, v1.asType(Instant.class, Instant.EPOCH));
 
@@ -220,6 +224,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asFont());
+		assertEquals(new JVariant(3).asFont(v), v);
 		assertEquals(v, v1.asType(JFont.class).get());
 		assertEquals(v, v1.asType(JFont.class, JFont.builder().build()));
 
@@ -247,6 +252,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asImage());
+		assertEquals(new JVariant(3).asImage(v), v);
 		assertEquals(v, v1.asType(BufferedImage.class).get());
 		assertEquals(v, v1.asType(BufferedImage.class, new BufferedImage(30, 29, BufferedImage.TYPE_INT_ARGB)));
 
@@ -279,6 +285,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asLine());
+		assertEquals(new JVariant(3).asLine(v), v);
 		assertEquals(v, v1.asType(Line2D.class).get());
 		assertEquals(v, v1.asType(Line2D.class, new Line2D.Double()));
 
@@ -310,6 +317,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asPoint());
+		assertEquals(new JVariant(3).asPoint(v), v);
 		assertEquals(v, v1.asType(Point2D.class).get());
 		assertEquals(v, v1.asType(Point2D.class, new Point2D.Double(0, 0)));
 
@@ -333,6 +341,7 @@ public class JVariantTest {
 	public void polygon_0() {
 		final JVariant v1 = new JVariant(ImmutableList.of());
 		assertEquals(ImmutableList.of(), v1.asPolyline());
+		assertEquals(new JVariant(3).asPolyline(ImmutableList.of()), ImmutableList.of());
 		assertEquals(ImmutableList.of(), v1.asType(ImmutableList.class).get());
 		assertEquals(ImmutableList.of(), v1.asType(ImmutableList.class, ImmutableList.of()));
 
@@ -412,6 +421,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asRectangle());
+		assertEquals(new JVariant(3).asRectangle(v), v);
 		assertEquals(v, v1.asType(Rectangle2D.class).get());
 		assertEquals(v, v1.asType(Rectangle2D.class, new Rectangle2D.Double()));
 
@@ -439,6 +449,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asRegularExpression());
+		assertEquals(new JVariant(3).asRegularExpression(v), v);
 		assertEquals(v, v1.asType(Pattern.class).get());
 		assertEquals(v, v1.asType(Pattern.class, Pattern.compile(".+")));
 
@@ -466,6 +477,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asSize());
+		assertEquals(new JVariant(3).asSize(v), v);
 		assertEquals(v, v1.asType(Dimension.class).get());
 		assertEquals(v, v1.asType(Dimension.class, new Dimension(0, 0)));
 
@@ -504,6 +516,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asString());
+		assertEquals(new JVariant(3).asString(v), v);
 		assertEquals(v, v1.asType(String.class).get());
 		assertEquals(v, v1.asType(String.class, ""));
 
@@ -531,6 +544,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asDouble(), 0.00001);
+		assertEquals(new JVariant(4).asDouble(3.0), 3.0, 0.00001);
 		assertEquals(v, v1.asType(Double.class).get().doubleValue(), 0.00001);
 		assertEquals(v, v1.asType(Double.class, Double.valueOf(992.9)).doubleValue(), 0.00001);
 
@@ -560,6 +574,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asFloat(), 0.00001);
+		assertEquals(new JVariant(4).asFloat(3.0f), 3.0, 0.00001);
 		assertEquals(v, v1.asType(Float.class).get().floatValue(), 0.00001);
 		assertEquals(v, v1.asType(Float.class, Float.valueOf(992.9f)).floatValue(), 0.00001);
 
@@ -589,6 +604,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asInteger());
+		assertEquals(new JVariant(4.5).asInteger(3), 3);
 		assertEquals(v, v1.asType(Integer.class).get().intValue());
 		assertEquals(v, v1.asType(Integer.class, Integer.valueOf(44)).intValue());
 
@@ -618,6 +634,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asLong());
+		assertEquals(new JVariant(4.5).asLong(3), 3);
 		assertEquals(v, v1.asType(Long.class).get().longValue());
 		assertEquals(v, v1.asType(Long.class, Long.valueOf(44)).longValue());
 
@@ -648,6 +665,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asURL());
+		assertEquals(new JVariant(4.5).asURL(v), v);
 		assertEquals(v, v1.asType(URL.class).get());
 		assertEquals(v, v1.asType(URL.class, new URL("http://www.b.com")));
 
@@ -675,6 +693,7 @@ public class JVariantTest {
 
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asUUID());
+		assertEquals(new JVariant(4.5).asUUID(v), v);
 		assertEquals(v, v1.asType(UUID.class).get());
 		assertEquals(v, v1.asType(UUID.class, UUID.randomUUID()));
 

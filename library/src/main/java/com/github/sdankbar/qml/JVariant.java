@@ -194,6 +194,21 @@ public class JVariant {
 	private static final Logger logger = LoggerFactory.getLogger(JVariant.class);
 	private static final Type[] TYPE_ARRAY = Type.values();
 
+	/**
+	 * Immutable JVariant containing the empty string.
+	 */
+	public static final JVariant NULL_STR = new JVariant("");
+
+	/**
+	 * Immutable JVariant containing 0 as an integer.
+	 */
+	public static final JVariant NULL_INT = new JVariant(0);
+
+	/**
+	 * Immutable JVariant containing 0 as a double.
+	 */
+	public static final JVariant NULL_DOUBLE = new JVariant(0.0);
+	
 	private static void checkSize(final SharedJavaCppMemory reuse, final int size) {
 		if (size > reuse.getSize()) {
 			throw new IllegalArgumentException("Serialized JVariant does not fit in shared memory");
@@ -589,6 +604,19 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a BOOL
+	 * @return The JVariant's value as a boolean or the defaultValue if not the
+	 *         correct type.
+	 */
+	public boolean asBoolean(final boolean defaultValue) {
+		if (type == Type.BOOL) {
+			return ((Boolean) obj).booleanValue();
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a byte array.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not
 	 *                                  BYTE_ARRAY
@@ -599,12 +627,38 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a BYTE_ARRAY
+	 * @return The JVariant's value as a byte array or the defaultValue if not the
+	 *         correct type.
+	 */
+	public byte[] asByteArray(final byte[] defaultValue) {
+		if (type == Type.BYTE_ARRAY) {
+			return (byte[]) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a Color.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not COLOR.
 	 */
 	public Color asColor() {
 		Preconditions.checkArgument(type == Type.COLOR, "Wrong type, type is {}", type);
 		return (Color) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a COLOR
+	 * @return The JVariant's value as a Color or the defaultValue if not the
+	 *         correct type.
+	 */
+	public Color asColor(final Color defaultValue) {
+		if (type == Type.COLOR) {
+			return (Color) obj;
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -618,12 +672,38 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a DATE_TIME
+	 * @return The JVariant's value as an Instant or the defaultValue if not the
+	 *         correct type.
+	 */
+	public Instant asDateTime(final Instant defaultValue) {
+		if (type == Type.DATE_TIME) {
+			return (Instant) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a double.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not DOUBLE
 	 */
 	public double asDouble() {
 		Preconditions.checkArgument(type == Type.DOUBLE, "Wrong type, type is {}", type);
 		return ((Double) obj).doubleValue();
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a DOUBLE
+	 * @return The JVariant's value as a double or the defaultValue if not the
+	 *         correct type.
+	 */
+	public double asDouble(final double defaultValue) {
+		if (type == Type.DOUBLE) {
+			return ((Double) obj).doubleValue();
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -636,12 +716,38 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a FLOAT
+	 * @return The JVariant's value as a float or the defaultValue if not the
+	 *         correct type.
+	 */
+	public float asFloat(final float defaultValue) {
+		if (type == Type.FLOAT) {
+			return ((Float) obj).floatValue();
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a JFont.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not Font
 	 */
 	public JFont asFont() {
 		Preconditions.checkArgument(type == Type.FONT, "Wrong type, type is {}", type);
 		return (JFont) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a FONT
+	 * @return The JVariant's value as a Font or the defaultValue if not the correct
+	 *         type.
+	 */
+	public JFont asFont(final JFont defaultValue) {
+		if (type == Type.FONT) {
+			return (JFont) obj;
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -654,12 +760,38 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a Image
+	 * @return The JVariant's value as a BufferedImage or the defaultValue if not
+	 *         the correct type.
+	 */
+	public BufferedImage asImage(final BufferedImage defaultValue) {
+		if (type == Type.IMAGE) {
+			return (BufferedImage) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as an int.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not INT
 	 */
 	public int asInteger() {
 		Preconditions.checkArgument(type == Type.INT, "Wrong type, type is {}", type);
 		return ((Integer) obj).intValue();
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a INT
+	 * @return The JVariant's value as a int or the defaultValue if not the correct
+	 *         type.
+	 */
+	public int asInteger(final int defaultValue) {
+		if (type == Type.INT) {
+			return ((Integer) obj).intValue();
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -672,6 +804,19 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a LINE
+	 * @return The JVariant's value as a Line2D or the defaultValue if not the
+	 *         correct type.
+	 */
+	public Line2D asLine(final Line2D defaultValue) {
+		if (type == Type.LINE) {
+			return (Line2D) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a long.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not LONG
 	 */
@@ -681,12 +826,38 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a LONG
+	 * @return The JVariant's value as a long or the defaultValue if not the correct
+	 *         type.
+	 */
+	public long asLong(final long defaultValue) {
+		if (type == Type.LONG) {
+			return ((Long) obj).longValue();
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a Point2D.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not POINT
 	 */
 	public Point2D asPoint() {
 		Preconditions.checkArgument(type == Type.POINT, "Wrong type, type is {}", type);
 		return (Point2D) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a POINT
+	 * @return The JVariant's value as a Point2D or the defaultValue if not the
+	 *         correct type.
+	 */
+	public Point2D asPoint(final Point2D defaultValue) {
+		if (type == Type.POINT) {
+			return (Point2D) obj;
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -701,6 +872,20 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a POLYLINE
+	 * @return The JVariant's value as an ImmutableList<Point2D> or the defaultValue
+	 *         if not the correct type.
+	 */
+	@SuppressWarnings("unchecked")
+	public ImmutableList<Point2D> asPolyline(final ImmutableList<Point2D> defaultValue) {
+		if (type == Type.POLYLINE) {
+			return (ImmutableList<Point2D>) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a Rectangle2D.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not
 	 *                                  RECTANGLE
@@ -708,6 +893,19 @@ public class JVariant {
 	public Rectangle2D asRectangle() {
 		Preconditions.checkArgument(type == Type.RECTANGLE, "Wrong type, type is {}", type);
 		return (Rectangle2D) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a RECTANGLE
+	 * @return The JVariant's value as a Rectangle2D or the defaultValue if not the
+	 *         correct type.
+	 */
+	public Rectangle2D asRectangle(final Rectangle2D defaultValue) {
+		if (type == Type.RECTANGLE) {
+			return (Rectangle2D) obj;
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -721,6 +919,19 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a REGULAR_EXPRESSION
+	 * @return The JVariant's value as a Pattern or the defaultValue if not the
+	 *         correct type.
+	 */
+	public Pattern asRegularExpression(final Pattern defaultValue) {
+		if (type == Type.REGULAR_EXPRESSION) {
+			return (Pattern) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a Dimension.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not SIZE
 	 */
@@ -730,12 +941,38 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a SIZE
+	 * @return The JVariant's value as a Dimension or the defaultValue if not the
+	 *         correct type.
+	 */
+	public Dimension asSize(final Dimension defaultValue) {
+		if (type == Type.SIZE) {
+			return (Dimension) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a String.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not STRING
 	 */
 	public String asString() {
 		Preconditions.checkArgument(type == Type.STRING, "Wrong type, type is {}", type);
 		return (String) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a STRING
+	 * @return The JVariant's value as a String or the defaultValue if not the
+	 *         correct type.
+	 */
+	public String asString(final String defaultValue) {
+		if (type == Type.STRING) {
+			return (String) obj;
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
@@ -775,12 +1012,38 @@ public class JVariant {
 	}
 
 	/**
+	 * @param defaultValue Value to return if JVariant is not a URL
+	 * @return The JVariant's value as a URL or the defaultValue if not the correct
+	 *         type.
+	 */
+	public URL asURL(final URL defaultValue) {
+		if (type == Type.URL) {
+			return (URL) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a UUID.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not UUID
 	 */
 	public UUID asUUID() {
 		Preconditions.checkArgument(type == Type.UUID, "Wrong type, type is {}", type);
 		return (UUID) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a UUID
+	 * @return The JVariant's value as a UUID or the defaultValue if not the correct
+	 *         type.
+	 */
+	public UUID asUUID(final UUID defaultValue) {
+		if (type == Type.UUID) {
+			return (UUID) obj;
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
