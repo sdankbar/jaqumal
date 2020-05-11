@@ -7,5 +7,6 @@
         <file>PerformanceMonitor.qml</file>
         <file>JLineSeries.qml</file>
         <file>JPolyline.qml</file>
+        <file>JListView.qml</file>
     </qresource>
 </RCC>

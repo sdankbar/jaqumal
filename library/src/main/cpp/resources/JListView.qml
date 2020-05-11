@@ -1,4 +1,6 @@
-﻿/**
+
+
+/**
  * The MIT License
  * Copyright © 2019 Stephen Dankbar
  *
@@ -20,51 +22,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import QtQuick 2.10
-import QtQuick.Window 2.10
+import QtQuick 2.0
 import QtQuick.Controls 1.4
-import QtQuick.Dialogs 1.3
-import QtQuick.Controls.Styles 1.4
-import QtGraphicalEffects 1.0
 import com.github.sdankbar.jaqumal 0.4
 
-Window {
-    visible: true
-    width: 800
-    height: 600
-    x: 400
-    y: 400
-    title: qsTr("ListView")
-    id: mainWindow
+ListView {
+    id: internalView
+    property string model_name
 
     EventBuilder {
         id: eventing
     }
 
-	JListView {
-		id: listView
-		anchors.fill: parent
-		spacing: 1
-		model_name: "list_model"
-        model: list_model
+    function selectIndex(index) {
+    	eventing.addBoolean(true)
+    	eventing.addInteger(index)
+    	eventing.addString(model_name)
+    	eventing.fireEvent("ListSelectionChangedEvent")
+    }
+    
+    function deselectIndex(index) {
+    	eventing.addBoolean(false)
+    	eventing.addInteger(index)
+    	eventing.addString(model_name)
+    	eventing.fireEvent("ListSelectionChangedEvent")
+    }
 
-        delegate: Rectangle {
-        	width: 50
-        	height: 20
-        	color: model.is_selected ? "light blue" : "transparent"
-        	border.color: "black"
-        	Text {
-        		anchors.fill: parent
-	            text: model.text
-    	    }
-    	    MouseArea {
-    	    	anchors.fill: parent
-    	    	onClicked: {
-    	    		listView.toggleSelectionIndex(index)
-    	    	}
-    	    }
-    	}
-	}
-
-
+    function toggleSelectionIndex(index) {
+    	eventing.addBoolean(!model.getData(index).is_selected)
+    	eventing.addInteger(index)
+    	eventing.addString(model_name)
+    	eventing.fireEvent("ListSelectionChangedEvent")
+    }
 }

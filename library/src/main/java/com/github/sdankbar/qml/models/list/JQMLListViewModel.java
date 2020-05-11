@@ -30,6 +30,7 @@ import java.util.Objects;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.ListSelectionChangedEvent;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -44,7 +45,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @param <K> Key type for the list model. Must contain the key "is_selected".
  */
-public class JQMLListViewModel<K> implements ListListener<K> {
+public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProcessor {
 
 	/**
 	 * Listener for selection changes in a JQMLListViewModel
@@ -138,6 +139,8 @@ public class JQMLListViewModel<K> implements ListListener<K> {
 		listModel.registerListener(this);
 
 		isSelectedKey = getKey(keys, "is_selected");
+
+		app.getEventDispatcher().register(ListSelectionChangedEvent.class, this);
 	}
 
 	@Override
@@ -230,6 +233,7 @@ public class JQMLListViewModel<K> implements ListListener<K> {
 	 *
 	 * @param e Event object
 	 */
+	@Override
 	public void handle(final ListSelectionChangedEvent e) {
 		if (isEventValidForModel(e)) {
 			setSelection(e.getSelectedIndex(), e.isSelected());
