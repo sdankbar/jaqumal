@@ -43,10 +43,11 @@ Window {
 		id: listView
 		anchors.fill: parent
 		spacing: 1
-		model_name: "list_model"
+		modelName: "list_model"
         model: list_model
         keyNavigationEnabled: true
         focus: true
+        selectionFollowsHighlight: true
 		
 		highlight: Rectangle {
 			color: "red"

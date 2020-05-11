@@ -26,35 +26,66 @@ import com.github.sdankbar.jaqumal 0.4
 
 ListView {
     id: internalView
-    property string model_name
+    property string modelName
+    property bool selectionFollowsHighlight: false
 
     EventBuilder {
         id: eventing
     }
 
+	QtObject {
+		id: internal
+		property bool blockEvent: false;
+	}
+
     function selectIndex(index) {
-    	eventing.addBoolean(true)
-    	eventing.addInteger(index)
-    	eventing.addString(model_name)
-    	eventing.fireEvent("ListSelectionChangedEvent")
+    	if (!internal.blockEvent) {
+    		eventing.addBoolean(true)
+    		eventing.addInteger(index)
+    		eventing.addString(modelName)
+    		eventing.fireEvent("ListSelectionChangedEvent")
+    		
+    		if (selectionFollowsHighlight) {
+    			internal.blockEvent = true;
+    			currentIndex = index;
+    			internal.blockEvent = false;
+    		}
+    	}
     }
     
     function deselectIndex(index) {
-    	eventing.addBoolean(false)
-    	eventing.addInteger(index)
-    	eventing.addString(model_name)
-    	eventing.fireEvent("ListSelectionChangedEvent")
+    	if (!internal.blockEvent) {
+    		eventing.addBoolean(false)
+    		eventing.addInteger(index)
+    		eventing.addString(modelName)
+    		eventing.fireEvent("ListSelectionChangedEvent")
+    	}
     }
 
     function toggleSelectionIndex(index) {
-    	eventing.addBoolean(!model.getData(index).is_selected)
-    	eventing.addInteger(index)
-    	eventing.addString(model_name)
-    	eventing.fireEvent("ListSelectionChangedEvent")
+    	if (!internal.blockEvent) {
+    		var oldSelection = model.getData(index).is_selected;
+    		eventing.addBoolean(!oldSelection)
+    		eventing.addInteger(index)
+    		eventing.addString(modelName)
+    		eventing.fireEvent("ListSelectionChangedEvent")
+    		
+    		if (!oldSelection && selectionFollowsHighlight) {
+    			internal.blockEvent = true;
+    			currentIndex = index;
+    			internal.blockEvent = false;
+    		}
+    	}
+    }
+    
+    onCurrentIndexChanged: {
+    	if (selectionFollowsHighlight && (0 <= currentIndex) && (currentIndex < count)) {
+    		selectIndex(currentIndex)
+    	}
     }
     
     Keys.onSpacePressed: {
-		if (keyNavigationEnabled && (0 <= currentIndex) && (currentIndex < count)) {
+		if (keyNavigationEnabled && !selectionFollowsHighlight && (0 <= currentIndex) && (currentIndex < count)) {
 			event.accepted = true
 			toggleSelectionIndex(currentIndex)
 		} else {
