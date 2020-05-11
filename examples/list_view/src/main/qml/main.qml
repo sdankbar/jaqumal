@@ -20,12 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import QtQuick 2.10
+import QtQuick 2.11
 import QtQuick.Window 2.10
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.3
-import QtQuick.Controls.Styles 1.4
-import QtGraphicalEffects 1.0
 import com.github.sdankbar.jaqumal 0.4
 
 Window {
@@ -47,6 +45,12 @@ Window {
 		spacing: 1
 		model_name: "list_model"
         model: list_model
+        keyNavigationEnabled: true
+        focus: true
+		
+		highlight: Rectangle {
+			color: "red"
+		}
 
         delegate: Rectangle {
         	width: 50

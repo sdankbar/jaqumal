@@ -1,5 +1,3 @@
-
-
 /**
  * The MIT License
  * Copyright © 2019 Stephen Dankbar
@@ -22,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import QtQuick 2.0
+import QtQuick 2.11
 import QtQuick.Controls 1.4
 import com.github.sdankbar.jaqumal 0.4
 
@@ -53,5 +51,14 @@ ListView {
     	eventing.addInteger(index)
     	eventing.addString(model_name)
     	eventing.fireEvent("ListSelectionChangedEvent")
+    }
+    
+    Keys.onSpacePressed: {
+		if (keyNavigationEnabled && (0 <= currentIndex) && (currentIndex < count)) {
+			event.accepted = true
+			toggleSelectionIndex(currentIndex)
+		} else {
+			event.accepted = false
+		}
     }
 }
