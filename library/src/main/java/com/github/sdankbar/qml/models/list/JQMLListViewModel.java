@@ -182,10 +182,12 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 	}
 
 	private void fireSelectionEvent(final ImmutableSet<Integer> changedIndices) {
-		final ImmutableList<Map<K, JVariant>> selected = getSelected();
-		final ImmutableList<Integer> selectedIndices = getSelectedIndices();
-		for (final SelectionListener<K> l : selectionListeners) {
-			l.selectionChanged(changedIndices, selectedIndices, selected);
+		if (!changedIndices.isEmpty()) {
+			final ImmutableList<Map<K, JVariant>> selected = getSelected();
+			final ImmutableList<Integer> selectedIndices = getSelectedIndices();
+			for (final SelectionListener<K> l : selectionListeners) {
+				l.selectionChanged(changedIndices, selectedIndices, selected);
+			}
 		}
 	}
 
@@ -281,6 +283,7 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 					// a new item, deselect all items.
 					deselectAllSelected(changedIndicesBuilder);
 				}
+				changedIndicesBuilder.add(index);
 
 				map.put(isSelectedKey, JVariant.valueOf(isSelected));
 				fireSelectionEvent(changedIndicesBuilder.build());
