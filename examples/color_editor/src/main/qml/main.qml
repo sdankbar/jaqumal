@@ -42,6 +42,14 @@ Window {
     EventBuilder {
         id: eventing
     }
+    
+    Connections {
+        target: presetColors
+    
+        onSizeChanged: {
+            console.error("New size is "+ presetColors.size)
+        }
+    }
 
     Row {
         Rectangle {

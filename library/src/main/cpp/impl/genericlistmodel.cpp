@@ -378,6 +378,7 @@ void GenericListModel::setRowData(qint32 row, const QVariant& data, int32_t role
         m_rowData[row].insert(roleIndex, data);
 
         endInsertRows();
+        emit sizeChanged();
     }
     else
     {
@@ -405,6 +406,7 @@ void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data,
         }
 
         endInsertRows();
+        emit sizeChanged();
     }
     else
     {
@@ -439,6 +441,7 @@ void GenericListModel::insertRowData(qint32 row, const QVariant& data, int32_t r
     m_rowData.insert(actualRow, map);
 
     endInsertRows();
+    emit sizeChanged();
 }
 
 void GenericListModel::insertRowData(qint32 row, const std::vector<QVariant>& data, QVector<int> roleIndex)
@@ -453,6 +456,7 @@ void GenericListModel::insertRowData(qint32 row, const std::vector<QVariant>& da
     m_rowData.insert(actualRow, map);
 
     endInsertRows();
+    emit sizeChanged();
 }
 
 void GenericListModel::erase(qint32 row)
@@ -460,6 +464,7 @@ void GenericListModel::erase(qint32 row)
     beginRemoveRows(QModelIndex(), row, row);
     m_rowData.removeAt(row);
     endRemoveRows();
+    emit sizeChanged();
 }
 
 QHash<int, QByteArray> GenericListModel::roleNames() const
@@ -514,5 +519,10 @@ void GenericListModel::reorder(const std::vector<int32_t>& ordering)
         swapArea.append(temp);
     }
     m_rowData.swap(swapArea);
+}
+
+qint32 GenericListModel::size() const
+{
+    return m_rowData.size();
 }
 

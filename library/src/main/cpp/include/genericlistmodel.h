@@ -52,10 +52,10 @@ extern int32_t getGenericListModelSize(void* tempPointer);
 class GenericListModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(qint32 size READ size NOTIFY sizeChanged)
 
 public:
-    explicit GenericListModel(
-            const QHash<int, QByteArray>& roleMap);
+    explicit GenericListModel(const QHash<int, QByteArray>& roleMap);
 
     // Basic functionality:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -86,6 +86,11 @@ public:
     bool containsRole(qint32 row, int32_t roleIndex);
 
     void reorder(const std::vector<int32_t>& ordering);
+    
+    qint32 size() const;
+    
+signals:
+    void sizeChanged();
 private:
 
     void emitSignal(qint32 row);
