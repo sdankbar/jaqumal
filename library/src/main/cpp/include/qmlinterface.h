@@ -64,6 +64,8 @@ extern int getStringWidth(const char* fontToString, const char* text);
 extern bool inFont(const char* fontToString, const int character);
 
 extern void* getScreens();
+extern const char* getCompileQtVersion();
+extern const char* getRuntimeQtVersion();
 }
 
 enum Type

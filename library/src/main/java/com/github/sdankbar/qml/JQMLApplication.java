@@ -140,6 +140,9 @@ public class JQMLApplication<EType> {
 		modelFactory = new JQMLModelFactory(this, eventLoopThread);
 
 		logger = new JQMLLogging();
+
+		log.info("Qt Compile version={} Qt Runtime version={}", ApiInstance.LIB_INSTANCE.getCompileQtVersion(),
+				ApiInstance.LIB_INSTANCE.getRuntimeQtVersion());
 	}
 
 	/**

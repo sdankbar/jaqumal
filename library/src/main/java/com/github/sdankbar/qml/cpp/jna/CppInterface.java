@@ -140,6 +140,8 @@ public interface CppInterface extends Library {
 	Pointer getBoundingRect2(String fontToString, int x, int y, int w, int h, int alignFlags, int textFlags,
 			String text);
 
+	String getCompileQtVersion();
+
 	String getQFontInfo(String fontToString);
 
 	String getQFontMetrics(String fontToString);
@@ -152,6 +154,8 @@ public interface CppInterface extends Library {
 			boolean strikeout, boolean underline, boolean fixedPitch, boolean kerning, int fontWeight,
 			double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
 			int hintingPreference, int stretch, int style, String styleName, int styleHint, int styleStrategy);
+
+	String getRuntimeQtVersion();
 
 	Pointer getScreens();
 

@@ -30,7 +30,6 @@ TEMPLATE = lib
 OBJECTS_DIR = objs
 MOC_DIR = mocs
 DESTDIR = libs
-CONFIG += debug
 
 DEFINES += JAQUMAL_LIBRARY
 
@@ -66,5 +65,3 @@ DISTFILES += \
 
 RESOURCES += \
     resources/jaqumal.qrc
-
-QMAKE_CXXFLAGS *= -Og

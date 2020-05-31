@@ -463,6 +463,16 @@ std::vector<QVariant> toQVariantList(void* data, uint32_t count)
     return vec;
 }
 
+const char* getCompileQtVersion()
+{
+    return QT_VERSION_STR;
+}
+
+const char* getRuntimeQtVersion()
+{
+    return qVersion();
+}
+
 QVariant toQVariant(void* data, int32_t& size)
 {
     char* buffer = static_cast<char*>(data);
