@@ -45,7 +45,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @param <K> Key type for the list model. Must contain the key "is_selected".
  */
-public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProcessor {
+public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 
 	/**
 	 * Listener for selection changes in a JQMLListViewModel
@@ -66,6 +66,10 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 	 * Enum of the various selection modes supported by the JQMLListViewModel.
 	 */
 	public static enum SelectionMode {
+		/**
+		 * Selection is not allowed
+		 */
+		NONE,
 		/**
 		 * Only 0 or 1 item may be selected
 		 */
@@ -135,23 +139,17 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 	private JQMLListViewModel(final String modelName, final ImmutableSet<K> keys, final JQMLApplication<?> app,
 			final SelectionMode mode) {
 		selectionMode = Objects.requireNonNull(mode, "mode is null");
-		listModel = app.getModelFactory().createListModel(modelName, keys);
-		listModel.registerListener(this);
-
 		isSelectedKey = getKey(keys, "is_selected");
+		listModel = app.getModelFactory().createListModel(modelName, keys);
+		listModel.registerListener((index, map) -> {
+			handleAddedElement(map);
+		});
 
 		app.getEventDispatcher().register(ListSelectionChangedEvent.class, this);
 	}
 
-	@Override
-	public void added(final int index, final Map<K, JVariant> map) {
-		if (map.get(isSelectedKey) == null) {
-			map.put(isSelectedKey, JVariant.FALSE);
-		}
-	}
-
 	/**
-	 * Deselects the item at the index.
+	 * Deselects the item at the index. If SelectionMode is NONE, no change is made.
 	 *
 	 * @param index Index of the item to deselect.
 	 */
@@ -160,14 +158,16 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 	}
 
 	/**
-	 * Deselects all items in the list.
+	 * Deselects all items in the list. If SelectionMode is NONE, no change is made.
 	 */
 	public void deselectAll() {
-		final ImmutableSet.Builder<Integer> changedIndicesBuilder = ImmutableSet.builder();
+		if (selectionMode != SelectionMode.NONE) {
+			final ImmutableSet.Builder<Integer> changedIndicesBuilder = ImmutableSet.builder();
 
-		deselectAllSelected(changedIndicesBuilder);
+			deselectAllSelected(changedIndicesBuilder);
 
-		fireSelectionEvent(changedIndicesBuilder.build());
+			fireSelectionEvent(changedIndicesBuilder.build());
+		}
 	}
 
 	private void deselectAllSelected(final ImmutableSet.Builder<Integer> changedIndicesBuilder) {
@@ -242,6 +242,12 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 		}
 	}
 
+	private void handleAddedElement(final Map<K, JVariant> map) {
+		if (map.get(isSelectedKey) == null) {
+			map.put(isSelectedKey, JVariant.FALSE);
+		}
+	}
+
 	private boolean isEventValidForModel(final ListSelectionChangedEvent e) {
 		return e.getModelName().equals(listModel.getModelName());
 	}
@@ -256,7 +262,7 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 	}
 
 	/**
-	 * Selects the item at the index.
+	 * Selects the item at the index. If SelectionMode is NONE, no change is made.
 	 *
 	 * @param index Index of the item to select.
 	 */
@@ -265,13 +271,14 @@ public class JQMLListViewModel<K> implements ListListener<K>, BuiltinEventProces
 	}
 
 	/**
-	 * Sets the selection of the item at the index to isSelected.
+	 * Sets the selection of the item at the index to isSelected. If SelectionMode
+	 * is NONE, no change is made.
 	 *
 	 * @param index      Index of the item to update its selection.
 	 * @param isSelected The item's new selection value.
 	 */
 	public void setSelection(final int index, final boolean isSelected) {
-		if ((0 <= index && index < listModel.size())) {
+		if (selectionMode != SelectionMode.NONE && (0 <= index && index < listModel.size())) {
 			final Map<K, JVariant> map = listModel.get(index);
 			final boolean oldState = map.get(isSelectedKey).asBoolean(false);
 
