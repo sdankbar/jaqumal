@@ -94,7 +94,7 @@ void QMLLibrary::invoke(Callback callback)
 
 GenericObjectModel* QMLLibrary::createGenericObjectModel(const QString& modelName, const std::vector<QString>& roles)
 {
-    GenericObjectModel* modelPtr = new GenericObjectModel(roles);
+    GenericObjectModel* modelPtr = new GenericObjectModel(modelName, roles);
     m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
     return modelPtr;
 }
@@ -108,7 +108,7 @@ GenericListModel* QMLLibrary::createGenericListModel(const QString& modelName, c
         roleNameMap[indices[i]] = roleNames[i].toStdString().c_str();
     }
 
-    GenericListModel* modelPtr = new GenericListModel(roleNameMap);
+    GenericListModel* modelPtr = new GenericListModel(modelName, roleNameMap);
     m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
     return modelPtr;
 }
@@ -123,7 +123,7 @@ GenericFlatTreeModel* QMLLibrary::createGenericFlatTreeModel(const QString& mode
         roleNameMap[indices[i]] = roleNames[i].toStdString().c_str();
     }
 
-    GenericFlatTreeModel* modelPtr = new GenericFlatTreeModel(roleNameMap, 0);
+    GenericFlatTreeModel* modelPtr = new GenericFlatTreeModel(modelName, roleNameMap, 0);
     m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
     return modelPtr;
 }

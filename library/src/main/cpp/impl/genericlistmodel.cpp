@@ -244,8 +244,9 @@ void reorderGenericListModel(void* tempPointer, int32_t* ordering, int32_t lengt
     }
 }
 
-GenericListModel::GenericListModel(const QHash<int, QByteArray>& roleMap)
+GenericListModel::GenericListModel(const QString& modelName, const QHash<int, QByteArray>& roleMap)
     : QAbstractListModel(nullptr),
+      m_modelName(modelName),
       m_roleNames(roleMap)
 {
     auto iter = m_roleNames.constBegin();
@@ -254,6 +255,11 @@ GenericListModel::GenericListModel(const QHash<int, QByteArray>& roleMap)
     {
         m_stringToIndexRoleMap[iter.value()] = iter.key();
     }
+}
+
+const QString& GenericListModel::modelName() const
+{
+	return m_modelName;
 }
 
 int GenericListModel::rowCount(const QModelIndex &parent) const

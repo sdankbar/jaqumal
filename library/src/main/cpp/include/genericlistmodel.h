@@ -53,9 +53,12 @@ class GenericListModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(qint32 size READ size NOTIFY sizeChanged)
+    Q_PROPERTY(const QString& model_name READ modelName)
 
 public:
-    explicit GenericListModel(const QHash<int, QByteArray>& roleMap);
+    explicit GenericListModel(const QString& modelName, const QHash<int, QByteArray>& roleMap);
+
+	const QString& modelName() const;
 
     // Basic functionality:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -94,6 +97,9 @@ signals:
 private:
 
     void emitSignal(qint32 row);
+
+	// Member variables
+	QString m_modelName;
 
     QList<QHash<int32_t, QVariant> > m_rowData;
 

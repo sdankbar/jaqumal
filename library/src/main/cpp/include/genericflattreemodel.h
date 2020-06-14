@@ -54,10 +54,15 @@ extern int32_t getGenericFlatTreeModelSize(void* tempPointer, int32_t* index, in
 class GenericFlatTreeModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(const QString& model_name READ modelName)
 
 public:
     explicit GenericFlatTreeModel(
-            const QHash<int, QByteArray>& roleMap, int32_t depth);
+    		const QString& modelName,
+            const QHash<int, QByteArray>& roleMap,
+            int32_t depth);
+
+	const QString& modelName() const;
 
     // Basic functionality:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -101,6 +106,8 @@ private:
 
     int32_t treeIndexToFlatIndex(const std::deque<int32_t>& indicies);
 
+	// Member Variables
+	QString m_modelName;
     QList<QHash<int32_t, QVariant>* > m_flatData;
 
     QList<QHash<int32_t, QVariant> > m_rowData;

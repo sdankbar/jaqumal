@@ -278,8 +278,9 @@ void reorderGenericFlatTreeModel(void* tempPointer, int32_t* index, int32_t elem
     }
 }
 
-GenericFlatTreeModel::GenericFlatTreeModel(const QHash<int, QByteArray>& roleMap, int32_t depth)
+GenericFlatTreeModel::GenericFlatTreeModel(const QString& modelName, const QHash<int, QByteArray>& roleMap, int32_t depth)
     : QAbstractListModel(nullptr),
+      m_modelName(modelName),
       m_roleNames(roleMap),
       m_depth(depth)
 {
@@ -305,6 +306,11 @@ GenericFlatTreeModel::GenericFlatTreeModel(const QHash<int, QByteArray>& roleMap
     }
 }
 
+const QString& GenericFlatTreeModel::modelName() const
+{
+	return m_modelName;
+}
+
 QSharedPointer<GenericFlatTreeModel> GenericFlatTreeModel::getSubmodel(qint32 row, bool create)
 {
     if (row < m_rowData.size())
@@ -317,7 +323,7 @@ QSharedPointer<GenericFlatTreeModel> GenericFlatTreeModel::getSubmodel(qint32 ro
         else if (create)
         {
             QSharedPointer<GenericFlatTreeModel> p =
-                    QSharedPointer<GenericFlatTreeModel>::create(m_roleNames, m_depth + 1);
+                    QSharedPointer<GenericFlatTreeModel>::create(m_modelName, m_roleNames, m_depth + 1);
             m_rowData[row].insert(m_submodelIndex, QVariant::fromValue(p));
             return p;
         }

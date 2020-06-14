@@ -43,9 +43,12 @@ extern bool isGenericObjectModelRolePresent(void* modelID, int32_t role);
 class GenericObjectModel : public QQmlPropertyMap
 {
     Q_OBJECT
+    Q_PROPERTY(const QString& model_name READ modelName)
 
 public:
-    explicit GenericObjectModel(const std::vector<QString>& roles);
+    explicit GenericObjectModel(const QString& modelName, const std::vector<QString>& roles);
+
+	const QString& modelName() const;
 
     void setData(const QVariant& data, int32_t roleIndex);
     void setData(const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
@@ -70,6 +73,9 @@ private slots:
 private:
 
     void callbackListeners(const QString& key, const QVariant& newValue);
+
+	// Member variables
+	QString m_modelName;
 
     std::vector<QString> m_roleMap;
 

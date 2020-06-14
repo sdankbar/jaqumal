@@ -140,8 +140,9 @@ void registerValueChangedCallback(void* tempPointer, void c(const char*, const c
 }
 
 
-GenericObjectModel::GenericObjectModel(const std::vector<QString>& roles)
+GenericObjectModel::GenericObjectModel(const QString& modelName, const std::vector<QString>& roles)
     : QQmlPropertyMap(this, nullptr),
+      m_modelName(modelName),
       m_roleMap(roles)
 {
     const int32_t size = static_cast<int32_t>(roles.size());
@@ -150,6 +151,11 @@ GenericObjectModel::GenericObjectModel(const std::vector<QString>& roles)
         setData(QVariant(), i);
     }
     QObject::connect(this, &QQmlPropertyMap::valueChanged, this, &GenericObjectModel::onValueChanged);
+}
+
+const QString& GenericObjectModel::modelName() const
+{
+	return m_modelName;
 }
 
 QVariant GenericObjectModel::getData(int32_t roleIndex) const
