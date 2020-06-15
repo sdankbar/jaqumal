@@ -54,7 +54,7 @@ extern int32_t getGenericFlatTreeModelSize(void* tempPointer, int32_t* index, in
 class GenericFlatTreeModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(const QString& model_name READ modelName)
+    Q_PROPERTY(const QString& modelName READ modelName)
 
 public:
     explicit GenericFlatTreeModel(

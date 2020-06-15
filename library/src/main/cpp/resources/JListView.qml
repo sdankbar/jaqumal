@@ -26,7 +26,6 @@ import com.github.sdankbar.jaqumal 0.4
 
 ListView {
     id: internalView
-    property string modelName
     property bool selectionFollowsHighlight: false
 
     EventBuilder {
@@ -42,7 +41,7 @@ ListView {
     	if (!internal.blockEvent) {
     		eventing.addBoolean(true)
     		eventing.addInteger(index)
-    		eventing.addString(modelName)
+            eventing.addString(model.modelName)
     		eventing.fireEvent("ListSelectionChangedEvent")
     		
     		if (selectionFollowsHighlight) {
@@ -57,7 +56,7 @@ ListView {
     	if (!internal.blockEvent) {
     		eventing.addBoolean(false)
     		eventing.addInteger(index)
-    		eventing.addString(modelName)
+            eventing.addString(model.modelName)
     		eventing.fireEvent("ListSelectionChangedEvent")
     	}
     }
@@ -67,7 +66,7 @@ ListView {
     		var oldSelection = model.getData(index).is_selected;
     		eventing.addBoolean(!oldSelection)
     		eventing.addInteger(index)
-    		eventing.addString(modelName)
+            eventing.addString(model.modelName)
     		eventing.fireEvent("ListSelectionChangedEvent")
     		
     		if (!oldSelection && selectionFollowsHighlight) {

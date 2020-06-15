@@ -296,7 +296,7 @@ const QString& GenericListModel::modelName() const
     return m_modelName;
 }
 
-const QVariantMap GenericListModel::root() const
+const QVariantMap& GenericListModel::root() const
 {
     return m_root;
 }
@@ -304,11 +304,13 @@ const QVariantMap GenericListModel::root() const
 void GenericListModel::putRootValue(const QString& key, const QVariant& value)
 {
     m_root[key] = value;
+    emit rootChanged();
 }
 
 void GenericListModel::removeRootValue(const QString& key)
 {
     m_root.remove(key);
+    emit rootChanged();
 }
 
 const QVariant& GenericListModel::getRootValue(const QString& key)

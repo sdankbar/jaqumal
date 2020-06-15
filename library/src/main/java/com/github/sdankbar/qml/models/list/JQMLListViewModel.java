@@ -47,6 +47,8 @@ import com.google.common.collect.ImmutableSet;
  */
 public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 
+	private static final String SELECTION_COUNT_KEY = "selectionCount";
+
 	/**
 	 * Listener for selection changes in a JQMLListViewModel
 	 *
@@ -141,6 +143,7 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		selectionMode = Objects.requireNonNull(mode, "mode is null");
 		isSelectedKey = getKey(keys, "is_selected");
 		listModel = app.getModelFactory().createListModel(modelName, keys);
+		listModel.putRootValue(SELECTION_COUNT_KEY, JVariant.NULL_INT);
 		listModel.registerListener((index, map) -> {
 			handleAddedElement(map);
 		});
@@ -185,6 +188,9 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		if (!changedIndices.isEmpty()) {
 			final ImmutableList<Map<K, JVariant>> selected = getSelected();
 			final ImmutableList<Integer> selectedIndices = getSelectedIndices();
+
+			listModel.putRootValue(SELECTION_COUNT_KEY, new JVariant(selected.size()));
+
 			for (final SelectionListener<K> l : selectionListeners) {
 				l.selectionChanged(changedIndices, selectedIndices, selected);
 			}
@@ -290,7 +296,7 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 					// a new item, deselect all items.
 					deselectAllSelected(changedIndicesBuilder);
 				}
-				changedIndicesBuilder.add(index);
+				changedIndicesBuilder.add(Integer.valueOf(index));
 
 				map.put(isSelectedKey, JVariant.valueOf(isSelected));
 				fireSelectionEvent(changedIndicesBuilder.build());

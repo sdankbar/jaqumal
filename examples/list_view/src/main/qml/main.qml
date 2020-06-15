@@ -43,7 +43,6 @@ Window {
 		id: listView
 		anchors.fill: parent
 		spacing: 1
-		modelName: "list_model"
         model: list_model
         keyNavigationEnabled: true
         focus: true

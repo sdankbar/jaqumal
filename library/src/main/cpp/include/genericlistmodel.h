@@ -57,14 +57,14 @@ class GenericListModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(qint32 size READ size NOTIFY sizeChanged)
-    Q_PROPERTY(const QString& model_name READ modelName)
-    Q_PROPERTY(const QVariantMap root READ root NOTIFY rootChanged)
+    Q_PROPERTY(const QString& modelName READ modelName)
+    Q_PROPERTY(const QVariantMap& root READ root NOTIFY rootChanged)
 
 public:
     explicit GenericListModel(const QString& modelName, const QHash<int, QByteArray>& roleMap);
 
     const QString& modelName() const;
-    const QVariantMap root() const;
+    const QVariantMap& root() const;
 
     void putRootValue(const QString& key, const QVariant& value);
     void removeRootValue(const QString& key);

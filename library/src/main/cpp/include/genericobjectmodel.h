@@ -43,7 +43,7 @@ extern bool isGenericObjectModelRolePresent(void* modelID, int32_t role);
 class GenericObjectModel : public QQmlPropertyMap
 {
     Q_OBJECT
-    Q_PROPERTY(const QString& model_name READ modelName)
+    Q_PROPERTY(const QString& modelName READ modelName)
 
 public:
     explicit GenericObjectModel(const QString& modelName, const std::vector<QString>& roles);
