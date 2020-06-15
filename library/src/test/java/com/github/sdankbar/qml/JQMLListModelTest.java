@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Test;
@@ -600,6 +601,20 @@ public class JQMLListModelTest {
 	 *
 	 */
 	@Test
+	public void putAndGetRootValues() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+
+		model.putRootValue("TEST1", new JVariant("ABC"));
+		assertEquals(new JVariant("ABC"), model.getRootValue("TEST1").get());
+		assertEquals(Optional.empty(), model.getRootValue("TEST2"));
+	}
+
+	/**
+	 *
+	 */
+	@Test
 	public void removeAll() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
@@ -673,6 +688,22 @@ public class JQMLListModelTest {
 		} catch (final IllegalStateException e) {
 			// Expected
 		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void removeRootValues() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+
+		model.putRootValue("TEST1", new JVariant("ABC"));
+		assertEquals(new JVariant("ABC"), model.getRootValue("TEST1").get());
+		model.removeRootValue("TEST1");
+		assertEquals(Optional.empty(), model.getRootValue("TEST1"));
+		model.removeRootValue("TEST2");
 	}
 
 	/**
