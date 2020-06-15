@@ -46,6 +46,7 @@ import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 
 /**
  * A model that is available to QML. Represents a list of Maps from the key type
@@ -356,6 +357,23 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 		return modelName;
 	}
 
+	/**
+	 * Returns a value from the root value map.
+	 *
+	 * @param key Key of the value to return.
+	 * @return The key's value or Optional.empty().
+	 */
+	public Optional<JVariant> getRootValue(final String key) {
+		final IntByReference length = new IntByReference();
+		final Pointer data = ListQMLAPIFast.getRootValueFromListModel(modelPointer, key, length);
+		JQMLExceptionHandling.checkExceptions();
+		if (data == null || Pointer.nativeValue(data) == 0) {
+			return Optional.empty();
+		} else {
+			return JVariant.deserialize(data.getByteBuffer(0, length.getValue()));
+		}
+	}
+
 	@Override
 	public int indexOf(final Object o) {
 		if (o == null) {
@@ -426,6 +444,21 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 	}
 
 	/**
+	 * Puts a value in the root value map.
+	 *
+	 * @param key  The value's key
+	 * @param data The new value.
+	 */
+	public void putRootValue(final String key, final JVariant data) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(data, "data is null");
+
+		data.serialize(accessor.getJavaToCppMemory());
+		ListQMLAPIFast.putRootValueIntoListModel(modelPointer, key, accessor.getJavaToCppMemory().getPointer());
+		JQMLExceptionHandling.checkExceptions();
+	}
+
+	/**
 	 * @param l ListListener to receive callbacks on this list changing.
 	 */
 	public void registerListener(final ListListener<K> l) {
@@ -485,6 +518,17 @@ public class JQMLListModel<K> extends AbstractJQMLModel implements List<Map<K, J
 			}
 		}
 		return modified;
+	}
+
+	/**
+	 * Removes a value from the root value map.
+	 *
+	 * @param key Key to remove.
+	 */
+	public void removeRootValue(final String key) {
+		Objects.requireNonNull(key, "key is null");
+		ListQMLAPIFast.removeRootValueFromListModel(modelPointer, key);
+		JQMLExceptionHandling.checkExceptions();
 	}
 
 	private void resetMapIndicies() {

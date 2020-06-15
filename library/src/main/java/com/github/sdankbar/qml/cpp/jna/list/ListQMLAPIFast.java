@@ -48,12 +48,18 @@ public class ListQMLAPIFast {
 
 	public static native int getGenericListModelSize(Pointer modelPointer);
 
+	public static native Pointer getRootValueFromListModel(Pointer modelPointer, String key, IntByReference length);
+
 	public static native void insertGenericListModelData(Pointer modelPointer, int index, Pointer data, int roleIndex);
 
 	public static native void insertGenericListModelDataMulti(Pointer modelPointer, int index, Pointer data,
 			int[] roleIndices, int valueCount);
 
 	public static native boolean isGenericListModelRolePresent(Pointer modelPointer, int index, int roleIndex);
+
+	public static native void putRootValueIntoListModel(Pointer modelPointer, String key, Pointer data);
+
+	public static native void removeRootValueFromListModel(Pointer modelPointer, String key);
 
 	public static native void reorderGenericListModel(Pointer modelPointer, int[] ordering, int length);
 

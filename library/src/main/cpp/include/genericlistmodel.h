@@ -47,6 +47,10 @@ extern void reorderGenericListModel(void* tempPointer, int32_t* ordering, int32_
 
 extern bool isGenericListModelRolePresent(void* tempPointer, int32_t index, int32_t roleIndex);
 extern int32_t getGenericListModelSize(void* tempPointer);
+
+extern void putRootValueIntoListModel(void* tempPointer, const char* key, void* data);
+extern void removeRootValueFromListModel(void* tempPointer, const char* key);
+extern void* getRootValueFromListModel(void* tempPointer, const char* key, int32_t& length);
 }
 
 class GenericListModel : public QAbstractListModel
@@ -54,11 +58,17 @@ class GenericListModel : public QAbstractListModel
     Q_OBJECT
     Q_PROPERTY(qint32 size READ size NOTIFY sizeChanged)
     Q_PROPERTY(const QString& model_name READ modelName)
+    Q_PROPERTY(const QVariantMap root READ root NOTIFY rootChanged)
 
 public:
     explicit GenericListModel(const QString& modelName, const QHash<int, QByteArray>& roleMap);
 
-	const QString& modelName() const;
+    const QString& modelName() const;
+    const QVariantMap root() const;
+
+    void putRootValue(const QString& key, const QVariant& value);
+    void removeRootValue(const QString& key);
+    const QVariant& getRootValue(const QString& key);
 
     // Basic functionality:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -94,17 +104,17 @@ public:
     
 signals:
     void sizeChanged();
+    void rootChanged();
 private:
 
     void emitSignal(qint32 row);
 
-	// Member variables
-	QString m_modelName;
+    // Member variables
+    QString m_modelName;
+    QVariantMap m_root;
 
     QList<QHash<int32_t, QVariant> > m_rowData;
-
     QHash<QString, int> m_stringToIndexRoleMap;
-
     QHash<int, QByteArray> m_roleNames;
 };
 

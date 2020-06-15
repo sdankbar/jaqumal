@@ -180,7 +180,6 @@ void* getGenericListModelData(void* tempPointer, int32_t index, int32_t roleInde
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         return fromQVariant(modelPtr->getRowData(index, roleIndex), length, false);
-
     }
     else
     {
@@ -222,7 +221,6 @@ int32_t getGenericListModelSize(void* tempPointer)
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         return modelPtr->rowCount();
-
     }
     else
     {
@@ -244,6 +242,42 @@ void reorderGenericListModel(void* tempPointer, int32_t* ordering, int32_t lengt
     }
 }
 
+void putRootValueIntoListModel(void* tempPointer, const char* key, void* data)
+{
+    if (checkQMLLibrary())
+    {
+        auto modelPtr = static_cast<GenericListModel*>(tempPointer);
+        QString keyStr(key);
+        int size;
+        QVariant dataVar = toQVariant(data, size);
+        modelPtr->putRootValue(keyStr, dataVar);
+    }
+}
+
+void removeRootValueFromListModel(void* tempPointer, const char* key)
+{
+    if (checkQMLLibrary())
+    {
+        auto modelPtr = static_cast<GenericListModel*>(tempPointer);
+        QString keyStr(key);
+        modelPtr->removeRootValue(keyStr);
+    }
+}
+
+void* getRootValueFromListModel(void* tempPointer, const char* key, int32_t& length)
+{
+    if (checkQMLLibrary())
+    {
+        auto modelPtr = static_cast<GenericListModel*>(tempPointer);
+        QString keyStr(key);
+        return fromQVariant(modelPtr->getRootValue(key), length, false);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 GenericListModel::GenericListModel(const QString& modelName, const QHash<int, QByteArray>& roleMap)
     : QAbstractListModel(nullptr),
       m_modelName(modelName),
@@ -259,7 +293,36 @@ GenericListModel::GenericListModel(const QString& modelName, const QHash<int, QB
 
 const QString& GenericListModel::modelName() const
 {
-	return m_modelName;
+    return m_modelName;
+}
+
+const QVariantMap GenericListModel::root() const
+{
+    return m_root;
+}
+
+void GenericListModel::putRootValue(const QString& key, const QVariant& value)
+{
+    m_root[key] = value;
+}
+
+void GenericListModel::removeRootValue(const QString& key)
+{
+    m_root.remove(key);
+}
+
+const QVariant& GenericListModel::getRootValue(const QString& key)
+{
+    auto iter = m_root.find(key);
+    if (iter != m_root.end())
+    {
+        return iter.value();
+    }
+    else
+    {
+        static const QVariant EMPTY;
+        return EMPTY;
+    }
 }
 
 int GenericListModel::rowCount(const QModelIndex &parent) const
