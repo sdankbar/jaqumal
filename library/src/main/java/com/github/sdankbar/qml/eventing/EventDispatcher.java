@@ -246,13 +246,8 @@ public class EventDispatcher<T> {
 	public void submit(final Event<T> e) {
 		List<ProcessorPair<T>> list;
 		synchronized (processors) {
-			if (processors.containsKey(e.getClass())) {
-				list = new ArrayList<>(processors.get(e.getClass()));
-			} else {
-				list = Collections.emptyList();
-			}
+			list = processors.getOrDefault(e.getClass(), ImmutableList.of());
 		}
-
 		handle(e, list, javaToCppMemory);
 	}
 
@@ -264,13 +259,8 @@ public class EventDispatcher<T> {
 	public void submitBuiltin(final Event<BuiltinEventProcessor> e) {
 		List<ProcessorPair<BuiltinEventProcessor>> list;
 		synchronized (builtInProcessors) {
-			if (builtInProcessors.containsKey(e.getClass())) {
-				list = new ArrayList<>(builtInProcessors.get(e.getClass()));
-			} else {
-				list = Collections.emptyList();
-			}
+			list = builtInProcessors.getOrDefault(e.getClass(), ImmutableList.of());
 		}
-
 		handle(e, list, javaToCppMemory);
 	}
 }
