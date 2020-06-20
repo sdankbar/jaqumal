@@ -24,13 +24,14 @@
 #define JPOLYLINE_H
 
 #include <QObject>
+#include <QPolygonF>
 #include <QtQuick/QQuickItem>
 
 class JPolyline : public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(const QVariantList& polyline READ polyline WRITE setPolyline NOTIFY polylineChanged)
+    Q_PROPERTY(const QPolygonF& polyline READ polyline WRITE setPolyline NOTIFY polylineChanged)
     Q_PROPERTY(const QColor& strokeColor READ strokeColor WRITE setStrokeColor NOTIFY strokeColorChanged)
     Q_PROPERTY(qint32 strokeWidth READ strokeWidth WRITE setStrokeWidth NOTIFY strokeWidthChanged)
 public:
@@ -40,8 +41,8 @@ public:
 
     QSGNode* updatePaintNode(QSGNode* oldName, UpdatePaintNodeData* data);
 
-    const QVariantList& polyline() const;
-    void setPolyline(const QVariantList& polyline);
+    const QPolygonF& polyline() const;
+    void setPolyline(const QPolygonF& polyline);
 
     const QColor& strokeColor() const;
     void setStrokeColor(const QColor& strokeColor);
@@ -51,13 +52,13 @@ public:
 
 signals:
 
-    void polylineChanged(const QVariantList& polyline);
+    void polylineChanged(const QPolygonF& polyline);
     void strokeColorChanged(const QColor& strokeColor);
     void strokeWidthChanged(qint32 strokeWidth);
 
 private:
 
-    QVariantList m_polyline;
+    QPolygonF m_polyline;
     QColor m_strokeColor;
     qint32 m_strokeWidth;
 

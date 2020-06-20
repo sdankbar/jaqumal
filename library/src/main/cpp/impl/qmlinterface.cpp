@@ -601,7 +601,7 @@ QVariant toQVariant(void* data, int32_t& size)
     }
     case POLYLINE: {
         int32_t length = *((int32_t*)(buffer + 1));
-        QVariantList polygon;
+        QPolygonF polygon;
         polygon.reserve(length);
         double* workingPtr = (double*)(buffer + 1 + 4);
         for (int32_t i = 0; i < length; ++i)
@@ -800,9 +800,9 @@ char* fromQVariant(const QVariant& var, int32_t& length, bool allocateMem)
         return ptr;
     }
     default:
-        if (var.canConvert<QVariantList>())
+        if (var.canConvert<QPolygonF>())
         {
-            QVariantList p = var.value<QVariantList>();
+            QPolygonF p = var.value<QPolygonF>();
             length = 1 + 4 + p.size() * (8 + 8);
             char* ptr = alloc(length, allocateMem);
             ptr[0] = POLYLINE;

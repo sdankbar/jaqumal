@@ -41,21 +41,23 @@ JPolyline::~JPolyline()
 
 QSGNode* JPolyline::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* data)
 {
+    Q_UNUSED(data);
+
     QSGGeometryNode* geoNode = nullptr;
     QSGGeometry* geo = nullptr;
+    QSGFlatColorMaterial* material = nullptr;
 
     const qint32 pointCount = m_polyline.size();
     if (oldNode == nullptr)
     {
         geoNode = new QSGGeometryNode();
+
         geo = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), pointCount);
-        geo->setLineWidth(m_strokeWidth);
         geo->setDrawingMode(QSGGeometry::DrawLineStrip);
         geoNode->setGeometry(geo);
         geoNode->setFlag(QSGNode::OwnsGeometry);
 
-        QSGFlatColorMaterial* material = new QSGFlatColorMaterial();
-        material->setColor(m_strokeColor);
+        material = new QSGFlatColorMaterial();
         geoNode->setMaterial(material);
         geoNode->setFlag(QSGNode::OwnsMaterial);
     }
@@ -64,16 +66,18 @@ QSGNode* JPolyline::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* data)
         geoNode = static_cast<QSGGeometryNode*>(oldNode);
         geo = geoNode->geometry();
         geo->allocate(pointCount);
+        material = static_cast<QSGFlatColorMaterial*>(geoNode->material());
     }
 
+    geo->setLineWidth(m_strokeWidth);
+    material->setColor(m_strokeColor);
+
     QSGGeometry::Point2D* vertexArray = geo->vertexDataAsPoint2D();
-    for (const QVariant& var : m_polyline)
+    for (const QPointF& p : m_polyline)
     {
-        const QPointF p = var.value<QPointF>();
         vertexArray->set(static_cast<float>(p.x()), static_cast<float>(p.y()));
         ++vertexArray;
     }
-
 
     geoNode->markDirty(QSGNode::DirtyGeometry);
     geoNode->markDirty(QSGNode::DirtyMaterial);
@@ -81,12 +85,12 @@ QSGNode* JPolyline::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* data)
     return geoNode;
 }
 
-const QVariantList& JPolyline::polyline() const
+const QPolygonF& JPolyline::polyline() const
 {
     return m_polyline;
 }
 
-void JPolyline::setPolyline(const QVariantList& polyline)
+void JPolyline::setPolyline(const QPolygonF& polyline)
 {
     if (m_polyline != polyline)
     {
