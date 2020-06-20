@@ -28,12 +28,15 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -48,20 +51,12 @@ import com.google.common.collect.ImmutableSet;
  * Requires that event name passed from QML matches the simple name of the event
  * class and that the order of the fields sent from QML matches the order of the
  * arguments on the class's single constructor.
- * 
- * Supports Class's whose single Constructor takes the follow types as parameters:
- * 
- * - boolean/Boolean
- * - Color
- * - Dimension
- * - double/Double
- * - float/Float
- * - Instant
- * - int/Integer
- * - long/Long
- * - Point2D
- * - Rectangle2D
- * - String
+ *
+ * Supports Class's whose single Constructor takes the follow types as
+ * parameters:
+ *
+ * - boolean/Boolean - Color - Dimension - double/Double - float/Float - Instant
+ * - int/Integer - long/Long - Point2D - Rectangle2D - String
  *
  * @param <T> EventProcessor type.
  */
@@ -71,6 +66,56 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 	private static Set<Class<?>> ALLOWED_PARAM_TYPE_SET = ImmutableSet.of(boolean.class, Boolean.class, Color.class,
 			Dimension.class, double.class, Double.class, float.class, Float.class, Instant.class, int.class,
 			Integer.class, long.class, Long.class, Point2D.class, Rectangle2D.class, String.class);
+
+	/**
+	 * Given an interface containing functions that take Event<T> subclasses as
+	 * arguments, returns a ReflectiveEventFactory that can construct all of the
+	 * Event types that are handled by that interface and are supported by
+	 * ReflectiveEventFactory.
+	 *
+	 * @param interfaceClass Interface class that handles Events.
+	 * @return ReflectiveEventFactory that constructs Events of the types handled by
+	 *         interfaceClass.
+	 */
+	public static <T> ReflectiveEventFactory<T> createFromInterface(final Class<T> interfaceClass) {
+		Objects.requireNonNull(interfaceClass, "interfaceClass is null");
+		Preconditions.checkArgument(interfaceClass.isInterface(), "Is not an interface: {}", interfaceClass);
+
+		final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+
+		final List<Class<? extends Event<T>>> classList = new ArrayList<>();
+		for (final Method m : interfaceClass.getDeclaredMethods()) {
+			final Optional<Class<? extends Event<T>>> type = isSingleEventParameter(m.getParameters());
+			if (type.isPresent() && isSupportedConstructor(type.get(), lookup)) {
+				classList.add(type.get());
+			}
+		}
+
+		return new ReflectiveEventFactory<>(classList);
+	}
+
+	private static <T> MethodHandle findConstructor(final Class<? extends Event<T>> c,
+			final MethodHandles.Lookup lookup) {
+		try {
+			Preconditions.checkArgument(c.getConstructors().length == 1, "Class must have exactly 1 constructor: ", c);
+			final MethodHandle h = lookup.unreflectConstructor(c.getConstructors()[0]);
+
+			if (h.type().parameterCount() == 1) {
+				final Class<?> arg = h.type().parameterType(0);
+				Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg) || arg.equals(EventParser.class),
+						"Class not supported as constructor parameter: {}", arg);
+			} else {
+				for (final Class<?> arg : h.type().parameterList()) {
+					Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg),
+							"Class not supported as constructor parameter: {}", arg);
+				}
+			}
+
+			return h;
+		} catch (IllegalAccessException | SecurityException | IllegalArgumentException e) {
+			throw new QMLException("Unable to reflect constructor for " + c, e);
+		}
+	}
 
 	private static Object getParameter(final Class<?> c, final EventParser parser) {
 		if (c.equals(boolean.class) || c.equals(Boolean.class)) {
@@ -99,6 +144,30 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 			return parser;
 		} else {
 			throw new QMLException("Unknown parameter type in constructor");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> Optional<Class<? extends Event<T>>> isSingleEventParameter(final Parameter[] params) {
+		if (params.length != 1) {
+			return Optional.empty();
+		}
+
+		for (final Parameter p : params) {
+			if (Event.class.isAssignableFrom(p.getType())) {
+				return Optional.of((Class<? extends Event<T>>) p.getType());
+			}
+		}
+		return Optional.empty();
+	}
+
+	private static <T> boolean isSupportedConstructor(final Class<? extends Event<T>> c,
+			final MethodHandles.Lookup lookup) {
+		try {
+			findConstructor(c, lookup);
+			return true;
+		} catch (final QMLException e) {
+			return false;
 		}
 	}
 
@@ -148,28 +217,6 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 				logger.warn("Caught Throwable while invoking constructor", e);
 				return null;
 			}
-		}
-	}
-
-	private MethodHandle findConstructor(final Class<? extends Event<T>> c, final MethodHandles.Lookup lookup) {
-		try {
-			Preconditions.checkArgument(c.getConstructors().length == 1, "Class must have exactly 1 constructor: ", c);
-			final MethodHandle h = lookup.unreflectConstructor(c.getConstructors()[0]);
-
-			if (h.type().parameterCount() == 1) {
-				final Class<?> arg = h.type().parameterType(0);
-				Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg) || arg.equals(EventParser.class),
-						"Class not supported as constructor parameter: ", arg);
-			} else {
-				for (final Class<?> arg : h.type().parameterList()) {
-					Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg),
-							"Class not supported as constructor parameter: ", arg);
-				}
-			}
-
-			return h;
-		} catch (IllegalAccessException | SecurityException e) {
-			throw new QMLException("Unable to reflect constructor for " + c, e);
 		}
 	}
 

@@ -35,6 +35,7 @@ import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -48,6 +49,13 @@ public class ReflectiveEventFactoryTest {
 	 *
 	 */
 	public static interface AbstractEventProcessor {
+		/**
+		 * @param e
+		 */
+		default void handle(final ComplexClass e) {
+			// Empty Implementation
+		}
+
 		/**
 		 * @param e
 		 */
@@ -67,6 +75,17 @@ public class ReflectiveEventFactoryTest {
 		 */
 		default void handle(final Event3 e) {
 			// Empty Implementation
+		}
+	}
+
+	public static class ComplexClass extends Event<AbstractEventProcessor> {
+		public ComplexClass(final List<String> args) {
+			// Empty Implementation
+		}
+
+		@Override
+		public void handle(final AbstractEventProcessor processor) {
+			processor.handle(this);
 		}
 	}
 
@@ -405,6 +424,41 @@ public class ReflectiveEventFactoryTest {
 		assertEquals(73, e.getA());
 		assertEquals(1.5, e.getB(), 0.001);
 		assertEquals("ABCD", e.getC());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCreate_5() {
+		final ReflectiveEventFactory<AbstractEventProcessor> f = ReflectiveEventFactory
+				.createFromInterface(AbstractEventProcessor.class);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.putInt(73);
+		buffer.putDouble(1.5);
+		buffer.put("ABCD".getBytes());
+		buffer.put((byte) 0);
+		buffer.position(0);
+		final EventParser parser = new EventParser(buffer);
+		final Event3 e = (Event3) f.create("Event3", parser);
+
+		assertEquals(73, e.getA());
+		assertEquals(1.5, e.getB(), 0.001);
+		assertEquals("ABCD", e.getC());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void testCreate_6() {
+		final ReflectiveEventFactory<AbstractEventProcessor> f = ReflectiveEventFactory
+				.createFromInterface(AbstractEventProcessor.class);
+
+		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		final EventParser parser = new EventParser(buffer);
+		assertNull(f.create("ComplexClass", parser));
 	}
 
 	/**
