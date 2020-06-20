@@ -45,7 +45,8 @@ SOURCES += \
     impl/qmlinterface.cpp \
     impl/eventdispatcher.cpp \
     impl/userinputsimulator.cpp \
-    impl/qmlimageprovider.cpp
+    impl/qmlimageprovider.cpp \
+    impl/jpolyline.cpp
 
 HEADERS += \
     include/qmllibobject.h \
@@ -57,7 +58,8 @@ HEADERS += \
     include/qmlinterface.h \
     include/eventdispatcher.h \
     include/userinputsimulator.h \
-    include/qmlimageprovider.h
+    include/qmlimageprovider.h \
+    include/jpolyline.h
 
 DISTFILES += \
     resources/qmldir \
