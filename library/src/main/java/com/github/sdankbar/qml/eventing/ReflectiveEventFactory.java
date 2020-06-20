@@ -29,7 +29,6 @@ import java.awt.geom.Rectangle2D;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,7 +84,7 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 
 		final List<Class<? extends Event<T>>> classList = new ArrayList<>();
 		for (final Method m : interfaceClass.getDeclaredMethods()) {
-			final Optional<Class<? extends Event<T>>> type = isSingleEventParameter(m.getParameters());
+			final Optional<Class<? extends Event<T>>> type = EventDispatcher.isSingleEventParameterMethod(m);
 			if (type.isPresent() && isSupportedConstructor(type.get(), lookup)) {
 				classList.add(type.get());
 			}
@@ -145,20 +144,6 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 		} else {
 			throw new QMLException("Unknown parameter type in constructor");
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> Optional<Class<? extends Event<T>>> isSingleEventParameter(final Parameter[] params) {
-		if (params.length != 1) {
-			return Optional.empty();
-		}
-
-		for (final Parameter p : params) {
-			if (Event.class.isAssignableFrom(p.getType())) {
-				return Optional.of((Class<? extends Event<T>>) p.getType());
-			}
-		}
-		return Optional.empty();
 	}
 
 	private static <T> boolean isSupportedConstructor(final Class<? extends Event<T>> c,

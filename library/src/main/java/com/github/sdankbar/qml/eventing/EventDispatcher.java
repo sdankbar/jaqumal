@@ -22,11 +22,14 @@
  */
 package com.github.sdankbar.qml.eventing;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Handles receiving events and sending them to the registered listeners.
@@ -61,7 +65,18 @@ public class EventDispatcher<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
 
-	static private final int DEFAULT_ORDER = 0;
+	private static final int DEFAULT_ORDER = 0;
+
+	private static <T> ImmutableList<Class<? extends Event<T>>> getHandledEvents(final Class<T> processorClass) {
+		final ImmutableList.Builder<Class<? extends Event<T>>> list = ImmutableList.builder();
+		for (final Method m : processorClass.getDeclaredMethods()) {
+			final Optional<Class<? extends Event<T>>> e = isSingleEventParameterMethod(m);
+			if (e.isPresent()) {
+				list.add(e.get());
+			}
+		}
+		return list.build();
+	}
 
 	private static <P> void handle(final Event<P> e, final List<ProcessorPair<P>> list,
 			final SharedJavaCppMemory javaToCppMemory) {
@@ -85,6 +100,21 @@ public class EventDispatcher<T> {
 			}
 		} catch (final Exception excp) {
 			log.warn("Exception caught processing event " + e, excp);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	static <T> Optional<Class<? extends Event<T>>> isSingleEventParameterMethod(final Method m) {
+		final Parameter[] params = m.getParameters();
+		if (params.length == 1) {
+			for (final Parameter p : params) {
+				if (Event.class.isAssignableFrom(p.getType())) {
+					return Optional.of((Class<? extends Event<T>>) p.getType());
+				}
+			}
+			return Optional.empty();
+		} else {
+			return Optional.empty();
 		}
 	}
 
@@ -167,6 +197,44 @@ public class EventDispatcher<T> {
 
 			list.add(new ProcessorPair<>(processor, order));
 			Collections.sort(list);
+		}
+	}
+
+	/**
+	 * Registers a processor for all built in events that the processor has declared
+	 * methods to handle. Order is the default order (0).
+	 *
+	 * @param processor The processor to send Events of Class type to.
+	 */
+	@SuppressWarnings("unchecked")
+	public void registerAll(final BuiltinEventProcessor processor) {
+		synchronized (builtInProcessors) {
+			for (final Class<? extends Event<BuiltinEventProcessor>> type : getHandledEvents(
+					(Class<BuiltinEventProcessor>) processor.getClass())) {
+				final List<ProcessorPair<BuiltinEventProcessor>> list = builtInProcessors.computeIfAbsent(type,
+						(k) -> new ArrayList<>());
+
+				list.add(new ProcessorPair<>(processor, DEFAULT_ORDER));
+				Collections.sort(list);
+			}
+		}
+	}
+
+	/**
+	 * Registers a processor for events of all types that the processor has declared
+	 * methods to handle. Order is the default order (0).
+	 *
+	 * @param processor The processor to send Events of Class type to.
+	 */
+	@SuppressWarnings("unchecked")
+	public void registerAll(final T processor) {
+		synchronized (processors) {
+			for (final Class<? extends Event<T>> type : getHandledEvents((Class<T>) processor.getClass())) {
+				final List<ProcessorPair<T>> list = processors.computeIfAbsent(type, (k) -> new ArrayList<>());
+
+				list.add(new ProcessorPair<>(processor, DEFAULT_ORDER));
+				Collections.sort(list);
+			}
 		}
 	}
 

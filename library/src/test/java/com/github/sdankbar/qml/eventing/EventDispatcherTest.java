@@ -26,8 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.github.sdankbar.qml.eventing.Event;
-import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent.EventType;
@@ -136,6 +134,52 @@ public class EventDispatcherTest {
 	 * @throws InterruptedException e
 	 */
 	@Test
+	public void testRegisterAll() throws InterruptedException {
+		final EventDispatcher<EventProcessor> d = new EventDispatcher<>();
+		final EventProcessor p = new EventProcessor();
+
+		d.submit(new Event1());
+		d.submit(new Event2());
+
+		assertEquals(0, p.count1);
+		assertEquals(0, p.count2);
+
+		d.registerAll(p);
+
+		EventProcessor.globalCount1 = 0;
+
+		d.submit(new Event1());
+		d.submit(new Event2());
+
+		assertEquals(1, p.count1);
+		assertEquals(1, p.count2);
+	}
+
+	/**
+	 * @throws InterruptedException e
+	 */
+	@Test
+	public void testRegisterAllBuiltinProcessor() throws InterruptedException {
+		final EventDispatcher<EventProcessor> d = new EventDispatcher<>();
+		final TestBuiltinEventProcessor p = new TestBuiltinEventProcessor();
+
+		d.submitBuiltin(new RenderEvent(EventType.FRAME_SWAP));
+
+		assertEquals(0, p.count1);
+
+		d.registerAll(p);
+
+		TestBuiltinEventProcessor.globalCount1 = 0;
+
+		d.submitBuiltin(new RenderEvent(EventType.FRAME_SWAP));
+
+		assertEquals(1, p.count1);
+	}
+
+	/**
+	 * @throws InterruptedException e
+	 */
+	@Test
 	public void testRegisterBuiltinProcessor() throws InterruptedException {
 		final EventDispatcher<EventProcessor> d = new EventDispatcher<>();
 		final TestBuiltinEventProcessor p = new TestBuiltinEventProcessor();
@@ -146,7 +190,7 @@ public class EventDispatcherTest {
 
 		d.register(RenderEvent.class, p);
 
-		EventProcessor.globalCount1 = 0;
+		TestBuiltinEventProcessor.globalCount1 = 0;
 
 		d.submitBuiltin(new RenderEvent(EventType.FRAME_SWAP));
 
