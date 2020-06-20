@@ -21,6 +21,9 @@
  * THE SOFTWARE.
  */
 #include "jpolyline.h"
+#include <QSGGeometryNode>
+#include <QSGGeometry>
+#include <QSGFlatColorMaterial>
 
 JPolyline::JPolyline(QQuickItem* parent) :
     QQuickItem(parent),
@@ -36,9 +39,46 @@ JPolyline::~JPolyline()
     // Empty Implementation
 }
 
-QSGNode* JPolyline::updatePaintNode(QSGNode* oldName, UpdatePaintNodeData* data)
+QSGNode* JPolyline::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* data)
 {
-    return nullptr;
+    QSGGeometryNode* geoNode = nullptr;
+    QSGGeometry* geo = nullptr;
+
+    const qint32 pointCount = m_polyline.size();
+    if (oldNode == nullptr)
+    {
+        geoNode = new QSGGeometryNode();
+        geo = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), pointCount);
+        geo->setLineWidth(m_strokeWidth);
+        geo->setDrawingMode(QSGGeometry::DrawLineStrip);
+        geoNode->setGeometry(geo);
+        geoNode->setFlag(QSGNode::OwnsGeometry);
+
+        QSGFlatColorMaterial* material = new QSGFlatColorMaterial();
+        material->setColor(m_strokeColor);
+        geoNode->setMaterial(material);
+        geoNode->setFlag(QSGNode::OwnsMaterial);
+    }
+    else
+    {
+        geoNode = static_cast<QSGGeometryNode*>(oldNode);
+        geo = geoNode->geometry();
+        geo->allocate(pointCount);
+    }
+
+    QSGGeometry::Point2D* vertexArray = geo->vertexDataAsPoint2D();
+    for (const QVariant& var : m_polyline)
+    {
+        const QPointF p = var.value<QPointF>();
+        vertexArray->set(static_cast<float>(p.x()), static_cast<float>(p.y()));
+        ++vertexArray;
+    }
+
+
+    geoNode->markDirty(QSGNode::DirtyGeometry);
+    geoNode->markDirty(QSGNode::DirtyMaterial);
+
+    return geoNode;
 }
 
 const QVariantList& JPolyline::polyline() const

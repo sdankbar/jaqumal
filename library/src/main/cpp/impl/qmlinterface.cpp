@@ -24,6 +24,7 @@
 #include "qmllibobject.h"
 #include <eventbuilder.h>
 #include <eventdispatcher.h>
+#include <jpolyline.h>
 #include <QQmlContext>
 #include <QTimer>
 #include <QDateTime>
@@ -89,6 +90,7 @@ void createQApplication(int32_t argc, char** argv)
     qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
     qmlRegisterUncreatableType<GenericFlatTreeModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericFlatTreeModel", "Cannot create GenericFlatTreeModel");
     qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");
+    qmlRegisterType<JPolyline>("com.github.sdankbar.jaqumal", 0, 4, "JPolyline");
 
     QMLLibrary::library = new QMLLibrary(*argcCopy, argvCopy);
 }
