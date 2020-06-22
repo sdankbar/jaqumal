@@ -66,6 +66,10 @@ Window {
     	    	onClicked: {
     	    		listView.toggleSelectionIndex(index)
     	    	}
+    	    	
+    	    	onPressed: {
+    	    	    console.log("SelectedIndex="+listView.getSelectedIndex())
+    	    	}
     	    }
     	}
 	}

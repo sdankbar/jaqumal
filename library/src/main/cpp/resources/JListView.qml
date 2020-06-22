@@ -37,6 +37,24 @@ ListView {
 		property bool blockEvent: false;
 	}
 
+    function getSelectedIndex() {
+        for (var i = 0; i < model.size; ++i) {
+            if (model.getData(i).is_selected === true) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    function getSelected() {
+        var index = getSelectedIndex()
+        if (index !== -1) {
+            return model.getData(index)
+        } else {
+            return null
+        }
+    }
+
     function selectIndex(index) {
     	if (!internal.blockEvent) {
     		eventing.addBoolean(true)

@@ -47,8 +47,6 @@ import com.google.common.collect.ImmutableSet;
  */
 public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 
-	private static final String SELECTION_COUNT_KEY = "selectionCount";
-
 	/**
 	 * Listener for selection changes in a JQMLListViewModel
 	 *
@@ -81,6 +79,8 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		 */
 		MULTIPLE
 	}
+
+	private static final String SELECTION_COUNT_KEY = "selectionCount";
 
 	private static <K> void checkKeySet(final ImmutableSet<K> keys) {
 		for (final K v : keys) {
