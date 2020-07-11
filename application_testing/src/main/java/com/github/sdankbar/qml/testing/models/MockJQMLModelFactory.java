@@ -43,6 +43,7 @@ import com.google.common.collect.ImmutableMap;
 public class MockJQMLModelFactory implements JQMLModelFactory {
 
 	private final Map<String, JQMLSingletonModel<?>> singletonModels = new HashMap<>();
+	private final Map<String, JQMLListModel<?>> listModels = new HashMap<>();
 	private final Set<String> modelName = new HashSet<>();
 
 	private void checkModelName(final String name) {
@@ -71,14 +72,18 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 
 	@Override
 	public <K extends Enum<K>> JQMLListModel<K> createListModel(String name, Class<K> enumClass) {
-		// TODO Auto-generated method stub
-		return null;
+		checkModelName(name);
+		JQMLListModel<K> temp = new MockJQMLListModel<>(name);
+		listModels.put(name, temp);
+		return temp;
 	}
 
 	@Override
 	public <K> JQMLListModel<K> createListModel(String name, Set<K> keys) {
-		// TODO Auto-generated method stub
-		return null;
+		checkModelName(name);
+		JQMLListModel<K> temp = new MockJQMLListModel<>(name);
+		listModels.put(name, temp);
+		return temp;
 	}
 
 	@Override
