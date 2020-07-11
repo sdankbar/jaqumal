@@ -37,10 +37,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import com.sun.jna.ptr.IntByReference;
-
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.exceptions.IllegalKeyException;
+import com.sun.jna.ptr.IntByReference;
 
 /**
  * Abstract base class that provides a Map interface to QML models.
@@ -286,13 +285,6 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 
 		final Optional<JVariant> opt = accessor.get(index, length);
 		return opt.orElse(null);
-	}
-
-	/**
-	 * @return The name of the QML model this map is a part of.
-	 */
-	public String getModelName() {
-		return modelName;
 	}
 
 	@Override

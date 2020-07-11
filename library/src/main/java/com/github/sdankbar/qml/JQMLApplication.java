@@ -53,6 +53,7 @@ import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.images.JQMLImageProvider;
 import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
+import com.github.sdankbar.qml.models.JQMLModelFactoryImpl;
 import com.google.common.collect.ImmutableList;
 import com.sun.jna.Pointer;
 
@@ -137,7 +138,7 @@ public class JQMLApplication<EType> {
 		ApiInstance.LIB_INSTANCE.addEventCallback(listener);
 		JQMLExceptionHandling.checkExceptions();
 
-		modelFactory = new JQMLModelFactory(this, eventLoopThread);
+		modelFactory = new JQMLModelFactoryImpl(this, eventLoopThread);
 
 		logger = new JQMLLogging();
 

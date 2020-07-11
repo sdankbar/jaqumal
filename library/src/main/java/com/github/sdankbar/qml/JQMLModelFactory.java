@@ -52,38 +52,9 @@ import com.google.common.collect.ImmutableMap;
  *
  *
  */
-public class JQMLModelFactory {
+public interface JQMLModelFactory {
 
-	private final JQMLApplication<?> app;
-	private final AtomicReference<Thread> eventLoopThread;
-	private final JQMLPerformanceModel perfModel;
 
-	private final SharedJavaCppMemory cppToJava = new SharedJavaCppMemory(16 * 1024 * 1024);
-	private final SharedJavaCppMemory javaToCpp = new SharedJavaCppMemory(16 * 1024 * 1024);
-
-	private final Set<String> modelName = new HashSet<>();
-
-	/**
-	 * Constructs a new factory.
-	 *
-	 * @param app             The parent JQMLApplication.
-	 * @param eventLoopThread A reference to the Qt Thread.
-	 */
-	JQMLModelFactory(final JQMLApplication<?> app, final AtomicReference<Thread> eventLoopThread) {
-		this.app = Objects.requireNonNull(app, "app is null");
-		this.eventLoopThread = Objects.requireNonNull(eventLoopThread, "eventLoopThread is null");
-
-		ApiInstance.LIB_INSTANCE.setSharedMemory(cppToJava.getPointer(), cppToJava.getSize());
-
-		perfModel = new JQMLPerformanceModel("PerfModel", this);
-		app.getEventDispatcher().register(RenderEvent.class, perfModel);
-	}
-
-	private void checkModelName(final String name) {
-		if (!modelName.add(Objects.requireNonNull(name, "name is null"))) {
-			throw new QMLException("Model with name [" + name + "] already exists");
-		}
-	}
 
 	/**
 	 * Creates a new JQMLButtonModel with the specified name.
@@ -95,11 +66,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread()
-	public JQMLButtonModel createButtonModel(final String name) {
-		JQMLUtilities.checkThread(eventLoopThread);
-
-		return new JQMLButtonModel(name, this, app.getEventDispatcher());
-	}
+	JQMLButtonModel createButtonModel(final String name) ;
 
 	/**
 	 * Creates a new JQMLFlatTreeModel with Class<K> being its key.
@@ -112,13 +79,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	public <K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass) {
-		JQMLUtilities.checkThread(eventLoopThread);
-		checkModelName(name);
-
-		return new JQMLFlatTreeModel<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new FlatTreeAccessor(javaToCpp, cppToJava));
-	}
+	<K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass) ;
 
 	/**
 	 * Creates a new JQMLFlatTreeModel with Class<K> being its key.
@@ -131,12 +92,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	public <K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys) {
-		JQMLUtilities.checkThread(eventLoopThread);
-		checkModelName(name);
-
-		return new JQMLFlatTreeModel<>(name, keys, eventLoopThread, new FlatTreeAccessor(javaToCpp, cppToJava));
-	}
+	<K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys) ;
 
 	/**
 	 * Creates a new JQMLListModel with Class<K> being its key.
@@ -149,13 +105,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	public <K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass) {
-		JQMLUtilities.checkThread(eventLoopThread);
-		checkModelName(name);
-
-		return new JQMLListModel<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new ListAccessor(javaToCpp, cppToJava));
-	}
+	<K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass);
 
 	/**
 	 * Creates a new JQMLListModel with Class<K> being its key.
@@ -168,12 +118,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	public <K> JQMLListModel<K> createListModel(final String name, final Set<K> keys) {
-		JQMLUtilities.checkThread(eventLoopThread);
-		checkModelName(name);
-
-		return new JQMLListModel<>(name, keys, eventLoopThread, new ListAccessor(javaToCpp, cppToJava));
-	}
+	<K> JQMLListModel<K> createListModel(final String name, final Set<K> keys) ;
 
 	/**
 	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
@@ -188,11 +133,8 @@ public class JQMLModelFactory {
 	 * @return The new pool.
 	 */
 	@QtThread
-	public <K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
-			final ImmutableMap<K, JVariant> initialValues) {
-		final JQMLListModel<K> model = createListModel(name, enumClass);
-		return new JQMLMapPool<>(model, initialValues);
-	}
+	<K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
+			final ImmutableMap<K, JVariant> initialValues) ;
 
 	/**
 	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
@@ -207,11 +149,8 @@ public class JQMLModelFactory {
 	 * @return The new pool.
 	 */
 	@QtThread
-	public <K> JQMLMapPool<K> createPool(final String name, final Set<K> keys,
-			final ImmutableMap<K, JVariant> initialValues) {
-		final JQMLListModel<K> model = createListModel(name, keys);
-		return new JQMLMapPool<>(model, initialValues);
-	}
+	<K> JQMLMapPool<K> createPool(final String name, final Set<K> keys,
+			final ImmutableMap<K, JVariant> initialValues);
 
 	/**
 	 * Creates a new JQMLSingletonModel with Class<K> being its key.
@@ -224,14 +163,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	public <K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass) {
-		JQMLUtilities.checkThread(eventLoopThread);
-		checkModelName(name);
-
-		return new JQMLSingletonModel<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new SingletonMapAccessor(javaToCpp, cppToJava));
-	}
-
+	<K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass) ;
 	/**
 	 * Creates a new JQMLSingletonModel with Class<K> being its key.
 	 *
@@ -243,12 +175,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	public <K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys) {
-		JQMLUtilities.checkThread(eventLoopThread);
-		checkModelName(name);
-
-		return new JQMLSingletonModel<>(name, keys, eventLoopThread, new SingletonMapAccessor(javaToCpp, cppToJava));
-	}
+	<K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys) ;
 
 	/**
 	 * Creates a new JQMLTextInputModel.
@@ -260,13 +187,7 @@ public class JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	public JQMLTextInputModel createTextInputModel(final String name) {
-		JQMLUtilities.checkThread(eventLoopThread);
-
-		final JQMLTextInputModel m = new JQMLTextInputModel(name, this, app.getEventDispatcher());
-
-		return m;
-	}
+	JQMLTextInputModel createTextInputModel(final String name) ;
 
 	/**
 	 * Creates a new JQMLXYSeriesModel which can be used for line/scatter graphs.
@@ -275,10 +196,6 @@ public class JQMLModelFactory {
 	 * @return The new model.
 	 */
 	@QtThread()
-	public JQMLXYSeriesModel createXYSeriesModel(final String name) {
-		JQMLUtilities.checkThread(eventLoopThread);
-
-		return new JQMLXYSeriesModel(name, this);
-	}
+	JQMLXYSeriesModel createXYSeriesModel(final String name);
 
 }
