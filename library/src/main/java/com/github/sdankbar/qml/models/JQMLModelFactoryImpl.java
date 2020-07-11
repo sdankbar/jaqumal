@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2020 Stephen Dankbar
+ * Copyright © 2019 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.models.flat_tree.FlatTreeAccessor;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.github.sdankbar.qml.models.list.JQMLListModelImpl;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.list.ListAccessor;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
@@ -122,7 +123,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModel<>(name, EnumSet.allOf(enumClass), eventLoopThread,
+		return new JQMLListModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread,
 				new ListAccessor(javaToCpp, cppToJava));
 	}
 
@@ -132,7 +133,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModel<>(name, keys, eventLoopThread, new ListAccessor(javaToCpp, cppToJava));
+		return new JQMLListModelImpl<>(name, keys, eventLoopThread, new ListAccessor(javaToCpp, cppToJava));
 	}
 
 	@QtThread

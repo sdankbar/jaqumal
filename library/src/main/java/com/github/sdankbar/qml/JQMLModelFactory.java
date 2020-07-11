@@ -22,28 +22,17 @@
  */
 package com.github.sdankbar.qml;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
-import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.exceptions.QMLThreadingException;
 import com.github.sdankbar.qml.models.JQMLMapPool;
-import com.github.sdankbar.qml.models.flat_tree.FlatTreeAccessor;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
-import com.github.sdankbar.qml.models.list.ListAccessor;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
-import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
-import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -53,8 +42,6 @@ import com.google.common.collect.ImmutableMap;
  *
  */
 public interface JQMLModelFactory {
-
-
 
 	/**
 	 * Creates a new JQMLButtonModel with the specified name.
@@ -66,7 +53,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread()
-	JQMLButtonModel createButtonModel(final String name) ;
+	JQMLButtonModel createButtonModel(final String name);
 
 	/**
 	 * Creates a new JQMLFlatTreeModel with Class<K> being its key.
@@ -79,7 +66,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass) ;
+	<K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass);
 
 	/**
 	 * Creates a new JQMLFlatTreeModel with Class<K> being its key.
@@ -92,7 +79,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys) ;
+	<K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys);
 
 	/**
 	 * Creates a new JQMLListModel with Class<K> being its key.
@@ -118,7 +105,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K> JQMLListModel<K> createListModel(final String name, final Set<K> keys) ;
+	<K> JQMLListModel<K> createListModel(final String name, final Set<K> keys);
 
 	/**
 	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
@@ -134,7 +121,7 @@ public interface JQMLModelFactory {
 	 */
 	@QtThread
 	<K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
-			final ImmutableMap<K, JVariant> initialValues) ;
+			final ImmutableMap<K, JVariant> initialValues);
 
 	/**
 	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
@@ -149,8 +136,7 @@ public interface JQMLModelFactory {
 	 * @return The new pool.
 	 */
 	@QtThread
-	<K> JQMLMapPool<K> createPool(final String name, final Set<K> keys,
-			final ImmutableMap<K, JVariant> initialValues);
+	<K> JQMLMapPool<K> createPool(final String name, final Set<K> keys, final ImmutableMap<K, JVariant> initialValues);
 
 	/**
 	 * Creates a new JQMLSingletonModel with Class<K> being its key.
@@ -163,7 +149,8 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass) ;
+	<K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass);
+
 	/**
 	 * Creates a new JQMLSingletonModel with Class<K> being its key.
 	 *
@@ -175,7 +162,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys) ;
+	<K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys);
 
 	/**
 	 * Creates a new JQMLTextInputModel.
@@ -187,7 +174,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	JQMLTextInputModel createTextInputModel(final String name) ;
+	JQMLTextInputModel createTextInputModel(final String name);
 
 	/**
 	 * Creates a new JQMLXYSeriesModel which can be used for line/scatter graphs.
