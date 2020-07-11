@@ -7,3 +7,4 @@ qrc_*.cpp
 /.qmake.stash
 /object_script.Jaqumal.Debug
 /object_script.Jaqumal.Release
+/target_wrapper.sh

@@ -74,7 +74,7 @@ public class JQMLApplication<EType> {
 		public Pointer invoke(final String type, final Pointer data, final int length) {
 			final ByteBuffer buffer = data.getByteBuffer(0, length);
 
-			Optional<JVariant> result = handleEvent(type, buffer);
+			final Optional<JVariant> result = handleEvent(type, buffer);
 
 			if (result.isPresent()) {
 				JVariant.serialize(ImmutableList.of(result.get()), memory);

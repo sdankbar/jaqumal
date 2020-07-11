@@ -207,6 +207,8 @@ public interface CppInterface extends Library {
 	 */
 	void reloadQMLFile(String fileName);
 
+	boolean runQMLTest(String pathToQMLTestFile);
+
 	void sendQMLEvent(String eventName, String[] keys, Pointer valuesPointer, int keyValuesCount);
 
 	/**

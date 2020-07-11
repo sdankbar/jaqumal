@@ -21,15 +21,14 @@
 # THE SOFTWARE.
 #
 
-QT       += qml quick widgets
-
-QT       += gui
+QT       += qml quick widgets gui
 
 TARGET = Jaqumal
 TEMPLATE = lib
 OBJECTS_DIR = objs
 MOC_DIR = mocs
 DESTDIR = libs
+CONFIG += qmltestcase
 
 DEFINES += JAQUMAL_LIBRARY
 
@@ -46,7 +45,8 @@ SOURCES += \
     impl/eventdispatcher.cpp \
     impl/userinputsimulator.cpp \
     impl/qmlimageprovider.cpp \
-    impl/jpolyline.cpp
+    impl/jpolyline.cpp \
+    impl/qmltest.cpp
 
 HEADERS += \
     include/qmllibobject.h \
@@ -59,7 +59,8 @@ HEADERS += \
     include/eventdispatcher.h \
     include/userinputsimulator.h \
     include/qmlimageprovider.h \
-    include/jpolyline.h
+    include/jpolyline.h \
+    include/qmltest.h
 
 DISTFILES += \
     resources/qmldir \
