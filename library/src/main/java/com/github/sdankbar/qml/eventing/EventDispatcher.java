@@ -78,7 +78,7 @@ public class EventDispatcher<T> {
 		return list.build();
 	}
 
-	private static <P> void handle(final Event<P> e, final List<ProcessorPair<P>> list,
+	private static <P> Optional<JVariant> handle(final Event<P> e, final List<ProcessorPair<P>> list,
 			final SharedJavaCppMemory javaToCppMemory) {
 		try {
 			for (final ProcessorPair<P> p : list) {
@@ -101,6 +101,8 @@ public class EventDispatcher<T> {
 		} catch (final Exception excp) {
 			log.warn("Exception caught processing event " + e, excp);
 		}
+
+		return e.getResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -242,25 +244,29 @@ public class EventDispatcher<T> {
 	 * Submits an Event to be dispatched to processors.
 	 *
 	 * @param e Event to dispatch.
+	 * 
+	 * @return Optional result of the event.
 	 */
-	public void submit(final Event<T> e) {
+	public Optional<JVariant> submit(final Event<T> e) {
 		List<ProcessorPair<T>> list;
 		synchronized (processors) {
 			list = processors.getOrDefault(e.getClass(), ImmutableList.of());
 		}
-		handle(e, list, javaToCppMemory);
+		return handle(e, list, javaToCppMemory);
 	}
 
 	/**
 	 * Submits a built in Event to be dispatched to processors.
 	 *
 	 * @param e Event to dispatch.
+	 * 
+	 * @return Optional result of the event.
 	 */
-	public void submitBuiltin(final Event<BuiltinEventProcessor> e) {
+	public Optional<JVariant> submitBuiltin(final Event<BuiltinEventProcessor> e) {
 		List<ProcessorPair<BuiltinEventProcessor>> list;
 		synchronized (builtInProcessors) {
 			list = builtInProcessors.getOrDefault(e.getClass(), ImmutableList.of());
 		}
-		handle(e, list, javaToCppMemory);
+		return handle(e, list, javaToCppMemory);
 	}
 }

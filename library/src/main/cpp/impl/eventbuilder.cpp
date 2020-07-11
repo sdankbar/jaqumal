@@ -21,13 +21,14 @@
  * THE SOFTWARE.
  */
 #include "eventbuilder.h"
+#include "qmlinterface.h"
 #include "iostream"
 #include <QColor>
 #include <QDateTime>
 
-std::vector<std::function<void(const char*, void*, int32_t)> > EventBuilder::EVENT_HANDLERS;
+std::vector<std::function<void*(const char*, void*, int32_t)> > EventBuilder::EVENT_HANDLERS;
 
-void EventBuilder::addEventHandler(std::function<void(const char*, void*, int32_t)> f)
+void EventBuilder::addEventHandler(std::function<void*(const char*, void*, int32_t)> f)
 {
     EVENT_HANDLERS.push_back(f);
 }
@@ -38,8 +39,9 @@ EventBuilder::EventBuilder(QObject* parent) :
     // Empty Implementation
 }
 
-void EventBuilder::fireEvent(const QString& type)
+QVariant EventBuilder::fireEvent(const QString& type)
 {
+	QVariant ret;
     if (!EVENT_HANDLERS.empty())
     {
         uint32_t size = m_queuedArguements.size();
@@ -50,7 +52,11 @@ void EventBuilder::fireEvent(const QString& type)
         }
         for (auto& func: EVENT_HANDLERS)
         {
-            func(type.toStdString().c_str(), memory, size);
+            void* result = func(type.toStdString().c_str(), memory, size);
+            if (result)
+            {
+              ret = toQVariantList(result, 1)[0];
+            }
         }
         delete[] memory;
     }
@@ -59,6 +65,8 @@ void EventBuilder::fireEvent(const QString& type)
         std::cerr << "No event handler registered" << std::endl;
     }
     m_queuedArguements.clear();
+    
+    return ret;
 }
 
 void EventBuilder::fireEvent(const QString& type, const QString& data)

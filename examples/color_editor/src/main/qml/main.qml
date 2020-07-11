@@ -119,7 +119,7 @@ Window {
                         onEditingFinished: {
                             eventing.addInteger(index)
                             eventing.addString(text)
-                            eventing.fireEvent("PresetColorNameEdited")
+                            console.error("fireEvent returned ("+eventing.fireEvent("PresetColorNameEdited")+")")
                         }
 
                         onAccepted: {
@@ -158,7 +158,7 @@ Window {
         onAccepted: {
             eventing.addInteger(editedColorIndex)
             eventing.addColor(color)
-            eventing.fireEvent("PresetColorEdited")
+            console.error("fireEvent returned ("+eventing.fireEvent("PresetColorEdited")+")")
         }
     }
 }

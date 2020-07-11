@@ -44,8 +44,9 @@ public interface CppInterface extends Library {
 		 * @param data   The data for the event. The data stored is specific for an
 		 *               Event type.
 		 * @param length The length of the array pointed to by data.
+		 * @return The result of the Event or null if no result.
 		 */
-		void invoke(String type, Pointer data, int length);
+		Pointer invoke(String type, Pointer data, int length);
 	}
 
 	/**

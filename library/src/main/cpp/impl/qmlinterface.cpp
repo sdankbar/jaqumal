@@ -142,9 +142,9 @@ void reloadQMLFile(const char* fileName)
     }
 }
 
-void addEventCallback(void c(const char*, void*, int32_t))
+void addEventCallback(void* c(const char*, void*, int32_t))
 {
-    EventBuilder::addEventHandler(std::function<void(const char*, void*, int32_t)>(c));
+    EventBuilder::addEventHandler(std::function<void*(const char*, void*, int32_t)>(c));
 }
 
 void invoke(void c())

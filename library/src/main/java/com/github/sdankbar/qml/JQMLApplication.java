@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jna.CppInterface.EventCallback;
+import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.EventFactory;
@@ -66,11 +68,20 @@ public class JQMLApplication<EType> {
 
 	private class ApplicationEventListener implements EventCallback {
 
+		private final SharedJavaCppMemory memory = new SharedJavaCppMemory(16 * 1024 * 1024);
+
 		@Override
-		public void invoke(final String type, final Pointer data, final int length) {
+		public Pointer invoke(final String type, final Pointer data, final int length) {
 			final ByteBuffer buffer = data.getByteBuffer(0, length);
 
-			handleEvent(type, buffer);
+			Optional<JVariant> result = handleEvent(type, buffer);
+
+			if (result.isPresent()) {
+				JVariant.serialize(ImmutableList.of(result.get()), memory);
+				return memory.getPointer();
+			} else {
+				return Pointer.NULL;
+			}
 		}
 
 	}
@@ -222,17 +233,18 @@ public class JQMLApplication<EType> {
 		return executor;
 	}
 
-	private void handleEvent(final String type, final ByteBuffer data) {
+	private Optional<JVariant> handleEvent(final String type, final ByteBuffer data) {
 		final EventParser parser = new EventParser(data);
 		final Event<BuiltinEventProcessor> builtinEvent = builtinFactory.create(type, parser);
 		if (builtinEvent != null) {
-			dispatcher.submitBuiltin(builtinEvent);
+			return dispatcher.submitBuiltin(builtinEvent);
 		} else {
 			final Event<EType> event = factory.create(type, parser);
 			if (event != null) {
-				dispatcher.submit(event);
+				return dispatcher.submit(event);
 			} else {
 				log.warn("Event creation failed: {}", type);
+				return Optional.empty();
 			}
 		}
 	}

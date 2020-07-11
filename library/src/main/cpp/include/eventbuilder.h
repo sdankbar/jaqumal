@@ -39,11 +39,11 @@ public:
     };
     Q_ENUMS(PerfEventType)
 
-    static void addEventHandler(std::function<void(const char*, void*, int32_t)> f);
+    static void addEventHandler(std::function<void*(const char*, void*, int32_t)> f);
 
     explicit EventBuilder(QObject *parent = nullptr);
 
-    Q_INVOKABLE void fireEvent(const QString& type);
+    Q_INVOKABLE QVariant fireEvent(const QString& type);
     Q_INVOKABLE void fireEvent(const QString& type, const QString& data);
 
     Q_INVOKABLE void mouseClickEvent(const QString& objectName, qint32 x, qint32 y, qint32 button, qint32 buttons, qint32 modifiers, bool wasHeld);
@@ -70,7 +70,7 @@ public:
 private:
 
     std::vector<char> m_queuedArguements;
-    static std::vector<std::function<void(const char*, void*, int32_t)> > EVENT_HANDLERS;
+    static std::vector<std::function<void*(const char*, void*, int32_t)> > EVENT_HANDLERS;
 };
 
 #endif // EVENTBUILDER_H

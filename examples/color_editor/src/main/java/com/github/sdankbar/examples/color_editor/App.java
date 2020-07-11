@@ -88,6 +88,7 @@ public class App {
 			@Override
 			public void handle(final PresetColorEditedEvent e) {
 				model.setData(e.getIndex(), PresetColorsRoles.colorRGB, new JVariant(e.getNewColor()));
+				e.setResult(new JVariant(42));
 			}
 
 		});
@@ -97,6 +98,7 @@ public class App {
 			@Override
 			public void handle(final PresetColorNameEditedEvent e) {
 				model.setData(e.getIndex(), PresetColorsRoles.colorName, new JVariant(e.getNewName()));
+				e.setResult(new JVariant("Success"));
 			}
 
 		});
