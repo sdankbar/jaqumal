@@ -41,4 +41,12 @@ public interface ListListener<K> {
 	 */
 	void added(int index, Map<K, JVariant> map);
 
+	/**
+	 * Callback for an item being removed from the list.
+	 *
+	 * @param index Index of the removed item.
+	 * @param map   Removed item.
+	 */
+	void removed(int index, Map<K, JVariant> map);
+
 }

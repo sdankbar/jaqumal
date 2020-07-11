@@ -54,7 +54,10 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	 */
 	public interface SelectionListener<K> {
 		/**
-		 * @param changedIndices  Set of indices whose selection changed.
+		 * @param changedIndices  Set of indices whose selection changed. For the case
+		 *                        of a removed value causing the selection to change,
+		 *                        the index is the index of the value before it was
+		 *                        removed.
 		 * @param selectedIndices Set of indices that are selected after the change.
 		 * @param selected        Set of items that are selected after the change.
 		 */
@@ -144,8 +147,18 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		isSelectedKey = getKey(keys, "is_selected");
 		listModel = app.getModelFactory().createListModel(modelName, keys);
 		listModel.putRootValue(SELECTION_COUNT_KEY, JVariant.NULL_INT);
-		listModel.registerListener((index, map) -> {
-			handleAddedElement(map);
+		listModel.registerListener(new ListListener<K>() {
+
+			@Override
+			public void added(int index, Map<K, JVariant> map) {
+				handleAddedElement(map);
+			}
+
+			@Override
+			public void removed(int index, Map<K, JVariant> map) {
+				handleRemovdElement(index, map);
+			}
+
 		});
 
 		app.getEventDispatcher().register(ListSelectionChangedEvent.class, this);
@@ -251,6 +264,14 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	private void handleAddedElement(final Map<K, JVariant> map) {
 		if (map.get(isSelectedKey) == null) {
 			map.put(isSelectedKey, JVariant.FALSE);
+		}
+	}
+
+	private void handleRemovdElement(int index, final Map<K, JVariant> map) {
+		JVariant v = map.get(isSelectedKey);
+		// If removed element was seleted, fire selection changed event
+		if (v != null && v.asBoolean(false)) {
+			fireSelectionEvent(ImmutableSet.of(Integer.valueOf(index)));
 		}
 	}
 

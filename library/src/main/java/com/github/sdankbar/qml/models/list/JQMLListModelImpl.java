@@ -338,6 +338,12 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 	}
 
+	private void fireRemoveEvent(final int index, final Map<K, JVariant> map) {
+		for (final ListListener<K> l : listeners) {
+			l.removed(index, map);
+		}
+	}
+
 	@Override
 	public Map<K, JVariant> get(final int index) {
 		verifyEventLoopThread();
@@ -489,6 +495,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		mapRefs.remove(index);
 		old.setIndex(-1);
 		resetMapIndicies();
+
+		fireRemoveEvent(index, copy);
 
 		return copy;
 	}
