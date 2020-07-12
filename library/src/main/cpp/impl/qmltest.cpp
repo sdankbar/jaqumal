@@ -26,9 +26,20 @@
 
 bool runQMLTest(const char* pathToQMLTestFile)
 {
-    std::cerr << pathToQMLTestFile << std::endl;
     QTEST_SET_MAIN_SOURCE_PATH;
-    int32_t result = quick_test_main(0, nullptr, "QMLTests", QUICK_TEST_SOURCE_DIR);
-    std::cerr << "result=" << result << std::endl;
+
+    const int argc = 3;
+    char** argv = new char*[argc];
+    argv[0] = strdup("");
+    argv[1] = strdup("-input");
+    argv[2] = strdup(pathToQMLTestFile);
+
+    int result = quick_test_main(argc, argv, "QMLTests", QUICK_TEST_SOURCE_DIR);
+
+    for (int i = 0; i < argc; ++i)
+    {
+        free(argv[i]);
+    }
+    delete[] argv;
     return result == 0;
 }
