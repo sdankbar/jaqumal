@@ -5,6 +5,7 @@ TestCase {
     name: "Test1"
 
     function test_string() {
+        log.info("Log Info")
         compare("A"+"B", "AB")
     }
 }

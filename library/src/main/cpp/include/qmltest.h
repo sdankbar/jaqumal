@@ -22,7 +22,57 @@
  */
 #pragma once
 
+#include <QObject>
+#include <QString>
+
 extern "C"
 {
 extern int runQMLTest(const char* pathToQMLTestFile);
 }
+
+class QQmlEngine;
+
+class MockQMLLogging : public QObject
+{
+    Q_OBJECT
+public:
+
+    MockQMLLogging(QObject* parent) ;
+
+    virtual ~MockQMLLogging();
+
+    Q_INVOKABLE void trace(const QString& message) const;
+    Q_INVOKABLE void debug(const QString& message) const;
+    Q_INVOKABLE void info(const QString& message) const;
+    Q_INVOKABLE void warn(const QString& message) const;
+    Q_INVOKABLE void error(const QString& message) const;
+};
+
+class MockUserInputSimulator : public QObject
+{
+    Q_OBJECT
+public:
+
+    MockUserInputSimulator(QObject* parent);
+
+    virtual ~MockUserInputSimulator();
+
+    Q_INVOKABLE void keyPress(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
+    Q_INVOKABLE void keyRelease(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
+    Q_INVOKABLE void keyClick(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
+};
+
+class MockSetup : public QObject
+{
+    Q_OBJECT
+
+public:
+    MockSetup() ;
+
+public slots:
+    void qmlEngineAvailable(QQmlEngine* engine);
+
+private:
+    MockQMLLogging m_logger;
+    MockUserInputSimulator m_uiSim;
+};

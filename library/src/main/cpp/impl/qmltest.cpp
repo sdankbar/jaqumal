@@ -21,8 +21,85 @@
  * THE SOFTWARE.
  */
 #include "qmltest.h"
+#include <QObject>
+#include <QQmlEngine>
+#include <QQmlContext>
 #include <QtQuickTest>
 #include <iostream>
+
+MockQMLLogging::MockQMLLogging(QObject* parent) :
+    QObject(parent)
+{
+    // Empty Implementation
+}
+
+MockQMLLogging::~MockQMLLogging() {
+    // Empty Implementation
+}
+
+void MockQMLLogging::trace(const QString& message) const
+{
+    std::cout << message.toStdString() << std::endl;
+}
+void MockQMLLogging::debug(const QString& message) const
+{
+    std::cout << message.toStdString() << std::endl;
+}
+void MockQMLLogging::MockQMLLogging::info(const QString& message) const
+{
+    std::cout << message.toStdString() << std::endl;
+}
+void MockQMLLogging::warn(const QString& message) const
+{
+    std::cerr << message.toStdString() << std::endl;
+}
+void MockQMLLogging::error(const QString& message) const
+{
+    std::cerr << message.toStdString() << std::endl;
+}
+
+
+MockUserInputSimulator::MockUserInputSimulator(QObject* parent) :
+    QObject(parent)
+{
+    // Empty Implementation
+}
+
+MockUserInputSimulator::~MockUserInputSimulator() {
+    // Empty Implementation
+}
+
+void MockUserInputSimulator::keyPress(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers, const QString& keyText)
+{
+    Q_UNUSED(keyName)
+    Q_UNUSED(modifiers)
+    Q_UNUSED(keyText)
+}
+void MockUserInputSimulator::keyRelease(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers, const QString& keyText)
+{
+    Q_UNUSED(keyName)
+    Q_UNUSED(modifiers)
+    Q_UNUSED(keyText)
+}
+void MockUserInputSimulator::keyClick(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers, const QString& keyText)
+{
+    Q_UNUSED(keyName)
+    Q_UNUSED(modifiers)
+    Q_UNUSED(keyText)
+}
+
+MockSetup::MockSetup() :
+    m_logger(this),
+    m_uiSim(this)
+{
+    // Empty Implementation
+}
+
+void MockSetup::qmlEngineAvailable(QQmlEngine *engine)
+{
+    engine->rootContext()->setContextProperty("log", QVariant::fromValue(&m_logger));
+    engine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));
+}
 
 int runQMLTest(const char* pathToQMLTestFile)
 {
@@ -34,7 +111,8 @@ int runQMLTest(const char* pathToQMLTestFile)
     argv[1] = strdup("-input");
     argv[2] = strdup(pathToQMLTestFile);
 
-    int result = quick_test_main(argc, argv, "QMLTests", QUICK_TEST_SOURCE_DIR);
+    MockSetup setup;
+    int result = quick_test_main_with_setup(argc, argv, "QMLTests", QUICK_TEST_SOURCE_DIR, &setup);
 
     for (int i = 0; i < argc; ++i)
     {
