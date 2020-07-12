@@ -24,6 +24,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QVariant>
 
 extern "C"
 {
@@ -60,6 +61,46 @@ public:
     Q_INVOKABLE void keyPress(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
     Q_INVOKABLE void keyRelease(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
     Q_INVOKABLE void keyClick(Qt::Key keyName, const Qt::KeyboardModifiers& modifiers = Qt::NoModifier, const QString& keyText = QString());
+};
+
+class MockEventBuilder : public QObject
+{
+    Q_OBJECT
+public:
+
+    explicit MockEventBuilder(QObject *parent = nullptr);
+
+    Q_INVOKABLE QVariant fireEvent(const QString& type);
+    Q_INVOKABLE void fireEvent(const QString& type, const QString& data);
+
+    Q_INVOKABLE void addBoolean(bool data);
+    Q_INVOKABLE void addInteger(qint32 data);
+    Q_INVOKABLE void addLong(qint64 data);
+    Q_INVOKABLE void addFloat(float data);
+    Q_INVOKABLE void addDouble(double data);
+    Q_INVOKABLE void addString(const QString& data);
+    Q_INVOKABLE void addColor(const QColor& data);
+    Q_INVOKABLE void addRect(const QRect& data);
+    Q_INVOKABLE void addSize(const QSize& data);
+    Q_INVOKABLE void addDate(const QDateTime& data);
+    Q_INVOKABLE void addPoint(const QPoint& data);
+};
+
+class MockEventDispatcher : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QStringList allowedEvents READ allowedEvents WRITE setAllowedEvents NOTIFY allowedEventsChanged)
+public:
+
+    explicit MockEventDispatcher(QObject *parent = nullptr);
+    virtual ~MockEventDispatcher();
+
+    const QStringList& allowedEvents() const;
+    void setAllowedEvents(const QStringList& newAllowedEvents);
+
+signals:
+    void allowedEventsChanged();
+    void eventReceived(const QString& name, const QVariantMap& args);
 };
 
 class MockSetup : public QObject

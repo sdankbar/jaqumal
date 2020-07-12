@@ -25,6 +25,7 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QtQuickTest>
+#include <QStringList>
 #include <iostream>
 
 MockQMLLogging::MockQMLLogging(QObject* parent) :
@@ -88,11 +89,99 @@ void MockUserInputSimulator::keyClick(Qt::Key keyName, const Qt::KeyboardModifie
     Q_UNUSED(keyText)
 }
 
+MockEventBuilder::MockEventBuilder(QObject *parent)
+{
+    Q_UNUSED(parent)
+}
+
+QVariant MockEventBuilder::fireEvent(const QString& type)
+{
+    Q_UNUSED(type)
+    return QVariant();
+}
+void MockEventBuilder::fireEvent(const QString& type, const QString& data)
+{
+    Q_UNUSED(type)
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addBoolean(bool data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addInteger(qint32 data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addLong(qint64 data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addFloat(float data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addDouble(double data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addString(const QString& data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addColor(const QColor& data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addRect(const QRect& data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addSize(const QSize& data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addDate(const QDateTime& data)
+{
+    Q_UNUSED(data)
+}
+void MockEventBuilder::addPoint(const QPoint& data)
+{
+    Q_UNUSED(data)
+}
+
+
+MockEventDispatcher::MockEventDispatcher(QObject *parent)
+{
+    Q_UNUSED(parent)
+}
+MockEventDispatcher::~MockEventDispatcher()
+{
+    // Empty Implementation
+}
+
+const QStringList& MockEventDispatcher::allowedEvents() const
+{
+    static QStringList l;
+    return l;
+}
+
+void MockEventDispatcher::setAllowedEvents(const QStringList& newAllowedEvents)
+{
+    Q_UNUSED(newAllowedEvents)
+}
+
+
 MockSetup::MockSetup() :
     m_logger(this),
     m_uiSim(this)
 {
-    // Empty Implementation
+    static bool firstCall = true;
+    if (firstCall)
+    {
+        qmlRegisterType<MockEventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
+        qmlRegisterType<MockEventDispatcher>("com.github.sdankbar.jaqumal", 0, 4, "EventDispatcher");
+        firstCall = false;
+    }
 }
 
 void MockSetup::qmlEngineAvailable(QQmlEngine *engine)
