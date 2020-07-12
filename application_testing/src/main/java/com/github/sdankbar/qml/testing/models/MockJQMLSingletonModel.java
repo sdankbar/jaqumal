@@ -35,9 +35,9 @@ import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 
 	private final String modelName;
-	private Map<K, JVariant> delegate = new HashMap<>();
+	private final Map<K, JVariant> delegate = new HashMap<>();
 
-	public MockJQMLSingletonModel(String name) {
+	public MockJQMLSingletonModel(final String name) {
 		this.modelName = Objects.requireNonNull(name, "name is null");
 	}
 
@@ -47,12 +47,12 @@ public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 	}
 
 	@Override
-	public boolean containsKey(Object arg0) {
+	public boolean containsKey(final Object arg0) {
 		return delegate.containsKey(arg0);
 	}
 
 	@Override
-	public boolean containsValue(Object arg0) {
+	public boolean containsValue(final Object arg0) {
 		return delegate.containsValue(arg0);
 	}
 
@@ -62,14 +62,13 @@ public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 	}
 
 	@Override
-	public JVariant get(Object arg0) {
+	public JVariant get(final Object arg0) {
 		return delegate.get(arg0);
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+		return delegate.isEmpty();
 	}
 
 	@Override
@@ -78,17 +77,17 @@ public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 	}
 
 	@Override
-	public JVariant put(K arg0, JVariant arg1) {
+	public JVariant put(final K arg0, final JVariant arg1) {
 		return delegate.put(arg0, arg1);
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends JVariant> arg0) {
+	public void putAll(final Map<? extends K, ? extends JVariant> arg0) {
 		delegate.putAll(arg0);
 	}
 
 	@Override
-	public JVariant remove(Object arg0) {
+	public JVariant remove(final Object arg0) {
 		return delegate.remove(arg0);
 	}
 
@@ -103,7 +102,7 @@ public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 	}
 
 	@Override
-	public void registerChangeListener(ChangeListener l) {
+	public void registerChangeListener(final ChangeListener l) {
 		// TODO Auto-generated method stub
 	}
 

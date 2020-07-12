@@ -53,78 +53,87 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	}
 
 	@Override
-	public JQMLButtonModel createButtonModel(String name) {
+	public JQMLButtonModel createButtonModel(final String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(String name, Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K> JQMLFlatTreeModel<K> createFlatTreeModel(String name, Set<K> keys) {
+	public <K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K extends Enum<K>> JQMLListModel<K> createListModel(String name, Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass) {
 		checkModelName(name);
-		JQMLListModel<K> temp = new MockJQMLListModel<>(name);
+		final JQMLListModel<K> temp = new MockJQMLListModel<>(name);
 		listModels.put(name, temp);
 		return temp;
 	}
 
 	@Override
-	public <K> JQMLListModel<K> createListModel(String name, Set<K> keys) {
+	public <K> JQMLListModel<K> createListModel(final String name, final Set<K> keys) {
 		checkModelName(name);
-		JQMLListModel<K> temp = new MockJQMLListModel<>(name);
+		final JQMLListModel<K> temp = new MockJQMLListModel<>(name);
 		listModels.put(name, temp);
 		return temp;
 	}
 
 	@Override
-	public <K extends Enum<K>> JQMLMapPool<K> createPool(String name, Class<K> enumClass,
-			ImmutableMap<K, JVariant> initialValues) {
+	public <K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
+			final ImmutableMap<K, JVariant> initialValues) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K> JQMLMapPool<K> createPool(String name, Set<K> keys, ImmutableMap<K, JVariant> initialValues) {
+	public <K> JQMLMapPool<K> createPool(final String name, final Set<K> keys,
+			final ImmutableMap<K, JVariant> initialValues) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(String name, Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass) {
 		checkModelName(name);
-		JQMLSingletonModel<K> temp = new MockJQMLSingletonModel<>(name);
+		final JQMLSingletonModel<K> temp = new MockJQMLSingletonModel<>(name);
 		singletonModels.put(name, temp);
 		return temp;
 	}
 
 	@Override
-	public <K> JQMLSingletonModel<K> createSingletonModel(String name, Set<K> keys) {
+	public <K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys) {
 		checkModelName(name);
-		JQMLSingletonModel<K> temp = new MockJQMLSingletonModel<>(name);
+		final JQMLSingletonModel<K> temp = new MockJQMLSingletonModel<>(name);
 		singletonModels.put(name, temp);
 		return temp;
 	}
 
 	@Override
-	public JQMLTextInputModel createTextInputModel(String name) {
+	public JQMLTextInputModel createTextInputModel(final String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public JQMLXYSeriesModel createXYSeriesModel(String name) {
+	public JQMLXYSeriesModel createXYSeriesModel(final String name) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public JQMLListModel<?> getListModel(final String name) {
+		return listModels.get(name);
+	}
+
+	public JQMLSingletonModel<?> getSingletonModel(final String name) {
+		return singletonModels.get(name);
 	}
 
 }
