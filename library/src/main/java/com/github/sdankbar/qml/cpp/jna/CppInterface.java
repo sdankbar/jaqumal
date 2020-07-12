@@ -207,7 +207,12 @@ public interface CppInterface extends Library {
 	 */
 	void reloadQMLFile(String fileName);
 
-	boolean runQMLTest(String pathToQMLTestFile);
+	/**
+	 * @param pathToQMLTestFile Path to QML test file or directory containing test
+	 *                          files.
+	 * @return 0 on test success, 1 on failure.
+	 */
+	int runQMLTest(String pathToQMLTestFile);
 
 	void sendQMLEvent(String eventName, String[] keys, Pointer valuesPointer, int keyValuesCount);
 

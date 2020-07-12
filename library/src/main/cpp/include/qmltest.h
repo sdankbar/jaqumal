@@ -24,5 +24,5 @@
 
 extern "C"
 {
-extern bool runQMLTest(const char* pathToQMLTestFile);
+extern int runQMLTest(const char* pathToQMLTestFile);
 }

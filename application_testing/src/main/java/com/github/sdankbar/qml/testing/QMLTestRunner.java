@@ -14,7 +14,8 @@ public class QMLTestRunner {
 	}
 
 	public void run() {
-		if (!ApiInstance.LIB_INSTANCE.runQMLTest(pathToQMLTests.getAbsolutePath())) {
+		final int r = ApiInstance.LIB_INSTANCE.runQMLTest(pathToQMLTests.getAbsolutePath());
+		if (r != 0) {
 			throw new AssertionError("QML unit test failure(s)");
 		}
 	}

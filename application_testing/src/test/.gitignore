@@ -1,1 +1,2 @@
-/*.qmlc
+qml_success/*.qmlc
+qml_failure/*.qmlc

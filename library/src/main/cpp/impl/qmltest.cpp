@@ -24,7 +24,7 @@
 #include <QtQuickTest>
 #include <iostream>
 
-bool runQMLTest(const char* pathToQMLTestFile)
+int runQMLTest(const char* pathToQMLTestFile)
 {
     QTEST_SET_MAIN_SOURCE_PATH;
 
@@ -41,5 +41,6 @@ bool runQMLTest(const char* pathToQMLTestFile)
         free(argv[i]);
     }
     delete[] argv;
-    return result == 0;
+
+    return result;
 }
