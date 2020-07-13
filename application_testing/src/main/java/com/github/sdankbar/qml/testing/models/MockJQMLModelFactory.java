@@ -136,4 +136,10 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		return singletonModels.get(name);
 	}
 
+	void reset() {
+		singletonModels.clear();
+		listModels.clear();
+		modelName.clear();
+	}
+
 }

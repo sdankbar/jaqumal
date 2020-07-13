@@ -190,15 +190,29 @@ void MockSetup::qmlEngineAvailable(QQmlEngine *engine)
     engine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));
 }
 
-int runQMLTest(const char* pathToQMLTestFile)
+int runQMLTest(const char* pathToQMLTestFile, char** importPaths, int importPathsCount)
 {
     QTEST_SET_MAIN_SOURCE_PATH;
 
-    const int argc = 3;
+    int argc = 3;
+    if (importPathsCount > 0)
+    {
+        argc = 4 + importPathsCount;
+    }
+
     char** argv = new char*[argc];
     argv[0] = strdup("");
     argv[1] = strdup("-input");
     argv[2] = strdup(pathToQMLTestFile);
+
+    if (importPathsCount > 0)
+    {
+        argv[3] = strdup("-import");
+        for (int i = 0; i < importPathsCount; ++i)
+        {
+            argv[4 + i] = strdup(importPaths[i]);
+        }
+    }
 
     MockSetup setup;
     int result = quick_test_main_with_setup(argc, argv, "QMLTests", QUICK_TEST_SOURCE_DIR, &setup);

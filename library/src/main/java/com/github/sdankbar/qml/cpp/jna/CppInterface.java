@@ -210,9 +210,11 @@ public interface CppInterface extends Library {
 	/**
 	 * @param pathToQMLTestFile Path to QML test file or directory containing test
 	 *                          files.
+	 * @param importPaths       0 or more paths that QML should use when searching
+	 *                          for files to import.
 	 * @return 0 on test success, 1 on failure.
 	 */
-	int runQMLTest(String pathToQMLTestFile);
+	int runQMLTest(String pathToQMLTestFile, String[] importPaths, int count);
 
 	void sendQMLEvent(String eventName, String[] keys, Pointer valuesPointer, int keyValuesCount);
 

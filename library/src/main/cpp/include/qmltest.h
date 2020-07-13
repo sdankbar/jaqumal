@@ -28,7 +28,7 @@
 
 extern "C"
 {
-extern int runQMLTest(const char* pathToQMLTestFile);
+extern int runQMLTest(const char* pathToQMLTestFile, char** importPaths, int importPathsCount);
 }
 
 class QQmlEngine;
