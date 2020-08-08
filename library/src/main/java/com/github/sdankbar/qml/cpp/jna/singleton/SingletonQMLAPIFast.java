@@ -60,6 +60,9 @@ public class SingletonQMLAPIFast {
 	public static native void setGenericObjectModelDataMulti(Pointer modelPointer, Pointer data, int[] roleIndicies,
 			int count);
 
+	public static native void marshallQVariant(Pointer p);
+	public static native void marshallQVariants(Pointer p, int count);
+	
 	private SingletonQMLAPIFast() {
 		// Empty Implementation
 	}

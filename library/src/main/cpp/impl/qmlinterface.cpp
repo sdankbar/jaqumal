@@ -73,6 +73,17 @@ void putDouble(char*& ptr, double real)
 }
 }
 
+void marshallQVariant(void* data)
+{
+    int32_t size;
+    QVariant var = toQVariant(data, size);
+}
+
+void marshallQVariants(void* data, int32_t valueCount)
+{
+    std::vector<QVariant> variants = toQVariantList(data, valueCount);
+}
+
 void createQApplication(int32_t argc, char** argv)
 {
     int* argcCopy = new int;

@@ -30,6 +30,9 @@
 extern std::function<void(const char*)> exceptionHandler;
 extern "C"
 {
+extern void marshallQVariant(void* data);
+extern void marshallQVariants(void* data, int32_t valueCount);
+
 extern void createQApplication(int32_t argc, char** argv);
 extern void execQApplication();
 extern void deleteQApplication();
