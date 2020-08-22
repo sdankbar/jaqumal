@@ -30,7 +30,6 @@ import java.util.Optional;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jna.flat_tree.FlatTreeQMLAPIFast;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
@@ -67,7 +66,7 @@ public class FlatTreeAccessor extends MapAccessor {
 
 		final Pointer indiciesMem = path.serialize();
 		FlatTreeQMLAPIFast.clearAllGenericFlatTreeModelData(modelPointer, indiciesMem, path.getCount());
-		JQMLExceptionHandling.checkExceptions();
+
 	}
 
 	/**
@@ -91,7 +90,6 @@ public class FlatTreeAccessor extends MapAccessor {
 		final Pointer indiciesMem = path.serialize();
 		final Pointer received = FlatTreeQMLAPIFast.getGenericFlatTreeModelData(modelPointer, indiciesMem,
 				path.getCount(), roleIndex, length);
-		JQMLExceptionHandling.checkExceptions();
 
 		return deserialize(received, length.getValue());
 	}
@@ -111,7 +109,6 @@ public class FlatTreeAccessor extends MapAccessor {
 
 		final Pointer indiciesMem = path.serialize();
 		FlatTreeQMLAPIFast.clearGenericFlatTreeModelData(modelPointer, indiciesMem, path.getCount(), roleIndex);
-		JQMLExceptionHandling.checkExceptions();
 
 		return oldValue;
 	}
@@ -124,7 +121,7 @@ public class FlatTreeAccessor extends MapAccessor {
 		value.serialize(javaToCppMemory);
 		FlatTreeQMLAPIFast.setGenericFlatTreeModelData(modelPointer, indiciesMem, path.getCount(),
 				javaToCppMemory.getPointer(), roleIndex);
-		JQMLExceptionHandling.checkExceptions();
+
 	}
 
 	@Override
@@ -145,7 +142,7 @@ public class FlatTreeAccessor extends MapAccessor {
 		final Pointer indiciesMem = path.serialize();
 		FlatTreeQMLAPIFast.setGenericFlatTreeModelDataMulti(modelPointer, indiciesMem, path.getCount(),
 				javaToCppMemory.getPointer(), array, array.length);
-		JQMLExceptionHandling.checkExceptions();
+
 	}
 
 	/**

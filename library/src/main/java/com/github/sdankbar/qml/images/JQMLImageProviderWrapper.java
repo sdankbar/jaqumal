@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.CppInterface.ImageProviderCallback;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
+import com.github.sdankbar.qml.cpp.jni.interfaces.ImageProviderCallback;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.sun.jna.Pointer;
 
@@ -51,7 +51,7 @@ public class JQMLImageProviderWrapper implements ImageProviderCallback {
 		this.id = Objects.requireNonNull(id, "id null");
 		this.provider = Objects.requireNonNull(provider, "provider is null");
 
-		ApiInstance.LIB_INSTANCE.addImageProvider(id, this);
+		ApplicationFunctions.addImageProvider(id, this);
 	}
 
 	/**
@@ -62,14 +62,14 @@ public class JQMLImageProviderWrapper implements ImageProviderCallback {
 	}
 
 	@Override
-	public Pointer invoke(final String imageID, final int w, final int h) {
+	public BufferedImage invoke(final String imageID, final int w, final int h) {
 		final BufferedImage image = provider.requestImage(imageID, new Dimension(w, h));
 		if (image != null) {
 			final JVariant var = new JVariant(image);
 			var.serialize(memory);
-			return memory.getPointer();
+			return image;
 		} else {
-			return Pointer.NULL;
+			return null;
 		}
 	}
 

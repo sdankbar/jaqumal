@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPI.MapChangeCallback;
@@ -109,7 +108,6 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 
 		modelPointer = ApiInstance.SINGLETON_LIB_INSTANCE.createGenericObjectModel(modelName, roleArray,
 				roleArray.length);
-		JQMLExceptionHandling.checkExceptions();
 
 		mapAccessor.setModelPointer(modelPointer);
 	}
@@ -124,7 +122,6 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 		verifyEventLoopThread();
 		if (!changeCallback.hasListeners()) {
 			SingletonQMLAPIFast.registerValueChangedCallback(modelPointer, changeCallback);
-			JQMLExceptionHandling.checkExceptions();
 		}
 		changeCallback.addListener(Objects.requireNonNull(l, "l is null"));
 	}

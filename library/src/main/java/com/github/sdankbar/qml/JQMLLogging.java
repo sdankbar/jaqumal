@@ -26,7 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.CppInterface.LoggingCallback;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
+import com.github.sdankbar.qml.cpp.jni.interfaces.LoggingCallback;
 
 /**
  * Class allows QML to access an SLF4j instance for the purposes of logging.
@@ -68,7 +69,7 @@ public class JQMLLogging {
 	 * Constructor
 	 */
 	public JQMLLogging() {
-		ApiInstance.LIB_INSTANCE.setLoggingCallback(c);
+		ApplicationFunctions.setLoggingCallback(c);
 	}
 
 }

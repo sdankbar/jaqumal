@@ -37,14 +37,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.list.ListQMLAPIFast;
+import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
@@ -57,7 +57,7 @@ import com.sun.jna.ptr.IntByReference;
 public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListModel<K> {
 
 	private final String modelName;
-	private final Pointer modelPointer;
+	private final long modelPointer;
 
 	private final Set<K> keySet;
 	private final AtomicReference<Thread> eventLoopThread;
@@ -103,11 +103,9 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 
 		verifyEventLoopThread();
-		modelPointer = ApiInstance.LIST_LIB_INSTANCE.createGenericListModel(modelName, roleArray, indicesArray,
-				roleArray.length);
-		JQMLExceptionHandling.checkExceptions();
+		modelPointer = ListModelFunctions.createGenericListModel(modelName, roleArray, indicesArray);
 
-		accessor.setModelPointer(modelPointer);
+		accessor.setModelPointer(new Pointer(modelPointer));
 
 		keySet = keys;
 	}
@@ -134,9 +132,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 
 		JVariant.serialize(variantList, m);
-		final int newIndex = ListQMLAPIFast.appendGenericListModelDataMulti(modelPointer, m.getPointer(), roles,
-				roles.length);
-		JQMLExceptionHandling.checkExceptions();
+		// TODO send data to QML
+		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
 				accessor.copy(newIndex), indexLookup);
@@ -174,8 +171,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 		JVariant.serialize(valueList, m);
 
-		ListQMLAPIFast.insertGenericListModelDataMulti(modelPointer, index, m.getPointer(), array, map.size());
-		JQMLExceptionHandling.checkExceptions();
+		// TODO send data to QML
+		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
 				accessor.copy(index), indexLookup);
@@ -207,9 +204,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		verifyEventLoopThread();
 
 		data.serialize(accessor.getJavaToCppMemory());
-		ListQMLAPIFast.insertGenericListModelData(modelPointer, index, accessor.getJavaToCppMemory().getPointer(),
-				indexLookup.get(role.toString()).intValue());
-		JQMLExceptionHandling.checkExceptions();
+		// TODO send data to QML
+		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
 				accessor.copy(index), indexLookup);
@@ -248,9 +244,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 		verifyEventLoopThread();
 		data.serialize(accessor.getJavaToCppMemory());
-		final int newIndex = ListQMLAPIFast.appendGenericListModelData(modelPointer,
-				accessor.getJavaToCppMemory().getPointer(), indexLookup.get(role.toString()).intValue());
-		JQMLExceptionHandling.checkExceptions();
+		// TODO
+		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
 		final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
 				accessor.copy(newIndex), indexLookup);
@@ -313,8 +308,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	@Override
 	public void clear(final int index) {
 		verifyEventLoopThread();
-		ListQMLAPIFast.clearAllGenericListModelData(modelPointer, index);
-		JQMLExceptionHandling.checkExceptions();
+		ListModelFunctions.clearAllGenericListModelData(modelPointer, index);
+
 	}
 
 	@Override
@@ -379,13 +374,10 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	@Override
 	public Optional<JVariant> getRootValue(final String key) {
 		final IntByReference length = new IntByReference();
-		final Pointer data = ListQMLAPIFast.getRootValueFromListModel(modelPointer, key, length);
-		JQMLExceptionHandling.checkExceptions();
-		if (data == null || Pointer.nativeValue(data) == 0) {
-			return Optional.empty();
-		} else {
-			return JVariant.deserialize(data.getByteBuffer(0, length.getValue()));
-		}
+		// TODO
+		JVariant data = ListModelFunctions.getRootValueFromListModel(modelPointer, key);
+
+		return Optional.ofNullable(data);
 	}
 
 	@Override
@@ -421,9 +413,9 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		Objects.requireNonNull(role, "role is null");
 
 		verifyEventLoopThread();
-		final boolean a = ListQMLAPIFast.isGenericListModelRolePresent(modelPointer, index,
+		final boolean a = ListModelFunctions.isGenericListModelRolePresent(modelPointer, index,
 				indexLookup.get(role.toString()).intValue());
-		JQMLExceptionHandling.checkExceptions();
+
 		return a;
 	}
 
@@ -468,10 +460,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public void putRootValue(final String key, final JVariant data) {
 		Objects.requireNonNull(key, "key is null");
 		Objects.requireNonNull(data, "data is null");
+		ListModelFunctions.putRootValueIntoListModel(modelPointer, key, data);
 
-		data.serialize(accessor.getJavaToCppMemory());
-		ListQMLAPIFast.putRootValueIntoListModel(modelPointer, key, accessor.getJavaToCppMemory().getPointer());
-		JQMLExceptionHandling.checkExceptions();
 	}
 
 	/**
@@ -489,8 +479,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		final Map<K, JVariant> copy = new HashMap<>(old);
 
 		verifyEventLoopThread();
-		ListQMLAPIFast.eraseGenericListModelData(modelPointer, index);
-		JQMLExceptionHandling.checkExceptions();
+		ListModelFunctions.eraseGenericListModelData(modelPointer, index);
 
 		mapRefs.remove(index);
 		old.setIndex(-1);
@@ -512,8 +501,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		Objects.requireNonNull(role, "role is null");
 
 		verifyEventLoopThread();
-		ListQMLAPIFast.clearGenericListModelData(modelPointer, index, indexLookup.get(role.toString()).intValue());
-		JQMLExceptionHandling.checkExceptions();
+		ListModelFunctions.clearGenericListModelData(modelPointer, index, indexLookup.get(role.toString()).intValue());
+
 	}
 
 	@Override
@@ -548,8 +537,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	@Override
 	public void removeRootValue(final String key) {
 		Objects.requireNonNull(key, "key is null");
-		ListQMLAPIFast.removeRootValueFromListModel(modelPointer, key);
-		JQMLExceptionHandling.checkExceptions();
+		ListModelFunctions.removeRootValueFromListModel(modelPointer, key);
+
 	}
 
 	private void resetMapIndicies() {
@@ -636,8 +625,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	@Override
 	public int size() {
 		verifyEventLoopThread();
-		final int a = ListQMLAPIFast.getGenericListModelSize(modelPointer);
-		JQMLExceptionHandling.checkExceptions();
+		final int a = ListModelFunctions.getGenericListModelSize(modelPointer);
+
 		return a;
 	}
 
@@ -653,8 +642,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 			ordering[i] = map.getIndex();
 		}
 
-		ListQMLAPIFast.reorderGenericListModel(modelPointer, ordering, mapRefs.size());
-		JQMLExceptionHandling.checkExceptions();
+		ListModelFunctions.reorderGenericListModel(modelPointer, ordering);
 
 		resetMapIndicies();
 	}

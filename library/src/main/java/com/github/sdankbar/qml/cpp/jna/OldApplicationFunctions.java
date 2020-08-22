@@ -20,8 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.cpp.jna.list;
+package com.github.sdankbar.qml.cpp.jna;
 
+import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 
@@ -29,18 +30,8 @@ import com.sun.jna.Pointer;
  * Interface used by JNA to call ListModel functions. This is not part of
  * ListQMLAPIFast because JNA direct mapping does not support arrays of strings.
  */
-public interface ListQMLAPI extends Library {
+public interface OldApplicationFunctions extends Library {
 
-	/**
-	 * Creates a new ListModel.
-	 *
-	 * @param modelName   The name of the model.
-	 * @param roleNames   An array of role names.
-	 * @param roleIndices An array of the indices for each role. Maps to the names
-	 *                    in roleNames.
-	 * @param length      Length of roleNames and roleIndices.
-	 * @return A Pointer to the new model.
-	 */
-	Pointer createGenericListModel(String modelName, String[] roleNames, int[] roleIndices, int length);
+	void setSharedMemory(Pointer p, int size);
 
 }

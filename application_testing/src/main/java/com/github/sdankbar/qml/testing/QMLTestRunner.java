@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.github.sdankbar.qml.cpp.ApiInstance;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 
 public class QMLTestRunner {
 
@@ -22,8 +23,7 @@ public class QMLTestRunner {
 	}
 
 	public void run() {
-		final int r = ApiInstance.LIB_INSTANCE.runQMLTest(pathToQMLTests.getAbsolutePath(), importPaths,
-				importPaths.length);
+		final int r = ApplicationFunctions.runQMLTest(pathToQMLTests.getAbsolutePath(), importPaths);
 		if (r != 0) {
 			throw new AssertionError("QML unit test failure(s)");
 		}

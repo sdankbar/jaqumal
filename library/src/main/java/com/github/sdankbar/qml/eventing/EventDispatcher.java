@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.ApiInstance;
+import com.github.sdankbar.qml.cpp.jni.EventFunctions;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.google.common.collect.ImmutableList;
@@ -95,8 +96,7 @@ public class EventDispatcher<T> {
 				final int argsCount = args.size();
 				final String[] keys = args.keySet().toArray(new String[argsCount]);
 				JVariant.serialize(new ArrayList<>(args.values()), javaToCppMemory);
-				ApiInstance.LIB_INSTANCE.sendQMLEvent(castEvent.getClass().getSimpleName(), keys,
-						javaToCppMemory.getPointer(), argsCount);
+				EventFunctions.sendQMLEvent(castEvent.getClass().getSimpleName(), keys);
 			}
 		} catch (final Exception excp) {
 			log.warn("Exception caught processing event " + e, excp);

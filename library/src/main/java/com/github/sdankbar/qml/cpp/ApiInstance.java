@@ -22,9 +22,8 @@
  */
 package com.github.sdankbar.qml.cpp;
 
-import com.github.sdankbar.qml.cpp.jna.CppInterface;
+import com.github.sdankbar.qml.cpp.jna.OldApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jna.flat_tree.FlatTreeQMLAPI;
-import com.github.sdankbar.qml.cpp.jna.list.ListQMLAPI;
 import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPI;
 import com.sun.jna.Native;
 
@@ -33,16 +32,8 @@ import com.sun.jna.Native;
  */
 public class ApiInstance {
 
-	/**
-	 * C++ API for interacting with a QApplication instance.
-	 */
-	public static final CppInterface LIB_INSTANCE = Native.load("Jaqumal", CppInterface.class);
-
-	/**
-	 * C++ API for creating and modifying List models.
-	 */
-	public static final ListQMLAPI LIST_LIB_INSTANCE = Native.load("Jaqumal", ListQMLAPI.class);
-
+	public static final OldApplicationFunctions LIB_INSTANCE = Native.load("Jaqumal", OldApplicationFunctions.class);
+	
 	/**
 	 * C++ API for creating and modifying Flat Tree models.
 	 */

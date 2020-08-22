@@ -48,7 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.CppInterface.InvokeCallback;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
+import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
 
 /**
  * The JQMLSheduledExecutorService allows for the scheduling of tasks to run on
@@ -314,8 +315,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		final FutureTask<T> f = new FutureTask<>(task);
 		final ImmediateTask<T> t = new ImmediateTask<>(isRunning, pendingCallbacks, f, invokeAnyQueue);
 
-		ApiInstance.LIB_INSTANCE.invoke(t);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.invoke(t);
 
 		return f;
 	}
@@ -333,8 +333,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		final FutureTask<T> f = new FutureTask<>(new RunnableWrapper<>(task, result));
 		final ImmediateTask<T> t = new ImmediateTask<>(isRunning, pendingCallbacks, f, null);
 
-		ApiInstance.LIB_INSTANCE.invoke(t);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.invoke(t);
 
 		return f;
 	}

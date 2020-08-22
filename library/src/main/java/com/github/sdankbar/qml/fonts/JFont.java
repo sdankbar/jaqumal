@@ -27,8 +27,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.cpp.ApiInstance;
+import com.github.sdankbar.qml.cpp.jni.FontFunctions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
@@ -66,7 +66,7 @@ public class JFont {
 		}
 
 		public JFont build() {
-			return new JFont(ApiInstance.LIB_INSTANCE.getQFontToString(family, pointSize, pixelSize, bold, italic,
+			return new JFont(FontFunctions.getQFontToString(family, pointSize, pixelSize, bold, italic,
 					overline, strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
 					letterSpacingType.value, capitalization.value, hintingPreference.value, stretch.value, style.value,
 					styleName, styleHint.value, styleStrategyMask()));
@@ -317,10 +317,6 @@ public class JFont {
 		}
 	}
 
-	static {
-		JQMLExceptionHandling.register();// Do very early so that exception handling is immediately available.
-	}
-
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -406,14 +402,14 @@ public class JFont {
 
 	public JFontInfo getJFontInfo() {
 		if (cachedInfo == null) {
-			cachedInfo = JFontInfo.fromString(ApiInstance.LIB_INSTANCE.getQFontInfo(fontToString));
+			cachedInfo = JFontInfo.fromString(FontFunctions.getQFontInfo(fontToString));
 		}
 		return cachedInfo;
 	}
 
 	public JFontMetrics getJFontMetrics() {
 		if (cachedMetrics == null) {
-			cachedMetrics = JFontMetrics.from(fontToString, ApiInstance.LIB_INSTANCE.getQFontMetrics(fontToString));
+			cachedMetrics = JFontMetrics.from(fontToString, FontFunctions.getQFontMetrics(fontToString));
 		}
 		return cachedMetrics;
 	}

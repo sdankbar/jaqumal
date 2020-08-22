@@ -30,7 +30,6 @@ import java.util.Optional;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPIFast;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
@@ -55,13 +54,13 @@ public class SingletonMapAccessor extends MapAccessor {
 	@Override
 	public void clear() {
 		SingletonQMLAPIFast.clearGenericObjectModel(modelPointer);
-		JQMLExceptionHandling.checkExceptions();
+
 	}
 
 	@Override
 	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
 		final Pointer received = SingletonQMLAPIFast.getGenericObjectModelData(modelPointer, roleIndex, length);
-		JQMLExceptionHandling.checkExceptions();
+
 		return deserialize(received, length.getValue());
 	}
 
@@ -70,7 +69,6 @@ public class SingletonMapAccessor extends MapAccessor {
 		final Optional<JVariant> existingValue = get(roleIndex, length);
 
 		SingletonQMLAPIFast.clearGenericObjectModelRole(modelPointer, roleIndex);
-		JQMLExceptionHandling.checkExceptions();
 
 		return existingValue;
 	}
@@ -79,7 +77,7 @@ public class SingletonMapAccessor extends MapAccessor {
 	public void set(final JVariant value, final int roleIndex) {
 		value.serialize(javaToCppMemory);
 		SingletonQMLAPIFast.setGenericObjectModelData(modelPointer, javaToCppMemory.getPointer(), roleIndex);
-		JQMLExceptionHandling.checkExceptions();
+
 	}
 
 	@Override
@@ -96,7 +94,7 @@ public class SingletonMapAccessor extends MapAccessor {
 		JVariant.serialize(values, javaToCppMemory);
 		SingletonQMLAPIFast.setGenericObjectModelDataMulti(modelPointer, javaToCppMemory.getPointer(), roles,
 				valuesMap.size());
-		JQMLExceptionHandling.checkExceptions();
+
 	}
 
 }

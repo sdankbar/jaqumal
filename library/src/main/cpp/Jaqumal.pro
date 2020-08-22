@@ -34,6 +34,10 @@ DEFINES += JAQUMAL_LIBRARY
 
 INCLUDEPATH += include
 
+# TODO discover the include path
+INCLUDEPATH += "C:\Program Files\Java\jdk-14.0.2\include" \
+        "C:\Program Files\Java\jdk-14.0.2\include\win32"
+
 SOURCES += \
     impl/qmllibobject.cpp \
     impl/genericlistmodel.cpp \
@@ -46,9 +50,13 @@ SOURCES += \
     impl/userinputsimulator.cpp \
     impl/qmlimageprovider.cpp \
     impl/jpolyline.cpp \
-    impl/qmltest.cpp
+    impl/qmltest.cpp \
+    impl/qmldatatransfer.cpp \
+    impl/jniutilities.cpp
 
 HEADERS += \
+    include/jniutilities.h \
+    include/qmldatatransfer.h \
     include/qmllibobject.h \
     include/genericlistmodel.h \
     include/eventbuilder.h \
