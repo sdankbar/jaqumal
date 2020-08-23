@@ -39,7 +39,7 @@ INCLUDEPATH += "C:\Program Files\Java\jdk-14.0.2\include" \
         "C:\Program Files\Java\jdk-14.0.2\include\win32"
 
 SOURCES += \
-    impl/qmllibobject.cpp \
+    impl/applicationfunctions.cpp \
     impl/genericlistmodel.cpp \
     impl/eventbuilder.cpp \
     impl/genericobjectmodel.cpp \
@@ -55,9 +55,9 @@ SOURCES += \
     impl/jniutilities.cpp
 
 HEADERS += \
+    include/applicationfunctions.h \
     include/jniutilities.h \
     include/qmldatatransfer.h \
-    include/qmllibobject.h \
     include/genericlistmodel.h \
     include/eventbuilder.h \
     include/genericobjectmodel.h \

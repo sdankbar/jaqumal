@@ -21,31 +21,52 @@
  * THE SOFTWARE.
  */
 #pragma once
-#include "jni.h"
-#include <QString>
 
-class JNIUtilities
+#include <jni.h>
+#include <QApplication>
+#include <qmllogging.h>
+#include <QQmlApplicationEngine>
+#include <userinputsimulator.h>
+#include <QQmlContext>
+
+class ApplicationFunctions
 {
 public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
 
-    static JNINativeMethod createJNIMethod(const char* name, const char* sig, void* funcPtr);
-    static jclass findClassGlobalReference(JNIEnv* env, const char* name);
+    static void create(int* argc, char** argv);
+    static void deleteSingleton();
+    static ApplicationFunctions* get();
+    static bool check(JNIEnv* env);
 
-    static void throwIllegalStateException(JNIEnv* env, const char* msg);
-    static void throwQMLException(JNIEnv* env, const char* msg);
+    void exec();
+    void quitApplication();
+    //void invoke(Callback callback)
+    void loadQMLFile(const QString& filePath);
+    void unloadQML();
+    void reloadQMLFile(const QString& filePath);
+    void setLoggingCallback(void c(int, const char*));
+    void addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback);
+    QList<QScreen*> getScreens();
 
-    static void invokeCallback(JNIEnv* env, jobject callbackObject);
-
-    static QString toQString(JNIEnv* env, jstring str);
+    template<typename T>
+    void addToContext(const QString& name, T* ptr)
+    {
+        m_qmlEngine->rootContext()->setContextProperty(name, QVariant::fromValue(ptr));
+    }
 
 private:
-    JNIUtilities();
+    ApplicationFunctions(int32_t argc, char** argv);
+    ~ApplicationFunctions();
 
-    static jclass illegalStateExceptionClass;
-    static jclass qmlExceptionClass;
-    static jclass callbackClass;
-    static jmethodID callbackMethod;
+    static ApplicationFunctions* SINGLETON;
+
+    QApplication* m_qapp;
+    QMLLogging m_logging;
+    QQmlApplicationEngine* m_qmlEngine;
+    UserInputSimulator m_uiSim;
 };
+
+
 

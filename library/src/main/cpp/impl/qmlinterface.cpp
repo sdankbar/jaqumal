@@ -84,74 +84,6 @@ void marshallQVariants(void* data, int32_t valueCount)
     std::vector<QVariant> variants = toQVariantList(data, valueCount);
 }
 
-void createQApplication(int32_t argc, char** argv)
-{
-    int* argcCopy = new int;
-    *argcCopy = argc;
-    char** argvCopy = new char*[argc];
-    for (int i = 0; i < argc; ++i)
-    {
-        argvCopy[i] = strdup(argv[i]);
-    }
-
-    qRegisterMetaType<Callback>();
-
-    qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
-    qmlRegisterType<EventDispatcher>("com.github.sdankbar.jaqumal", 0, 4, "EventDispatcher");
-    qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
-    qmlRegisterUncreatableType<GenericFlatTreeModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericFlatTreeModel", "Cannot create GenericFlatTreeModel");
-    qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");
-    qmlRegisterType<JPolyline>("com.github.sdankbar.jaqumal", 0, 4, "JPolyline");
-
-    QMLLibrary::library = new QMLLibrary(*argcCopy, argvCopy);
-}
-
-void execQApplication() {
-    if (checkQMLLibrary())
-    {
-        QMLLibrary::library->exec();
-    }
-}
-
-void deleteQApplication()
-{
-    delete QMLLibrary::library;
-    QMLLibrary::library = nullptr;
-}
-
-void quitQApplication()
-{
-    if (checkQMLLibrary())
-    {
-        QMLLibrary::library->quitApplication();
-    }
-}
-
-void loadQMLFile(const char* fileName)
-{
-    if (checkQMLLibrary())
-    {
-        QString filePath(fileName);
-        QMLLibrary::library->loadQMLFile(filePath);
-    }
-}
-
-void unloadQML()
-{
-    if (checkQMLLibrary())
-    {
-        QMLLibrary::library->unloadQML();
-    }
-}
-
-void reloadQMLFile(const char* fileName)
-{
-    if (checkQMLLibrary())
-    {
-        QString filePath(fileName);
-        QMLLibrary::library->reloadQMLFile(filePath);
-    }
-}
 
 void addEventCallback(void* c(const char*, void*, int32_t))
 {
@@ -179,11 +111,6 @@ void setLoggingCallback(void c(int, const char*))
     {
         QMLLibrary::library->setLoggingCallback(c);
     }
-}
-
-void setExceptionCallback(void c(const char*))
-{
-    exceptionHandler = c;
 }
 
 void addImageProvider(const char* id, void* c(const char*, int, int))
@@ -474,16 +401,6 @@ std::vector<QVariant> toQVariantList(void* data, uint32_t count)
         }
     }
     return vec;
-}
-
-const char* getCompileQtVersion()
-{
-    return QT_VERSION_STR;
-}
-
-const char* getRuntimeQtVersion()
-{
-    return qVersion();
 }
 
 QVariant toQVariant(void* data, int32_t& size)

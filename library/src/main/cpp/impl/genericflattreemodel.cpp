@@ -22,25 +22,11 @@
  */
 #include "genericflattreemodel.h"
 #include "qmlinterface.h"
-#include "qmllibobject.h"
+#include <applicationfunctions.h>
 
 namespace
 {
 const QString SUBMODEL_ROLE("SUBMODEL");
-
-bool checkQMLLibrary()
-{
-    if (QMLLibrary::library != nullptr)
-    {
-        return true;
-    }
-    else
-    {
-        exceptionHandler("Attempted to use QApplication before QApplication was created");
-        return false;
-    }
-}
-}
 
 std::deque<int32_t> toTreePath(int32_t* index, int32_t count)
 {
@@ -55,7 +41,7 @@ std::deque<int32_t> toTreePath(int32_t* index, int32_t count)
 
 void* createGenericFlatTreeModel(const char* modelName, char** roleNames, int32_t* roleIndices, int32_t length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         QString modelNameStr(modelName);
 
@@ -67,7 +53,8 @@ void* createGenericFlatTreeModel(const char* modelName, char** roleNames, int32_
             roleIndicesList.push_back(roleIndices[i]);
         }
 
-        return QMLLibrary::library->createGenericFlatTreeModel(modelNameStr, roleNamesList, roleIndicesList);
+        //return QMLLibrary::library->createGenericFlatTreeModel(modelNameStr, roleNamesList, roleIndicesList);
+        return nullptr;
     }
     else
     {
@@ -77,7 +64,7 @@ void* createGenericFlatTreeModel(const char* modelName, char** roleNames, int32_
 
 void setGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elementCount, void* data, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -89,7 +76,7 @@ void setGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elem
 
 void setGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, int32_t elementCount, void* data, int32_t* roleIndex, int32_t valueCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -108,7 +95,7 @@ void setGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, int32_t
 
 void insertGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elementCount, void* data, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -119,7 +106,7 @@ void insertGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t e
 
 void insertGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, int32_t elementCount, void* data, int32_t* roleIndex, int32_t valueCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -138,7 +125,7 @@ void insertGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, int3
 
 void clearGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elementCount, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -147,7 +134,7 @@ void clearGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t el
 }
 void clearAllGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elementCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -156,7 +143,7 @@ void clearAllGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t
 }
 void eraseGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elementCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -165,7 +152,7 @@ void eraseGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t el
 }
 int32_t appendGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elementCount, void* data, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -180,7 +167,7 @@ int32_t appendGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_
 
 int32_t appendGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, int32_t elementCount, void* data, int32_t* roleIndex, int32_t valueCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -203,7 +190,7 @@ int32_t appendGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, i
 
 void* getGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elementCount, int32_t roleIndex, int32_t& length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -217,7 +204,7 @@ void* getGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t ele
 
 void clearGenericFlatTreeModelRole(void* tempPointer, int32_t* index, int32_t elementCount, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -226,7 +213,7 @@ void clearGenericFlatTreeModelRole(void* tempPointer, int32_t* index, int32_t el
 }
 void clearGenericFlatTreeModel(void* tempPointer, int32_t* index, int32_t elementCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -235,7 +222,7 @@ void clearGenericFlatTreeModel(void* tempPointer, int32_t* index, int32_t elemen
 }
 bool isGenericFlatTreeModelRolePresent(void* tempPointer, int32_t* index, int32_t elementCount, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -248,7 +235,7 @@ bool isGenericFlatTreeModelRolePresent(void* tempPointer, int32_t* index, int32_
 }
 int32_t getGenericFlatTreeModelSize(void* tempPointer, int32_t* index, int32_t elementCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
@@ -262,7 +249,7 @@ int32_t getGenericFlatTreeModelSize(void* tempPointer, int32_t* index, int32_t e
 
 void reorderGenericFlatTreeModel(void* tempPointer, int32_t* index, int32_t elementCount, int32_t* ordering, int32_t length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);

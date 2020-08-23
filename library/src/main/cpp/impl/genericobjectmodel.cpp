@@ -21,30 +21,15 @@
  * THE SOFTWARE.
  */
 #include "genericobjectmodel.h"
-#include "qmllibobject.h"
 #include "qmlinterface.h"
 #include <iostream>
-
-namespace
-{
-bool checkQMLLibrary()
-{
-    if (QMLLibrary::library != nullptr)
-    {
-        return true;
-    }
-    else
-    {
-        exceptionHandler("Attempted to use QApplication before QApplication was created");
-        return false;
-    }
-}
-}
+#include <applicationfunctions.h>
+#include <memory>
 
 void* createGenericObjectModel(const char* modelName, char** roleNames,
                               int32_t length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         QString modelNameStr(modelName);
 
@@ -54,7 +39,8 @@ void* createGenericObjectModel(const char* modelName, char** roleNames,
             roles.push_back(roleNames[i]);
         }
 
-        return QMLLibrary::library->createGenericObjectModel(modelNameStr, roles);
+        //return QMLLibrary::library->createGenericObjectModel(modelNameStr, roles);
+        return nullptr;
     }
     else
     {
@@ -64,7 +50,7 @@ void* createGenericObjectModel(const char* modelName, char** roleNames,
 
 void setGenericObjectModelData(void* tempPointer, void* data, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         int32_t size;
@@ -74,7 +60,7 @@ void setGenericObjectModelData(void* tempPointer, void* data, int32_t roleIndex)
 
 void setGenericObjectModelDataMulti(void* tempPointer, void* data, int32_t* roleIndex, int32_t valueCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         std::vector<QVariant> variants = toQVariantList(data, static_cast<uint32_t>(valueCount));
@@ -91,7 +77,7 @@ void setGenericObjectModelDataMulti(void* tempPointer, void* data, int32_t* role
 
 void* getGenericObjectModelData(void* tempPointer, int32_t roleIndex, int32_t& length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         return modelPtr->getDataSerialized(roleIndex, length);
@@ -104,7 +90,7 @@ void* getGenericObjectModelData(void* tempPointer, int32_t roleIndex, int32_t& l
 
 void clearGenericObjectModelRole(void* tempPointer, int32_t role)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         modelPtr->clear(role);
@@ -112,7 +98,7 @@ void clearGenericObjectModelRole(void* tempPointer, int32_t role)
 }
 void clearGenericObjectModel(void* tempPointer)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         modelPtr->clear();
@@ -120,7 +106,7 @@ void clearGenericObjectModel(void* tempPointer)
 }
 bool isGenericObjectModelRolePresent(void* tempPointer, int32_t role)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         return modelPtr->containsRole(role);
@@ -132,7 +118,7 @@ bool isGenericObjectModelRolePresent(void* tempPointer, int32_t role)
 }
 void registerValueChangedCallback(void* tempPointer, void c(const char*, const char*, int32_t))
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         modelPtr->registerValueChangedCallback(c);

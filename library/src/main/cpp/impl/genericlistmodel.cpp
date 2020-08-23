@@ -22,27 +22,11 @@
  */
 #include "genericlistmodel.h"
 #include "qmlinterface.h"
-#include "qmllibobject.h"
-
-namespace
-{
-bool checkQMLLibrary()
-{
-    if (QMLLibrary::library  != nullptr)
-    {
-        return true;
-    }
-    else
-    {
-        exceptionHandler("Attempted to use QApplication before QApplication was created");
-        return false;
-    }
-}
-}
+#include "applicationfunctions.h"
 
 void* createGenericListModel(const char* modelName, char** roleNames, int32_t* roleIndices, int32_t length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check())
     {
         QString modelNameStr(modelName);
 
@@ -54,7 +38,15 @@ void* createGenericListModel(const char* modelName, char** roleNames, int32_t* r
             roleIndicesList.push_back(roleIndices[i]);
         }
 
-        return QMLLibrary::library->createGenericListModel(modelNameStr, roleNamesList, roleIndicesList);
+        QHash<int, QByteArray> roleNameMap;
+        for (int32_t i = 0; i < roleNamesList.size(); ++i)
+        {
+            roleNameMap[roleIndices[i]] = roleNamesList[i].toStdString().c_str();
+        }
+
+        GenericListModel* modelPtr = new GenericListModel(modelName, roleNameMap);
+        m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
+        return modelPtr;
     }
     else
     {

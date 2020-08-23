@@ -23,6 +23,7 @@
 #include "jniutilities.h"
 #include "string.h"
 #include "qmldatatransfer.h"
+#include "applicationfunctions.h"
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
@@ -33,6 +34,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
 
     JNIUtilities::initialize(env);
     QMLDataTransfer::initialize(env);
+    ApplicationFunctions::initialize(env);
 
     // Return the JNI Version as required by method
     return JNI_VERSION_1_2;
@@ -45,15 +47,18 @@ void JNI_OnUnload(JavaVM* vm, void*)
 
     JNIUtilities::uninitialize(env);
     QMLDataTransfer::uninitialize(env);
+    ApplicationFunctions::uninitialize(env);
 }
 
 jclass JNIUtilities::illegalStateExceptionClass;
+jclass JNIUtilities::qmlExceptionClass;
 jclass JNIUtilities::callbackClass;
 jmethodID JNIUtilities::callbackMethod;
 
 void JNIUtilities::initialize(JNIEnv* env)
 {
     illegalStateExceptionClass = findClassGlobalReference(env, "java/lang/IllegalStateException");
+    qmlExceptionClass = findClassGlobalReference(env, "com/github/sdankbar/qml/exceptions/QMLException");
     callbackClass = findClassGlobalReference(env, "com/github/sdankbar/jni/CallbackInterface");
     callbackMethod = env->GetMethodID(callbackClass, "callback", "(I)V");
 }
@@ -61,6 +66,7 @@ void JNIUtilities::initialize(JNIEnv* env)
 void JNIUtilities::uninitialize(JNIEnv* env)
 {
     env->DeleteGlobalRef(illegalStateExceptionClass);
+    env->DeleteGlobalRef(qmlExceptionClass);
     env->DeleteGlobalRef(callbackClass);
 }
 
@@ -86,12 +92,25 @@ void JNIUtilities::throwIllegalStateException(JNIEnv* env, const char* msg)
     env->ThrowNew(illegalStateExceptionClass, msg);
 }
 
+void JNIUtilities::throwQMLException(JNIEnv* env, const char* msg)
+{
+    env->ThrowNew(qmlExceptionClass, msg);
+}
+
 void JNIUtilities::invokeCallback(JNIEnv* env, jobject callbackObject)
 {
     env->CallVoidMethod(callbackObject, callbackMethod, 0);
 }
 
+QString JNIUtilities::toQString(JNIEnv* env, jstring str)
+{
+    const char* array = env->GetStringUTFChars(str, NULL);
+    QString qstr = QString::fromUtf8(array);
+    env->ReleaseStringUTFChars(str, array);
+    return qstr;
+}
+
 JNIUtilities::JNIUtilities()
 {
-
+    // Empty Implementation
 }
