@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "qmlinterface.h"
-#include "qmllibobject.h"
 #include <eventbuilder.h>
 #include <eventdispatcher.h>
 #include <jpolyline.h>
@@ -33,27 +32,16 @@
 #include <QFontInfo>
 #include <QFontMetrics>
 #include <QScreen>
+#include <QImage>
 #include <iostream>
 #include <functional>
+#include <applicationfunctions.h>
 
 std::function<void(const char*)> exceptionHandler;
 static char* cppToJavaMem;
 static int32_t cppToJavaMemLength;
 namespace
 {
-bool checkQMLLibrary()
-{
-    if (QMLLibrary::library != nullptr)
-    {
-        return true;
-    }
-    else
-    {
-        exceptionHandler("Attempted to use QApplication before QApplication was created");
-        return false;
-    }
-}
-
 void putByte(char*& ptr, char byte)
 {
     *ptr = byte;
@@ -92,11 +80,11 @@ void addEventCallback(void* c(const char*, void*, int32_t))
 
 void invoke(void c())
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
-        Callback callback(c);
-        QMLLibrary::library->metaObject()->invokeMethod(QMLLibrary::library, "invoke", Qt::QueuedConnection,
-                                                        Q_ARG(Callback, callback));
+        //Callback callback(c);
+        //QMLLibrary::library->metaObject()->invokeMethod(QMLLibrary::library, "invoke", Qt::QueuedConnection,
+        //                                                Q_ARG(Callback, callback));
     }
 }
 
@@ -107,25 +95,25 @@ void invokeWithDelay(void c(), int32_t milliseconds)
 
 void setLoggingCallback(void c(int, const char*))
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
-        QMLLibrary::library->setLoggingCallback(c);
+        //QMLLibrary::library->setLoggingCallback(c);
     }
 }
 
 void addImageProvider(const char* id, void* c(const char*, int, int))
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
-        QMLLibrary::library->addImageProvider(
-            QString(id), 
-            std::function<void* (const char*, int , int)>(c));
+        //QMLLibrary::library->addImageProvider(
+        //    QString(id),
+        //    std::function<void* (const char*, int , int)>(c));
     }
 }
 
 void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer, int keyValuesCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         std::vector<QVariant> variants = toQVariantList(valuesPointer, static_cast<uint32_t>(keyValuesCount));
         QVariantMap map;
@@ -154,7 +142,7 @@ const char* getQFontToString(const char* family, int pointSize, int pixelSize, b
                              double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
                              int hintingPreference, int stretch, int style, const char* styleName, int styleHint, int styleStrategy)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         QFont f(family);
         if (pointSize > 0) {
@@ -194,7 +182,7 @@ const char* getQFontToString(const char* family, int pointSize, int pixelSize, b
 
 extern const char* getQFontInfo(const char* fontToString)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         static std::string ret;
         QFont f;
@@ -225,7 +213,7 @@ extern const char* getQFontInfo(const char* fontToString)
 
 const char* getQFontMetrics(const char* fontToString)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         static std::string ret;
         QFont f;
@@ -258,7 +246,7 @@ const char* getQFontMetrics(const char* fontToString)
 }
 void* getBoundingRect(const char* fontToString, const char* text)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         QFont f;
         f.fromString(QString(fontToString));
@@ -280,7 +268,7 @@ void* getBoundingRect(const char* fontToString, const char* text)
 void* getBoundingRect2(const char* fontToString, int x, int y, int w, int h, int alignFlags, int textFlags,
             const char* text)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         QFont f;
         f.fromString(QString(fontToString));
@@ -302,7 +290,7 @@ void* getBoundingRect2(const char* fontToString, int x, int y, int w, int h, int
 }
 void* getTightBoundingRect(const char* fontToString, const char* text)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         QFont f;
         f.fromString(QString(fontToString));
@@ -323,7 +311,7 @@ void* getTightBoundingRect(const char* fontToString, const char* text)
 }
 int getStringWidth(const char* fontToString, const char* text)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         QFont f;
         f.fromString(QString(fontToString));
@@ -337,7 +325,7 @@ int getStringWidth(const char* fontToString, const char* text)
 }
 bool inFont(const char* fontToString, const int character)
 {
-    if (checkQMLLibrary()) // QTBUG-27024
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
     {
         QFont f;
         f.fromString(QString(fontToString));
@@ -353,9 +341,9 @@ bool inFont(const char* fontToString, const int character)
 void* getScreens()
 {
     static char* retPtr = nullptr;
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
-        QList<QScreen*> screens = QMLLibrary::library->getScreens();
+        /*QList<QScreen*> screens = QMLLibrary::library->getScreens();
         size_t bytesAllocated = 4u + static_cast<size_t>(screens.size()) * (8u + 4u * 4u);
         free(retPtr);
         retPtr = reinterpret_cast<char*>(malloc(bytesAllocated));
@@ -372,7 +360,7 @@ void* getScreens()
             putInt(working, geo.y());
             putInt(working, geo.width());
             putInt(working, geo.height());
-        }
+        }*/
 
         return retPtr;
     }
@@ -512,7 +500,7 @@ QVariant toQVariant(void* data, int32_t& size)
         return QVariant(QUuid(str));
     }
     case FONT: {
-        if (checkQMLLibrary()) // QTBUG-27024
+        if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
         {
             int32_t length = *((int32_t*)(buffer + 1));
             QString str = QString::fromUtf8(buffer + 5, length);

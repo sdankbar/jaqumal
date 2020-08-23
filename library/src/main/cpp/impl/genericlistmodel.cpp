@@ -26,7 +26,7 @@
 
 void* createGenericListModel(const char* modelName, char** roleNames, int32_t* roleIndices, int32_t length)
 {
-    if (ApplicationFunctions::check())
+    if (ApplicationFunctions::check(nullptr))
     {
         QString modelNameStr(modelName);
 
@@ -45,7 +45,7 @@ void* createGenericListModel(const char* modelName, char** roleNames, int32_t* r
         }
 
         GenericListModel* modelPtr = new GenericListModel(modelName, roleNameMap);
-        m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
+        //m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
         return modelPtr;
     }
     else
@@ -56,7 +56,7 @@ void* createGenericListModel(const char* modelName, char** roleNames, int32_t* r
 
 void setGenericListModelData(void* tempPointer, int32_t index, void* data, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         int32_t size;
@@ -66,7 +66,7 @@ void setGenericListModelData(void* tempPointer, int32_t index, void* data, int32
 
 void setGenericListModelDataMulti(void* tempPointer, int32_t index, void* data, int32_t* roleIndex, int32_t valueCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         std::vector<QVariant> variants = toQVariantList(data, valueCount);
@@ -83,7 +83,7 @@ void setGenericListModelDataMulti(void* tempPointer, int32_t index, void* data, 
 
 void insertGenericListModelData(void* tempPointer, int32_t index, void* data, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         int32_t size;
@@ -93,7 +93,7 @@ void insertGenericListModelData(void* tempPointer, int32_t index, void* data, in
 
 void insertGenericListModelDataMulti(void* tempPointer, int32_t index, void* data, int32_t* roleIndex, int32_t valueCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         std::vector<QVariant> variants = toQVariantList(data, valueCount);
@@ -109,7 +109,7 @@ void insertGenericListModelDataMulti(void* tempPointer, int32_t index, void* dat
 
 void clearGenericListModelData(void* tempPointer, int32_t index, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         modelPtr->clear(index, roleIndex);
@@ -117,7 +117,7 @@ void clearGenericListModelData(void* tempPointer, int32_t index, int32_t roleInd
 }
 void clearAllGenericListModelData(void* tempPointer, int32_t index)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         modelPtr->clear(index);
@@ -125,7 +125,7 @@ void clearAllGenericListModelData(void* tempPointer, int32_t index)
 }
 void eraseGenericListModelData(void* tempPointer, int32_t index)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         modelPtr->erase(index);
@@ -133,7 +133,7 @@ void eraseGenericListModelData(void* tempPointer, int32_t index)
 }
 int32_t appendGenericListModelData(void* tempPointer, void* data, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         int32_t size;
@@ -147,7 +147,7 @@ int32_t appendGenericListModelData(void* tempPointer, void* data, int32_t roleIn
 
 int32_t appendGenericListModelDataMulti(void* tempPointer, void* data, int32_t* roleIndex, int32_t valueCount)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         std::vector<QVariant> variants = toQVariantList(data, valueCount);
@@ -168,7 +168,7 @@ int32_t appendGenericListModelDataMulti(void* tempPointer, void* data, int32_t* 
 
 void* getGenericListModelData(void* tempPointer, int32_t index, int32_t roleIndex, int32_t& length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         return fromQVariant(modelPtr->getRowData(index, roleIndex), length, false);
@@ -181,7 +181,7 @@ void* getGenericListModelData(void* tempPointer, int32_t index, int32_t roleInde
 
 void clearGenericListModelRole(void* tempPointer, int32_t index, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         modelPtr->clear(index, roleIndex);
@@ -189,7 +189,7 @@ void clearGenericListModelRole(void* tempPointer, int32_t index, int32_t roleInd
 }
 void clearGenericListModel(void* tempPointer, int32_t index)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         modelPtr->clear(index);
@@ -197,7 +197,7 @@ void clearGenericListModel(void* tempPointer, int32_t index)
 }
 bool isGenericListModelRolePresent(void* tempPointer, int32_t index, int32_t roleIndex)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         return modelPtr->containsRole(index, roleIndex);
@@ -209,7 +209,7 @@ bool isGenericListModelRolePresent(void* tempPointer, int32_t index, int32_t rol
 }
 int32_t getGenericListModelSize(void* tempPointer)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         return modelPtr->rowCount();
@@ -222,7 +222,7 @@ int32_t getGenericListModelSize(void* tempPointer)
 
 void reorderGenericListModel(void* tempPointer, int32_t* ordering, int32_t length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         std::vector<int32_t> orderingVec;
@@ -236,7 +236,7 @@ void reorderGenericListModel(void* tempPointer, int32_t* ordering, int32_t lengt
 
 void putRootValueIntoListModel(void* tempPointer, const char* key, void* data)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         QString keyStr(key);
@@ -248,7 +248,7 @@ void putRootValueIntoListModel(void* tempPointer, const char* key, void* data)
 
 void removeRootValueFromListModel(void* tempPointer, const char* key)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         QString keyStr(key);
@@ -258,7 +258,7 @@ void removeRootValueFromListModel(void* tempPointer, const char* key)
 
 void* getRootValueFromListModel(void* tempPointer, const char* key, int32_t& length)
 {
-    if (checkQMLLibrary())
+    if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         QString keyStr(key);

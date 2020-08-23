@@ -27,6 +27,7 @@
 namespace
 {
 const QString SUBMODEL_ROLE("SUBMODEL");
+}
 
 std::deque<int32_t> toTreePath(int32_t* index, int32_t count)
 {
