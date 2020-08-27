@@ -196,7 +196,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("setFont",    "(Ljava/lang/String;I)V",    (void *)&setFont),
         JNIUtilities::createJNIMethod("setPolyline",    "(I[DI)V",    (void *)&setPolyline),*/
     };
-    jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/");
+    jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods));
     env->DeleteLocalRef(javaClass);
 }
@@ -266,10 +266,11 @@ void ApplicationFunctions::quitApplication()
    m_qapp->quit();
 }
 
-//void ApplicationFunctions::invoke(Callback callback)
-//{
-//  callback();
-//}
+void ApplicationFunctions::invoke(jobject callback)
+{
+  // TODO
+  // callback();
+}
 
 /*
 GenericObjectModel* ApplicationFunctions::createGenericObjectModel(const QString& modelName, const std::vector<QString>& roles)

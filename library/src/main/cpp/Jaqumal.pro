@@ -40,6 +40,8 @@ INCLUDEPATH += "C:\Program Files\Java\jdk-14.0.2\include" \
 
 SOURCES += \
     impl/applicationfunctions.cpp \
+    impl/eventfunctions.cpp \
+    impl/fontfunctions.cpp \
     impl/genericlistmodel.cpp \
     impl/eventbuilder.cpp \
     impl/genericobjectmodel.cpp \
@@ -56,6 +58,8 @@ SOURCES += \
 
 HEADERS += \
     include/applicationfunctions.h \
+    include/eventfunctions.h \
+    include/fontfunctions.h \
     include/jniutilities.h \
     include/qmldatatransfer.h \
     include/genericlistmodel.h \

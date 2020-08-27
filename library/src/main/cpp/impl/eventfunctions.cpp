@@ -20,19 +20,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.cpp.jni;
+#include "eventfunctions.h"
 
-import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
+#include "jniutilities.h"
 
-public class EventFunctions {
-	/**
-	 * Adds a callback to be called when an event is created.
-	 *
-	 * @param c The callback. Caller is responsible to ensuring the EventCallback
-	 *          object is not garbage collected.
-	 */
-	public static native void addEventCallback(EventCallback c);
+#include <eventbuilder.h>
+#include <eventdispatcher.h>
+#include <jpolyline.h>
+#include <QQmlContext>
+#include <QTimer>
+#include <QDateTime>
+#include <QUuid>
+#include <QFont>
+#include <QFontInfo>
+#include <QFontMetrics>
+#include <QScreen>
+#include <QApplication>
+#include <iostream>
+#include <functional>
 
-	public static native void sendQMLEvent(String eventName, String[] keys);
+#include "qmlimageprovider.h"
+#include <QQmlContext>
+#include <QQuickWindow>
+#include <iostream>
+#include <csignal>
+
+//
+JNICALL void sendQMLEvent(JNIEnv* env, jclass, jstring eventName, jobjectArray keys)
+{
+
+}
+
+void EventFunctions::initialize(JNIEnv* env)
+{
+    // TODO
+    JNINativeMethod methods[] = {
+        JNIUtilities::createJNIMethod("sendQMLEvent",    "(Ljava/lang/String;[Ljava/lang/String;)V",    (void *)&sendQMLEvent)
+    };
+    jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/EventFunctions");
+    env->RegisterNatives(javaClass, methods, sizeof(methods));
+    env->DeleteLocalRef(javaClass);
+}
+
+void EventFunctions::uninitialize(JNIEnv*)
+{
 
 }

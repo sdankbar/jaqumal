@@ -29,43 +29,15 @@
 #include <userinputsimulator.h>
 #include <QQmlContext>
 
-class ApplicationFunctions
+class EventFunctions
 {
 public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
 
-    static void create(int* argc, char** argv);
-    static void deleteSingleton();
-    static ApplicationFunctions* get();
-    static bool check(JNIEnv* env);
-
-    void exec();
-    void quitApplication();
-    void invoke(jobject callback);
-    void loadQMLFile(const QString& filePath);
-    void unloadQML();
-    void reloadQMLFile(const QString& filePath);
-    void setLoggingCallback(void c(int, const char*));
-    void addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback);
-    QList<QScreen*> getScreens();
-
-    template<typename T>
-    void addToContext(const QString& name, T* ptr)
-    {
-        m_qmlEngine->rootContext()->setContextProperty(name, QVariant::fromValue(ptr));
-    }
 
 private:
-    ApplicationFunctions(int32_t argc, char** argv);
-    ~ApplicationFunctions();
 
-    static ApplicationFunctions* SINGLETON;
-
-    QApplication* m_qapp;
-    QMLLogging m_logging;
-    QQmlApplicationEngine* m_qmlEngine;
-    UserInputSimulator m_uiSim;
 };
 
 

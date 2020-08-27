@@ -24,6 +24,8 @@
 #include "string.h"
 #include "qmldatatransfer.h"
 #include "applicationfunctions.h"
+#include "eventfunctions.h"
+#include "fontfunctions.h"
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
@@ -35,6 +37,9 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     JNIUtilities::initialize(env);
     QMLDataTransfer::initialize(env);
     ApplicationFunctions::initialize(env);
+    EventFunctions::initialize(env);
+    FontFunctions::initialize(env);
+
 
     // Return the JNI Version as required by method
     return JNI_VERSION_1_2;
@@ -48,6 +53,8 @@ void JNI_OnUnload(JavaVM* vm, void*)
     JNIUtilities::uninitialize(env);
     QMLDataTransfer::uninitialize(env);
     ApplicationFunctions::uninitialize(env);
+    EventFunctions::uninitialize(env);
+    FontFunctions::uninitialize(env);
 }
 
 jclass JNIUtilities::illegalStateExceptionClass;

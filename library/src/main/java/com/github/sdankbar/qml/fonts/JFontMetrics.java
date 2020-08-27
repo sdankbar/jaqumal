@@ -27,10 +27,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Objects;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jni.FontFunctions;
 import com.google.common.base.Preconditions;
-import com.sun.jna.Pointer;
 
 public class JFontMetrics {
 
@@ -105,9 +103,8 @@ public class JFontMetrics {
 		Objects.requireNonNull(constraint, "constraint is null");
 		Objects.requireNonNull(alignmentFlags, "alignmentFlags is null");
 		Objects.requireNonNull(textFlags, "textFlags is null");
-		return FontFunctions.getBoundingRect2(fontToString, constraint.x, constraint.y,
-				constraint.width, constraint.height, TextAlignment.setToFlags(alignmentFlags),
-				TextFlag.setToFlags(textFlags), text);
+		return FontFunctions.getBoundingRect2(fontToString, constraint.x, constraint.y, constraint.width,
+				constraint.height, TextAlignment.setToFlags(alignmentFlags), TextFlag.setToFlags(textFlags), text);
 	}
 
 	public Rectangle getBoundingRect(final String text) {
@@ -153,11 +150,11 @@ public class JFontMetrics {
 
 	public Rectangle2D getTightBoundingRect(final String text) {
 		Objects.requireNonNull(text, "text is null");
-		final Pointer p = FontFunctions.getTightBoundingRect(fontToString, text);
-		if (p.equals(Pointer.NULL)) {
+		final Rectangle p = FontFunctions.getTightBoundingRect(fontToString, text);
+		if (p == null) {
 			throw new IllegalStateException();
 		}
-		return new Rectangle2D.Double(p.getInt(0), p.getInt(4), p.getInt(8), p.getInt(12));
+		return new Rectangle2D.Double(p.x, p.y, p.width, p.height);
 	}
 
 	public int getUnderlinePos() {
