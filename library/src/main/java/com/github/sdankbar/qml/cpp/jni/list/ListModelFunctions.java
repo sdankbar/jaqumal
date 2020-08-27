@@ -26,8 +26,10 @@ import com.github.sdankbar.qml.JVariant;
 
 public final class ListModelFunctions {
 
-	private ListModelFunctions() {}
-	
+	private ListModelFunctions() {
+		// Empty Implementation
+	}
+
 	/**
 	 * Creates a new ListModel.
 	 *
@@ -39,7 +41,7 @@ public final class ListModelFunctions {
 	 * @return A Pointer to the new model.
 	 */
 	public static native long createGenericListModel(String modelName, String[] roleNames, int[] roleIndices);
-	
+
 	public static native int appendGenericListModelData(long modelPointer);
 
 	public static native void clearAllGenericListModelData(long modelPointer, int index);
