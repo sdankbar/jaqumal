@@ -29,8 +29,9 @@
 #include <userinputsimulator.h>
 #include <QQmlContext>
 
-class ApplicationFunctions
+class ApplicationFunctions : public QObject
 {
+    Q_OBJECT
 public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
@@ -43,7 +44,6 @@ public:
 
     void exec();
     void quitApplication();
-    void invoke(jobject callback);
     void loadQMLFile(const QString& filePath);
     void unloadQML();
     void reloadQMLFile(const QString& filePath);
@@ -56,6 +56,8 @@ public:
     {
         m_qmlEngine->rootContext()->setContextProperty(name, QVariant::fromValue(ptr));
     }
+public slots:
+    void invokeCallback(jobject c);
 
 private:
     ApplicationFunctions(int32_t& argc, char** argv);

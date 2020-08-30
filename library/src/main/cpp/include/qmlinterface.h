@@ -28,69 +28,6 @@
 #include <QVariant>
 
 extern std::function<void(const char*)> exceptionHandler;
-extern "C"
-{
-extern void marshallQVariant(void* data);
-extern void marshallQVariants(void* data, int32_t valueCount);
 
-extern void loadQMLFile(const char* fileName);
-extern void unloadQML();
-extern void reloadQMLFile(const char* fileName);
-extern void addEventCallback(void* c(const char*, void*, int32_t));
-extern void setLoggingCallback(void c(int, const char*));
-extern void setExceptionCallback(void c(const char*));
-extern void addImageProvider(const char* id, void* c(const char*, int, int));
-extern void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer, int keyValuesCount);
-
-extern void invoke(void c());
-extern void invokeWithDelay(void c(), int32_t milliseconds);
-extern void cleanupMemory(void* ptr);
-
-extern void setSharedMemory(char* cppToJava, int32_t length);
-
-extern const char* getQFontToString(const char* family, int pointSize, int pixelSize, bool bold, bool italic, bool overline,
-                                    bool strikeout, bool underline, bool fixedPitch, bool kerning, int fontWeight,
-                                    double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
-                                    int hintingPreference, int stretch, int style, const char* styleName, int styleHint, int styleStrategy);
-extern const char* getQFontInfo(const char* fontToString);
-extern const char* getQFontMetrics(const char* fontToString);
-extern void* getBoundingRect(const char* fontToString, const char* text);
-extern void* getBoundingRect2(const char* fontToString, int x, int y, int w, int h, int alignFlags, int textFlags,
-            const char* text);
-extern void* getTightBoundingRect(const char* fontToString, const char* text);
-extern int getStringWidth(const char* fontToString, const char* text);
-extern bool inFont(const char* fontToString, const int character);
-
-extern void* getScreens();
-extern const char* getCompileQtVersion();
-extern const char* getRuntimeQtVersion();
-}
-
-enum Type
-{
-    REGULAR_EXPRESSION,
-    URL,
-    UUID,
-    INT,
-    LONG,
-    BOOL,
-    DOUBLE,
-    FLOAT,
-    STRING,
-    BYTE_ARRAY,
-    DATE_TIME,
-    SIZE,
-    POINT,
-    LINE,
-    RECTANGLE,
-    COLOR,
-    IMAGE,
-    FONT,
-    POLYLINE
-};
-
-QVariant toQVariant(void* data, int32_t& size);
-std::vector<QVariant> toQVariantList(void* data, uint32_t count);
-char* fromQVariant(const QVariant& var, int32_t& length, bool allocateMem);
 
 #endif // JAQUMAL_H

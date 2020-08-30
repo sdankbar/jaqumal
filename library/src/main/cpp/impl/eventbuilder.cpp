@@ -55,7 +55,7 @@ QVariant EventBuilder::fireEvent(const QString& type)
             void* result = func(type.toStdString().c_str(), memory, size);
             if (result)
             {
-              ret = toQVariantList(result, 1)[0];
+              //ret = toQVariantList(result, 1)[0];
             }
         }
         delete[] memory;

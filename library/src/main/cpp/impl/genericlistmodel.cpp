@@ -60,7 +60,7 @@ void setGenericListModelData(void* tempPointer, int32_t index, void* data, int32
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         int32_t size;
-        modelPtr->setRowData(index, toQVariant(data, size), roleIndex);
+        //modelPtr->setRowData(index, toQVariant(data, size), roleIndex);
     }
 }
 
@@ -69,7 +69,7 @@ void setGenericListModelDataMulti(void* tempPointer, int32_t index, void* data, 
     if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
-        std::vector<QVariant> variants = toQVariantList(data, valueCount);
+        std::vector<QVariant> variants;// = toQVariantList(data, valueCount);
         QVector<int> roleIndicies(valueCount);
         roleIndicies.reserve(valueCount);
         for (int32_t i = 0; i < valueCount; ++i)
@@ -87,7 +87,7 @@ void insertGenericListModelData(void* tempPointer, int32_t index, void* data, in
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         int32_t size;
-        modelPtr->insertRowData(index, toQVariant(data, size), roleIndex);
+        //modelPtr->insertRowData(index, toQVariant(data, size), roleIndex);
     }
 }
 
@@ -96,7 +96,7 @@ void insertGenericListModelDataMulti(void* tempPointer, int32_t index, void* dat
     if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
-        std::vector<QVariant> variants = toQVariantList(data, valueCount);
+        std::vector<QVariant> variants;// = toQVariantList(data, valueCount);
         QVector<int> roleIndicies(valueCount);
         roleIndicies.reserve(valueCount);
         for (int32_t i = 0; i < valueCount; ++i)
@@ -137,7 +137,8 @@ int32_t appendGenericListModelData(void* tempPointer, void* data, int32_t roleIn
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         int32_t size;
-        return modelPtr->appendRowData(toQVariant(data, size), roleIndex);
+        //return modelPtr->appendRowData(toQVariant(data, size), roleIndex);
+        return -1;
     }
     else
     {
@@ -150,7 +151,7 @@ int32_t appendGenericListModelDataMulti(void* tempPointer, void* data, int32_t* 
     if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
-        std::vector<QVariant> variants = toQVariantList(data, valueCount);
+        std::vector<QVariant> variants;// = toQVariantList(data, valueCount);
         QVector<int> roleIndicies(valueCount);
         roleIndicies.reserve(valueCount);
         for (int32_t i = 0; i < valueCount; ++i)
@@ -171,7 +172,8 @@ void* getGenericListModelData(void* tempPointer, int32_t index, int32_t roleInde
     if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
-        return fromQVariant(modelPtr->getRowData(index, roleIndex), length, false);
+        //return fromQVariant(modelPtr->getRowData(index, roleIndex), length, false);
+        return nullptr;
     }
     else
     {
@@ -241,8 +243,8 @@ void putRootValueIntoListModel(void* tempPointer, const char* key, void* data)
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         QString keyStr(key);
         int size;
-        QVariant dataVar = toQVariant(data, size);
-        modelPtr->putRootValue(keyStr, dataVar);
+        //QVariant dataVar = toQVariant(data, size);
+        //modelPtr->putRootValue(keyStr, dataVar);
     }
 }
 
@@ -262,7 +264,8 @@ void* getRootValueFromListModel(void* tempPointer, const char* key, int32_t& len
     {
         auto modelPtr = static_cast<GenericListModel*>(tempPointer);
         QString keyStr(key);
-        return fromQVariant(modelPtr->getRootValue(key), length, false);
+        //return fromQVariant(modelPtr->getRootValue(key), length, false);
+        return nullptr;
     }
     else
     {

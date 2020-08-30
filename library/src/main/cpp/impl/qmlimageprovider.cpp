@@ -52,7 +52,7 @@ QImage QMLImageProvider::requestImage(const QString& id, QSize* size, const QSiz
     if (data != nullptr)
     {
         int dataLength = 0;
-        QVariant imageVar = toQVariant(data, dataLength);
+        QVariant imageVar;// = toQVariant(data, dataLength);
         QImage image = imageVar.value<QImage>();
         if (size)
         {

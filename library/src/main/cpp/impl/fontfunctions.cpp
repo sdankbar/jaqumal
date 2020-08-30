@@ -43,7 +43,7 @@
 #include <QQmlContext>
 #include <QQuickWindow>
 #include <iostream>
-#include <csignal>
+#include <applicationfunctions.h>
 
 /*
  * Class:     com_github_sdankbar_qml_cpp_jni_FontFunctions
@@ -70,9 +70,34 @@ jobject JNICALL getBoundingRect2(JNIEnv* env, jclass, jstring, jint, jint, jint,
  * Method:    getQFontInfo
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-jstring JNICALL getQFontInfo(JNIEnv *, jclass, jstring)
+jstring JNICALL getQFontInfo(JNIEnv* env, jclass, jstring fontToString)
 {
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(JNIUtilities::toQString(env, fontToString));
+        const QFontInfo info(f);
+        //  0         1         2         3        4          5           6      7        8     9             10       11
+        // Family, pointSize, pixelSize, bold, exactMatch, fixedPitch, italic, rawMode, style, styleHint, styleName, weight
 
+        const QString temp("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12");
+        QString ret = temp.arg(info.family()).arg(info.pointSize()).arg(info.pixelSize())
+                .arg(info.bold())
+                .arg(info.exactMatch())
+                .arg(info.fixedPitch())
+                .arg(info.italic())
+                .arg(info.rawMode())
+                .arg(info.style())
+                .arg(info.styleHint())
+                .arg(info.styleName())
+                .arg(info.weight());
+
+        return env->NewStringUTF(qPrintable(ret));
+    }
+    else
+    {
+        return env->NewStringUTF("");
+    }
 }
 
 /*
@@ -80,9 +105,36 @@ jstring JNICALL getQFontInfo(JNIEnv *, jclass, jstring)
  * Method:    getQFontMetrics
  * Signature: (Ljava/lang/String;)Ljava/lang/String;
  */
-jstring JNICALL getQFontMetrics(JNIEnv*, jclass, jstring)
+jstring JNICALL getQFontMetrics(JNIEnv* env, jclass, jstring fontToString)
 {
+    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(JNIUtilities::toQString(env, fontToString));
+        const QFontMetrics metrics(f);
+        //  0           1             2      3      4          5          6           7               8            9           10         11          12
+        // ascent,averageCharWidth,descent,height,leading,lineSpacing,maxWidth,minLeftBearing,minRightBearing,overLinePos,strikeOutPos,underlinePos,xheight
 
+        const QString temp("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13");
+        QString ret = temp.arg(metrics.ascent())
+                .arg(metrics.averageCharWidth())
+                .arg(metrics.descent())
+                .arg(metrics.height())
+                .arg(metrics.leading())
+                .arg(metrics.lineSpacing())
+                .arg(metrics.maxWidth())
+                .arg(metrics.minLeftBearing())
+                .arg(metrics.minRightBearing())
+                .arg(metrics.overlinePos())
+                .arg(metrics.strikeOutPos())
+                .arg(metrics.underlinePos())
+                .arg(metrics.xHeight());
+        return env->NewStringUTF(qPrintable(ret));
+    }
+    else
+    {
+        return env->NewStringUTF("");
+    }
 }
 
 /*
@@ -90,11 +142,50 @@ jstring JNICALL getQFontMetrics(JNIEnv*, jclass, jstring)
  * Method:    getQFontToString
  * Signature: (Ljava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;
  */
-jstring JNICALL getQFontToString(JNIEnv *, jclass, jstring, jint, jint, jboolean, jboolean, jboolean,
-                                 jboolean, jboolean, jboolean, jboolean, jint, jdouble, jdouble, jint,
-                                 jint, jint, jint, jint, jstring, jint, jint)
+jstring JNICALL getQFontToString(JNIEnv* env, jclass, jstring family, jint pointSize,
+                                 jint pixelSize, jboolean bold, jboolean italic, jboolean overline,
+                                 jboolean strikeout, jboolean underline, jboolean fixedPitch,
+                                 jboolean kerning, jint fontWeight, jdouble wordSpacing,
+                                 jdouble letteringSpacing, jint letterSpacingType,
+                                 jint capitalization, jint hintingPreference, jint stretch, jint style,
+                                 jstring styleName, jint styleHint, jint styleStrategy)
 {
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    {
+        QFont f(JNIUtilities::toQString(env, family));
+        if (pointSize > 0) {
+            f.setPointSize(pointSize);
+        } else if (pixelSize > 0) {
+            f.setPixelSize(pixelSize);
+        }
 
+        f.setBold(bold);
+        f.setFixedPitch(fixedPitch);
+        f.setItalic(italic);
+        f.setKerning(kerning);
+        f.setOverline(overline);
+        f.setStrikeOut(strikeout);
+        f.setUnderline(underline);
+        f.setWeight(fontWeight);
+
+        f.setWordSpacing(wordSpacing);
+        f.setLetterSpacing(static_cast<QFont::SpacingType>(letterSpacingType), letteringSpacing);
+
+        f.setCapitalization(static_cast<QFont::Capitalization>(capitalization));
+        f.setHintingPreference(static_cast<QFont::HintingPreference>(hintingPreference));
+        f.setStretch(stretch);
+        f.setStyle(static_cast<QFont::Style>(style));
+        f.setStyleName(JNIUtilities::toQString(env, (styleName)));
+        f.setStyleHint(static_cast<QFont::StyleHint>(styleHint), static_cast<QFont::StyleStrategy>(styleStrategy));
+
+        static std::string ret;
+        ret = f.toString().toStdString();
+        return env->NewStringUTF(qPrintable(f.toString()));
+    }
+    else
+    {
+        return env->NewStringUTF("");
+    }
 }
 
 /*

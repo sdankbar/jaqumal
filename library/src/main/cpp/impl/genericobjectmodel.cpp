@@ -54,7 +54,7 @@ void setGenericObjectModelData(void* tempPointer, void* data, int32_t roleIndex)
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
         int32_t size;
-        modelPtr->setData(toQVariant(data, size), roleIndex);
+        //modelPtr->setData(toQVariant(data, size), roleIndex);
     }
 }
 
@@ -63,7 +63,7 @@ void setGenericObjectModelDataMulti(void* tempPointer, void* data, int32_t* role
     if (ApplicationFunctions::check(nullptr))
     {
         auto modelPtr = static_cast<GenericObjectModel*>(tempPointer);
-        std::vector<QVariant> variants = toQVariantList(data, static_cast<uint32_t>(valueCount));
+        std::vector<QVariant> variants;// = toQVariantList(data, static_cast<uint32_t>(valueCount));
         std::vector<int32_t> roleIndicies;
         roleIndicies.reserve(static_cast<uint32_t>(valueCount));
         for (int32_t i = 0; i < valueCount; ++i)
@@ -159,7 +159,7 @@ QVariant GenericObjectModel::getData(int32_t roleIndex) const
 
 char* GenericObjectModel::getDataSerialized(int32_t roleIndex, int32_t& length) const
 {
-    return fromQVariant(getData(roleIndex), length, false);
+    return nullptr;//fromQVariant(getData(roleIndex), length, false);
 }
 
 void GenericObjectModel::setData(const QVariant& data, int32_t roleIndex)
@@ -238,7 +238,7 @@ void GenericObjectModel::callbackListeners(const QString& key, const QVariant& n
     if (!callbacks.empty())
     {
         int32_t l;
-        std::unique_ptr<char> data(fromQVariant(newValue, l, true));
+        std::unique_ptr<char> data;//(fromQVariant(newValue, l, true));
         for (const auto& f: callbacks)
         {
             f(key.toStdString().c_str(), data.get(), l);

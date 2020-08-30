@@ -68,7 +68,10 @@ JNICALL void createQApplication(JNIEnv* env, jclass, jobjectArray argv)
 
 JNICALL void deleteQApplication(JNIEnv* env, jclass)
 {
-    ApplicationFunctions::deleteSingleton();
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::deleteSingleton();
+    }
 }
 
 JNICALL void execQApplication(JNIEnv* env, jclass)
@@ -78,14 +81,17 @@ JNICALL void execQApplication(JNIEnv* env, jclass)
         ApplicationFunctions::get()->exec();
     }
 }
+
 JNICALL jstring getCompileQtVersion(JNIEnv* env, jclass)
 {
     return env->NewStringUTF(QT_VERSION_STR);
 }
+
 JNICALL jstring getRuntimeQtVersion(JNIEnv* env, jclass)
 {
     return env->NewStringUTF(qVersion());
 }
+
 JNICALL void loadQMLFile(JNIEnv* env, jclass, jstring fileName)
 {
     if (ApplicationFunctions::check(env))
@@ -93,6 +99,7 @@ JNICALL void loadQMLFile(JNIEnv* env, jclass, jstring fileName)
         ApplicationFunctions::get()->loadQMLFile(JNIUtilities::toQString(env, fileName));
     }
 }
+
 JNICALL void reloadQMLFile(JNIEnv* env, jclass, jstring fileName)
 {
     if (ApplicationFunctions::check(env))
@@ -100,6 +107,7 @@ JNICALL void reloadQMLFile(JNIEnv* env, jclass, jstring fileName)
         ApplicationFunctions::get()->reloadQMLFile(JNIUtilities::toQString(env, fileName));
     }
 }
+
 JNICALL void unloadQML(JNIEnv* env, jclass)
 {
     if (ApplicationFunctions::check(env))
@@ -107,10 +115,15 @@ JNICALL void unloadQML(JNIEnv* env, jclass)
         ApplicationFunctions::get()->unloadQML();
     }
 }
+
 JNICALL void setLoggingCallback(JNIEnv* env, jclass, jobject c)
 {
-    // TODO
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->setLoggingCallback(c);
+    }
 }
+
 JNICALL void quitQApplication(JNIEnv* env, jclass)
 {
     if (ApplicationFunctions::check(env))
@@ -118,32 +131,47 @@ JNICALL void quitQApplication(JNIEnv* env, jclass)
         ApplicationFunctions::get()->quitApplication();
     }
 }
+
 JNICALL int runQMLTest(JNIEnv* env, jclass, jstring pathToQMLTestFile, jobjectArray importPaths)
 {
-
+    // TODO
 }
+
 JNICALL void addImageProvider(JNIEnv* env, jclass, jstring id, jobject c)
 {
-
+    // TODO
 }
+
 JNICALL jobjectArray getScreens(JNIEnv* env, jclass)
 {
-
+    // TODO
 }
+
 JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->metaObject()->invokeMethod(
+                    ApplicationFunctions::get(),
+                    "invokeCallback",
+                    Qt::QueuedConnection,
+                    Q_ARG(jobject, callback));
+    }
 }
+
 JNICALL void invokeWithDelay(JNIEnv* env, jclass, jobject callback, jint delayMilli)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        std::function<void()> func = [=] {
+            ApplicationFunctions::get()->invokeCallback(callback);
+        };
+        QTimer::singleShot(delayMilli, func);
+    }
 }
 
 void ApplicationFunctions::create(int* argc, char** argv)
 {
-    // TODO
-    //qRegisterMetaType<Callback>();
-
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
     qmlRegisterType<EventDispatcher>("com.github.sdankbar.jaqumal", 0, 4, "EventDispatcher");
     qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
@@ -192,7 +220,6 @@ void ApplicationFunctions::initialize(JNIEnv* env)
     loggingCallback = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/LoggingCallback");
     loggingCallbackMethod = env->GetMethodID(loggingCallback, "invoke", "(ILjava/lang/String;)V");
 
-
     // TODO
     static JNINativeMethod methods[] = {
         JNIUtilities::createJNIMethod("createQApplication",    "([Ljava/lang/String;)V",    (void *)&createQApplication)
@@ -202,9 +229,9 @@ void ApplicationFunctions::initialize(JNIEnv* env)
     env->DeleteLocalRef(javaClass);
 }
 
-void ApplicationFunctions::uninitialize(JNIEnv*)
+void ApplicationFunctions::uninitialize(JNIEnv* env)
 {
-
+    env->DeleteGlobalRef(loggingCallback);
 }
 
 ApplicationFunctions* ApplicationFunctions::SINGLETON = nullptr;
@@ -267,10 +294,9 @@ void ApplicationFunctions::quitApplication()
    m_qapp->quit();
 }
 
-void ApplicationFunctions::invoke(jobject callback)
+void ApplicationFunctions::invokeCallback(jobject callback)
 {
-  // TODO
-  // callback();
+    JNIUtilities::invokeCallback(lastEnv, callback);
 }
 
 /*

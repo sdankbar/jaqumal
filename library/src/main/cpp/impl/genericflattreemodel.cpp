@@ -70,7 +70,7 @@ void setGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t elem
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
         int32_t size;
-        modelPtr->setRowData(indicies, toQVariant(data, size), roleIndex);
+        //modelPtr->setRowData(indicies, toQVariant(data, size), roleIndex);
 
     }
 }
@@ -82,7 +82,7 @@ void setGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, int32_t
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
 
-        std::vector<QVariant> variants = toQVariantList(data, valueCount);
+        std::vector<QVariant> variants;// = toQVariantList(data, valueCount);
         QVector<int> roleIndicies(valueCount);
         roleIndicies.reserve(valueCount);
         for (int32_t i = 0; i < valueCount; ++i)
@@ -101,7 +101,7 @@ void insertGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t e
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
         int32_t size;
-        modelPtr->insertRowData(indicies, toQVariant(data, size), roleIndex);
+        //modelPtr->insertRowData(indicies, toQVariant(data, size), roleIndex);
     }
 }
 
@@ -112,7 +112,7 @@ void insertGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, int3
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
 
-        std::vector<QVariant> variants = toQVariantList(data, valueCount);
+        std::vector<QVariant> variants;// = toQVariantList(data, valueCount);
         QVector<int> roleIndicies(valueCount);
         roleIndicies.reserve(valueCount);
         for (int32_t i = 0; i < valueCount; ++i)
@@ -158,7 +158,7 @@ int32_t appendGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
         int32_t size;
-        return modelPtr->appendRowData(toQVariant(data, size), roleIndex, indicies);
+        return -1;//modelPtr->appendRowData(toQVariant(data, size), roleIndex, indicies);
     }
     else
     {
@@ -173,7 +173,7 @@ int32_t appendGenericFlatTreeModelDataMulti(void* tempPointer, int32_t* index, i
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
 
-        std::vector<QVariant> variants = toQVariantList(data, valueCount);
+        std::vector<QVariant> variants;// = toQVariantList(data, valueCount);
         QVector<int> roleIndicies(valueCount);
         roleIndicies.reserve(valueCount);
         for (int32_t i = 0; i < valueCount; ++i)
@@ -195,7 +195,7 @@ void* getGenericFlatTreeModelData(void* tempPointer, int32_t* index, int32_t ele
     {
         auto modelPtr = static_cast<GenericFlatTreeModel*>(tempPointer);
         std::deque<int32_t> indicies = toTreePath(index, elementCount);
-        return fromQVariant(modelPtr->getRowData(indicies, roleIndex), length, true);
+        return nullptr;//fromQVariant(modelPtr->getRowData(indicies, roleIndex), length, true);
     }
     else
     {
