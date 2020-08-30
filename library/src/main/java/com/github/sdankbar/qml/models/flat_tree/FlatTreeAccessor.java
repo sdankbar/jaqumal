@@ -27,14 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.jna.flat_tree.FlatTreeQMLAPIFast;
+import com.github.sdankbar.qml.cpp.jni.flat_tree.FlatTreeQMLAPIFast;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.MapAccessor;
 import com.github.sdankbar.qml.models.TreePath;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 
 /**
  * Implementation of MapAccessor that is used to modify one of the Maps in a
@@ -65,7 +64,7 @@ public class FlatTreeAccessor extends MapAccessor {
 		checkIndex();
 
 		final Pointer indiciesMem = path.serialize();
-		FlatTreeQMLAPIFast.clearAllGenericFlatTreeModelData(modelPointer, indiciesMem, path.getCount());
+		FlatTreeQMLAPIFast.clearAllGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
 
 	}
 
@@ -87,11 +86,9 @@ public class FlatTreeAccessor extends MapAccessor {
 	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
 		checkIndex();
 
-		final Pointer indiciesMem = path.serialize();
-		final Pointer received = FlatTreeQMLAPIFast.getGenericFlatTreeModelData(modelPointer, indiciesMem,
-				path.getCount(), roleIndex, length);
-
-		return deserialize(received, length.getValue());
+		final JVariant received = FlatTreeQMLAPIFast.getGenericFlatTreeModelData(Pointer.nativeValue(modelPointer),
+				path.toArray(), roleIndex);
+		return Optional.ofNullable(received);
 	}
 
 	/**
@@ -108,7 +105,7 @@ public class FlatTreeAccessor extends MapAccessor {
 		final Optional<JVariant> oldValue = get(roleIndex, length);
 
 		final Pointer indiciesMem = path.serialize();
-		FlatTreeQMLAPIFast.clearGenericFlatTreeModelData(modelPointer, indiciesMem, path.getCount(), roleIndex);
+		FlatTreeQMLAPIFast.clearGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray(), roleIndex);
 
 		return oldValue;
 	}
@@ -117,10 +114,9 @@ public class FlatTreeAccessor extends MapAccessor {
 	public void set(final JVariant value, final int roleIndex) {
 		checkIndex();
 
-		final Pointer indiciesMem = path.serialize();
 		value.serialize(javaToCppMemory);
-		FlatTreeQMLAPIFast.setGenericFlatTreeModelData(modelPointer, indiciesMem, path.getCount(),
-				javaToCppMemory.getPointer(), roleIndex);
+		// TODO
+		FlatTreeQMLAPIFast.setGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
 
 	}
 
@@ -140,8 +136,8 @@ public class FlatTreeAccessor extends MapAccessor {
 		JVariant.serialize(variantList, javaToCppMemory);
 
 		final Pointer indiciesMem = path.serialize();
-		FlatTreeQMLAPIFast.setGenericFlatTreeModelDataMulti(modelPointer, indiciesMem, path.getCount(),
-				javaToCppMemory.getPointer(), array, array.length);
+		// TODO
+		FlatTreeQMLAPIFast.setGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
 
 	}
 

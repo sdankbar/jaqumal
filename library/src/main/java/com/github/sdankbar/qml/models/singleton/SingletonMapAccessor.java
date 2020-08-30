@@ -27,13 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPIFast;
+import com.github.sdankbar.qml.cpp.jni.singleton.SingletonQMLAPIFast;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.MapAccessor;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 
 /**
  * Implementation of MapAccessor that is used to modify the map in an
@@ -53,22 +52,22 @@ public class SingletonMapAccessor extends MapAccessor {
 
 	@Override
 	public void clear() {
-		SingletonQMLAPIFast.clearGenericObjectModel(modelPointer);
+		SingletonQMLAPIFast.clearGenericObjectModel(Pointer.nativeValue(modelPointer));
 
 	}
 
 	@Override
 	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
-		final Pointer received = SingletonQMLAPIFast.getGenericObjectModelData(modelPointer, roleIndex, length);
-
-		return deserialize(received, length.getValue());
+		final JVariant received = SingletonQMLAPIFast.getGenericObjectModelData(Pointer.nativeValue(modelPointer),
+				roleIndex);
+		return Optional.ofNullable(received);
 	}
 
 	@Override
 	public Optional<JVariant> remove(final int roleIndex, final IntByReference length) {
 		final Optional<JVariant> existingValue = get(roleIndex, length);
 
-		SingletonQMLAPIFast.clearGenericObjectModelRole(modelPointer, roleIndex);
+		SingletonQMLAPIFast.clearGenericObjectModelRole(Pointer.nativeValue(modelPointer), roleIndex);
 
 		return existingValue;
 	}
@@ -76,7 +75,8 @@ public class SingletonMapAccessor extends MapAccessor {
 	@Override
 	public void set(final JVariant value, final int roleIndex) {
 		value.serialize(javaToCppMemory);
-		SingletonQMLAPIFast.setGenericObjectModelData(modelPointer, javaToCppMemory.getPointer(), roleIndex);
+		// TODO
+		SingletonQMLAPIFast.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
 
 	}
 
@@ -92,8 +92,8 @@ public class SingletonMapAccessor extends MapAccessor {
 		}
 
 		JVariant.serialize(values, javaToCppMemory);
-		SingletonQMLAPIFast.setGenericObjectModelDataMulti(modelPointer, javaToCppMemory.getPointer(), roles,
-				valuesMap.size());
+		// TODO
+		SingletonQMLAPIFast.setGenericObjectModelDataMulti(Pointer.nativeValue(modelPointer));
 
 	}
 

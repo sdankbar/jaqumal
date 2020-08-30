@@ -43,7 +43,6 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jni.EventFunctions;
 import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
@@ -59,8 +58,6 @@ import com.github.sdankbar.qml.images.JQMLImageProvider;
 import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
 import com.github.sdankbar.qml.models.JQMLModelFactoryImpl;
 import com.google.common.collect.ImmutableList;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.ByteByReference;
 
 /**
  * Starting point for creating a Jaqumal application.
@@ -74,7 +71,7 @@ public class JQMLApplication<EType> {
 		private final SharedJavaCppMemory memory = new SharedJavaCppMemory(16 * 1024 * 1024);
 
 		@Override
-		public JVariant invoke(String type, ByteBuffer buffer) {
+		public JVariant invoke(final String type, final ByteBuffer buffer) {
 			final Optional<JVariant> result = handleEvent(type, buffer);
 			return result.orElse(null);
 		}
@@ -134,7 +131,7 @@ public class JQMLApplication<EType> {
 		this.factory = Objects.requireNonNull(factory, "factory is null");
 		Objects.requireNonNull(argv, "argv is null");
 
-		ApplicationFunctions.createQApplication( argv);
+		ApplicationFunctions.createQApplication(argv);
 
 		EventFunctions.addEventCallback(listener);
 
@@ -161,7 +158,7 @@ public class JQMLApplication<EType> {
 			public void run() {
 				shutdownRunning.set(true);
 				try {
-					executor.submit(() -> ApplicationFunctions.quitQApplication());
+					executor.submit(ApplicationFunctions::quitQApplication);
 				} catch (final RejectedExecutionException e) {
 					log.debug("Executor has already been shutdown");
 				}

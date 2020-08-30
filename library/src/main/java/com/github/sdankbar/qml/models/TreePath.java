@@ -265,6 +265,14 @@ public class TreePath {
 		}
 	}
 
+	public int[] toArray() {
+		final int[] array = new int[size];
+		for (int i = 0; i < size; ++i) {
+			array[i] = m.getInt(i * 4);
+		}
+		return array;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder b = new StringBuilder("TreePath [");

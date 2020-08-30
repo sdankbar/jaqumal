@@ -22,54 +22,27 @@
  */
 package com.github.sdankbar.qml;
 
-import static org.junit.Assert.assertEquals;
-
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPIFast;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
-import com.google.common.collect.ImmutableList;
-import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
 
 public class JMHTest {
 
 	private static final SharedJavaCppMemory memory = new SharedJavaCppMemory(10000);
-	
-	@Benchmark
-	public void benchmark_marshallIntegers() {
-		List<JVariant> list = new ArrayList<>(256);
-		for (int i = 0; i < 256; ++i) {
-			list.add(new JVariant(i));
-		}
-		JVariant.serialize(list, memory);
-		SingletonQMLAPIFast.marshallQVariants(memory.getPointer(), 4);
-	}
 
 	@Test
 	public void runBenchmarks() throws RunnerException {
-		final Options options = new OptionsBuilder().include(JMHTest.class.getName() + ".*")
-				.mode(Mode.Throughput).timeUnit(TimeUnit.MICROSECONDS).warmupTime(TimeValue.seconds(1))
-				.warmupIterations(3).threads(1).measurementIterations(3).forks(1).shouldFailOnError(false)
-				.shouldDoGC(true).build();
+		final Options options = new OptionsBuilder().include(JMHTest.class.getName() + ".*").mode(Mode.Throughput)
+				.timeUnit(TimeUnit.MICROSECONDS).warmupTime(TimeValue.seconds(1)).warmupIterations(3).threads(1)
+				.measurementIterations(3).forks(1).shouldFailOnError(false).shouldDoGC(true).build();
 
 		new Runner(options).run();
 	}

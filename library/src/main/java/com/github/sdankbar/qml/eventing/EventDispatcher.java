@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jni.EventFunctions;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
@@ -138,7 +137,7 @@ public class EventDispatcher<T> {
 			final BuiltinEventProcessor processor) {
 		synchronized (builtInProcessors) {
 			final List<ProcessorPair<BuiltinEventProcessor>> list = builtInProcessors.computeIfAbsent(type,
-					(k) -> new ArrayList<>());
+					k -> new ArrayList<>());
 
 			list.add(new ProcessorPair<>(processor, DEFAULT_ORDER));
 			Collections.sort(list);
@@ -159,7 +158,7 @@ public class EventDispatcher<T> {
 			final BuiltinEventProcessor processor, final int order) {
 		synchronized (builtInProcessors) {
 			final List<ProcessorPair<BuiltinEventProcessor>> list = builtInProcessors.computeIfAbsent(type,
-					(k) -> new ArrayList<>());
+					k -> new ArrayList<>());
 
 			list.add(new ProcessorPair<>(processor, order));
 			Collections.sort(list);
@@ -176,7 +175,7 @@ public class EventDispatcher<T> {
 	 */
 	public void register(final Class<? extends Event<T>> type, final T processor) {
 		synchronized (processors) {
-			final List<ProcessorPair<T>> list = processors.computeIfAbsent(type, (k) -> new ArrayList<>());
+			final List<ProcessorPair<T>> list = processors.computeIfAbsent(type, k -> new ArrayList<>());
 
 			list.add(new ProcessorPair<>(processor, DEFAULT_ORDER));
 			Collections.sort(list);
@@ -195,7 +194,7 @@ public class EventDispatcher<T> {
 	 */
 	public void register(final Class<? extends Event<T>> type, final T processor, final int order) {
 		synchronized (processors) {
-			final List<ProcessorPair<T>> list = processors.computeIfAbsent(type, (k) -> new ArrayList<>());
+			final List<ProcessorPair<T>> list = processors.computeIfAbsent(type, k -> new ArrayList<>());
 
 			list.add(new ProcessorPair<>(processor, order));
 			Collections.sort(list);
@@ -214,7 +213,7 @@ public class EventDispatcher<T> {
 			for (final Class<? extends Event<BuiltinEventProcessor>> type : getHandledEvents(
 					(Class<BuiltinEventProcessor>) processor.getClass())) {
 				final List<ProcessorPair<BuiltinEventProcessor>> list = builtInProcessors.computeIfAbsent(type,
-						(k) -> new ArrayList<>());
+						k -> new ArrayList<>());
 
 				list.add(new ProcessorPair<>(processor, DEFAULT_ORDER));
 				Collections.sort(list);
@@ -232,7 +231,7 @@ public class EventDispatcher<T> {
 	public void registerAll(final T processor) {
 		synchronized (processors) {
 			for (final Class<? extends Event<T>> type : getHandledEvents((Class<T>) processor.getClass())) {
-				final List<ProcessorPair<T>> list = processors.computeIfAbsent(type, (k) -> new ArrayList<>());
+				final List<ProcessorPair<T>> list = processors.computeIfAbsent(type, k -> new ArrayList<>());
 
 				list.add(new ProcessorPair<>(processor, DEFAULT_ORDER));
 				Collections.sort(list);
@@ -244,7 +243,7 @@ public class EventDispatcher<T> {
 	 * Submits an Event to be dispatched to processors.
 	 *
 	 * @param e Event to dispatch.
-	 * 
+	 *
 	 * @return Optional result of the event.
 	 */
 	public Optional<JVariant> submit(final Event<T> e) {
@@ -259,7 +258,7 @@ public class EventDispatcher<T> {
 	 * Submits a built in Event to be dispatched to processors.
 	 *
 	 * @param e Event to dispatch.
-	 * 
+	 *
 	 * @return Optional result of the event.
 	 */
 	public Optional<JVariant> submitBuiltin(final Event<BuiltinEventProcessor> e) {

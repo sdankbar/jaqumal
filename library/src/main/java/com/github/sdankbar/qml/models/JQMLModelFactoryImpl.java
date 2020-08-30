@@ -33,7 +33,6 @@ import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JQMLUtilities;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.QtThread;
-import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
 import com.github.sdankbar.qml.exceptions.QMLException;
@@ -77,8 +76,6 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	public JQMLModelFactoryImpl(final JQMLApplication<?> app, final AtomicReference<Thread> eventLoopThread) {
 		this.app = Objects.requireNonNull(app, "app is null");
 		this.eventLoopThread = Objects.requireNonNull(eventLoopThread, "eventLoopThread is null");
-
-		ApiInstance.LIB_INSTANCE.setSharedMemory(cppToJava.getPointer(), cppToJava.getSize());
 
 		perfModel = new JQMLPerformanceModel("PerfModel", this);
 		app.getEventDispatcher().register(RenderEvent.class, perfModel);

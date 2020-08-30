@@ -38,13 +38,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
@@ -375,7 +373,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public Optional<JVariant> getRootValue(final String key) {
 		final IntByReference length = new IntByReference();
 		// TODO
-		JVariant data = ListModelFunctions.getRootValueFromListModel(modelPointer, key);
+		final JVariant data = ListModelFunctions.getRootValueFromListModel(modelPointer, key);
 
 		return Optional.ofNullable(data);
 	}

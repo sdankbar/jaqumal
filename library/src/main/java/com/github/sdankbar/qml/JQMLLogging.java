@@ -25,7 +25,6 @@ package com.github.sdankbar.qml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jni.interfaces.LoggingCallback;
 
@@ -39,23 +38,23 @@ public class JQMLLogging {
 		@Override
 		public void invoke(final int type, final String formattedMessage) {
 			switch (type) {
-			case 0:
-				logger.trace(formattedMessage);
-				break;
-			case 1:
-				logger.debug(formattedMessage);
-				break;
-			case 2:
-				logger.info(formattedMessage);
-				break;
-			case 3:
-				logger.warn(formattedMessage);
-				break;
-			case 4:
-				logger.error(formattedMessage);
-				break;
-			default:
-				break;
+				case 0:
+					logger.trace(formattedMessage);
+					break;
+				case 1:
+					logger.debug(formattedMessage);
+					break;
+				case 2:
+					logger.info(formattedMessage);
+					break;
+				case 3:
+					logger.warn(formattedMessage);
+					break;
+				case 4:
+					logger.error(formattedMessage);
+					break;
+				default:
+					break;
 			}
 		}
 

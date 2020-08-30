@@ -26,7 +26,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 
 public class QMLTestRunner {

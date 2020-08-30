@@ -20,17 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.cpp.jna.singleton;
+package com.github.sdankbar.qml.cpp.jni.singleton;
 
+import com.github.sdankbar.qml.JVariant;
 import com.sun.jna.Callback;
-import com.sun.jna.Library;
-import com.sun.jna.Pointer;
 
-/**
- * Interface used by JNA to call ListModel functions. This is not part of
- * ListQMLAPIFast because JNA direct mapping does not support arrays of strings.
- */
-public interface SingletonQMLAPI extends Library {
+public class SingletonQMLAPIFast {
 
 	/**
 	 * Interface for getting callbacks from the C++ Singleton model that a value has
@@ -44,7 +39,7 @@ public interface SingletonQMLAPI extends Library {
 		 * @param newValueData Pointer to the new value.
 		 * @param dataLength   Length of the data pointed to by newValueData.
 		 */
-		void invoke(String key, Pointer newValueData, int dataLength);
+		void invoke(String key, JVariant data);
 	}
 
 	/**
@@ -57,6 +52,35 @@ public interface SingletonQMLAPI extends Library {
 	 * @param length      Length of roleNames and roleIndices.
 	 * @return A Pointer to the new model.
 	 */
-	Pointer createGenericObjectModel(String modelName, String[] roleNames, int length);
+	public static native long createGenericObjectModel(String modelName, String[] roleNames);
+
+	/**
+	 * Clears all data from the Map.
+	 *
+	 * @param modelPointer Pointer to the model.
+	 */
+	public static native void clearGenericObjectModel(long modelPointer);
+
+	/**
+	 * Clears the data for the role.
+	 *
+	 * @param modelPointer Pointer to the model.
+	 * @param role         Index of role to clear.
+	 */
+	public static native void clearGenericObjectModelRole(long modelPointer, int role);
+
+	public static native JVariant getGenericObjectModelData(long modelPointer, int roleIndex);
+
+	public static native boolean isGenericObjectModelRolePresent(long modelPointer, int role);
+
+	public static native void registerValueChangedCallback(long modelPointer, MapChangeCallback callback);
+
+	public static native void setGenericObjectModelData(long modelPointer);
+
+	public static native void setGenericObjectModelDataMulti(long modelPointer);
+
+	private SingletonQMLAPIFast() {
+		// Empty Implementation
+	}
 
 }
