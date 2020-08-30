@@ -39,6 +39,7 @@ public:
     static void deleteSingleton();
     static ApplicationFunctions* get();
     static bool check(JNIEnv* env);
+    static void invokeLoggingCallback(jobject obj, int type, const std::string& msg);
 
     void exec();
     void quitApplication();
@@ -46,7 +47,7 @@ public:
     void loadQMLFile(const QString& filePath);
     void unloadQML();
     void reloadQMLFile(const QString& filePath);
-    void setLoggingCallback(void c(int, const char*));
+    void setLoggingCallback(jobject callbackObject);
     void addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback);
     QList<QScreen*> getScreens();
 
@@ -57,10 +58,13 @@ public:
     }
 
 private:
-    ApplicationFunctions(int32_t argc, char** argv);
+    ApplicationFunctions(int32_t& argc, char** argv);
     ~ApplicationFunctions();
 
     static ApplicationFunctions* SINGLETON;
+    static JNIEnv* lastEnv;
+    static jclass loggingCallback;
+    static jmethodID loggingCallbackMethod;
 
     QApplication* m_qapp;
     QMLLogging m_logging;

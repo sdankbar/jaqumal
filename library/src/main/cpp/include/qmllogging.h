@@ -20,11 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef QMLLOGGING_H
-#define QMLLOGGING_H
+#pragma once
 
+#include <jni.h>
 #include <QObject>
-#include <functional>
 
 class QMLLogging : public QObject
 {
@@ -35,17 +34,15 @@ public:
 
     void qtMessages(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
-    Q_INVOKABLE void trace(const QString& message) const;
-    Q_INVOKABLE void debug(const QString& message) const;
-    Q_INVOKABLE void info(const QString& message) const;
-    Q_INVOKABLE void warn(const QString& message) const;
-    Q_INVOKABLE void error(const QString& message) const;
+    Q_INVOKABLE void trace(const std::string& message) const;
+    Q_INVOKABLE void debug(const std::string& message) const;
+    Q_INVOKABLE void info(const std::string& message) const;
+    Q_INVOKABLE void warn(const std::string& message) const;
+    Q_INVOKABLE void error(const std::string& message) const;
 
-    void setCallback(void c(int, const char*));
+    void setCallback(jobject obj);
 
 private:
 
-    std::function<void(int, const char*)> javaLoggingCallback;
+    jobject javaLoggingCallback;
 };
-
-#endif // QMLLOGGING_H

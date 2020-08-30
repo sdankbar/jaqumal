@@ -23,6 +23,7 @@
 #include "qmllogging.h"
 #include <sstream>
 #include <iostream>
+#include <applicationfunctions.h>
 
 QMLLogging* loggingPtr = nullptr;
 
@@ -54,22 +55,21 @@ void staticQtMessages(QtMsgType type, const QMessageLogContext &context, const Q
             funcStr = context.function;
         }
         sstr << "[" << fileStr << ":" << context.line << ":" << funcStr << "] " << msg.toStdString();
-        const std::string message = sstr.str();
         switch (type) {
         case QtDebugMsg:
-            std::cerr << "DEBUG: " << message << std::endl;
+            std::cerr << "DEBUG: " << sstr.str() << std::endl;
             break;
         case QtInfoMsg:
-            std::cerr << "INFO: " << message << std::endl;
+            std::cerr << "INFO: " << sstr.str() << std::endl;
             break;
         case QtWarningMsg:
-            std::cerr << "WARN: " << message << std::endl;
+            std::cerr << "WARN: " << sstr.str() << std::endl;
             break;
         case QtCriticalMsg:
-            std::cerr << "CRIT: " << message << std::endl;
+            std::cerr << "CRIT: " << sstr.str() << std::endl;
             break;
         case QtFatalMsg:
-            std::cerr << "FATAL: " << message << std::endl;
+            std::cerr << "FATAL: " << sstr.str() << std::endl;
             break;
         }
     }
@@ -101,54 +101,47 @@ void QMLLogging::qtMessages(QtMsgType type, const QMessageLogContext &context, c
         funcStr = context.function;
     }
     sstr << "[" << fileStr << ":" << context.line << ":" << funcStr << "] " << msg.toStdString();
-    const std::string temp = sstr.str();
-    const QString message = QString::fromStdString(temp);
     switch (type) {
     case QtDebugMsg:
-        debug(message);
+        debug(sstr.str());
         break;
     case QtInfoMsg:
-        info(message);
+        info(sstr.str());
         break;
     case QtWarningMsg:
-        warn(message);
+        warn(sstr.str());
         break;
     case QtCriticalMsg:
-        error(message);
+        error(sstr.str());
         break;
     case QtFatalMsg:
-        error("FATAL: " + message);
+        error("FATAL: " + sstr.str());
         break;
     }
 }
 
-void QMLLogging::trace(const QString& message) const
+void QMLLogging::trace(const std::string& message) const
 {
-    const std::string temp = message.toStdString();
-    javaLoggingCallback(0, temp.c_str());
+    ApplicationFunctions::invokeLoggingCallback(javaLoggingCallback, 0, message);
 }
-void QMLLogging::debug(const QString& message) const
+void QMLLogging::debug(const std::string& message) const
 {
-    const std::string temp = message.toStdString();
-    javaLoggingCallback(1, temp.c_str());
+    ApplicationFunctions::invokeLoggingCallback(javaLoggingCallback, 1, message);
 }
-void QMLLogging::info(const QString& message) const
+void QMLLogging::info(const std::string& message) const
 {
-    const std::string temp = message.toStdString();
-    javaLoggingCallback(2, temp.c_str());
+    ApplicationFunctions::invokeLoggingCallback(javaLoggingCallback, 2, message);
 }
-void QMLLogging::warn(const QString& message) const
+void QMLLogging::warn(const std::string& message) const
 {
-    const std::string temp = message.toStdString();
-    javaLoggingCallback(3, temp.c_str());
+    ApplicationFunctions::invokeLoggingCallback(javaLoggingCallback, 3, message);
 }
-void QMLLogging::error(const QString& message) const
+void QMLLogging::error(const std::string& message) const
 {
-    const std::string temp = message.toStdString();
-    javaLoggingCallback(4, temp.c_str());
+    ApplicationFunctions::invokeLoggingCallback(javaLoggingCallback, 4, message);
 }
 
-void QMLLogging::setCallback(void c(int, const char*))
+void QMLLogging::setCallback(jobject obj)
 {
-    javaLoggingCallback = c;
+    javaLoggingCallback = obj;
 }

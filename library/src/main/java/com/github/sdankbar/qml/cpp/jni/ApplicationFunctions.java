@@ -59,73 +59,53 @@ public final class ApplicationFunctions {
 	/**
 	 * Deletes the current QApplication.
 	 */
-	public static void deleteQApplication() {
-		// TODO
-	}
+	public static native void deleteQApplication();
 
 	/**
 	 * Calls QApplication::exec()
 	 */
-	public static void execQApplication() {
-		// TODO
-	}
+	public static native void execQApplication();
 
 	/**
 	 * @return The version of Qt the Jaqumal was compiled with.
 	 */
-	public static String getCompileQtVersion() {
-		// TODO
-		return "";
-	}
+	public static native String getCompileQtVersion();
 
 	/**
 	 * @return The version of Qt the Jaqumal is linked against.
 	 */
-	public static String getRuntimeQtVersion() {
-		// TODO
-		return "";
-	}
+	public static native String getRuntimeQtVersion();
 
 	/**
 	 * Loads the QML file at the given path.
 	 *
 	 * @param fileName The path to the QML file to load.
 	 */
-	public static void loadQMLFile(final String fileName) {
-		// TODO
-	}
+	public static native void loadQMLFile(final String fileName);
 
 	/**
 	 * Reloads the QML file at the given path.
 	 *
 	 * @param fileName The path to the QML file to reload.
 	 */
-	public static void reloadQMLFile(final String fileName) {
-		// TODO
-	}
+	public static native void reloadQMLFile(final String fileName);
 
 	/**
 	 * Unloads the currently loaded QML.
 	 */
-	public static void unloadQML() {
-		// TODO
-	}
+	public static native void unloadQML();
 
 	/**
 	 * Sets the callback to call when C++ wants to log.
 	 *
 	 * @param c The logging callback.
 	 */
-	public static void setLoggingCallback(final LoggingCallback c) {
-		// TODO
-	}
+	public static native void setLoggingCallback(final LoggingCallback c);
 
 	/**
 	 * Calls QApplication::quit()
 	 */
-	public static void quitQApplication() {
-		// TODO
-	}
+	public static native void quitQApplication();
 
 	/**
 	 * @param pathToQMLTestFile Path to QML test file or directory containing test
@@ -134,10 +114,7 @@ public final class ApplicationFunctions {
 	 *                          for files to import.
 	 * @return 0 on test success, 1 on failure.
 	 */
-	public static int runQMLTest(final String pathToQMLTestFile, final String[] importPaths) {
-		// TODO
-		return 0;
-	}
+	public static native int runQMLTest(final String pathToQMLTestFile, final String[] importPaths);
 
 	/**
 	 * Registers a new image provider.
@@ -145,17 +122,12 @@ public final class ApplicationFunctions {
 	 * @param id Identifier of the image provider.
 	 * @param c  The provider's callback.
 	 */
-	public static void addImageProvider(final String id, final ImageProviderCallback c) {
-		// TODO
-	}
+	public static native void addImageProvider(final String id, final ImageProviderCallback c);
 
 	/**
 	 * @return Buffer containing number of screens, then dpi and rectangles.
 	 */
-	public static ByteBuffer getScreens() {
-		// TODO
-		return null;
-	}
+	public static native ByteBuffer getScreens();
 
 	/**
 	 * Invokes a callback on the Qt thread.
@@ -163,9 +135,7 @@ public final class ApplicationFunctions {
 	 * @param callback The callback to call. Caller is responsible to ensuring the
 	 *                 InvokeCallback object is not garbage collected.
 	 */
-	public static void invoke(final InvokeCallback callback) {
-		// TODO
-	}
+	public static native void invoke(final InvokeCallback callback);
 
 	/**
 	 * Invokes a callback on the Qt thread after a delay.
@@ -174,7 +144,5 @@ public final class ApplicationFunctions {
 	 *                   InvokeCallback object is not garbage collected.
 	 * @param delayMilli The delay until calling the callback in milliseconds.
 	 */
-	public static void invokeWithDelay(final InvokeCallback callback, final int delayMilli) {
-		// TODO
-	}
+	public static native void invokeWithDelay(final InvokeCallback callback, final int delayMilli);
 }

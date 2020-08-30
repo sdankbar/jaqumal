@@ -38,6 +38,9 @@
 #include <QApplication>
 #include <iostream>
 #include <functional>
+#include <genericflattreemodel.h>
+#include <genericlistmodel.h>
+#include <genericobjectmodel.h>
 
 #include "qmlimageprovider.h"
 #include <QQmlContext>
@@ -67,6 +70,7 @@ JNICALL void deleteQApplication(JNIEnv* env, jclass)
 {
     ApplicationFunctions::deleteSingleton();
 }
+
 JNICALL void execQApplication(JNIEnv* env, jclass)
 {
     if (ApplicationFunctions::check(env))
@@ -142,9 +146,9 @@ void ApplicationFunctions::create(int* argc, char** argv)
 
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
     qmlRegisterType<EventDispatcher>("com.github.sdankbar.jaqumal", 0, 4, "EventDispatcher");
-    //qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
-    //qmlRegisterUncreatableType<GenericFlatTreeModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericFlatTreeModel", "Cannot create GenericFlatTreeModel");
-    //qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");
+    qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
+    qmlRegisterUncreatableType<GenericFlatTreeModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericFlatTreeModel", "Cannot create GenericFlatTreeModel");
+    qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");
     qmlRegisterType<JPolyline>("com.github.sdankbar.jaqumal", 0, 4, "JPolyline");
 
     SINGLETON = new ApplicationFunctions(*argc, argv);
@@ -172,8 +176,23 @@ bool ApplicationFunctions::check(JNIEnv* env)
     }
 }
 
+void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const std::string& msg)
+{
+    jstring javaStr = lastEnv->NewStringUTF(msg.c_str());
+    lastEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
+}
+
+jclass ApplicationFunctions::loggingCallback;
+jmethodID ApplicationFunctions::loggingCallbackMethod;
+JNIEnv* ApplicationFunctions::lastEnv = nullptr;
+
 void ApplicationFunctions::initialize(JNIEnv* env)
 {
+    lastEnv = env;
+    loggingCallback = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/LoggingCallback");
+    loggingCallbackMethod = env->GetMethodID(loggingCallback, "invoke", "(ILjava/lang/String;)V");
+
+
     // TODO
     static JNINativeMethod methods[] = {
         JNIUtilities::createJNIMethod("createQApplication",    "([Ljava/lang/String;)V",    (void *)&createQApplication)
@@ -198,7 +217,7 @@ void signal_handler(int)
   }
 }
 
-ApplicationFunctions::ApplicationFunctions(int32_t argc, char** argv) :
+ApplicationFunctions::ApplicationFunctions(int32_t& argc, char** argv) :
     m_qapp(new QApplication(argc, argv)),
     m_logging(),
     m_qmlEngine(new QQmlApplicationEngine(m_qapp)),
@@ -306,9 +325,9 @@ void ApplicationFunctions::reloadQMLFile(const QString& filePath)
     loadQMLFile(filePath);
 }
 
-void ApplicationFunctions::setLoggingCallback(void c(int, const char*))
+void ApplicationFunctions::setLoggingCallback(jobject callbackObject)
 {
-    m_logging.setCallback(c);
+    m_logging.setCallback(callbackObject);
 }
 
 void ApplicationFunctions::addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback)
