@@ -27,10 +27,15 @@
 #include "eventfunctions.h"
 #include "fontfunctions.h"
 
+#include <iostream>
+
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
+    std::cout << "Jaqumal Library OnLoad" << std::endl;
+
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_2) != JNI_OK) {
+        std::cout << "  bad version" << std::endl;
         return JNI_ERR;
     }
 
@@ -39,7 +44,6 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     ApplicationFunctions::initialize(env);
     EventFunctions::initialize(env);
     FontFunctions::initialize(env);
-
 
     // Return the JNI Version as required by method
     return JNI_VERSION_1_2;
@@ -66,8 +70,8 @@ void JNIUtilities::initialize(JNIEnv* env)
 {
     illegalStateExceptionClass = findClassGlobalReference(env, "java/lang/IllegalStateException");
     qmlExceptionClass = findClassGlobalReference(env, "com/github/sdankbar/qml/exceptions/QMLException");
-    callbackClass = findClassGlobalReference(env, "com/github/sdankbar/jni/CallbackInterface");
-    callbackMethod = env->GetMethodID(callbackClass, "callback", "(I)V");
+    callbackClass = findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback");
+    callbackMethod = env->GetMethodID(callbackClass, "invoke", "()V");
 }
 
 void JNIUtilities::uninitialize(JNIEnv* env)

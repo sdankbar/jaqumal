@@ -20,21 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.cpp.jni;
+#pragma once
 
-import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
+#include <jni.h>
+#include <QApplication>
+#include <qmllogging.h>
+#include <QQmlApplicationEngine>
+#include <userinputsimulator.h>
+#include <QQmlContext>
 
-public class EventFunctions {
-	/**
-	 * Adds a callback to be called when an event is created.
-	 *
-	 * @param c The callback. Caller is responsible to ensuring the EventCallback
-	 *          object is not garbage collected.
-	 */
-	public static void addEventCallback(final EventCallback c) {
-		// TODO
-	}
+class ListModelFunctions
+{
+public:
+    static void initialize(JNIEnv* env);
+    static void uninitialize(JNIEnv* env);
 
-	public static native void sendQMLEvent(final String eventName, final String[] keys);
 
-}
+private:
+
+};
+
+
+

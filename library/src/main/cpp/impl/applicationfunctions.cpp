@@ -175,29 +175,11 @@ bool ApplicationFunctions::check(JNIEnv* env)
 void ApplicationFunctions::initialize(JNIEnv* env)
 {
     // TODO
-    JNINativeMethod methods[] = {
-        /*JNIUtilities::createJNIMethod("setInteger",    "(II)V",    (void *)&setInteger),
-        JNIUtilities::createJNIMethod("setLong",    "(JI)V",    (void *)&setLong),
-        JNIUtilities::createJNIMethod("setBoolean",    "(ZI)V",    (void *)&setBoolean),
-        JNIUtilities::createJNIMethod("setFloat",    "(FI)V",    (void *)&setFloat),
-        JNIUtilities::createJNIMethod("setDouble",    "(DI)V",    (void *)&setDouble),
-        JNIUtilities::createJNIMethod("setSize",    "(III)V",    (void *)&setSize),
-        JNIUtilities::createJNIMethod("setPoint",    "(III)V",    (void *)&setPoint),
-        JNIUtilities::createJNIMethod("setLine",    "(IIIII)V",    (void *)&setLine),
-        JNIUtilities::createJNIMethod("setRectangle",    "(IIIII)V",    (void *)&setRectangle),
-        JNIUtilities::createJNIMethod("setString",    "(Ljava/lang/String;I)V",    (void *)&setString),
-        JNIUtilities::createJNIMethod("setRegularExpression",    "(Ljava/lang/String;I)V",    (void *)&setRegularExpression),
-        JNIUtilities::createJNIMethod("setURL",    "(Ljava/lang/String;I)V",    (void *)&setURL),
-        JNIUtilities::createJNIMethod("setUUID",    "(Ljava/lang/String;I)V",    (void *)&setUUID),
-        JNIUtilities::createJNIMethod("setByteArray",    "([BI)V",    (void *)&setByteArray),
-        JNIUtilities::createJNIMethod("setColor",    "(II)V",    (void *)&setColor),
-        JNIUtilities::createJNIMethod("setDateTime",    "(JII)V",    (void *)&setDateTime),
-        JNIUtilities::createJNIMethod("setImage",    "(II[BI)V",    (void *)&setImage),
-        JNIUtilities::createJNIMethod("setFont",    "(Ljava/lang/String;I)V",    (void *)&setFont),
-        JNIUtilities::createJNIMethod("setPolyline",    "(I[DI)V",    (void *)&setPolyline),*/
+    static JNINativeMethod methods[] = {
+        JNIUtilities::createJNIMethod("createQApplication",    "([Ljava/lang/String;)V",    (void *)&createQApplication)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
-    env->RegisterNatives(javaClass, methods, sizeof(methods));
+    env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
     env->DeleteLocalRef(javaClass);
 }
 
