@@ -50,9 +50,21 @@
  * Method:    getBoundingRect
  * Signature: (Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;
  */
-jobject JNICALL getBoundingRect(JNIEnv* env, jstring, jstring)
+jobject JNICALL getBoundingRect(JNIEnv* env, jstring fontToString, jstring text)
 {
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(JNIUtilities::toQString(env, fontToString));
+        const QFontMetrics metrics(f);
+        QRect rect = metrics.boundingRect(JNIUtilities::toQString(env, text));
 
+        return FontFunctions::constructRectangle(env, rect.x(), rect.y(), rect.width(), rect.height());
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 /*
@@ -60,9 +72,22 @@ jobject JNICALL getBoundingRect(JNIEnv* env, jstring, jstring)
  * Method:    getBoundingRect2
  * Signature: (Ljava/lang/String;IIIIIILjava/lang/String;)Ljava/awt/Rectangle;
  */
-jobject JNICALL getBoundingRect2(JNIEnv* env, jclass, jstring, jint, jint, jint, jint, jint, jint, jstring)
+jobject JNICALL getBoundingRect2(JNIEnv* env, jclass, jstring fontToString, jint x, jint y, jint w, jint h, jint alignFlags, jint textFlags, jstring text)
 {
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(JNIUtilities::toQString(env, fontToString));
+        const QFontMetrics metrics(f);
+        const QRect bounds(x, y, w, h);
+        QRect rect = metrics.boundingRect(bounds, alignFlags | textFlags, JNIUtilities::toQString(env, text));
 
+        return FontFunctions::constructRectangle(env, rect.x(), rect.y(), rect.width(), rect.height());
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 /*
@@ -107,7 +132,7 @@ jstring JNICALL getQFontInfo(JNIEnv* env, jclass, jstring fontToString)
  */
 jstring JNICALL getQFontMetrics(JNIEnv* env, jclass, jstring fontToString)
 {
-    if (ApplicationFunctions::check(nullptr)) // QTBUG-27024
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
     {
         QFont f;
         f.fromString(JNIUtilities::toQString(env, fontToString));
@@ -193,9 +218,19 @@ jstring JNICALL getQFontToString(JNIEnv* env, jclass, jstring family, jint point
  * Method:    getStringWidth
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-jint JNICALL getStringWidth(JNIEnv *, jclass, jstring, jstring)
+jint JNICALL getStringWidth(JNIEnv* env, jclass, jstring fontToString, jstring text)
 {
-
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(JNIUtilities::toQString(env, fontToString));
+        const QFontMetrics metrics(f);
+        return metrics.width(JNIUtilities::toQString(env, text));
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 /*
@@ -203,9 +238,21 @@ jint JNICALL getStringWidth(JNIEnv *, jclass, jstring, jstring)
  * Method:    getTightBoundingRect
  * Signature: (Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;
  */
-jobject JNICALL getTightBoundingRect(JNIEnv *, jclass, jstring, jstring)
+jobject JNICALL getTightBoundingRect(JNIEnv* env, jclass, jstring fontToString, jstring text)
 {
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(JNIUtilities::toQString(env, fontToString));
+        const QFontMetrics metrics(f);
+        QRect rect = metrics.tightBoundingRect(JNIUtilities::toQString(env, text));
 
+        return FontFunctions::constructRectangle(env, rect.x(), rect.y(), rect.width(), rect.height());
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 /*
@@ -213,23 +260,44 @@ jobject JNICALL getTightBoundingRect(JNIEnv *, jclass, jstring, jstring)
  * Method:    inFont
  * Signature: (Ljava/lang/String;I)Z
  */
-jboolean JNICALL inFont(JNIEnv *, jclass, jstring, jint)
+jboolean JNICALL inFont(JNIEnv* env, jclass, jstring fontToString, jint character)
 {
-
+    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    {
+        QFont f;
+        f.fromString(JNIUtilities::toQString(env, fontToString));
+        const QFontMetrics metrics(f);
+        return metrics.inFont(QChar(static_cast<int32_t>(character)));
+    }
+    else
+    {
+        return false;
+    }
 }
+
+jclass FontFunctions::rectangleClass;
+jmethodID FontFunctions::rectangleConstructor;
 
 void FontFunctions::initialize(JNIEnv* env)
 {
+    rectangleClass = JNIUtilities::findClassGlobalReference(env, "java.awt.Rectangle");
+    rectangleConstructor = env->GetMethodID(rectangleClass, "<init>", "(IIII)V");
+
     // TODO
     JNINativeMethod methods[] = {
 
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/FontFunctions");
-    //env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
+    env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));
     env->DeleteLocalRef(javaClass);
 }
 
 void FontFunctions::uninitialize(JNIEnv*)
 {
 
+}
+
+jobject FontFunctions::constructRectangle(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h)
+{
+    return env->NewObject(rectangleClass, rectangleConstructor, x, y, w, h);
 }

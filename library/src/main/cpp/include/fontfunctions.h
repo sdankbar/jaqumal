@@ -35,9 +35,11 @@ public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
 
+    static jobject constructRectangle(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h);
 
 private:
-
+    static jclass rectangleClass;
+    static jmethodID rectangleConstructor;
 };
 
 
