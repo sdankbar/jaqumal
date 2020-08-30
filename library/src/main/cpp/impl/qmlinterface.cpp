@@ -46,12 +46,7 @@ void addEventCallback(void* c(const char*, void*, int32_t))
 
 void addImageProvider(const char* id, void* c(const char*, int, int))
 {
-    if (ApplicationFunctions::check(nullptr))
-    {
-        //QMLLibrary::library->addImageProvider(
-        //    QString(id),
-        //    std::function<void* (const char*, int , int)>(c));
-    }
+
 }
 
 void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer, int keyValuesCount)
@@ -69,34 +64,3 @@ void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer,
     }
 }
 
-void* getScreens()
-{
-    static char* retPtr = nullptr;
-    if (ApplicationFunctions::check(nullptr))
-    {
-        /*QList<QScreen*> screens = QMLLibrary::library->getScreens();
-        size_t bytesAllocated = 4u + static_cast<size_t>(screens.size()) * (8u + 4u * 4u);
-        free(retPtr);
-        retPtr = reinterpret_cast<char*>(malloc(bytesAllocated));
-        memset(retPtr, 0, bytesAllocated);
-
-        char* working = retPtr;
-        putInt(working, screens.size());
-        for (int i = 0; i < screens.size(); ++i)
-        {
-            putDouble(working, screens[i]->physicalDotsPerInch());
-
-            QRect geo = screens[i]->geometry();
-            putInt(working, geo.x());
-            putInt(working, geo.y());
-            putInt(working, geo.width());
-            putInt(working, geo.height());
-        }*/
-
-        return retPtr;
-    }
-    else
-    {
-        return nullptr;
-    }
-}

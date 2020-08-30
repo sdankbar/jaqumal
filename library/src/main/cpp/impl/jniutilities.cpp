@@ -128,6 +128,14 @@ QString JNIUtilities::toQString(JNIEnv* env, jstring str)
     return qstr;
 }
 
+std::string JNIUtilities::toString(JNIEnv* env, jstring str)
+{
+    const char* array = env->GetStringUTFChars(str, NULL);
+    std::string stdString = std::string(array);
+    env->ReleaseStringUTFChars(str, array);
+    return stdString;
+}
+
 JNIUtilities::JNIUtilities()
 {
     // Empty Implementation

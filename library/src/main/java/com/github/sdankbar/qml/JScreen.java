@@ -44,6 +44,11 @@ public class JScreen {
 		this.dpi = dpi;
 	}
 
+	public JScreen(final int x, final int y, final int w, final int h, final double dpi) {
+		geometry = new Rectangle2D.Double(x, y, w, h);
+		this.dpi = dpi;
+	}
+
 	/**
 	 * @return the screen dots per inch.
 	 */

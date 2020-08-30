@@ -23,7 +23,7 @@
 #include "qmlimageprovider.h"
 #include "qmlinterface.h"
 
-QMLImageProvider::QMLImageProvider(std::function<void* (const char*, int, int)> callback) :
+QMLImageProvider::QMLImageProvider(std::function<QImage(std::string,int32_t,int32_t)> callback) :
     QQuickImageProvider(QQuickImageProvider::Image),
     javaImageProviderCallback(callback)
 {
@@ -48,20 +48,5 @@ QImage QMLImageProvider::requestImage(const QString& id, QSize* size, const QSiz
       correctedHeight = requestedSize.height();
     }
     
-    void* data = javaImageProviderCallback(id.toStdString().c_str(), correctedWidth, correctedHeight);
-    if (data != nullptr)
-    {
-        int dataLength = 0;
-        QVariant imageVar;// = toQVariant(data, dataLength);
-        QImage image = imageVar.value<QImage>();
-        if (size)
-        {
-            *size = image.size();
-        }
-        return image;
-    }
-    else
-    {
-        return QImage();
-    }
+    return javaImageProviderCallback(id.toStdString(), correctedWidth, correctedHeight);
 }

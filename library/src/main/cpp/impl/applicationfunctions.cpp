@@ -47,6 +47,7 @@
 #include <QQuickWindow>
 #include <iostream>
 #include <csignal>
+#include <qmltest.h>
 
 JNICALL void createQApplication(JNIEnv* env, jclass, jobjectArray argv)
 {
@@ -134,17 +135,52 @@ JNICALL void quitQApplication(JNIEnv* env, jclass)
 
 JNICALL int runQMLTest(JNIEnv* env, jclass, jstring pathToQMLTestFile, jobjectArray importPaths)
 {
-    // TODO
+    std::string path = JNIUtilities::toString(env, pathToQMLTestFile);
+    const int32_t count = env->GetArrayLength(importPaths);
+    std::vector<std::string> paths;
+    for (int i = 0; i < count; ++i)
+    {
+        jstring str = static_cast<jstring>(env->GetObjectArrayElement(importPaths, i));
+        const char* array = env->GetStringUTFChars(str, NULL);
+        std::string temp(array);
+        env->ReleaseStringUTFChars(str, array);
+        paths.push_back(temp);
+    }
+    runQMLTest(path, paths);
 }
 
 JNICALL void addImageProvider(JNIEnv* env, jclass, jstring id, jobject c)
 {
-    // TODO
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->addImageProvider(
+            env, JNIUtilities::toQString(env, id), c);
+    }
 }
 
 JNICALL jobjectArray getScreens(JNIEnv* env, jclass)
 {
-    // TODO
+    if (ApplicationFunctions::check(env))
+    {
+        QList<QScreen*> screens = ApplicationFunctions::get()->getScreens();
+        jobjectArray array = ApplicationFunctions::get()->createJScreenArray(env, screens.length());
+        for (int32_t i= 0; i < screens.length(); ++i)
+        {
+            QScreen* s = screens[i];
+
+            QRect geo = s->geometry();
+            env->SetObjectArrayElement(
+                        array, i,
+                        ApplicationFunctions::get()->createJScreen(env, geo.x(), geo.y(), geo.width(), geo.height(),
+                                                                   s->physicalDotsPerInch()));
+        }
+
+        return array;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
@@ -164,7 +200,7 @@ JNICALL void invokeWithDelay(JNIEnv* env, jclass, jobject callback, jint delayMi
     if (ApplicationFunctions::check(env))
     {
         std::function<void()> func = [=] {
-            ApplicationFunctions::get()->invokeCallback(callback);
+            ApplicationFunctions::get()->invokeCallback(env, callback);
         };
         QTimer::singleShot(delayMilli, func);
     }
@@ -212,6 +248,14 @@ void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const st
 
 jclass ApplicationFunctions::loggingCallback;
 jmethodID ApplicationFunctions::loggingCallbackMethod;
+jclass ApplicationFunctions::jscreenClass;
+jmethodID ApplicationFunctions::jscreenContructor;
+jclass ApplicationFunctions::imageProviderClass;
+jmethodID ApplicationFunctions::imageProviderInvoke;
+jclass ApplicationFunctions::bufferedImageClass;
+jmethodID ApplicationFunctions::bufferedImageGetWidth;
+jmethodID ApplicationFunctions::bufferedImageGetHeight;
+jmethodID ApplicationFunctions::bufferedImageGetRGB;
 JNIEnv* ApplicationFunctions::lastEnv = nullptr;
 
 void ApplicationFunctions::initialize(JNIEnv* env)
@@ -219,6 +263,15 @@ void ApplicationFunctions::initialize(JNIEnv* env)
     lastEnv = env;
     loggingCallback = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/LoggingCallback");
     loggingCallbackMethod = env->GetMethodID(loggingCallback, "invoke", "(ILjava/lang/String;)V");
+    jscreenClass= JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/JScreen");
+    jscreenContructor= env->GetMethodID(jscreenClass, "<init>", "(IIIID)V");
+    imageProviderClass= JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/ImageProviderCallback");
+    jscreenContructor= env->GetMethodID(jscreenClass, "invoke", "(Ljava/lang/String;II)Ljava.awt.image.BufferedImage;");
+
+    bufferedImageClass= JNIUtilities::findClassGlobalReference(env, "java/awt/image/BufferedImage");
+    bufferedImageGetWidth= env->GetMethodID(bufferedImageClass, "getWidth", "()I");
+    bufferedImageGetHeight= env->GetMethodID(bufferedImageClass, "getHeight", "()I");
+    bufferedImageGetRGB= env->GetMethodID(bufferedImageClass, "getRGB", "(IIII[III)[I");
 
     // TODO
     static JNINativeMethod methods[] = {
@@ -294,9 +347,9 @@ void ApplicationFunctions::quitApplication()
    m_qapp->quit();
 }
 
-void ApplicationFunctions::invokeCallback(jobject callback)
+void ApplicationFunctions::invokeCallback(JNIEnv* env, jobject c)
 {
-    JNIUtilities::invokeCallback(lastEnv, callback);
+    JNIUtilities::invokeCallback(env, c);
 }
 
 /*
@@ -356,12 +409,51 @@ void ApplicationFunctions::setLoggingCallback(jobject callbackObject)
     m_logging.setCallback(callbackObject);
 }
 
-void ApplicationFunctions::addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback)
+void ApplicationFunctions::addImageProvider(JNIEnv* env, const QString& id, jobject javaImageProviderCallback)
 {
-    m_qmlEngine->addImageProvider(id, new QMLImageProvider(javaImageProviderCallback));
+    m_qmlEngine->addImageProvider(
+                id, new QMLImageProvider(createImageProviderFunctionCallback(env, javaImageProviderCallback)));
 }
 
 QList<QScreen*> ApplicationFunctions::getScreens()
 {
     return m_qapp->screens();
+}
+
+jobjectArray ApplicationFunctions::createJScreenArray(JNIEnv* env, int32_t length)
+{
+    return env->NewObjectArray(length, jscreenClass, nullptr);
+}
+
+jobject ApplicationFunctions::createJScreen(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h, double dpi)
+{
+    return env->NewObject(jscreenClass, jscreenContructor, x, y, w, h, dpi);
+}
+
+std::function<QImage(std::string,int32_t,int32_t)> ApplicationFunctions::createImageProviderFunctionCallback(JNIEnv* env, jobject obj)
+{
+    std::function<QImage(std::string,int32_t,int32_t)> func = [=] (std::string id, int32_t w, int32_t h) {
+        jstring jStr = env->NewStringUTF(id.c_str());
+        jobject bufferedImage = env->CallObjectMethod(obj, imageProviderInvoke, jStr, w, h);
+        return toQImage(env, bufferedImage);
+    };
+    return func;
+}
+
+void cleanupMemory2(void* ptr)
+{
+    delete static_cast<unsigned char*>(ptr);
+}
+
+QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
+{
+    jint w = env->CallIntMethod(bufferedImage, bufferedImageGetWidth);
+    jint h = env->CallIntMethod(bufferedImage, bufferedImageGetHeight);
+    jintArray pixelData = static_cast<jintArray>(env->CallObjectMethod(bufferedImage, bufferedImageGetRGB, 0, 0, w, h, nullptr, 0, w));
+    const int32_t copyLength = 4 * w * h;
+    unsigned char* copy = new unsigned char[copyLength];
+    jint* jData = env->GetIntArrayElements(pixelData, nullptr);
+    memcpy(copy, jData, copyLength);
+    env->ReleaseIntArrayElements(pixelData, jData, JNI_ABORT);
+    return QImage(copy, w, h, QImage::Format_ARGB32, &cleanupMemory2);
 }
