@@ -44,11 +44,6 @@ void addEventCallback(void* c(const char*, void*, int32_t))
     EventBuilder::addEventHandler(std::function<void*(const char*, void*, int32_t)>(c));
 }
 
-void addImageProvider(const char* id, void* c(const char*, int, int))
-{
-
-}
-
 void sendQMLEvent(const char* eventName, const char** keys, void* valuesPointer, int keyValuesCount)
 {
     if (ApplicationFunctions::check(nullptr))

@@ -208,7 +208,7 @@ int runQMLTest(const std::string& pathToQMLTestFile, std::vector<std::string>& i
     if (!importPaths.empty())
     {
         argv[3] = strdup("-import");
-        for (int i = 0; i < importPaths.size(); ++i)
+        for (size_t i = 0; i < importPaths.size(); ++i)
         {
             argv[4 + i] = strdup(importPaths[i].c_str());
         }

@@ -48,8 +48,11 @@ public:
     void unloadQML();
     void reloadQMLFile(const QString& filePath);
     void setLoggingCallback(jobject callbackObject);
-    void addImageProvider(const QString& id, std::function<void* (const char*, int, int)> javaImageProviderCallback);
+    void addImageProvider(JNIEnv* env, const QString& id, jobject javaImageProviderCallback);
     QList<QScreen*> getScreens();
+    jobjectArray createJScreenArray(JNIEnv* env, int32_t length);
+    jobject createJScreen(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h, double dpi);
+    std::function<QImage(std::string,int32_t,int32_t)> createImageProviderFunctionCallback(JNIEnv* env, jobject obj);
 
     template<typename T>
     void addToContext(const QString& name, T* ptr)
@@ -57,16 +60,29 @@ public:
         m_qmlEngine->rootContext()->setContextProperty(name, QVariant::fromValue(ptr));
     }
 public slots:
-    void invokeCallback(jobject c);
+    void invokeCallback(JNIEnv* env, jobject c);
 
 private:
     ApplicationFunctions(int32_t& argc, char** argv);
     ~ApplicationFunctions();
 
+    QImage toQImage(JNIEnv* env, jobject bufferedImage);
+
     static ApplicationFunctions* SINGLETON;
     static JNIEnv* lastEnv;
     static jclass loggingCallback;
     static jmethodID loggingCallbackMethod;
+
+    static jclass jscreenClass;
+    static jmethodID jscreenContructor;
+
+    static jclass imageProviderClass;
+    static jmethodID imageProviderInvoke;
+
+    static jclass bufferedImageClass;
+    static jmethodID bufferedImageGetWidth;
+    static jmethodID bufferedImageGetHeight;
+    static jmethodID bufferedImageGetRGB;
 
     QApplication* m_qapp;
     QMLLogging m_logging;

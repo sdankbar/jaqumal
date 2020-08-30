@@ -39,6 +39,7 @@ public:
     static void invokeCallback(JNIEnv* env, jobject callbackObject);
 
     static QString toQString(JNIEnv* env, jstring str);
+    static std::string toString(JNIEnv* env, jstring str);
 
 private:
     JNIUtilities();

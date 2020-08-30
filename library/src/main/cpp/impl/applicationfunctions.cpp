@@ -146,7 +146,7 @@ JNICALL int runQMLTest(JNIEnv* env, jclass, jstring pathToQMLTestFile, jobjectAr
         env->ReleaseStringUTFChars(str, array);
         paths.push_back(temp);
     }
-    runQMLTest(path, paths);
+    return runQMLTest(path, paths);
 }
 
 JNICALL void addImageProvider(JNIEnv* env, jclass, jstring id, jobject c)
@@ -266,7 +266,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
     jscreenClass= JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/JScreen");
     jscreenContructor= env->GetMethodID(jscreenClass, "<init>", "(IIIID)V");
     imageProviderClass= JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/ImageProviderCallback");
-    jscreenContructor= env->GetMethodID(jscreenClass, "invoke", "(Ljava/lang/String;II)Ljava.awt.image.BufferedImage;");
+    imageProviderInvoke= env->GetMethodID(imageProviderClass, "invoke", "(Ljava/lang/String;II)Ljava/awt/image/BufferedImage;");
 
     bufferedImageClass= JNIUtilities::findClassGlobalReference(env, "java/awt/image/BufferedImage");
     bufferedImageGetWidth= env->GetMethodID(bufferedImageClass, "getWidth", "()I");

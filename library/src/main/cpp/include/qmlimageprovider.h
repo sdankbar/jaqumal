@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 #pragma once
-
+#include <jni.h>
 #include <QObject>
 #include <QQuickImageProvider>
 #include <functional>
@@ -30,11 +30,11 @@
 class QMLImageProvider : public QQuickImageProvider
 {
 public:
-    explicit QMLImageProvider(std::function<void* (const char*, int, int)> javaImageProviderCallback);
+    explicit QMLImageProvider(std::function<QImage(std::string,int32_t,int32_t)> javaImageProviderCallback);
     virtual ~QMLImageProvider() override;
 
     virtual QImage requestImage(const QString& id, QSize* size, const QSize& requestedSize) override;
 private:
 
-    std::function<void* (const char*, int, int)> javaImageProviderCallback;
+    std::function<QImage(std::string,int32_t,int32_t)> javaImageProviderCallback;
 };

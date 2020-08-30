@@ -48,5 +48,10 @@ QImage QMLImageProvider::requestImage(const QString& id, QSize* size, const QSiz
       correctedHeight = requestedSize.height();
     }
     
-    return javaImageProviderCallback(id.toStdString(), correctedWidth, correctedHeight);
+    QImage ret = javaImageProviderCallback(id.toStdString(), correctedWidth, correctedHeight);
+    if (size)
+    {
+        *size = ret.size();
+    }
+    return ret;
 }
