@@ -22,10 +22,8 @@
  */
 package com.github.sdankbar.qml;
 
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -359,19 +357,7 @@ public class JQMLApplication<EType> {
 	 */
 	@QtThread
 	public ImmutableList<JScreen> screens() {
-		final ByteBuffer buffer = ApplicationFunctions.getScreens();
-		buffer.order(ByteOrder.nativeOrder());
-		final int count = buffer.getInt();
-
-		final ImmutableList.Builder<JScreen> builder = ImmutableList.builder();
-		for (int i = 0; i < count; ++i) {
-			final double dpi = buffer.getDouble();
-			final Rectangle2D rect = new Rectangle2D.Double(buffer.getInt(), buffer.getInt(), buffer.getInt(),
-					buffer.getInt());
-			builder.add(new JScreen(rect, dpi));
-		}
-
-		return builder.build();
+		return ImmutableList.copyOf(ApplicationFunctions.getScreens());
 	}
 
 	private void verifyEventLoopThread() {

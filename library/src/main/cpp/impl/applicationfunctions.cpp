@@ -97,7 +97,7 @@ JNICALL void loadQMLFile(JNIEnv* env, jclass, jstring fileName)
 {
     if (ApplicationFunctions::check(env))
     {
-        ApplicationFunctions::get()->loadQMLFile(JNIUtilities::toQString(env, fileName));
+        ApplicationFunctions::get()->loadQML(JNIUtilities::toQString(env, fileName));
     }
 }
 
@@ -105,11 +105,11 @@ JNICALL void reloadQMLFile(JNIEnv* env, jclass, jstring fileName)
 {
     if (ApplicationFunctions::check(env))
     {
-        ApplicationFunctions::get()->reloadQMLFile(JNIUtilities::toQString(env, fileName));
+        ApplicationFunctions::get()->reloadQML(JNIUtilities::toQString(env, fileName));
     }
 }
 
-JNICALL void unloadQML(JNIEnv* env, jclass)
+JNICALL void unloadQMLFile(JNIEnv* env, jclass)
 {
     if (ApplicationFunctions::check(env))
     {
@@ -121,7 +121,7 @@ JNICALL void setLoggingCallback(JNIEnv* env, jclass, jobject c)
 {
     if (ApplicationFunctions::check(env))
     {
-        ApplicationFunctions::get()->setLoggingCallback(c);
+        ApplicationFunctions::get()->setLoggingObject(c);
     }
 }
 
@@ -133,7 +133,7 @@ JNICALL void quitQApplication(JNIEnv* env, jclass)
     }
 }
 
-JNICALL int runQMLTest(JNIEnv* env, jclass, jstring pathToQMLTestFile, jobjectArray importPaths)
+JNICALL int runQMLTests(JNIEnv* env, jclass, jstring pathToQMLTestFile, jobjectArray importPaths)
 {
     std::string path = JNIUtilities::toString(env, pathToQMLTestFile);
     const int32_t count = env->GetArrayLength(importPaths);
@@ -153,7 +153,7 @@ JNICALL void addImageProvider(JNIEnv* env, jclass, jstring id, jobject c)
 {
     if (ApplicationFunctions::check(env))
     {
-        ApplicationFunctions::get()->addImageProvider(
+        ApplicationFunctions::get()->addImageProviderObject(
             env, JNIUtilities::toQString(env, id), c);
     }
 }
@@ -162,7 +162,7 @@ JNICALL jobjectArray getScreens(JNIEnv* env, jclass)
 {
     if (ApplicationFunctions::check(env))
     {
-        QList<QScreen*> screens = ApplicationFunctions::get()->getScreens();
+        QList<QScreen*> screens = ApplicationFunctions::get()->getScreensList();
         jobjectArray array = ApplicationFunctions::get()->createJScreenArray(env, screens.length());
         for (int32_t i= 0; i < screens.length(); ++i)
         {
@@ -258,6 +258,9 @@ jmethodID ApplicationFunctions::bufferedImageGetHeight;
 jmethodID ApplicationFunctions::bufferedImageGetRGB;
 JNIEnv* ApplicationFunctions::lastEnv = nullptr;
 
+
+//JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
+//JNICALL void invokeWithDelay(JNIEnv* env, jclass, jobject callback, jint delayMilli)
 void ApplicationFunctions::initialize(JNIEnv* env)
 {
     lastEnv = env;
@@ -275,7 +278,21 @@ void ApplicationFunctions::initialize(JNIEnv* env)
 
     // TODO
     static JNINativeMethod methods[] = {
-        JNIUtilities::createJNIMethod("createQApplication",    "([Ljava/lang/String;)V",    (void *)&createQApplication)
+        JNIUtilities::createJNIMethod("createQApplication",    "([Ljava/lang/String;)V",    (void *)&createQApplication),
+        JNIUtilities::createJNIMethod("deleteQApplication",    "()V",    (void *)&deleteQApplication),
+        JNIUtilities::createJNIMethod("execQApplication",    "()V",    (void *)&execQApplication),
+        JNIUtilities::createJNIMethod("getCompileQtVersion",    "()Ljava/lang/String;",    (void *)&getCompileQtVersion),
+        JNIUtilities::createJNIMethod("getRuntimeQtVersion",    "()Ljava/lang/String;",    (void *)&getRuntimeQtVersion),
+        JNIUtilities::createJNIMethod("loadQMLFile",    "(Ljava/lang/String;)V",    (void *)&loadQMLFile),
+        JNIUtilities::createJNIMethod("reloadQMLFile",    "(Ljava/lang/String;)V",    (void *)&reloadQMLFile),
+        JNIUtilities::createJNIMethod("unloadQMLFile",    "()V",    (void *)&unloadQMLFile),
+        JNIUtilities::createJNIMethod("setLoggingCallback",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/LoggingCallback;)V",    (void *)&setLoggingCallback),
+        JNIUtilities::createJNIMethod("quitQApplication",    "()V",    (void *)&quitQApplication),
+        JNIUtilities::createJNIMethod("runQMLTests",    "(Ljava/lang/String;[Ljava/lang/String;)I",    (void *)&runQMLTests),
+        JNIUtilities::createJNIMethod("addImageProvider",    "(Ljava/lang/String;Lcom/github/sdankbar/qml/cpp/jni/interfaces/ImageProviderCallback;)V",    (void *)&addImageProvider),
+        JNIUtilities::createJNIMethod("getScreens",    "()[Lcom/github/sdankbar/qml/JScreen;",    (void *)&getScreens),
+        JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
+        JNIUtilities::createJNIMethod("invokeWithDelay",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;I)V",    (void *)&invokeWithDelay),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
@@ -378,7 +395,7 @@ GenericFlatTreeModel* ApplicationFunctions::createGenericFlatTreeModel(const QSt
 }
 */
 
-void ApplicationFunctions::loadQMLFile(const QString& filePath)
+void ApplicationFunctions::loadQML(const QString& filePath)
 {
     m_qmlEngine->load(filePath);
 }
@@ -398,24 +415,24 @@ void ApplicationFunctions::unloadQML()
     m_qmlEngine->clearComponentCache();
 }
 
-void ApplicationFunctions::reloadQMLFile(const QString& filePath)
+void ApplicationFunctions::reloadQML(const QString& filePath)
 {
     unloadQML();
-    loadQMLFile(filePath);
+    loadQML(filePath);
 }
 
-void ApplicationFunctions::setLoggingCallback(jobject callbackObject)
+void ApplicationFunctions::setLoggingObject(jobject callbackObject)
 {
     m_logging.setCallback(callbackObject);
 }
 
-void ApplicationFunctions::addImageProvider(JNIEnv* env, const QString& id, jobject javaImageProviderCallback)
+void ApplicationFunctions::addImageProviderObject(JNIEnv* env, const QString& id, jobject javaImageProviderCallback)
 {
     m_qmlEngine->addImageProvider(
                 id, new QMLImageProvider(createImageProviderFunctionCallback(env, javaImageProviderCallback)));
 }
 
-QList<QScreen*> ApplicationFunctions::getScreens()
+QList<QScreen*> ApplicationFunctions::getScreensList()
 {
     return m_qapp->screens();
 }

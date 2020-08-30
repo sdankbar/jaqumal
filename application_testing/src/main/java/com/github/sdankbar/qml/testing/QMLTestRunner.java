@@ -44,7 +44,7 @@ public class QMLTestRunner {
 	}
 
 	public void run() {
-		final int r = ApplicationFunctions.runQMLTest(pathToQMLTests.getAbsolutePath(), importPaths);
+		final int r = ApplicationFunctions.runQMLTests(pathToQMLTests.getAbsolutePath(), importPaths);
 		if (r != 0) {
 			throw new AssertionError("QML unit test failure(s)");
 		}

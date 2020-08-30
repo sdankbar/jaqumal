@@ -23,11 +23,11 @@
 package com.github.sdankbar.qml.cpp.jni;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.sdankbar.qml.JScreen;
 import com.github.sdankbar.qml.cpp.jni.interfaces.ImageProviderCallback;
 import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
 import com.github.sdankbar.qml.cpp.jni.interfaces.LoggingCallback;
@@ -93,7 +93,7 @@ public final class ApplicationFunctions {
 	/**
 	 * Unloads the currently loaded QML.
 	 */
-	public static native void unloadQML();
+	public static native void unloadQMLFile();
 
 	/**
 	 * Sets the callback to call when C++ wants to log.
@@ -114,7 +114,7 @@ public final class ApplicationFunctions {
 	 *                          for files to import.
 	 * @return 0 on test success, 1 on failure.
 	 */
-	public static native int runQMLTest(final String pathToQMLTestFile, final String[] importPaths);
+	public static native int runQMLTests(final String pathToQMLTestFile, final String[] importPaths);
 
 	/**
 	 * Registers a new image provider.
@@ -125,9 +125,9 @@ public final class ApplicationFunctions {
 	public static native void addImageProvider(final String id, final ImageProviderCallback c);
 
 	/**
-	 * @return Buffer containing number of screens, then dpi and rectangles.
+	 * @return Array of screens.
 	 */
-	public static native ByteBuffer getScreens();
+	public static native JScreen[] getScreens();
 
 	/**
 	 * Invokes a callback on the Qt thread.
