@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "qmlimageprovider.h"
-#include "qmlinterface.h"
 
 QMLImageProvider::QMLImageProvider(std::function<QImage(std::string,int32_t,int32_t)> callback) :
     QQuickImageProvider(QQuickImageProvider::Image),

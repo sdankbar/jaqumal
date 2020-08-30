@@ -49,7 +49,6 @@ SOURCES += \
     impl/genericflattreemodel.cpp \
     impl/listmodelfunctions.cpp \
     impl/qmllogging.cpp \
-    impl/qmlinterface.cpp \
     impl/eventdispatcher.cpp \
     impl/singletonmodelfunctions.cpp \
     impl/userinputsimulator.cpp \
@@ -72,7 +71,6 @@ HEADERS += \
     include/genericobjectmodel.h \
     include/genericflattreemodel.h \
     include/qmllogging.h \
-    include/qmlinterface.h \
     include/eventdispatcher.h \
     include/singletonmodelfunctions.h \
     include/userinputsimulator.h \

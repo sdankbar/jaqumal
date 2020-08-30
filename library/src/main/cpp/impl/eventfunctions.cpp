@@ -43,22 +43,39 @@
 #include <QQmlContext>
 #include <QQuickWindow>
 #include <iostream>
-#include <csignal>
+#include <applicationfunctions.h>
+#include <qmldatatransfer.h>
+
+JNICALL void addEventCallback(JNIEnv* env, jclass, jobject eventCallback)
+{
+    //EventBuilder::addEventHandler(std::function<void*(const char*, void*, int32_t)>(c));
+}
 
 //
 JNICALL void sendQMLEvent(JNIEnv* env, jclass, jstring eventName, jobjectArray keys)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        QVariantMap map;
+        const size_t count = env->GetArrayLength(keys);
+        for (size_t i = 0; i < count; ++i)
+        {
+            jstring jStr = static_cast<jstring>(env->GetObjectArrayElement(keys, i));
+            map.insert(JNIUtilities::toQString(env, jStr), QMLDataTransfer::retrieve(i));
+        }
+        EventDispatcher::sendToDispatchers(JNIUtilities::toQString(env, eventName), map);
+    }
 }
 
 void EventFunctions::initialize(JNIEnv* env)
 {
     // TODO
     JNINativeMethod methods[] = {
-        JNIUtilities::createJNIMethod("sendQMLEvent",    "(Ljava/lang/String;[Ljava/lang/String;)V",    (void *)&sendQMLEvent)
+        JNIUtilities::createJNIMethod("sendQMLEvent",    "(Ljava/lang/String;[Ljava/lang/String;)V",    (void *)&sendQMLEvent),
+        JNIUtilities::createJNIMethod("addEventCallback",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/EventCallback;)V",    (void *)&addEventCallback)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/EventFunctions");
-    env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
+    env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));
     env->DeleteLocalRef(javaClass);
 }
 

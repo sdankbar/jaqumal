@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "genericlistmodel.h"
-#include "qmlinterface.h"
 #include "applicationfunctions.h"
 
 void* createGenericListModel(const char* modelName, char** roleNames, int32_t* roleIndices, int32_t length)

@@ -218,6 +218,22 @@ void QMLDataTransfer::uninitialize(JNIEnv*)
 
 }
 
+const QVariant& QMLDataTransfer::retrieve(size_t i)
+{
+    return variants[i];
+}
+
+void QMLDataTransfer::retrieve(QVariant& var, size_t i)
+{
+    var.swap(variants[i]);
+}
+
+void QMLDataTransfer::retrieve(QVariant& var, int32_t& role, size_t i)
+{
+    var.swap(variants[i]);
+    role = roleStack[i];
+}
+
 QMLDataTransfer::QMLDataTransfer()
 {
     // Empty Implementation

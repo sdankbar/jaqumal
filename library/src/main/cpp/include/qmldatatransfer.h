@@ -45,6 +45,10 @@ public:
         roleStack.push_back(role);
     }
 
+    static const QVariant& retrieve(size_t i);
+    static void retrieve(QVariant& var, size_t i);
+    static void retrieve(QVariant& var, int32_t& role, size_t i);
+
 private:
     QMLDataTransfer();
 

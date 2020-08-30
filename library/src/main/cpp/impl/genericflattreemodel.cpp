@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "genericflattreemodel.h"
-#include "qmlinterface.h"
 #include <applicationfunctions.h>
 
 namespace

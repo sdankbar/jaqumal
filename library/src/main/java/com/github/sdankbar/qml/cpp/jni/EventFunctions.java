@@ -31,9 +31,7 @@ public class EventFunctions {
 	 * @param c The callback. Caller is responsible to ensuring the EventCallback
 	 *          object is not garbage collected.
 	 */
-	public static void addEventCallback(final EventCallback c) {
-		// TODO
-	}
+	public static native void addEventCallback(final EventCallback c);
 
 	public static native void sendQMLEvent(final String eventName, final String[] keys);
 

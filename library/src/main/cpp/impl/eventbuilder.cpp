@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "eventbuilder.h"
-#include "qmlinterface.h"
 #include "iostream"
 #include <QColor>
 #include <QDateTime>

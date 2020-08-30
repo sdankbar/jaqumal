@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "genericobjectmodel.h"
-#include "qmlinterface.h"
 #include <iostream>
 #include <applicationfunctions.h>
 #include <memory>
@@ -152,7 +151,8 @@ QVariant GenericObjectModel::getData(int32_t roleIndex) const
     }
     else
     {
-        exceptionHandler("Role does not exist");
+        //exceptionHandler("Role does not exist");
+        // TODO throw
         return QVariant();
     }
 }
@@ -175,7 +175,8 @@ void GenericObjectModel::setData(const QVariant& data, int32_t roleIndex)
     }
     else
     {
-        exceptionHandler("Role does not exist");
+        // TODO throw
+        //exceptionHandler("Role does not exist");
     }
 }
 
