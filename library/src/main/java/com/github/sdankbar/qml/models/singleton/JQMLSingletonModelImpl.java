@@ -29,8 +29,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.jni.singleton.SingletonQMLAPIFast;
-import com.github.sdankbar.qml.cpp.jni.singleton.SingletonQMLAPIFast.MapChangeCallback;
+import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
+import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions.MapChangeCallback;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
 import com.sun.jna.Pointer;
@@ -97,7 +97,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 			indexLookup.put(name, Integer.valueOf(i++));
 		}
 
-		modelPointer = new Pointer(SingletonQMLAPIFast.createGenericObjectModel(modelName, roleArray));
+		modelPointer = new Pointer(SingletonModelFunctions.createGenericObjectModel(modelName, roleArray));
 
 		mapAccessor.setModelPointer(modelPointer);
 	}
@@ -111,7 +111,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	public void registerChangeListener(final ChangeListener l) {
 		verifyEventLoopThread();
 		if (!changeCallback.hasListeners()) {
-			SingletonQMLAPIFast.registerValueChangedCallback(Pointer.nativeValue(modelPointer), changeCallback);
+			SingletonModelFunctions.registerValueChangedCallback(Pointer.nativeValue(modelPointer), changeCallback);
 		}
 		changeCallback.addListener(Objects.requireNonNull(l, "l is null"));
 	}

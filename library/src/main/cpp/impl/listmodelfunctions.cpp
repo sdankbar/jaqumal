@@ -162,7 +162,7 @@ void ListModelFunctions::initialize(JNIEnv* env)
 
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/list/ListModelFunctions");
-    env->RegisterNatives(javaClass, methods, sizeof(methods));
+    env->RegisterNatives(javaClass, methods, sizeof(methods)/sizeof(JNINativeMethod));
     env->DeleteLocalRef(javaClass);
 }
 

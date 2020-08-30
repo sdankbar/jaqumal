@@ -25,7 +25,7 @@ package com.github.sdankbar.qml.cpp.jni.singleton;
 import com.github.sdankbar.qml.JVariant;
 import com.sun.jna.Callback;
 
-public class SingletonQMLAPIFast {
+public class SingletonModelFunctions {
 
 	/**
 	 * Interface for getting callbacks from the C++ Singleton model that a value has
@@ -77,7 +77,7 @@ public class SingletonQMLAPIFast {
 
 	public static native void setGenericObjectModelData(long modelPointer);
 
-	private SingletonQMLAPIFast() {
+	private SingletonModelFunctions() {
 		// Empty Implementation
 	}
 

@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.jni.singleton.SingletonQMLAPIFast;
+import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.MapAccessor;
 import com.sun.jna.Pointer;
@@ -52,13 +52,13 @@ public class SingletonMapAccessor extends MapAccessor {
 
 	@Override
 	public void clear() {
-		SingletonQMLAPIFast.clearGenericObjectModel(Pointer.nativeValue(modelPointer));
+		SingletonModelFunctions.clearGenericObjectModel(Pointer.nativeValue(modelPointer));
 
 	}
 
 	@Override
 	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
-		final JVariant received = SingletonQMLAPIFast.getGenericObjectModelData(Pointer.nativeValue(modelPointer),
+		final JVariant received = SingletonModelFunctions.getGenericObjectModelData(Pointer.nativeValue(modelPointer),
 				roleIndex);
 		return Optional.ofNullable(received);
 	}
@@ -67,7 +67,7 @@ public class SingletonMapAccessor extends MapAccessor {
 	public Optional<JVariant> remove(final int roleIndex, final IntByReference length) {
 		final Optional<JVariant> existingValue = get(roleIndex, length);
 
-		SingletonQMLAPIFast.clearGenericObjectModelRole(Pointer.nativeValue(modelPointer), roleIndex);
+		SingletonModelFunctions.clearGenericObjectModelRole(Pointer.nativeValue(modelPointer), roleIndex);
 
 		return existingValue;
 	}
@@ -76,7 +76,7 @@ public class SingletonMapAccessor extends MapAccessor {
 	public void set(final JVariant value, final int roleIndex) {
 		value.serialize(javaToCppMemory);
 		// TODO
-		SingletonQMLAPIFast.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
+		SingletonModelFunctions.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
 
 	}
 
@@ -93,7 +93,7 @@ public class SingletonMapAccessor extends MapAccessor {
 
 		JVariant.serialize(values, javaToCppMemory);
 		// TODO
-		SingletonQMLAPIFast.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
+		SingletonModelFunctions.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
 
 	}
 

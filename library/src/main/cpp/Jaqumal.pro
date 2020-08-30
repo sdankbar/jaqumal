@@ -41,6 +41,7 @@ INCLUDEPATH += "C:\Program Files\Java\jdk-14.0.2\include" \
 SOURCES += \
     impl/applicationfunctions.cpp \
     impl/eventfunctions.cpp \
+    impl/flattreemodelfunctions.cpp \
     impl/fontfunctions.cpp \
     impl/genericlistmodel.cpp \
     impl/eventbuilder.cpp \
@@ -50,6 +51,7 @@ SOURCES += \
     impl/qmllogging.cpp \
     impl/qmlinterface.cpp \
     impl/eventdispatcher.cpp \
+    impl/singletonmodelfunctions.cpp \
     impl/userinputsimulator.cpp \
     impl/qmlimageprovider.cpp \
     impl/jpolyline.cpp \
@@ -60,6 +62,7 @@ SOURCES += \
 HEADERS += \
     include/applicationfunctions.h \
     include/eventfunctions.h \
+    include/flattreemodelfunctions.h \
     include/fontfunctions.h \
     include/jniutilities.h \
     include/listmodelfunctions.h \
@@ -71,6 +74,7 @@ HEADERS += \
     include/qmllogging.h \
     include/qmlinterface.h \
     include/eventdispatcher.h \
+    include/singletonmodelfunctions.h \
     include/userinputsimulator.h \
     include/qmlimageprovider.h \
     include/jpolyline.h \

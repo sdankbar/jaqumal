@@ -27,6 +27,10 @@
 #include "eventfunctions.h"
 #include "fontfunctions.h"
 
+#include "flattreemodelfunctions.h"
+#include "singletonmodelfunctions.h"
+#include "listmodelfunctions.h"
+
 #include <iostream>
 
 jint JNI_OnLoad(JavaVM* vm, void*)
@@ -44,6 +48,9 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     ApplicationFunctions::initialize(env);
     EventFunctions::initialize(env);
     FontFunctions::initialize(env);
+    FlatTreeModelFunctions::initialize(env);
+    ListModelFunctions::initialize(env);
+    SingletonModelFunctions::initialize(env);
 
     // Return the JNI Version as required by method
     return JNI_VERSION_1_2;
