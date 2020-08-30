@@ -58,7 +58,7 @@ void EventFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("sendQMLEvent",    "(Ljava/lang/String;[Ljava/lang/String;)V",    (void *)&sendQMLEvent)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/EventFunctions");
-    env->RegisterNatives(javaClass, methods, sizeof(methods));
+    env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
     env->DeleteLocalRef(javaClass);
 }
 

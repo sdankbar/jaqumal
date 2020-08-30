@@ -134,7 +134,7 @@ void FontFunctions::initialize(JNIEnv* env)
 
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/FontFunctions");
-    env->RegisterNatives(javaClass, methods, sizeof(methods));
+    //env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
     env->DeleteLocalRef(javaClass);
 }
 

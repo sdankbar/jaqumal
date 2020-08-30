@@ -209,7 +209,7 @@ void QMLDataTransfer::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("setPolyline",    "(I[DI)V",    (void *)&setPolyline),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/data_transfer/QMLDataTransfer");
-    env->RegisterNatives(javaClass, methods, sizeof(methods));
+    env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
     env->DeleteLocalRef(javaClass);
 }
 
