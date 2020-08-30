@@ -44,12 +44,12 @@ public:
 
     void exec();
     void quitApplication();
-    void loadQMLFile(const QString& filePath);
+    void loadQML(const QString& filePath);
     void unloadQML();
-    void reloadQMLFile(const QString& filePath);
-    void setLoggingCallback(jobject callbackObject);
-    void addImageProvider(JNIEnv* env, const QString& id, jobject javaImageProviderCallback);
-    QList<QScreen*> getScreens();
+    void reloadQML(const QString& filePath);
+    void setLoggingObject(jobject callbackObject);
+    void addImageProviderObject(JNIEnv* env, const QString& id, jobject javaImageProviderCallback);
+    QList<QScreen*> getScreensList();
     jobjectArray createJScreenArray(JNIEnv* env, int32_t length);
     jobject createJScreen(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h, double dpi);
     std::function<QImage(std::string,int32_t,int32_t)> createImageProviderFunctionCallback(JNIEnv* env, jobject obj);
