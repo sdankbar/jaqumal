@@ -27,7 +27,7 @@ import com.github.sdankbar.qml.JVariant;
 /**
  * Interface to call C++ functions for controlling Flat Tree models.
  */
-public class FlatTreeQMLAPIFast {
+public class FlatTreeModelFunctions {
 
 	/**
 	 * Creates a new FlatTreeModel.
@@ -89,7 +89,7 @@ public class FlatTreeQMLAPIFast {
 
 	public static native void setGenericFlatTreeModelData(long modelPointer, int[] indices);
 
-	private FlatTreeQMLAPIFast() {
+	private FlatTreeModelFunctions() {
 		// Empty Implementation
 	}
 

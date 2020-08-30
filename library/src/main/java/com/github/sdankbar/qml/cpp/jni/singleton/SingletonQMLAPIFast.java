@@ -77,8 +77,6 @@ public class SingletonQMLAPIFast {
 
 	public static native void setGenericObjectModelData(long modelPointer);
 
-	public static native void setGenericObjectModelDataMulti(long modelPointer);
-
 	private SingletonQMLAPIFast() {
 		// Empty Implementation
 	}

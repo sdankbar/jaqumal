@@ -93,7 +93,7 @@ public class SingletonMapAccessor extends MapAccessor {
 
 		JVariant.serialize(values, javaToCppMemory);
 		// TODO
-		SingletonQMLAPIFast.setGenericObjectModelDataMulti(Pointer.nativeValue(modelPointer));
+		SingletonQMLAPIFast.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
 
 	}
 

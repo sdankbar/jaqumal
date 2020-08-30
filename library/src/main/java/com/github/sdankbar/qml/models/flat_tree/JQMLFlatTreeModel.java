@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.jni.flat_tree.FlatTreeQMLAPIFast;
+import com.github.sdankbar.qml.cpp.jni.flat_tree.FlatTreeModelFunctions;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.github.sdankbar.qml.models.TreePath;
 import com.google.common.base.Preconditions;
@@ -161,7 +161,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 		indexLookup.put("FLAT_INDEX_INDEX", Integer.valueOf(indicesArray[keySet.size() + 2]));
 
 		verifyEventLoopThread();
-		modelPointer = new Pointer(FlatTreeQMLAPIFast.createGenericFlatTreeModel(modelName, roleArray, indicesArray));
+		modelPointer = new Pointer(FlatTreeModelFunctions.createGenericFlatTreeModel(modelName, roleArray, indicesArray));
 
 		accessor.setModelPointer(modelPointer);
 	}
@@ -183,7 +183,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 		data.serialize(accessor.getJavaToCppMemory());
 		final Pointer indiciesMem = p.serialize();
 		// TODO
-		final int newIndex = FlatTreeQMLAPIFast.appendGenericFlatTreeModelData(Pointer.nativeValue(modelPointer),
+		final int newIndex = FlatTreeModelFunctions.appendGenericFlatTreeModelData(Pointer.nativeValue(modelPointer),
 				p.toArray());
 
 		createNode(root, TreePath.of(p, newIndex), 0);
@@ -217,7 +217,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 
 		JVariant.serialize(valueList, accessor.getJavaToCppMemory());
 		// TODO
-		final int newIndex = FlatTreeQMLAPIFast.appendGenericFlatTreeModelData(Pointer.nativeValue(modelPointer),
+		final int newIndex = FlatTreeModelFunctions.appendGenericFlatTreeModelData(Pointer.nativeValue(modelPointer),
 				p.toArray());
 
 		path = TreePath.of(path, newIndex);
@@ -327,7 +327,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 		final Pointer indiciesMem = p.serialize();
 		data.serialize(accessor.getJavaToCppMemory());
 		// TODO
-		FlatTreeQMLAPIFast.insertGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), p.toArray());
+		FlatTreeModelFunctions.insertGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), p.toArray());
 
 		createNode(root, p, 0);
 		resetMapIndicies(p.removeLast());
@@ -354,7 +354,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 
 		verifyEventLoopThread();
 		final Pointer indiciesMem = p.serialize();
-		final boolean a = FlatTreeQMLAPIFast.isGenericFlatTreeModelRolePresent(Pointer.nativeValue(modelPointer),
+		final boolean a = FlatTreeModelFunctions.isGenericFlatTreeModelRolePresent(Pointer.nativeValue(modelPointer),
 				p.toArray(), indexLookup.get(role.toString()).intValue());
 
 		return a;
@@ -376,7 +376,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 		Preconditions.checkArgument(!p.equals(TreePath.of()), "Cannot remove root node");
 		verifyEventLoopThread();
 		final Pointer indiciesMem = p.serialize();
-		FlatTreeQMLAPIFast.eraseGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), p.toArray());
+		FlatTreeModelFunctions.eraseGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), p.toArray());
 
 		final Optional<Node<K>> n = removeNode(root, p, 0);
 		if (n.isPresent()) {
@@ -476,7 +476,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 		Objects.requireNonNull(p, "p is null");
 		verifyEventLoopThread();
 		final Pointer indiciesMem = p.serialize();
-		final int a = FlatTreeQMLAPIFast.getGenericFlatTreeModelSize(Pointer.nativeValue(modelPointer), p.toArray());
+		final int a = FlatTreeModelFunctions.getGenericFlatTreeModelSize(Pointer.nativeValue(modelPointer), p.toArray());
 
 		return a;
 	}
@@ -507,7 +507,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 			}
 
 			final Pointer indiciesMem = p.serialize();
-			FlatTreeQMLAPIFast.reorderGenericFlatTreeModel(Pointer.nativeValue(modelPointer), p.toArray(), ordering);
+			FlatTreeModelFunctions.reorderGenericFlatTreeModel(Pointer.nativeValue(modelPointer), p.toArray(), ordering);
 
 			resetMapIndicies(p);
 		}
