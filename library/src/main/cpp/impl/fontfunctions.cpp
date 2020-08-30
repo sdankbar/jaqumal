@@ -280,7 +280,7 @@ jmethodID FontFunctions::rectangleConstructor;
 
 void FontFunctions::initialize(JNIEnv* env)
 {
-    rectangleClass = JNIUtilities::findClassGlobalReference(env, "java.awt.Rectangle");
+    rectangleClass = JNIUtilities::findClassGlobalReference(env, "java/awt/Rectangle");
     rectangleConstructor = env->GetMethodID(rectangleClass, "<init>", "(IIII)V");
 
     // TODO
