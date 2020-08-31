@@ -243,7 +243,8 @@ bool ApplicationFunctions::check(JNIEnv* env)
 void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const std::string& msg)
 {
     jstring javaStr = lastEnv->NewStringUTF(msg.c_str());
-    lastEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
+    // TODO
+    //lastEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
 }
 
 jclass ApplicationFunctions::loggingCallback;
@@ -258,9 +259,6 @@ jmethodID ApplicationFunctions::bufferedImageGetHeight;
 jmethodID ApplicationFunctions::bufferedImageGetRGB;
 JNIEnv* ApplicationFunctions::lastEnv = nullptr;
 
-
-//JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
-//JNICALL void invokeWithDelay(JNIEnv* env, jclass, jobject callback, jint delayMilli)
 void ApplicationFunctions::initialize(JNIEnv* env)
 {
     lastEnv = env;
@@ -369,14 +367,6 @@ void ApplicationFunctions::invokeCallback(JNIEnv* env, jobject c)
 }
 
 /*
-GenericObjectModel* ApplicationFunctions::createGenericObjectModel(const QString& modelName, const std::vector<QString>& roles)
-{
-
-}
-
-
-
-
 GenericFlatTreeModel* ApplicationFunctions::createGenericFlatTreeModel(const QString& modelName, const QStringList& roleNames,
                                         const QVector<int>& indices)
 {
