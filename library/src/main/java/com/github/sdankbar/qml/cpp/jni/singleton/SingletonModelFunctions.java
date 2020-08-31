@@ -23,24 +23,9 @@
 package com.github.sdankbar.qml.cpp.jni.singleton;
 
 import com.github.sdankbar.qml.JVariant;
-import com.sun.jna.Callback;
+import com.github.sdankbar.qml.cpp.jni.interfaces.MapChangeCallback;
 
 public class SingletonModelFunctions {
-
-	/**
-	 * Interface for getting callbacks from the C++ Singleton model that a value has
-	 * changed.
-	 */
-	public interface MapChangeCallback extends Callback {
-		/**
-		 * Called when a value changes in the map.
-		 *
-		 * @param key          Key/Role name that changed.
-		 * @param newValueData Pointer to the new value.
-		 * @param dataLength   Length of the data pointed to by newValueData.
-		 */
-		void invoke(String key, JVariant data);
-	}
 
 	/**
 	 * Creates a new SingletonModel.

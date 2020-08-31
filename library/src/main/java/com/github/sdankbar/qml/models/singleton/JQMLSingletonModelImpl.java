@@ -29,8 +29,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.cpp.jni.interfaces.MapChangeCallback;
 import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
-import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions.MapChangeCallback;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
 import com.sun.jna.Pointer;

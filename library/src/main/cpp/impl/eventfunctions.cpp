@@ -63,6 +63,7 @@ JNICALL void sendQMLEvent(JNIEnv* env, jclass, jstring eventName, jobjectArray k
             jstring jStr = static_cast<jstring>(env->GetObjectArrayElement(keys, i));
             map.insert(JNIUtilities::toQString(env, jStr), QMLDataTransfer::retrieve(i));
         }
+        QMLDataTransfer::clearPendingData();
         EventDispatcher::sendToDispatchers(JNIUtilities::toQString(env, eventName), map);
     }
 }

@@ -23,6 +23,8 @@
 #pragma once
 
 #include <jni.h>
+#include <QString>
+#include <QQmlPropertyMap>
 
 class SingletonModelFunctions
 {
@@ -32,6 +34,47 @@ public:
 
 private:
 
+};
+
+class GenericObjectModel : public QQmlPropertyMap
+{
+    Q_OBJECT
+    Q_PROPERTY(const QString& modelName READ modelName)
+
+public:
+    explicit GenericObjectModel(const QString& modelName, const std::vector<QString>& roles);
+
+    const QString& modelName() const;
+
+    void setData(const std::vector<int32_t>& roleIndex);
+    Q_INVOKABLE void setData(const QVariant& data, const QString& propertyName);
+
+    Q_INVOKABLE QVariant getData(const QString& propertyName) const;
+    QVariant getData(int32_t roleIndex) const;
+
+
+    void clear(int32_t roleIndex);
+    void clear();
+
+    bool containsRole(int32_t roleIndex);
+
+    void registerValueChangedCallback(std::function<void(const char*, const char*, int32_t)> c);
+
+private slots:
+
+    void onValueChanged(const QString& key, const QVariant& value);
+
+private:
+
+    void setData(const QVariant& data, int32_t roleIndex);
+    void callbackListeners(const QString& key, const QVariant& newValue);
+
+    // Member variables
+    QString m_modelName;
+
+    std::vector<QString> m_roleMap;
+
+    std::vector<std::function<void(const char*, const char*, int32_t)> > callbacks;
 };
 
 

@@ -40,7 +40,7 @@
 #include <functional>
 #include <genericflattreemodel.h>
 #include <genericlistmodel.h>
-#include <genericobjectmodel.h>
+#include <singletonmodelfunctions.h>
 
 #include "qmlimageprovider.h"
 #include <QQmlContext>
@@ -276,7 +276,6 @@ void ApplicationFunctions::initialize(JNIEnv* env)
     bufferedImageGetHeight= env->GetMethodID(bufferedImageClass, "getHeight", "()I");
     bufferedImageGetRGB= env->GetMethodID(bufferedImageClass, "getRGB", "(IIII[III)[I");
 
-    // TODO
     static JNINativeMethod methods[] = {
         JNIUtilities::createJNIMethod("createQApplication",    "([Ljava/lang/String;)V",    (void *)&createQApplication),
         JNIUtilities::createJNIMethod("deleteQApplication",    "()V",    (void *)&deleteQApplication),
@@ -372,9 +371,7 @@ void ApplicationFunctions::invokeCallback(JNIEnv* env, jobject c)
 /*
 GenericObjectModel* ApplicationFunctions::createGenericObjectModel(const QString& modelName, const std::vector<QString>& roles)
 {
-    GenericObjectModel* modelPtr = new GenericObjectModel(modelName, roles);
-    m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
-    return modelPtr;
+
 }
 
 
@@ -473,4 +470,9 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
     memcpy(copy, jData, copyLength);
     env->ReleaseIntArrayElements(pixelData, jData, JNI_ABORT);
     return QImage(copy, w, h, QImage::Format_ARGB32, &cleanupMemory2);
+}
+
+void ApplicationFunctions::addToContext(const QString& name, const QVariant& value)
+{
+    m_qmlEngine->rootContext()->setContextProperty(name, value);
 }

@@ -54,10 +54,12 @@ public:
     jobject createJScreen(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h, double dpi);
     std::function<QImage(std::string,int32_t,int32_t)> createImageProviderFunctionCallback(JNIEnv* env, jobject obj);
 
+    void addToContext(const QString& name, const QVariant& value);
+
     template<typename T>
     void addToContext(const QString& name, T* ptr)
     {
-        m_qmlEngine->rootContext()->setContextProperty(name, QVariant::fromValue(ptr));
+        addToContext(name, QVariant::fromValue(ptr));
     }
 public slots:
     void invokeCallback(JNIEnv* env, jobject c);

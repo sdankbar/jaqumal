@@ -234,6 +234,22 @@ void QMLDataTransfer::retrieve(QVariant& var, int32_t& role, size_t i)
     role = roleStack[i];
 }
 
+jobject QMLDataTransfer::toJVariant(const QVariant& value)
+{
+    // TODO
+    return nullptr;
+}
+
+const std::vector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
+{
+    return roleStack;
+}
+
+void QMLDataTransfer::clearPendingData()
+{
+    roleStack.clear();
+}
+
 QMLDataTransfer::QMLDataTransfer()
 {
     // Empty Implementation

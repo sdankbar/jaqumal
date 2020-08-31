@@ -42,16 +42,37 @@
 #include "qmlimageprovider.h"
 #include <QQmlContext>
 #include <QQuickWindow>
-#include <iostream>
+#include <applicationfunctions.h>
+#include <qmldatatransfer.h>
 
 /*
  * Class:     com_github_sdankbar_qml_cpp_jni_singleton_SingletonQMLAPIFast
  * Method:    createGenericObjectModel
  * Signature: (Ljava/lang/String;[Ljava/lang/String;)J
  */
-jlong JNICALL createGenericObjectModel(JNIEnv *, jclass, jstring, jobjectArray)
+jlong JNICALL createGenericObjectModel(JNIEnv* env, jclass, jstring modelName, jobjectArray roleStrings)
 {
+    if (ApplicationFunctions::check(env))
+    {
+        QString modelNameStr = JNIUtilities::toQString(env, modelName);
 
+        const size_t length = env->GetArrayLength(roleStrings);
+        std::vector<QString> roles;
+        for (size_t i = 0; i < length; ++i)
+        {
+            jstring jStr = static_cast<jstring>(env->GetObjectArrayElement(roleStrings, i));
+            QString n = JNIUtilities::toQString(env, jStr);
+            roles.push_back(n);
+        }
+
+        GenericObjectModel* modelPtr = new GenericObjectModel(modelNameStr, roles);
+        ApplicationFunctions::get()->addToContext(modelNameStr, modelPtr);
+        return reinterpret_cast<jlong>(modelPtr);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 /*
@@ -59,9 +80,13 @@ jlong JNICALL createGenericObjectModel(JNIEnv *, jclass, jstring, jobjectArray)
  * Method:    clearGenericObjectModel
  * Signature: (J)V
  */
-void JNICALL clearGenericObjectModel(JNIEnv *, jclass, jlong)
+void JNICALL clearGenericObjectModel(JNIEnv* env, jclass, jlong longPtr)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
+        modelPtr->clear();
+    }
 }
 
 /*
@@ -69,9 +94,13 @@ void JNICALL clearGenericObjectModel(JNIEnv *, jclass, jlong)
  * Method:    clearGenericObjectModelRole
  * Signature: (JI)V
  */
-void JNICALL clearGenericObjectModelRole(JNIEnv *, jclass, jlong, jint)
+void JNICALL clearGenericObjectModelRole(JNIEnv* env, jclass, jlong longPtr, jint roleIndex)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
+        modelPtr->clear(roleIndex);
+    }
 }
 
 /*
@@ -79,9 +108,17 @@ void JNICALL clearGenericObjectModelRole(JNIEnv *, jclass, jlong, jint)
  * Method:    getGenericObjectModelData
  * Signature: (JI)Lcom/github/sdankbar/qml/JVariant;
  */
-jstring JNICALL getGenericObjectModelData(JNIEnv *, jclass, jlong, jint)
+jobject JNICALL getGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr, jint roleIndex)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
+        return QMLDataTransfer::toJVariant(modelPtr->getData(roleIndex));
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 /*
@@ -89,9 +126,17 @@ jstring JNICALL getGenericObjectModelData(JNIEnv *, jclass, jlong, jint)
  * Method:    isGenericObjectModelRolePresent
  * Signature: (JI)Z
  */
-jboolean JNICALL isGenericObjectModelRolePresent(JNIEnv *, jclass, jlong, jint)
+jboolean JNICALL isGenericObjectModelRolePresent(JNIEnv* env, jclass, jlong longPtr, jint roleIndex)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
+        return modelPtr->containsRole(roleIndex);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 /*
@@ -99,9 +144,14 @@ jboolean JNICALL isGenericObjectModelRolePresent(JNIEnv *, jclass, jlong, jint)
  * Method:    registerValueChangedCallback
  * Signature: (JLcom/github/sdankbar/qml/cpp/jni/singleton/SingletonQMLAPIFast/MapChangeCallback;)V
  */
-void JNICALL registerValueChangedCallback(JNIEnv *, jclass, jlong, jobject)
+void JNICALL registerValueChangedCallback(JNIEnv* env, jclass, jlong longPtr, jobject c)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
+        // TODO
+        // modelPtr->registerValueChangedCallback(c);
+    }
 }
 
 /*
@@ -109,16 +159,25 @@ void JNICALL registerValueChangedCallback(JNIEnv *, jclass, jlong, jobject)
  * Method:    setGenericObjectModelData
  * Signature: (J)V
  */
-void JNICALL setGenericObjectModelData(JNIEnv *, jclass, jlong)
+void JNICALL setGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr)
 {
-
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
+        modelPtr->setData(QMLDataTransfer::getPendingRoleIndices());
+    }
 }
 
 void SingletonModelFunctions::initialize(JNIEnv* env)
 {
-    // TODO
     JNINativeMethod methods[] = {
-
+        JNIUtilities::createJNIMethod("createGenericObjectModel",    "(Ljava/lang/String;[Ljava/lang/String;)J",    (void *)&createGenericObjectModel),
+        JNIUtilities::createJNIMethod("clearGenericObjectModel",    "(J)V",    (void *)&clearGenericObjectModel),
+        JNIUtilities::createJNIMethod("clearGenericObjectModelRole",    "(JI)V",    (void *)&clearGenericObjectModelRole),
+        JNIUtilities::createJNIMethod("getGenericObjectModelData",    "(JI)Lcom/github/sdankbar/qml/JVariant;",    (void *)&getGenericObjectModelData),
+        JNIUtilities::createJNIMethod("isGenericObjectModelRolePresent",    "(JI)Z",    (void *)&isGenericObjectModelRolePresent),
+        JNIUtilities::createJNIMethod("registerValueChangedCallback",    "(JLcom/github/sdankbar/qml/cpp/jni/interfaces/MapChangeCallback;)V",  (void *)&registerValueChangedCallback),
+        JNIUtilities::createJNIMethod("setGenericObjectModelData",    "(J)V",    (void *)&setGenericObjectModelData),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/singleton/SingletonModelFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods)/sizeof(JNINativeMethod));
@@ -129,3 +188,122 @@ void SingletonModelFunctions::uninitialize(JNIEnv*)
 {
 
 }
+
+GenericObjectModel::GenericObjectModel(const QString& modelName, const std::vector<QString>& roles)
+    : QQmlPropertyMap(this, nullptr),
+      m_modelName(modelName),
+      m_roleMap(roles)
+{
+    const int32_t size = static_cast<int32_t>(roles.size());
+    for (int32_t i = 0; i < size; ++i)
+    {
+        setData(QVariant(), i);
+    }
+    QObject::connect(this, &QQmlPropertyMap::valueChanged, this, &GenericObjectModel::onValueChanged);
+}
+
+const QString& GenericObjectModel::modelName() const
+{
+    return m_modelName;
+}
+
+QVariant GenericObjectModel::getData(int32_t roleIndex) const
+{
+    if (0 <= roleIndex && static_cast<uint32_t>(roleIndex) < m_roleMap.size())
+    {
+        return value(m_roleMap[static_cast<uint32_t>(roleIndex)]);
+    }
+    else
+    {
+        //exceptionHandler("Role does not exist");
+        // TODO throw
+        return QVariant();
+    }
+}
+
+void GenericObjectModel::setData(const QVariant& data, int32_t roleIndex)
+{
+    if (0 <= roleIndex && static_cast<uint32_t>(roleIndex) < m_roleMap.size())
+    {
+        const QString& role = m_roleMap[static_cast<uint32_t>(roleIndex)];
+        if (value(role) != data)
+        {
+            insert(role, data);
+            emit valueChanged(role, data);
+        }
+    }
+    else
+    {
+        // TODO throw
+        //exceptionHandler("Role does not exist");
+    }
+}
+
+void GenericObjectModel::setData(const QVariant& data, const QString& propertyName)
+{
+    if (std::find(m_roleMap.begin(), m_roleMap.end(), propertyName) != m_roleMap.end())
+    {
+        if (value(propertyName) != data)
+        {
+            insert(propertyName, data);
+
+            callbackListeners(propertyName, data);
+        }
+    }
+}
+
+void GenericObjectModel::setData(const std::vector<int32_t>& roleIndex)
+{
+    for (size_t i = 0; i < roleIndex.size(); ++i)
+    {
+        setData(QMLDataTransfer::retrieve(i), roleIndex[i]);
+    }
+    QMLDataTransfer::clearPendingData();
+}
+
+QVariant GenericObjectModel::getData(const QString& propertyName) const
+{
+    return value(propertyName);
+}
+
+void GenericObjectModel::clear(int32_t roleIndex)
+{
+    setData(QVariant(), roleIndex);
+}
+
+void GenericObjectModel::clear()
+{
+    for (uint32_t i = 0; i < m_roleMap.size(); ++i)
+    {
+        clear(static_cast<int32_t>(i));
+    }
+}
+
+bool GenericObjectModel::containsRole(int32_t roleIndex)
+{
+    return getData(roleIndex) != QVariant();
+}
+
+void GenericObjectModel::onValueChanged(const QString& key, const QVariant& value)
+{
+    callbackListeners(key, value);
+}
+
+void GenericObjectModel::registerValueChangedCallback(std::function<void(const char*, const char*, int32_t)> c)
+{
+    callbacks.push_back(c);
+}
+
+void GenericObjectModel::callbackListeners(const QString& key, const QVariant& newValue)
+{
+    if (!callbacks.empty())
+    {
+        int32_t l;
+        //std::unique_ptr<char> data;//(fromQVariant(newValue, l, true));
+        for (const auto& f: callbacks)
+        {
+            //f(key.toStdString().c_str(), data.get(), l);
+        }
+    }
+}
+
