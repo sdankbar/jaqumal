@@ -22,8 +22,6 @@
  */
 package com.github.sdankbar.qml.models.singleton;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,24 +73,17 @@ public class SingletonMapAccessor extends MapAccessor {
 	@Override
 	public void set(final JVariant value, final int roleIndex) {
 		value.serialize(javaToCppMemory);
-		// TODO
+		value.sendToQML(roleIndex);
 		SingletonModelFunctions.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
 
 	}
 
 	@Override
 	public void set(final Map<Integer, JVariant> valuesMap) {
-		final List<JVariant> values = new ArrayList<>(valuesMap.size());
-		final int[] roles = new int[valuesMap.size()];
-		int i = 0;
 		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			values.add(e.getValue());
-			roles[i] = e.getKey().intValue();
-			++i;
+			e.getValue().sendToQML(e.getKey().intValue());
 		}
 
-		JVariant.serialize(values, javaToCppMemory);
-		// TODO
 		SingletonModelFunctions.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
 
 	}

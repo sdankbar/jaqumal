@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.sdankbar.qml.cpp.jni.data_transfer.QMLDataTransfer;
 import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.fonts.JFont;
 import com.google.common.base.Preconditions;
@@ -241,107 +242,107 @@ public class JVariant {
 
 		final Type t = TYPE_ARRAY[index];
 		switch (t) {
-		case BOOL: {
-			return Optional.of(new JVariant(buffer.get() != 0 ? Boolean.TRUE : Boolean.FALSE));
-		}
-		case BYTE_ARRAY: {
-			final int length = buffer.getInt();
-			final byte[] array = new byte[length];
-			buffer.get(array);
-			return Optional.of(new JVariant(array));
-		}
-		case COLOR: {
-			return Optional.of(new JVariant(new Color(buffer.getInt(), true)));
-		}
-		case DATE_TIME: {
-			return Optional.of(new JVariant(Instant.ofEpochSecond(buffer.getLong(), buffer.getInt())));
-		}
-		case DOUBLE: {
-			return Optional.of(new JVariant(buffer.getDouble()));
-		}
-		case FLOAT: {
-			return Optional.of(new JVariant(buffer.getFloat()));
-		}
-		case IMAGE: {
-			final int width = buffer.getInt();
-			final int height = buffer.getInt();
-			final BufferedImage v = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-			for (int r = 0; r < height; ++r) {
-				for (int c = 0; c < width; ++c) {
-					v.setRGB(c, r, buffer.getInt());
+			case BOOL: {
+				return Optional.of(new JVariant(buffer.get() != 0 ? Boolean.TRUE : Boolean.FALSE));
+			}
+			case BYTE_ARRAY: {
+				final int length = buffer.getInt();
+				final byte[] array = new byte[length];
+				buffer.get(array);
+				return Optional.of(new JVariant(array));
+			}
+			case COLOR: {
+				return Optional.of(new JVariant(new Color(buffer.getInt(), true)));
+			}
+			case DATE_TIME: {
+				return Optional.of(new JVariant(Instant.ofEpochSecond(buffer.getLong(), buffer.getInt())));
+			}
+			case DOUBLE: {
+				return Optional.of(new JVariant(buffer.getDouble()));
+			}
+			case FLOAT: {
+				return Optional.of(new JVariant(buffer.getFloat()));
+			}
+			case IMAGE: {
+				final int width = buffer.getInt();
+				final int height = buffer.getInt();
+				final BufferedImage v = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+				for (int r = 0; r < height; ++r) {
+					for (int c = 0; c < width; ++c) {
+						v.setRGB(c, r, buffer.getInt());
+					}
+				}
+				return Optional.of(new JVariant(v));
+			}
+			case INT: {
+				return Optional.of(new JVariant(buffer.getInt()));
+			}
+			case LINE: {
+				return Optional.of(new JVariant(new Line2D.Double(buffer.getDouble(), buffer.getDouble(),
+						buffer.getDouble(), buffer.getDouble())));
+			}
+			case LONG: {
+				return Optional.of(new JVariant(buffer.getLong()));
+			}
+			case POINT: {
+				return Optional.of(new JVariant(new Point2D.Double(buffer.getDouble(), buffer.getDouble())));
+			}
+			case RECTANGLE: {
+				return Optional.of(new JVariant(new Rectangle2D.Double(buffer.getDouble(), buffer.getDouble(),
+						buffer.getDouble(), buffer.getDouble())));
+			}
+			case REGULAR_EXPRESSION: {
+				final byte[] array = new byte[buffer.getInt()];
+				buffer.get(array);
+				final String s = new String(array, StandardCharsets.UTF_8);
+				return Optional.of(new JVariant(Pattern.compile(s)));
+			}
+			case SIZE: {
+				final double w = buffer.getDouble();
+				final double h = buffer.getDouble();
+				final Dimension temp = new Dimension();
+				temp.setSize(w, h);
+				return Optional.of(new JVariant(temp));
+			}
+			case STRING: {
+				final byte[] array = new byte[buffer.getInt()];
+				buffer.get(array);
+				final String s = new String(array, StandardCharsets.UTF_8);
+				return Optional.of(new JVariant(s));
+			}
+			case URL: {
+				final byte[] array = new byte[buffer.getInt()];
+				buffer.get(array);
+				final String s = new String(array, StandardCharsets.UTF_8);
+				try {
+					return Optional.of(new JVariant(new URL(s)));
+				} catch (final MalformedURLException e) {
+					logger.warn("Failed to deserialize JVariant into URL", e);
+					return Optional.empty();
 				}
 			}
-			return Optional.of(new JVariant(v));
-		}
-		case INT: {
-			return Optional.of(new JVariant(buffer.getInt()));
-		}
-		case LINE: {
-			return Optional.of(new JVariant(
-					new Line2D.Double(buffer.getDouble(), buffer.getDouble(), buffer.getDouble(), buffer.getDouble())));
-		}
-		case LONG: {
-			return Optional.of(new JVariant(buffer.getLong()));
-		}
-		case POINT: {
-			return Optional.of(new JVariant(new Point2D.Double(buffer.getDouble(), buffer.getDouble())));
-		}
-		case RECTANGLE: {
-			return Optional.of(new JVariant(new Rectangle2D.Double(buffer.getDouble(), buffer.getDouble(),
-					buffer.getDouble(), buffer.getDouble())));
-		}
-		case REGULAR_EXPRESSION: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(Pattern.compile(s)));
-		}
-		case SIZE: {
-			final double w = buffer.getDouble();
-			final double h = buffer.getDouble();
-			final Dimension temp = new Dimension();
-			temp.setSize(w, h);
-			return Optional.of(new JVariant(temp));
-		}
-		case STRING: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(s));
-		}
-		case URL: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			try {
-				return Optional.of(new JVariant(new URL(s)));
-			} catch (final MalformedURLException e) {
-				logger.warn("Failed to deserialize JVariant into URL", e);
+			case UUID: {
+				final byte[] array = new byte[buffer.getInt()];
+				buffer.get(array);
+				final String s = new String(array, StandardCharsets.UTF_8);
+				return Optional.of(new JVariant(UUID.fromString(s)));
+			}
+			case FONT: {
+				final byte[] array = new byte[buffer.getInt()];
+				buffer.get(array);
+				final String s = new String(array, StandardCharsets.UTF_8);
+				return Optional.of(new JVariant(JFont.fromString(s)));
+			}
+			case POLYLINE: {
+				final int count = buffer.getInt();
+				final ImmutableList.Builder<Point2D> builder = ImmutableList.builder();
+				for (int i = 0; i < count; ++i) {
+					builder.add(new Point2D.Double(buffer.getDouble(), buffer.getDouble()));
+				}
+				return Optional.of(new JVariant(builder.build()));
+			}
+			default:
 				return Optional.empty();
-			}
-		}
-		case UUID: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(UUID.fromString(s)));
-		}
-		case FONT: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(JFont.fromString(s)));
-		}
-		case POLYLINE: {
-			final int count = buffer.getInt();
-			final ImmutableList.Builder<Point2D> builder = ImmutableList.builder();
-			for (int i = 0; i < count; ++i) {
-				builder.add(new Point2D.Double(buffer.getDouble(), buffer.getDouble()));
-			}
-			return Optional.of(new JVariant(builder.build()));
-		}
-		default:
-			return Optional.empty();
 		}
 	}
 
@@ -1147,179 +1148,264 @@ public class JVariant {
 	private int serialize(final SharedJavaCppMemory reuse, final int offset) {
 		final ByteBuffer buffer = reuse.getBuffer(offset);
 		switch (type) {
-		case BOOL: {
-			final Boolean v = (Boolean) obj;
-			checkSize(reuse, 2);
-			buffer.put((byte) type.ordinal());
-			buffer.put((byte) (v.booleanValue() ? 1 : 0));
-			break;
-		}
-		case BYTE_ARRAY: {
-			final byte[] v = (byte[]) obj;
-			checkSize(reuse, 1 + 4 + v.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.length);
-			buffer.put(v);
-			break;
-		}
-		case COLOR: {
-			final Color v = (Color) obj;
-			checkSize(reuse, 1 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.getRGB());
-			break;
-		}
-		case DATE_TIME: {
-			final Instant v = (Instant) obj;
-			checkSize(reuse, 1 + 8 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putLong(v.getEpochSecond());
-			buffer.putInt(v.getNano());
-			break;
-		}
-		case DOUBLE: {
-			final Double v = (Double) obj;
-			checkSize(reuse, 1 + 8);
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.doubleValue());
-			break;
-		}
-		case FLOAT: {
-			final Float v = (Float) obj;
-			checkSize(reuse, 1 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putFloat(v.floatValue());
-			break;
-		}
-		case IMAGE: {
-			final BufferedImage v = (BufferedImage) obj;
-			final int[] pixels = v.getRGB(0, 0, v.getWidth(), v.getHeight(), null, 0, v.getWidth());
-			checkSize(reuse, 1 + 4 + 4 + (4 * pixels.length));
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.getWidth());
-			buffer.putInt(v.getHeight());
-			for (final int i : pixels) {
-				buffer.putInt(i);
+			case BOOL: {
+				final Boolean v = (Boolean) obj;
+				checkSize(reuse, 2);
+				buffer.put((byte) type.ordinal());
+				buffer.put((byte) (v.booleanValue() ? 1 : 0));
+				break;
 			}
-			break;
-		}
-		case INT: {
-			final Integer v = (Integer) obj;
-			checkSize(reuse, 1 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.intValue());
-			break;
-		}
-		case LINE: {
-			final Line2D v = (Line2D) obj;
-			checkSize(reuse, 1 + 8 + 8 + 8 + 8);
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getX1());
-			buffer.putDouble(v.getY1());
-			buffer.putDouble(v.getX2());
-			buffer.putDouble(v.getY2());
-			break;
-		}
-		case LONG: {
-			final Long v = (Long) obj;
-			checkSize(reuse, 1 + 8);
-
-			buffer.put((byte) type.ordinal());
-			buffer.putLong(v.longValue());
-			break;
-		}
-		case POINT: {
-			final Point2D v = (Point2D) obj;
-			checkSize(reuse, 1 + 8 + 8);
-
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getX());
-			buffer.putDouble(v.getY());
-			break;
-		}
-		case RECTANGLE: {
-			final Rectangle2D v = (Rectangle2D) obj;
-			checkSize(reuse, 1 + 8 + 8 + 8 + 8);
-
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getX());
-			buffer.putDouble(v.getY());
-			buffer.putDouble(v.getWidth());
-			buffer.putDouble(v.getHeight());
-			break;
-		}
-		case REGULAR_EXPRESSION: {
-			final Pattern v = (Pattern) obj;
-			final byte[] utf8 = v.pattern().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case SIZE: {
-			final Dimension v = (Dimension) obj;
-			checkSize(reuse, 1 + 8 + 8);
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getWidth());
-			buffer.putDouble(v.getHeight());
-			break;
-		}
-		case STRING: {
-			final String v = (String) obj;
-			final byte[] utf8 = v.getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case URL: {
-			final URL v = (URL) obj;
-			final byte[] utf8 = v.toExternalForm().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case UUID: {
-			final UUID v = (UUID) obj;
-			final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case FONT: {
-			final JFont v = (JFont) obj;
-			final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case POLYLINE: {
-			@SuppressWarnings("unchecked")
-			final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
-			checkSize(reuse, 1 + 4 + list.size() * (8 + 8));
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(list.size());
-			for (final Point2D p : list) {
-				buffer.putDouble(p.getX());
-				buffer.putDouble(p.getY());
+			case BYTE_ARRAY: {
+				final byte[] v = (byte[]) obj;
+				checkSize(reuse, 1 + 4 + v.length);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(v.length);
+				buffer.put(v);
+				break;
 			}
-			break;
-		}
-		default: {
-			logger.error("Unkonwn type {}", type);
-			throw new IllegalStateException("Unkonwn type " + type);
-		}
+			case COLOR: {
+				final Color v = (Color) obj;
+				checkSize(reuse, 1 + 4);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(v.getRGB());
+				break;
+			}
+			case DATE_TIME: {
+				final Instant v = (Instant) obj;
+				checkSize(reuse, 1 + 8 + 4);
+				buffer.put((byte) type.ordinal());
+				buffer.putLong(v.getEpochSecond());
+				buffer.putInt(v.getNano());
+				break;
+			}
+			case DOUBLE: {
+				final Double v = (Double) obj;
+				checkSize(reuse, 1 + 8);
+				buffer.put((byte) type.ordinal());
+				buffer.putDouble(v.doubleValue());
+				break;
+			}
+			case FLOAT: {
+				final Float v = (Float) obj;
+				checkSize(reuse, 1 + 4);
+				buffer.put((byte) type.ordinal());
+				buffer.putFloat(v.floatValue());
+				break;
+			}
+			case IMAGE: {
+				final BufferedImage v = (BufferedImage) obj;
+				final int[] pixels = v.getRGB(0, 0, v.getWidth(), v.getHeight(), null, 0, v.getWidth());
+				checkSize(reuse, 1 + 4 + 4 + (4 * pixels.length));
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(v.getWidth());
+				buffer.putInt(v.getHeight());
+				for (final int i : pixels) {
+					buffer.putInt(i);
+				}
+				break;
+			}
+			case INT: {
+				final Integer v = (Integer) obj;
+				checkSize(reuse, 1 + 4);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(v.intValue());
+				break;
+			}
+			case LINE: {
+				final Line2D v = (Line2D) obj;
+				checkSize(reuse, 1 + 8 + 8 + 8 + 8);
+				buffer.put((byte) type.ordinal());
+				buffer.putDouble(v.getX1());
+				buffer.putDouble(v.getY1());
+				buffer.putDouble(v.getX2());
+				buffer.putDouble(v.getY2());
+				break;
+			}
+			case LONG: {
+				final Long v = (Long) obj;
+				checkSize(reuse, 1 + 8);
+
+				buffer.put((byte) type.ordinal());
+				buffer.putLong(v.longValue());
+				break;
+			}
+			case POINT: {
+				final Point2D v = (Point2D) obj;
+				checkSize(reuse, 1 + 8 + 8);
+
+				buffer.put((byte) type.ordinal());
+				buffer.putDouble(v.getX());
+				buffer.putDouble(v.getY());
+				break;
+			}
+			case RECTANGLE: {
+				final Rectangle2D v = (Rectangle2D) obj;
+				checkSize(reuse, 1 + 8 + 8 + 8 + 8);
+
+				buffer.put((byte) type.ordinal());
+				buffer.putDouble(v.getX());
+				buffer.putDouble(v.getY());
+				buffer.putDouble(v.getWidth());
+				buffer.putDouble(v.getHeight());
+				break;
+			}
+			case REGULAR_EXPRESSION: {
+				final Pattern v = (Pattern) obj;
+				final byte[] utf8 = v.pattern().getBytes(StandardCharsets.UTF_8);
+				checkSize(reuse, 1 + 4 + utf8.length);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(utf8.length);
+				buffer.put(utf8);
+				break;
+			}
+			case SIZE: {
+				final Dimension v = (Dimension) obj;
+				checkSize(reuse, 1 + 8 + 8);
+				buffer.put((byte) type.ordinal());
+				buffer.putDouble(v.getWidth());
+				buffer.putDouble(v.getHeight());
+				break;
+			}
+			case STRING: {
+				final String v = (String) obj;
+				final byte[] utf8 = v.getBytes(StandardCharsets.UTF_8);
+				checkSize(reuse, 1 + 4 + utf8.length);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(utf8.length);
+				buffer.put(utf8);
+				break;
+			}
+			case URL: {
+				final URL v = (URL) obj;
+				final byte[] utf8 = v.toExternalForm().getBytes(StandardCharsets.UTF_8);
+				checkSize(reuse, 1 + 4 + utf8.length);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(utf8.length);
+				buffer.put(utf8);
+				break;
+			}
+			case UUID: {
+				final UUID v = (UUID) obj;
+				final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
+				checkSize(reuse, 1 + 4 + utf8.length);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(utf8.length);
+				buffer.put(utf8);
+				break;
+			}
+			case FONT: {
+				final JFont v = (JFont) obj;
+				final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
+				checkSize(reuse, 1 + 4 + utf8.length);
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(utf8.length);
+				buffer.put(utf8);
+				break;
+			}
+			case POLYLINE: {
+				@SuppressWarnings("unchecked")
+				final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
+				checkSize(reuse, 1 + 4 + list.size() * (8 + 8));
+				buffer.put((byte) type.ordinal());
+				buffer.putInt(list.size());
+				for (final Point2D p : list) {
+					buffer.putDouble(p.getX());
+					buffer.putDouble(p.getY());
+				}
+				break;
+			}
+			default: {
+				logger.error("Unkonwn type {}", type);
+				throw new IllegalStateException("Unkonwn type " + type);
+			}
 		}// end switch
 
 		return buffer.position() - offset;
+	}
+
+	public void sendToQML(final int role) {
+		switch (type) {
+			case BOOL: {
+				QMLDataTransfer.setBoolean(((Boolean) obj).booleanValue(), role);
+				break;
+			}
+			case BYTE_ARRAY: {
+				QMLDataTransfer.setByteArray(((byte[]) obj), role);
+				break;
+			}
+			case COLOR: {
+				QMLDataTransfer.setColor(((Color) obj).getRGB(), role);
+				break;
+			}
+			case DATE_TIME: {
+				// TODO
+				break;
+			}
+			case DOUBLE: {
+				QMLDataTransfer.setDouble(((Double) obj).doubleValue(), role);
+				break;
+			}
+			case FLOAT: {
+				QMLDataTransfer.setFloat(((Float) obj).floatValue(), role);
+				break;
+			}
+			case IMAGE: {
+				// TODO
+				break;
+			}
+			case INT: {
+				QMLDataTransfer.setInteger(((Integer) obj).intValue(), role);
+				break;
+			}
+			case LINE: {
+				// TODO
+				break;
+			}
+			case LONG: {
+				QMLDataTransfer.setLong(((Long) obj).longValue(), role);
+				break;
+			}
+			case POINT: {
+				// TODO
+				break;
+			}
+			case RECTANGLE: {
+				// TODO
+				break;
+			}
+			case REGULAR_EXPRESSION: {
+				// TODO
+				break;
+			}
+			case SIZE: {
+				// TODO
+				break;
+			}
+			case STRING: {
+				QMLDataTransfer.setString(((String) obj), role);
+				break;
+			}
+			case URL: {
+				QMLDataTransfer.setString(((URL) obj).toExternalForm(), role);
+				break;
+			}
+			case UUID: {
+				QMLDataTransfer.setUUID(((UUID) obj).toString(), role);
+				break;
+			}
+			case FONT: {
+				QMLDataTransfer.setFont(((JFont) obj).toString(), role);
+				break;
+			}
+			case POLYLINE: {
+				// TODO
+				break;
+			}
+			default: {
+				logger.error("Unkonwn type {}", type);
+				throw new IllegalStateException("Unkonwn type " + type);
+			}
+		}// end switch
 	}
 
 	/**
