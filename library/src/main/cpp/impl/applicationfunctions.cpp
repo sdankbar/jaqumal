@@ -300,6 +300,9 @@ void ApplicationFunctions::initialize(JNIEnv* env)
 void ApplicationFunctions::uninitialize(JNIEnv* env)
 {
     env->DeleteGlobalRef(loggingCallback);
+    env->DeleteGlobalRef(jscreenClass);
+    env->DeleteGlobalRef(imageProviderClass);
+    env->DeleteGlobalRef(bufferedImageClass);
 }
 
 ApplicationFunctions* ApplicationFunctions::SINGLETON = nullptr;

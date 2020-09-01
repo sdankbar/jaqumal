@@ -70,7 +70,6 @@ JNICALL void sendQMLEvent(JNIEnv* env, jclass, jstring eventName, jobjectArray k
 
 void EventFunctions::initialize(JNIEnv* env)
 {
-    // TODO
     JNINativeMethod methods[] = {
         JNIUtilities::createJNIMethod("sendQMLEvent",    "(Ljava/lang/String;[Ljava/lang/String;)V",    (void *)&sendQMLEvent),
         JNIUtilities::createJNIMethod("addEventCallback",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/EventCallback;)V",    (void *)&addEventCallback)
@@ -82,5 +81,5 @@ void EventFunctions::initialize(JNIEnv* env)
 
 void EventFunctions::uninitialize(JNIEnv*)
 {
-
+    // Empty Implementation
 }

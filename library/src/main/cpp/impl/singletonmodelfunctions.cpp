@@ -186,7 +186,7 @@ void SingletonModelFunctions::initialize(JNIEnv* env)
 
 void SingletonModelFunctions::uninitialize(JNIEnv*)
 {
-
+    // Empty Implementation
 }
 
 GenericObjectModel::GenericObjectModel(const QString& modelName, const std::vector<QString>& roles)

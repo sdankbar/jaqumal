@@ -283,18 +283,23 @@ void FontFunctions::initialize(JNIEnv* env)
     rectangleClass = JNIUtilities::findClassGlobalReference(env, "java/awt/Rectangle");
     rectangleConstructor = env->GetMethodID(rectangleClass, "<init>", "(IIII)V");
 
-    // TODO
     JNINativeMethod methods[] = {
-
+        JNIUtilities::createJNIMethod("getBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getBoundingRect),
+        JNIUtilities::createJNIMethod("getBoundingRect2",    "(Ljava/lang/String;IIIIIILjava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getBoundingRect2),
+        JNIUtilities::createJNIMethod("getQFontMetrics",    "(Ljava/lang/String;)Ljava/lang/String;",    (void *)&getQFontMetrics),
+        JNIUtilities::createJNIMethod("getQFontToString",    "(Ljava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;",    (void *)&getQFontToString),
+        JNIUtilities::createJNIMethod("getStringWidth",    "(Ljava/lang/String;Ljava/lang/String;)I",    (void *)&getStringWidth),
+        JNIUtilities::createJNIMethod("getTightBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getTightBoundingRect),
+        JNIUtilities::createJNIMethod("inFont",    "(Ljava/lang/String;I)Z",    (void *)&inFont),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/FontFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));
     env->DeleteLocalRef(javaClass);
 }
 
-void FontFunctions::uninitialize(JNIEnv*)
+void FontFunctions::uninitialize(JNIEnv* env)
 {
-
+    env->DeleteGlobalRef(rectangleClass);
 }
 
 jobject FontFunctions::constructRectangle(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h)
