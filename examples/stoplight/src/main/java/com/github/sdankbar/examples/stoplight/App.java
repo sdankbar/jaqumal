@@ -42,7 +42,7 @@ public class App {
 	/**
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 		/**
 		 * @param e Event to handle
 		 */
@@ -85,7 +85,7 @@ public class App {
 		final JQMLButtonModel button = app.getModelFactory().createButtonModel("walkModel");
 		button.setText("Walk");
 		button.registerOnClicked(() -> System.out.println("Request Walk Signal"));
-		button.registerHoverChanged((b) -> System.out.println(b ? "Hovered" : "Not Hovered"));
+		button.registerHoverChanged(b -> System.out.println(b ? "Hovered" : "Not Hovered"));
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 
@@ -104,10 +104,10 @@ public class App {
 					index = 0;
 					app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
 				}
-				app.getEventDispatcher().submit(new TestQMLEvent());
+				// app.getEventDispatcher().submit(new TestQMLEvent());
 			}
 		};
-		app.getQMLThreadExecutor().execute(r);
+		// app.getQMLThreadExecutor().execute(r);
 
 		app.execute();
 	}

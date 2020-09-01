@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -119,18 +118,9 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public Map<K, JVariant> add(final ImmutableMap<K, JVariant> map) {
 		Objects.requireNonNull(map, "map is null");
 		verifyEventLoopThread();
-		final SharedJavaCppMemory m = accessor.getJavaToCppMemory();
-		final List<JVariant> variantList = new ArrayList<>(map.size());
-		final int[] roles = new int[map.size()];
-		int i = 0;
 		for (final Entry<K, JVariant> entry : map.entrySet()) {
-			variantList.add(entry.getValue());
-			roles[i] = indexLookup.get(entry.getKey().toString()).intValue();
-			++i;
+			entry.getValue().sendToQML(indexLookup.get(entry.getKey().toString()).intValue());
 		}
-
-		JVariant.serialize(variantList, m);
-		// TODO send data to QML
 		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
@@ -158,18 +148,9 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		Objects.requireNonNull(map, "map is null");
 		verifyEventLoopThread();
 
-		final List<JVariant> valueList = new ArrayList<>(map.size());
-		final int[] array = new int[map.size()];
-		int i = 0;
-		final SharedJavaCppMemory m = accessor.getJavaToCppMemory();
 		for (final Entry<K, JVariant> entry : map.entrySet()) {
-			valueList.add(entry.getValue());
-			array[i] = indexLookup.get(entry.getKey().toString()).intValue();
-			++i;
+			entry.getValue().sendToQML(indexLookup.get(entry.getKey().toString()).intValue());
 		}
-		JVariant.serialize(valueList, m);
-
-		// TODO send data to QML
 		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
@@ -201,8 +182,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		Objects.requireNonNull(role, "role is null");
 		verifyEventLoopThread();
 
-		data.serialize(accessor.getJavaToCppMemory());
-		// TODO send data to QML
+		data.sendToQML(indexLookup.get(data.toString()).intValue());
 		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
@@ -241,8 +221,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		Objects.requireNonNull(role, "role is null");
 
 		verifyEventLoopThread();
-		data.serialize(accessor.getJavaToCppMemory());
-		// TODO
+		data.sendToQML(indexLookup.get(data.toString()).intValue());
 		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
 		final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,

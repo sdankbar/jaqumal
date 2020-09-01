@@ -42,6 +42,8 @@ public:
     static bool check(JNIEnv* env);
     static void invokeLoggingCallback(jobject obj, int type, const std::string& msg);
 
+    static JNIEnv* mainEnv;
+
     void exec();
     void quitApplication();
     void loadQML(const QString& filePath);
@@ -71,7 +73,6 @@ private:
     QImage toQImage(JNIEnv* env, jobject bufferedImage);
 
     static ApplicationFunctions* SINGLETON;
-    static JNIEnv* lastEnv;
     static jclass loggingCallback;
     static jmethodID loggingCallbackMethod;
 

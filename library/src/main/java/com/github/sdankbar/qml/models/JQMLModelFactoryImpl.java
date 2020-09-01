@@ -33,7 +33,6 @@ import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JQMLUtilities;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.QtThread;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.models.flat_tree.FlatTreeAccessor;
@@ -61,9 +60,6 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	private final JQMLApplication<?> app;
 	private final AtomicReference<Thread> eventLoopThread;
 	private final JQMLPerformanceModel perfModel;
-
-	private final SharedJavaCppMemory cppToJava = new SharedJavaCppMemory(16 * 1024 * 1024);
-	private final SharedJavaCppMemory javaToCpp = new SharedJavaCppMemory(16 * 1024 * 1024);
 
 	private final Set<String> modelName = new HashSet<>();
 
@@ -101,8 +97,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLFlatTreeModel<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new FlatTreeAccessor(javaToCpp, cppToJava));
+		return new JQMLFlatTreeModel<>(name, EnumSet.allOf(enumClass), eventLoopThread, new FlatTreeAccessor());
 	}
 
 	@Override
@@ -111,7 +106,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLFlatTreeModel<>(name, keys, eventLoopThread, new FlatTreeAccessor(javaToCpp, cppToJava));
+		return new JQMLFlatTreeModel<>(name, keys, eventLoopThread, new FlatTreeAccessor());
 	}
 
 	@QtThread
@@ -120,8 +115,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new ListAccessor(javaToCpp, cppToJava));
+		return new JQMLListModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread, new ListAccessor());
 	}
 
 	@QtThread
@@ -130,7 +124,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModelImpl<>(name, keys, eventLoopThread, new ListAccessor(javaToCpp, cppToJava));
+		return new JQMLListModelImpl<>(name, keys, eventLoopThread, new ListAccessor());
 	}
 
 	@QtThread
@@ -156,7 +150,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		checkModelName(name);
 
 		return new JQMLSingletonModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new SingletonMapAccessor(javaToCpp, cppToJava));
+				new SingletonMapAccessor());
 	}
 
 	@QtThread
@@ -165,8 +159,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLSingletonModelImpl<>(name, keys, eventLoopThread,
-				new SingletonMapAccessor(javaToCpp, cppToJava));
+		return new JQMLSingletonModelImpl<>(name, keys, eventLoopThread, new SingletonMapAccessor());
 	}
 
 	@Override

@@ -22,14 +22,11 @@
  */
 package com.github.sdankbar.qml.models.flat_tree;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.flat_tree.FlatTreeModelFunctions;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.MapAccessor;
 import com.github.sdankbar.qml.models.TreePath;
 import com.sun.jna.Pointer;
@@ -42,16 +39,6 @@ import com.sun.jna.ptr.IntByReference;
 public class FlatTreeAccessor extends MapAccessor {
 
 	private TreePath path;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param javaToCppMemory Memory used for Java to C++ communication.
-	 * @param cppToJavaMemory Memory used for C++ to Java communication.
-	 */
-	public FlatTreeAccessor(final SharedJavaCppMemory javaToCppMemory, final SharedJavaCppMemory cppToJavaMemory) {
-		super(javaToCppMemory, cppToJavaMemory);
-	}
 
 	private void checkIndex() {
 		if (path == null) {
@@ -76,7 +63,7 @@ public class FlatTreeAccessor extends MapAccessor {
 	 * @return The copied accessor.
 	 */
 	public FlatTreeAccessor copy(final TreePath p) {
-		final FlatTreeAccessor a = new FlatTreeAccessor(javaToCppMemory, cppToJavaMemory);
+		final FlatTreeAccessor a = new FlatTreeAccessor();
 		a.setTreePath(p);
 		a.setModelPointer(modelPointer);
 		return a;
@@ -105,7 +92,8 @@ public class FlatTreeAccessor extends MapAccessor {
 		final Optional<JVariant> oldValue = get(roleIndex, length);
 
 		final Pointer indiciesMem = path.serialize();
-		FlatTreeModelFunctions.clearGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray(), roleIndex);
+		FlatTreeModelFunctions.clearGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray(),
+				roleIndex);
 
 		return oldValue;
 	}
@@ -114,29 +102,19 @@ public class FlatTreeAccessor extends MapAccessor {
 	public void set(final JVariant value, final int roleIndex) {
 		checkIndex();
 
-		value.serialize(javaToCppMemory);
-		// TODO
+		value.sendToQML(roleIndex);
 		FlatTreeModelFunctions.setGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
 
 	}
 
 	@Override
 	public void set(final Map<Integer, JVariant> valuesMap) {
-		final List<JVariant> variantList = new ArrayList<>(valuesMap.size());
-		final int[] array = new int[valuesMap.size()];
-		int i = 0;
 		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			variantList.add(e.getValue());
-			array[i] = e.getKey().intValue();
-			++i;
+			e.getValue().sendToQML(e.getKey().intValue());
 		}
 
 		checkIndex();
 
-		JVariant.serialize(variantList, javaToCppMemory);
-
-		final Pointer indiciesMem = path.serialize();
-		// TODO
 		FlatTreeModelFunctions.setGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
 
 	}

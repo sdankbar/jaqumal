@@ -26,11 +26,8 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
-import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jni.interfaces.ImageProviderCallback;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
-import com.sun.jna.Pointer;
 
 /**
  * Wraps a JQMLImageProvider, allowing it to be called from C++.
@@ -39,7 +36,6 @@ public class JQMLImageProviderWrapper implements ImageProviderCallback {
 
 	private final String id;
 	private final JQMLImageProvider provider;
-	private final SharedJavaCppMemory memory = new SharedJavaCppMemory(16 * 1024 * 1024);
 
 	/**
 	 * Constructs new wrapper.
@@ -65,8 +61,6 @@ public class JQMLImageProviderWrapper implements ImageProviderCallback {
 	public BufferedImage invoke(final String imageID, final int w, final int h) {
 		final BufferedImage image = provider.requestImage(imageID, new Dimension(w, h));
 		if (image != null) {
-			final JVariant var = new JVariant(image);
-			var.serialize(memory);
 			return image;
 		} else {
 			return null;

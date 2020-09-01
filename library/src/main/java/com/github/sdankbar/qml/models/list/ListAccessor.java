@@ -22,17 +22,14 @@
  */
 package com.github.sdankbar.qml.models.list;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.MapAccessor;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 
 /**
  * Implementation of MapAccessor that is used to modify one of the maps in a
@@ -41,16 +38,6 @@ import com.github.sdankbar.qml.models.MapAccessor;
 public class ListAccessor extends MapAccessor {
 
 	private int listIndex;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param javaToCppMemory Memory used for Java to C++ communication.
-	 * @param cppToJavaMemory Memory used for C++ to Java communication.
-	 */
-	public ListAccessor(final SharedJavaCppMemory javaToCppMemory, final SharedJavaCppMemory cppToJavaMemory) {
-		super(javaToCppMemory, cppToJavaMemory);
-	}
 
 	private void checkIndex() {
 		if (listIndex < 0) {
@@ -73,7 +60,7 @@ public class ListAccessor extends MapAccessor {
 	 * @return The copied accessor.
 	 */
 	public ListAccessor copy(final int listIndex) {
-		final ListAccessor a = new ListAccessor(javaToCppMemory, cppToJavaMemory);
+		final ListAccessor a = new ListAccessor();
 		a.setModelPointer(modelPointer);
 		a.setListIndex(listIndex);
 		return a;
@@ -83,7 +70,8 @@ public class ListAccessor extends MapAccessor {
 	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
 		checkIndex();
 
-		final JVariant received = ListModelFunctions.getGenericListModelData(Pointer.nativeValue(modelPointer), listIndex, roleIndex);
+		final JVariant received = ListModelFunctions.getGenericListModelData(Pointer.nativeValue(modelPointer),
+				listIndex, roleIndex);
 
 		return Optional.ofNullable(received);
 	}
@@ -110,33 +98,25 @@ public class ListAccessor extends MapAccessor {
 	public void set(final JVariant value, final int roleIndex) {
 		checkIndex();
 
-		value.serialize(javaToCppMemory);
-		// TODO
+		value.sendToQML(roleIndex);
 		ListModelFunctions.setGenericListModelData(Pointer.nativeValue(modelPointer), listIndex);
 
 	}
 
 	@Override
 	public void set(final Map<Integer, JVariant> valuesMap) {
-		final List<JVariant> variantList = new ArrayList<>(valuesMap.size());
-		final int[] array = new int[valuesMap.size()];
-		int i = 0;
 		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			variantList.add(e.getValue());
-			array[i] = e.getKey().intValue();
-			++i;
+			e.getValue().sendToQML(e.getKey().intValue());
 		}
 
 		checkIndex();
 
-		JVariant.serialize(variantList, javaToCppMemory);
-		// TODO
 		ListModelFunctions.setGenericListModelData(Pointer.nativeValue(modelPointer), listIndex);
 
 	}
 
 	/**
-	 * @param listIndex The index indo the list model that this accessor works on.
+	 * @param listIndex The index into the list model that this accessor works on.
 	 */
 	public void setListIndex(final int listIndex) {
 		this.listIndex = listIndex;

@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jni.EventFunctions;
 import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.EventFactory;
@@ -65,8 +64,6 @@ import com.google.common.collect.ImmutableList;
 public class JQMLApplication<EType> {
 
 	private class ApplicationEventListener implements EventCallback {
-
-		private final SharedJavaCppMemory memory = new SharedJavaCppMemory(16 * 1024 * 1024);
 
 		@Override
 		public JVariant invoke(final String type, final ByteBuffer buffer) {

@@ -32,11 +32,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
-
 public class JMHTest {
-
-	private static final SharedJavaCppMemory memory = new SharedJavaCppMemory(10000);
 
 	@Test
 	public void runBenchmarks() throws RunnerException {

@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.EventFunctions;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.google.common.collect.ImmutableList;
 
@@ -78,8 +77,7 @@ public class EventDispatcher<T> {
 		return list.build();
 	}
 
-	private static <P> Optional<JVariant> handle(final Event<P> e, final List<ProcessorPair<P>> list,
-			final SharedJavaCppMemory javaToCppMemory) {
+	private static <P> Optional<JVariant> handle(final Event<P> e, final List<ProcessorPair<P>> list) {
 		try {
 			for (final ProcessorPair<P> p : list) {
 				if (e.isConsumed()) {
@@ -94,7 +92,8 @@ public class EventDispatcher<T> {
 				final Map<String, JVariant> args = castEvent.getParameters();
 				final int argsCount = args.size();
 				final String[] keys = args.keySet().toArray(new String[argsCount]);
-				JVariant.serialize(new ArrayList<>(args.values()), javaToCppMemory);
+				// JVariant.serialize(new ArrayList<>(args.values()), javaToCppMemory);
+				// TODO
 				EventFunctions.sendQMLEvent(castEvent.getClass().getSimpleName(), keys);
 			}
 		} catch (final Exception excp) {
@@ -122,8 +121,6 @@ public class EventDispatcher<T> {
 	private final Map<Class<? extends Event<T>>, List<ProcessorPair<T>>> processors = new HashMap<>();
 
 	private final Map<Class<? extends Event<BuiltinEventProcessor>>, List<ProcessorPair<BuiltinEventProcessor>>> builtInProcessors = new HashMap<>();
-
-	private final SharedJavaCppMemory javaToCppMemory = new SharedJavaCppMemory(16 * 1024 * 1024);
 
 	/**
 	 * Registers a processor for built in events of Class type. Order is the default
@@ -251,7 +248,7 @@ public class EventDispatcher<T> {
 		synchronized (processors) {
 			list = processors.getOrDefault(e.getClass(), ImmutableList.of());
 		}
-		return handle(e, list, javaToCppMemory);
+		return handle(e, list);
 	}
 
 	/**
@@ -266,6 +263,6 @@ public class EventDispatcher<T> {
 		synchronized (builtInProcessors) {
 			list = builtInProcessors.getOrDefault(e.getClass(), ImmutableList.of());
 		}
-		return handle(e, list, javaToCppMemory);
+		return handle(e, list);
 	}
 }

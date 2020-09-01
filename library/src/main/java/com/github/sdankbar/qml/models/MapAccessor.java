@@ -22,52 +22,25 @@
  */
 package com.github.sdankbar.qml.models;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.google.common.base.Preconditions;
+import com.github.sdankbar.qml.JVariant;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
-
-import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 
 /**
  * Abstract class for modifying maps contained in QML models.
  */
 public abstract class MapAccessor {
 
-	protected final SharedJavaCppMemory javaToCppMemory;
-	protected final SharedJavaCppMemory cppToJavaMemory;
-
 	protected Pointer modelPointer;
-
-	protected MapAccessor(final SharedJavaCppMemory javaToCppMemory, final SharedJavaCppMemory cppToJavaMemory) {
-		this.javaToCppMemory = Objects.requireNonNull(javaToCppMemory, "javaToCppMemory is null");
-		this.cppToJavaMemory = Objects.requireNonNull(cppToJavaMemory, "cppToJavaMemory is null");
-	}
 
 	/**
 	 * Remove all values from the map.
 	 */
 	public abstract void clear();
-
-	protected Optional<JVariant> deserialize(final Pointer p, final int length) {
-		Preconditions.checkArgument(length >= 0, "length must be positive.");
-
-		if (p == null || Pointer.nativeValue(p) == 0) {
-			return Optional.empty();
-		} else if (Pointer.nativeValue(cppToJavaMemory.getPointer()) == Pointer.nativeValue(p)) {
-			return JVariant.deserialize(cppToJavaMemory.getBuffer(0));
-		} else {
-			final ByteBuffer buffer = p.getByteBuffer(0, length);
-			buffer.order(ByteOrder.nativeOrder());
-			return JVariant.deserialize(buffer);
-		}
-	}
 
 	/**
 	 * Return the map's value for the role.
@@ -78,14 +51,6 @@ public abstract class MapAccessor {
 	 * @return Value of the role or Optional.empty()
 	 */
 	public abstract Optional<JVariant> get(final int roleIndex, IntByReference length);
-
-	/**
-	 * @return A reference to the shared memory used to send data between Java and
-	 *         C++,
-	 */
-	public SharedJavaCppMemory getJavaToCppMemory() {
-		return javaToCppMemory;
-	}
 
 	/**
 	 * Removes the map's value for the role.

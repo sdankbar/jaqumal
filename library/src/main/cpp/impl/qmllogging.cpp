@@ -120,6 +120,27 @@ void QMLLogging::qtMessages(QtMsgType type, const QMessageLogContext &context, c
     }
 }
 
+void QMLLogging::trace(const QString& message) const
+{
+    trace(message.toStdString());
+}
+void QMLLogging::debug(const QString& message) const
+{
+    debug(message.toStdString());
+}
+void QMLLogging::info(const QString& message) const
+{
+    info(message.toStdString());
+}
+void QMLLogging::warn(const QString& message) const
+{
+    warn(message.toStdString());
+}
+void QMLLogging::error(const QString& message) const
+{
+    error(message.toStdString());
+}
+
 void QMLLogging::trace(const std::string& message) const
 {
     ApplicationFunctions::invokeLoggingCallback(javaLoggingCallback, 0, message);

@@ -51,6 +51,7 @@
 
 JNICALL void createQApplication(JNIEnv* env, jclass, jobjectArray argv)
 {
+    ApplicationFunctions::mainEnv = env;
     const int32_t argc = env->GetArrayLength(argv);
 
     int* argcCopy = new int;
@@ -121,7 +122,7 @@ JNICALL void setLoggingCallback(JNIEnv* env, jclass, jobject c)
 {
     if (ApplicationFunctions::check(env))
     {
-        ApplicationFunctions::get()->setLoggingObject(c);
+        ApplicationFunctions::get()->setLoggingObject(env->NewGlobalRef(c));
     }
 }
 
@@ -187,11 +188,11 @@ JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
 {
     if (ApplicationFunctions::check(env))
     {
-        ApplicationFunctions::get()->metaObject()->invokeMethod(
-                    ApplicationFunctions::get(),
-                    "invokeCallback",
-                    Qt::QueuedConnection,
-                    Q_ARG(jobject, callback));
+        jobject globalRef = env->NewGlobalRef(callback);
+        QMetaObject::invokeMethod(ApplicationFunctions::get(), [=]{
+            ApplicationFunctions::get()->invokeCallback(env, globalRef);
+            env->DeleteGlobalRef(globalRef);
+        });
     }
 }
 
@@ -199,8 +200,10 @@ JNICALL void invokeWithDelay(JNIEnv* env, jclass, jobject callback, jint delayMi
 {
     if (ApplicationFunctions::check(env))
     {
+        jobject globalRef = env->NewGlobalRef(callback);
         std::function<void()> func = [=] {
-            ApplicationFunctions::get()->invokeCallback(env, callback);
+            ApplicationFunctions::get()->invokeCallback(env, globalRef);
+            env->DeleteGlobalRef(globalRef);
         };
         QTimer::singleShot(delayMilli, func);
     }
@@ -242,9 +245,8 @@ bool ApplicationFunctions::check(JNIEnv* env)
 
 void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const std::string& msg)
 {
-    jstring javaStr = lastEnv->NewStringUTF(msg.c_str());
-    // TODO
-    //lastEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
+    jstring javaStr = mainEnv->NewStringUTF(msg.c_str());
+    mainEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
 }
 
 jclass ApplicationFunctions::loggingCallback;
@@ -257,11 +259,10 @@ jclass ApplicationFunctions::bufferedImageClass;
 jmethodID ApplicationFunctions::bufferedImageGetWidth;
 jmethodID ApplicationFunctions::bufferedImageGetHeight;
 jmethodID ApplicationFunctions::bufferedImageGetRGB;
-JNIEnv* ApplicationFunctions::lastEnv = nullptr;
+JNIEnv* ApplicationFunctions::mainEnv = nullptr;
 
 void ApplicationFunctions::initialize(JNIEnv* env)
 {
-    lastEnv = env;
     loggingCallback = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/LoggingCallback");
     loggingCallbackMethod = env->GetMethodID(loggingCallback, "invoke", "(ILjava/lang/String;)V");
     jscreenClass= JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/JScreen");

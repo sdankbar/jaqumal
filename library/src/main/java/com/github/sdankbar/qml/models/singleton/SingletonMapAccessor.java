@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.models.MapAccessor;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -37,16 +36,6 @@ import com.sun.jna.ptr.IntByReference;
  * SingletonModel.
  */
 public class SingletonMapAccessor extends MapAccessor {
-
-	/**
-	 * Constructor.
-	 *
-	 * @param javaToCppMemory Memory used for Java to C++ communication.
-	 * @param cppToJavaMemory Memory used for C++ to Java communication.
-	 */
-	public SingletonMapAccessor(final SharedJavaCppMemory javaToCppMemory, final SharedJavaCppMemory cppToJavaMemory) {
-		super(javaToCppMemory, cppToJavaMemory);
-	}
 
 	@Override
 	public void clear() {
@@ -72,7 +61,6 @@ public class SingletonMapAccessor extends MapAccessor {
 
 	@Override
 	public void set(final JVariant value, final int roleIndex) {
-		value.serialize(javaToCppMemory);
 		value.sendToQML(roleIndex);
 		SingletonModelFunctions.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
 
