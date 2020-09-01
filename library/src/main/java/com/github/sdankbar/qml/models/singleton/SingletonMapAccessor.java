@@ -28,8 +28,6 @@ import java.util.Optional;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
 import com.github.sdankbar.qml.models.MapAccessor;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * Implementation of MapAccessor that is used to modify the map in an
@@ -39,22 +37,21 @@ public class SingletonMapAccessor extends MapAccessor {
 
 	@Override
 	public void clear() {
-		SingletonModelFunctions.clearGenericObjectModel(Pointer.nativeValue(modelPointer));
+		SingletonModelFunctions.clearGenericObjectModel(modelPointer);
 
 	}
 
 	@Override
-	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
-		final JVariant received = SingletonModelFunctions.getGenericObjectModelData(Pointer.nativeValue(modelPointer),
-				roleIndex);
+	public Optional<JVariant> get(final int roleIndex) {
+		final JVariant received = SingletonModelFunctions.getGenericObjectModelData(modelPointer, roleIndex);
 		return Optional.ofNullable(received);
 	}
 
 	@Override
-	public Optional<JVariant> remove(final int roleIndex, final IntByReference length) {
-		final Optional<JVariant> existingValue = get(roleIndex, length);
+	public Optional<JVariant> remove(final int roleIndex) {
+		final Optional<JVariant> existingValue = get(roleIndex);
 
-		SingletonModelFunctions.clearGenericObjectModelRole(Pointer.nativeValue(modelPointer), roleIndex);
+		SingletonModelFunctions.clearGenericObjectModelRole(modelPointer, roleIndex);
 
 		return existingValue;
 	}
@@ -62,7 +59,7 @@ public class SingletonMapAccessor extends MapAccessor {
 	@Override
 	public void set(final JVariant value, final int roleIndex) {
 		value.sendToQML(roleIndex);
-		SingletonModelFunctions.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
+		SingletonModelFunctions.setGenericObjectModelData(modelPointer);
 
 	}
 
@@ -72,7 +69,7 @@ public class SingletonMapAccessor extends MapAccessor {
 			e.getValue().sendToQML(e.getKey().intValue());
 		}
 
-		SingletonModelFunctions.setGenericObjectModelData(Pointer.nativeValue(modelPointer));
+		SingletonModelFunctions.setGenericObjectModelData(modelPointer);
 
 	}
 

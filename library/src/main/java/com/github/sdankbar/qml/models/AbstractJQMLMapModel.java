@@ -39,7 +39,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.exceptions.IllegalKeyException;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * Abstract base class that provides a Map interface to QML models.
@@ -199,8 +198,6 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	protected final Set<K> keys;
 	protected final Map<String, Integer> indexLookup = new HashMap<>();
 
-	private final IntByReference length = new IntByReference();
-
 	private final KeySet<K> keySet = new KeySet<>(this);
 	private final ValueCollection<K> valueCollection = new ValueCollection<>(this);
 	private final EntrySet<K> entrySet = new EntrySet<>(this);
@@ -230,7 +227,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 			if (index == null) {
 				return false;
 			} else {
-				return accessor.get(index.intValue(), length).isPresent();
+				return accessor.get(index.intValue()).isPresent();
 			}
 		}
 	}
@@ -239,7 +236,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	public boolean containsValue(final Object value) {
 		verifyEventLoopThread();
 		for (int i = 0; i < keys.size(); ++i) {
-			final Optional<JVariant> opt = accessor.get(i, length);
+			final Optional<JVariant> opt = accessor.get(i);
 			if (opt.isPresent() && opt.get().equals(value)) {
 				return true;
 			}
@@ -283,7 +280,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		verifyEventLoopThread();
 		final int index = verifyKey(key);
 
-		final Optional<JVariant> opt = accessor.get(index, length);
+		final Optional<JVariant> opt = accessor.get(index);
 		return opt.orElse(null);
 	}
 
@@ -316,7 +313,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		if (value != null) {
 			final int index = verifyKey(key);
 
-			final JVariant existingValue = accessor.get(index, length).orElse(null);
+			final JVariant existingValue = accessor.get(index).orElse(null);
 
 			accessor.set(value, index);
 
@@ -341,7 +338,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	public JVariant remove(final Object key) {
 		verifyEventLoopThread();
 		final int index = verifyKey(key);
-		return accessor.remove(index, length).orElse(null);
+		return accessor.remove(index).orElse(null);
 	}
 
 	@Override

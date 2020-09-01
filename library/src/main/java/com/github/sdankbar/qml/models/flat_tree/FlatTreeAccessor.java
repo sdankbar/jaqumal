@@ -29,8 +29,6 @@ import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.flat_tree.FlatTreeModelFunctions;
 import com.github.sdankbar.qml.models.MapAccessor;
 import com.github.sdankbar.qml.models.TreePath;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * Implementation of MapAccessor that is used to modify one of the Maps in a
@@ -50,8 +48,7 @@ public class FlatTreeAccessor extends MapAccessor {
 	public void clear() {
 		checkIndex();
 
-		final Pointer indiciesMem = path.serialize();
-		FlatTreeModelFunctions.clearAllGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
+		FlatTreeModelFunctions.clearAllGenericFlatTreeModelData(modelPointer, path.toArray());
 
 	}
 
@@ -70,11 +67,11 @@ public class FlatTreeAccessor extends MapAccessor {
 	}
 
 	@Override
-	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
+	public Optional<JVariant> get(final int roleIndex) {
 		checkIndex();
 
-		final JVariant received = FlatTreeModelFunctions.getGenericFlatTreeModelData(Pointer.nativeValue(modelPointer),
-				path.toArray(), roleIndex);
+		final JVariant received = FlatTreeModelFunctions.getGenericFlatTreeModelData(modelPointer, path.toArray(),
+				roleIndex);
 		return Optional.ofNullable(received);
 	}
 
@@ -86,14 +83,12 @@ public class FlatTreeAccessor extends MapAccessor {
 	}
 
 	@Override
-	public Optional<JVariant> remove(final int roleIndex, final IntByReference length) {
+	public Optional<JVariant> remove(final int roleIndex) {
 		checkIndex();
 
-		final Optional<JVariant> oldValue = get(roleIndex, length);
+		final Optional<JVariant> oldValue = get(roleIndex);
 
-		final Pointer indiciesMem = path.serialize();
-		FlatTreeModelFunctions.clearGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray(),
-				roleIndex);
+		FlatTreeModelFunctions.clearGenericFlatTreeModelData(modelPointer, path.toArray(), roleIndex);
 
 		return oldValue;
 	}
@@ -103,7 +98,7 @@ public class FlatTreeAccessor extends MapAccessor {
 		checkIndex();
 
 		value.sendToQML(roleIndex);
-		FlatTreeModelFunctions.setGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
+		FlatTreeModelFunctions.setGenericFlatTreeModelData(modelPointer, path.toArray());
 
 	}
 
@@ -115,7 +110,7 @@ public class FlatTreeAccessor extends MapAccessor {
 
 		checkIndex();
 
-		FlatTreeModelFunctions.setGenericFlatTreeModelData(Pointer.nativeValue(modelPointer), path.toArray());
+		FlatTreeModelFunctions.setGenericFlatTreeModelData(modelPointer, path.toArray());
 
 	}
 

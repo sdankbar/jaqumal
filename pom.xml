@@ -55,7 +55,6 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 
-		<jna.version>5.3.1</jna.version>
 		<commons.io.version>2.6</commons.io.version>
 		<guava.version>28.0-jre</guava.version>
 
@@ -70,16 +69,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>net.java.dev.jna</groupId>
-				<artifactId>jna</artifactId>
-				<version>${jna.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.java.dev.jna</groupId>
-				<artifactId>jna-platform</artifactId>
-				<version>${jna.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>

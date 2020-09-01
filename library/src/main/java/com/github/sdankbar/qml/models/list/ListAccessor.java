@@ -28,8 +28,6 @@ import java.util.Optional;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
 import com.github.sdankbar.qml.models.MapAccessor;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * Implementation of MapAccessor that is used to modify one of the maps in a
@@ -48,7 +46,7 @@ public class ListAccessor extends MapAccessor {
 	@Override
 	public void clear() {
 		checkIndex();
-		ListModelFunctions.clearAllGenericListModelData(Pointer.nativeValue(modelPointer), listIndex);
+		ListModelFunctions.clearAllGenericListModelData(modelPointer, listIndex);
 
 	}
 
@@ -67,11 +65,10 @@ public class ListAccessor extends MapAccessor {
 	}
 
 	@Override
-	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
+	public Optional<JVariant> get(final int roleIndex) {
 		checkIndex();
 
-		final JVariant received = ListModelFunctions.getGenericListModelData(Pointer.nativeValue(modelPointer),
-				listIndex, roleIndex);
+		final JVariant received = ListModelFunctions.getGenericListModelData(modelPointer, listIndex, roleIndex);
 
 		return Optional.ofNullable(received);
 	}
@@ -84,12 +81,12 @@ public class ListAccessor extends MapAccessor {
 	}
 
 	@Override
-	public Optional<JVariant> remove(final int roleIndex, final IntByReference length) {
+	public Optional<JVariant> remove(final int roleIndex) {
 		checkIndex();
 
-		final Optional<JVariant> existingValue = get(roleIndex, length);
+		final Optional<JVariant> existingValue = get(roleIndex);
 
-		ListModelFunctions.clearGenericListModelData(Pointer.nativeValue(modelPointer), listIndex, roleIndex);
+		ListModelFunctions.clearGenericListModelData(modelPointer, listIndex, roleIndex);
 
 		return existingValue;
 	}
@@ -99,7 +96,7 @@ public class ListAccessor extends MapAccessor {
 		checkIndex();
 
 		value.sendToQML(roleIndex);
-		ListModelFunctions.setGenericListModelData(Pointer.nativeValue(modelPointer), listIndex);
+		ListModelFunctions.setGenericListModelData(modelPointer, listIndex);
 
 	}
 
@@ -111,7 +108,7 @@ public class ListAccessor extends MapAccessor {
 
 		checkIndex();
 
-		ListModelFunctions.setGenericListModelData(Pointer.nativeValue(modelPointer), listIndex);
+		ListModelFunctions.setGenericListModelData(modelPointer, listIndex);
 
 	}
 

@@ -33,7 +33,6 @@ import com.github.sdankbar.qml.cpp.jni.interfaces.MapChangeCallback;
 import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
-import com.sun.jna.Pointer;
 
 /**
  * A model that is available to QML. Represents a single Map from the key type
@@ -72,7 +71,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 
 	private final SingletonMapAccessor mapAccessor;
 	private final MapChangeListener changeCallback = new MapChangeListener();
-	private final Pointer modelPointer;
+	private final long modelPointer;
 
 	/**
 	 * Model constructor.
@@ -97,7 +96,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 			indexLookup.put(name, Integer.valueOf(i++));
 		}
 
-		modelPointer = new Pointer(SingletonModelFunctions.createGenericObjectModel(modelName, roleArray));
+		modelPointer = SingletonModelFunctions.createGenericObjectModel(modelName, roleArray);
 
 		mapAccessor.setModelPointer(modelPointer);
 	}
@@ -111,7 +110,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	public void registerChangeListener(final ChangeListener l) {
 		verifyEventLoopThread();
 		if (!changeCallback.hasListeners()) {
-			SingletonModelFunctions.registerValueChangedCallback(Pointer.nativeValue(modelPointer), changeCallback);
+			SingletonModelFunctions.registerValueChangedCallback(modelPointer, changeCallback);
 		}
 		changeCallback.addListener(Objects.requireNonNull(l, "l is null"));
 	}

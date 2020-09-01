@@ -42,8 +42,6 @@ import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * A model that is available to QML. Represents a list of Maps from the key type
@@ -102,7 +100,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		verifyEventLoopThread();
 		modelPointer = ListModelFunctions.createGenericListModel(modelName, roleArray, indicesArray);
 
-		accessor.setModelPointer(new Pointer(modelPointer));
+		accessor.setModelPointer(modelPointer);
 
 		keySet = keys;
 	}
@@ -350,10 +348,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	 */
 	@Override
 	public Optional<JVariant> getRootValue(final String key) {
-		final IntByReference length = new IntByReference();
-		// TODO
 		final JVariant data = ListModelFunctions.getRootValueFromListModel(modelPointer, key);
-
 		return Optional.ofNullable(data);
 	}
 

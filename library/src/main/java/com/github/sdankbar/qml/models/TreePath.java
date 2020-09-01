@@ -22,11 +22,11 @@
  */
 package com.github.sdankbar.qml.models;
 
+import java.nio.ByteBuffer;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.common.base.Preconditions;
-import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
 
 /**
  * Represents an item in a tree that is an array of arrays. The path to the item
@@ -58,7 +58,7 @@ public class TreePath {
 		Preconditions.checkArgument(index0 >= 0, "Index cannot be negative");
 
 		final TreePath p = new TreePath(1);
-		p.m.setInt(0, index0);
+		p.m.putInt(index0);
 		return p;
 	}
 
@@ -72,8 +72,8 @@ public class TreePath {
 		Preconditions.checkArgument(index1 >= 0, "Index cannot be negative");
 
 		final TreePath p = new TreePath(2);
-		p.m.setInt(0, index0);
-		p.m.setInt(4, index1);
+		p.m.putInt(index0);
+		p.m.putInt(index1);
 
 		return p;
 	}
@@ -90,9 +90,9 @@ public class TreePath {
 		Preconditions.checkArgument(index2 >= 0, "Index cannot be negative");
 
 		final TreePath p = new TreePath(3);
-		p.m.setInt(0, index0);
-		p.m.setInt(4, index1);
-		p.m.setInt(8, index2);
+		p.m.putInt(index0);
+		p.m.putInt(index1);
+		p.m.putInt(index2);
 		return p;
 	}
 
@@ -112,15 +112,12 @@ public class TreePath {
 		}
 
 		final TreePath p = new TreePath(3 + other.length);
-		p.m.setInt(0, index0);
-		p.m.setInt(4, index1);
-		p.m.setInt(8, index2);
-		int offset = 12;
+		p.m.putInt(index0);
+		p.m.putInt(index1);
+		p.m.putInt(index2);
 		for (final int i : other) {
 			Preconditions.checkArgument(i >= 0, "Index cannot be negative");
-
-			p.m.setInt(offset, i);
-			offset += 4;
+			p.m.putInt(i);
 		}
 		return p;
 	}
@@ -137,13 +134,13 @@ public class TreePath {
 		final int lastOffset = 4 * path.getCount();
 		int offset = 0;
 		for (; offset < lastOffset; offset += 4) {
-			p.m.setInt(offset, path.m.getInt(offset));
+			p.m.putInt(path.m.getInt(offset));
 		}
-		p.m.setInt(offset, index0);
+		p.m.putInt(index0);
 		return p;
 	}
 
-	private final Memory m;
+	private final ByteBuffer m;
 	private final int size;
 
 	private TreePath() {
@@ -152,7 +149,7 @@ public class TreePath {
 	}
 
 	private TreePath(final int count) {
-		m = new Memory(4 * count);
+		m = ByteBuffer.allocateDirect(4 * count);
 		size = count;
 	}
 
@@ -230,7 +227,7 @@ public class TreePath {
 			final TreePath p = new TreePath(size - 1);
 			final int lastOffset = 4 * p.getCount();
 			for (int offset = 0; offset < lastOffset; offset += 4) {
-				p.m.setInt(offset, m.getInt(offset + 4));
+				p.m.putInt(m.getInt(offset + 4));
 			}
 			return p;
 		}
@@ -248,27 +245,16 @@ public class TreePath {
 			final TreePath p = new TreePath(size - 1);
 			final int lastOffset = 4 * p.getCount();
 			for (int offset = 0; offset < lastOffset; offset += 4) {
-				p.m.setInt(offset, m.getInt(offset));
+				p.m.putInt(offset, m.getInt(offset));
 			}
 			return p;
-		}
-	}
-
-	/**
-	 * @return This TreePath in its serialized form.
-	 */
-	public Pointer serialize() {
-		if (m == null) {
-			return Pointer.NULL;
-		} else {
-			return m;
 		}
 	}
 
 	public int[] toArray() {
 		final int[] array = new int[size];
 		for (int i = 0; i < size; ++i) {
-			array[i] = m.getInt(i * 4);
+			array[i] = m.getInt(i);
 		}
 		return array;
 	}
@@ -277,7 +263,7 @@ public class TreePath {
 	public String toString() {
 		final StringBuilder b = new StringBuilder("TreePath [");
 		for (int i = 0; i < size; ++i) {
-			b.append(m.getInt(i * 4));
+			b.append(m.getInt(i));
 			if (i != (size - 1)) {
 				b.append(", ");
 			}

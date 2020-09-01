@@ -23,19 +23,16 @@
 package com.github.sdankbar.qml.models;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * Abstract class for modifying maps contained in QML models.
  */
 public abstract class MapAccessor {
 
-	protected Pointer modelPointer;
+	protected long modelPointer;
 
 	/**
 	 * Remove all values from the map.
@@ -50,7 +47,7 @@ public abstract class MapAccessor {
 	 *                  of the serialized data being returned.
 	 * @return Value of the role or Optional.empty()
 	 */
-	public abstract Optional<JVariant> get(final int roleIndex, IntByReference length);
+	public abstract Optional<JVariant> get(final int roleIndex);
 
 	/**
 	 * Removes the map's value for the role.
@@ -60,7 +57,7 @@ public abstract class MapAccessor {
 	 *                  of the serialized data being returned.
 	 * @return Existing Value of the role or Optional.empty() if it had no value.
 	 */
-	public abstract Optional<JVariant> remove(int roleIndex, final IntByReference length);
+	public abstract Optional<JVariant> remove(int roleIndex);
 
 	/**
 	 * Puts a new value into the map.
@@ -82,8 +79,8 @@ public abstract class MapAccessor {
 	 *
 	 * @param modelPointer Pointer to the C++ model.
 	 */
-	public void setModelPointer(final Pointer modelPointer) {
-		this.modelPointer = Objects.requireNonNull(modelPointer, "modelPointer is null");
+	public void setModelPointer(final long modelPointer) {
+		this.modelPointer = modelPointer;
 	}
 
 }
