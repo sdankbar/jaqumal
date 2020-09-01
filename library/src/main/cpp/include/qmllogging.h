@@ -34,15 +34,21 @@ public:
 
     void qtMessages(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
-    Q_INVOKABLE void trace(const std::string& message) const;
-    Q_INVOKABLE void debug(const std::string& message) const;
-    Q_INVOKABLE void info(const std::string& message) const;
-    Q_INVOKABLE void warn(const std::string& message) const;
-    Q_INVOKABLE void error(const std::string& message) const;
+    Q_INVOKABLE void trace(const QString& message) const;
+    Q_INVOKABLE void debug(const QString& message) const;
+    Q_INVOKABLE void info(const QString& message) const;
+    Q_INVOKABLE void warn(const QString& message) const;
+    Q_INVOKABLE void error(const QString& message) const;
 
     void setCallback(jobject obj);
 
 private:
+
+    void trace(const std::string& message) const;
+    void debug(const std::string& message) const;
+    void info(const std::string& message) const;
+    void warn(const std::string& message) const;
+    void error(const std::string& message) const;
 
     jobject javaLoggingCallback;
 };
