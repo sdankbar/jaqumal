@@ -137,12 +137,4 @@ public final class ApplicationFunctions {
 	 */
 	public static native void invoke(final InvokeCallback callback);
 
-	/**
-	 * Invokes a callback on the Qt thread after a delay.
-	 *
-	 * @param callback   The callback to call. Caller is responsible to ensuring the
-	 *                   InvokeCallback object is not garbage collected.
-	 * @param delayMilli The delay until calling the callback in milliseconds.
-	 */
-	public static native void invokeWithDelay(final InvokeCallback callback, final int delayMilli);
 }

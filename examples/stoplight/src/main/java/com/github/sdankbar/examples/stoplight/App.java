@@ -96,10 +96,10 @@ public class App {
 				model.put(StopLightRoles.lightColor, new JVariant(lightColors[index]));
 				if (index == 0) {
 					index = 1;
-					app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
+					//app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
 				} else if (index == 1) {
 					index = 2;
-					app.getQMLThreadExecutor().schedule(this, 1, TimeUnit.SECONDS);
+					//app.getQMLThreadExecutor().schedule(this, 1, TimeUnit.SECONDS);
 				} else if (index == 2) {
 					index = 0;
 					app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
@@ -107,7 +107,7 @@ public class App {
 				// app.getEventDispatcher().submit(new TestQMLEvent());
 			}
 		};
-		// app.getQMLThreadExecutor().execute(r);
+		app.getQMLThreadExecutor().execute(r);
 
 		app.execute();
 	}

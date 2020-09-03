@@ -196,16 +196,6 @@ JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
     }
 }
 
-JNICALL void invokeWithDelay(JNIEnv* env, jclass, jobject callback, jint delayMilli)
-{
-    if (ApplicationFunctions::check(env))
-    {
-        jobject globalRef = env->NewGlobalRef(callback);
-        std::function<void()> func = [=] {
-            ApplicationFunctions::get()->invokeCallback(env, globalRef);
-            env->DeleteGlobalRef(globalRef);
-        };
-        QTimer::singleShot(delayMilli, func);
     }
 }
 
@@ -290,7 +280,6 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("addImageProvider",    "(Ljava/lang/String;Lcom/github/sdankbar/qml/cpp/jni/interfaces/ImageProviderCallback;)V",    (void *)&addImageProvider),
         JNIUtilities::createJNIMethod("getScreens",    "()[Lcom/github/sdankbar/qml/JScreen;",    (void *)&getScreens),
         JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
-        JNIUtilities::createJNIMethod("invokeWithDelay",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;I)V",    (void *)&invokeWithDelay),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
