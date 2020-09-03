@@ -50,7 +50,7 @@ public:
     void unloadQML();
     void reloadQML(const QString& filePath);
     void setLoggingObject(jobject callbackObject);
-    void addImageProviderObject(JNIEnv* env, const QString& id, jobject javaImageProviderCallback);
+    void addImageProviderObject(const QString& id, jobject javaImageProviderCallback);
     QList<QScreen*> getScreensList();
     jobjectArray createJScreenArray(JNIEnv* env, int32_t length);
     jobject createJScreen(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h, double dpi);

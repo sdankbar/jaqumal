@@ -155,7 +155,7 @@ JNICALL void addImageProvider(JNIEnv* env, jclass, jstring id, jobject c)
     if (ApplicationFunctions::check(env))
     {
         ApplicationFunctions::get()->addImageProviderObject(
-            env, JNIUtilities::toQString(env, id), c);
+            JNIUtilities::toQString(env, id), c);
     }
 }
 
@@ -190,12 +190,10 @@ JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
     {
         jobject globalRef = env->NewGlobalRef(callback);
         QMetaObject::invokeMethod(ApplicationFunctions::get(), [=]{
-            ApplicationFunctions::get()->invokeCallback(env, globalRef);
-            env->DeleteGlobalRef(globalRef);
+            JNIEnv* qtEnv = ApplicationFunctions::mainEnv;
+            ApplicationFunctions::get()->invokeCallback(qtEnv, globalRef);
+            qtEnv->DeleteGlobalRef(globalRef);
         });
-    }
-}
-
     }
 }
 
@@ -237,6 +235,10 @@ void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const st
 {
     jstring javaStr = mainEnv->NewStringUTF(msg.c_str());
     mainEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
+    if (mainEnv->ExceptionCheck()) {
+        std::cerr << "Exception while logging" << std::endl;
+        mainEnv->ExceptionClear();
+    }
 }
 
 jclass ApplicationFunctions::loggingCallback;
@@ -279,7 +281,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("runQMLTests",    "(Ljava/lang/String;[Ljava/lang/String;)I",    (void *)&runQMLTests),
         JNIUtilities::createJNIMethod("addImageProvider",    "(Ljava/lang/String;Lcom/github/sdankbar/qml/cpp/jni/interfaces/ImageProviderCallback;)V",    (void *)&addImageProvider),
         JNIUtilities::createJNIMethod("getScreens",    "()[Lcom/github/sdankbar/qml/JScreen;",    (void *)&getScreens),
-        JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
+        JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
@@ -406,10 +408,10 @@ void ApplicationFunctions::setLoggingObject(jobject callbackObject)
     m_logging.setCallback(callbackObject);
 }
 
-void ApplicationFunctions::addImageProviderObject(JNIEnv* env, const QString& id, jobject javaImageProviderCallback)
+void ApplicationFunctions::addImageProviderObject(const QString& id, jobject javaImageProviderCallback)
 {
     m_qmlEngine->addImageProvider(
-                id, new QMLImageProvider(createImageProviderFunctionCallback(env, javaImageProviderCallback)));
+                id, new QMLImageProvider(createImageProviderFunctionCallback(mainEnv, javaImageProviderCallback)));
 }
 
 QList<QScreen*> ApplicationFunctions::getScreensList()
