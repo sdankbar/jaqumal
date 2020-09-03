@@ -24,12 +24,25 @@
 #include "iostream"
 #include <QColor>
 #include <QDateTime>
+#include <jniutilities.h>
+#include <applicationfunctions.h>
 
-std::vector<std::function<void*(const char*, void*, int32_t)> > EventBuilder::EVENT_HANDLERS;
+jobject EventBuilder::EVENT_HANDLER = nullptr;
+jclass EventBuilder::eventCallbackClass;
+jmethodID EventBuilder::eventCallbackMethod;
 
-void EventBuilder::addEventHandler(std::function<void*(const char*, void*, int32_t)> f)
+void EventBuilder::setEventHandler(JNIEnv* env, jobject handler)
 {
-    EVENT_HANDLERS.push_back(f);
+    if (EVENT_HANDLER)
+    {
+        env->DeleteGlobalRef(EVENT_HANDLER);
+    }
+    else
+    {
+        eventCallbackClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/EventCallback");
+        eventCallbackMethod = env->GetMethodID(eventCallbackClass, "invoke", "(Ljava/lang/String;Ljava/nio/ByteBuffer;)Lcom/github/sdankbar/qml/JVariant;");
+    }
+    EVENT_HANDLER = handler;
 }
 
 EventBuilder::EventBuilder(QObject* parent) :
@@ -41,7 +54,7 @@ EventBuilder::EventBuilder(QObject* parent) :
 QVariant EventBuilder::fireEvent(const QString& type)
 {
 	QVariant ret;
-    if (!EVENT_HANDLERS.empty())
+    if (EVENT_HANDLER)
     {
         uint32_t size = m_queuedArguements.size();
         char* memory = new char[size];
@@ -49,14 +62,24 @@ QVariant EventBuilder::fireEvent(const QString& type)
         {
             memory[i] = m_queuedArguements[i];
         }
-        for (auto& func: EVENT_HANDLERS)
+
+        JNIEnv* env = ApplicationFunctions::mainEnv;
+        jstring typeStr = env->NewStringUTF(type.toStdString().c_str());
+        jobject buffer = env->NewDirectByteBuffer(memory, size);
+        jobject result = ApplicationFunctions::mainEnv->CallObjectMethod(EVENT_HANDLER, eventCallbackMethod, typeStr, buffer);
+        if (env->ExceptionCheck())
         {
-            void* result = func(type.toStdString().c_str(), memory, size);
-            if (result)
-            {
-              //ret = toQVariantList(result, 1)[0];
-            }
+            std::cerr << "Exception when calling event handler" << std::endl;
+            env->ExceptionClear();
         }
+        env->DeleteLocalRef(typeStr);
+        env->DeleteLocalRef(buffer);
+        if (result)
+        {
+            // TODO
+            //ret = toQVariantList(result, 1)[0];
+        }
+
         delete[] memory;
     }
     else

@@ -104,7 +104,7 @@ public class App {
 					index = 0;
 					app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
 				}
-				// app.getEventDispatcher().submit(new TestQMLEvent());
+				app.getEventDispatcher().submit(new TestQMLEvent());
 			}
 		};
 		app.getQMLThreadExecutor().execute(r);

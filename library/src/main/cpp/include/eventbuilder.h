@@ -26,6 +26,7 @@
 #include <QObject>
 #include <QMouseEvent>
 #include <functional>
+#include <jni.h>
 
 class EventBuilder : public QObject
 {
@@ -39,7 +40,7 @@ public:
     };
     Q_ENUMS(PerfEventType)
 
-    static void addEventHandler(std::function<void*(const char*, void*, int32_t)> f);
+    static void setEventHandler(JNIEnv* env, jobject handler);
 
     explicit EventBuilder(QObject *parent = nullptr);
 
@@ -69,8 +70,11 @@ public:
 
 private:
 
+    static jobject EVENT_HANDLER;
+    static jclass eventCallbackClass;
+    static jmethodID eventCallbackMethod;
+
     std::vector<char> m_queuedArguements;
-    static std::vector<std::function<void*(const char*, void*, int32_t)> > EVENT_HANDLERS;
 };
 
 #endif // EVENTBUILDER_H

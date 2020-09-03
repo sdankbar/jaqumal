@@ -48,7 +48,7 @@
 
 JNICALL void addEventCallback(JNIEnv* env, jclass, jobject eventCallback)
 {
-    //EventBuilder::addEventHandler(std::function<void*(const char*, void*, int32_t)>(c));
+    EventBuilder::setEventHandler(env, env->NewGlobalRef(eventCallback));
 }
 
 //
