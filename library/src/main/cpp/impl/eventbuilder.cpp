@@ -26,6 +26,7 @@
 #include <QDateTime>
 #include <jniutilities.h>
 #include <applicationfunctions.h>
+#include <qmldatatransfer.h>
 
 jobject EventBuilder::EVENT_HANDLER = nullptr;
 jclass EventBuilder::eventCallbackClass;
@@ -40,7 +41,7 @@ void EventBuilder::setEventHandler(JNIEnv* env, jobject handler)
     else
     {
         eventCallbackClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/EventCallback");
-        eventCallbackMethod = env->GetMethodID(eventCallbackClass, "invoke", "(Ljava/lang/String;Ljava/nio/ByteBuffer;)Lcom/github/sdankbar/qml/JVariant;");
+        eventCallbackMethod = env->GetMethodID(eventCallbackClass, "invoke", "(Ljava/lang/String;Ljava/nio/ByteBuffer;)Z");
     }
     EVENT_HANDLER = handler;
 }
@@ -66,7 +67,7 @@ QVariant EventBuilder::fireEvent(const QString& type)
         JNIEnv* env = ApplicationFunctions::mainEnv;
         jstring typeStr = env->NewStringUTF(type.toStdString().c_str());
         jobject buffer = env->NewDirectByteBuffer(memory, size);
-        jobject result = ApplicationFunctions::mainEnv->CallObjectMethod(EVENT_HANDLER, eventCallbackMethod, typeStr, buffer);
+        bool result = ApplicationFunctions::mainEnv->CallObjectMethod(EVENT_HANDLER, eventCallbackMethod, typeStr, buffer);
         if (env->ExceptionCheck())
         {
             std::cerr << "Exception when calling event handler" << std::endl;
@@ -76,8 +77,8 @@ QVariant EventBuilder::fireEvent(const QString& type)
         env->DeleteLocalRef(buffer);
         if (result)
         {
-            // TODO
-            //ret = toQVariantList(result, 1)[0];
+            ret = QMLDataTransfer::retrieve(0);
+            QMLDataTransfer::clearPendingData();
         }
 
         delete[] memory;

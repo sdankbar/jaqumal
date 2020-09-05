@@ -32,8 +32,11 @@ public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
 
-private:
+    static void invokeMapChangedCallback(jobject callback, jstring key, jobject jvariant);
 
+private:
+    static jclass mapChangedClass;
+    static jmethodID mapChangedMethod;
 };
 
 class GenericObjectModel : public QQmlPropertyMap
@@ -58,7 +61,7 @@ public:
 
     bool containsRole(int32_t roleIndex);
 
-    void registerValueChangedCallback(std::function<void(const char*, const char*, int32_t)> c);
+    void registerValueChangedCallback(jobject c);
 
 private slots:
 
@@ -74,7 +77,7 @@ private:
 
     std::vector<QString> m_roleMap;
 
-    std::vector<std::function<void(const char*, const char*, int32_t)> > callbacks;
+    std::vector<jobject> callbacks;
 };
 
 

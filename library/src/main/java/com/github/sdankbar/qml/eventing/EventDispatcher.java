@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -90,10 +91,13 @@ public class EventDispatcher<T> {
 			if (!e.isConsumed() && QMLReceivableEvent.class.isInstance(e)) {
 				final QMLReceivableEvent<P> castEvent = (QMLReceivableEvent<P>) e;
 				final Map<String, JVariant> args = castEvent.getParameters();
-				final int argsCount = args.size();
-				final String[] keys = args.keySet().toArray(new String[argsCount]);
-				// JVariant.serialize(new ArrayList<>(args.values()), javaToCppMemory);
-				// TODO
+				final String[] keys = new String[args.size()];
+				int i = 0;
+				for (final Entry<String, JVariant> entry : args.entrySet()) {
+					keys[i] = entry.getKey();
+					entry.getValue().sendToQML(i);
+					++i;
+				}
 				EventFunctions.sendQMLEvent(castEvent.getClass().getSimpleName(), keys);
 			}
 		} catch (final Exception excp) {

@@ -149,8 +149,8 @@ void JNICALL registerValueChangedCallback(JNIEnv* env, jclass, jlong longPtr, jo
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        // TODO
-        // modelPtr->registerValueChangedCallback(c);
+        jobject globalC = env->NewGlobalRef(c);
+        modelPtr->registerValueChangedCallback(globalC);
     }
 }
 
@@ -169,8 +169,14 @@ void JNICALL setGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr)
     }
 }
 
+jclass SingletonModelFunctions::mapChangedClass;
+jmethodID SingletonModelFunctions::mapChangedMethod;
+
 void SingletonModelFunctions::initialize(JNIEnv* env)
 {
+    mapChangedClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/MapChangeCallback");
+    mapChangedMethod = env->GetMethodID(mapChangedClass, "invoke", "(Ljava/lang/String;Lcom/github/sdankbar/qml/JVariant;)V");
+
     JNINativeMethod methods[] = {
         JNIUtilities::createJNIMethod("createGenericObjectModel",    "(Ljava/lang/String;[Ljava/lang/String;)J",    (void *)&createGenericObjectModel),
         JNIUtilities::createJNIMethod("clearGenericObjectModel",    "(J)V",    (void *)&clearGenericObjectModel),
@@ -188,6 +194,17 @@ void SingletonModelFunctions::initialize(JNIEnv* env)
 void SingletonModelFunctions::uninitialize(JNIEnv*)
 {
     // Empty Implementation
+}
+
+void SingletonModelFunctions::invokeMapChangedCallback(jobject callback, jstring key, jobject jvariant)
+{
+    JNIEnv* env = ApplicationFunctions::mainEnv;
+    env->CallVoidMethod(callback, mapChangedMethod, key, jvariant);
+    if (env->ExceptionCheck())
+    {
+        std::cerr << "Exception when calling MapChangedCallback" << std::endl;
+        env->ExceptionClear();
+    }
 }
 
 GenericObjectModel::GenericObjectModel(const QString& modelName, const std::vector<QString>& roles)
@@ -291,7 +308,7 @@ void GenericObjectModel::onValueChanged(const QString& key, const QVariant& valu
     callbackListeners(key, value);
 }
 
-void GenericObjectModel::registerValueChangedCallback(std::function<void(const char*, const char*, int32_t)> c)
+void GenericObjectModel::registerValueChangedCallback(jobject c)
 {
     callbacks.push_back(c);
 }
@@ -302,9 +319,9 @@ void GenericObjectModel::callbackListeners(const QString& key, const QVariant& n
     {
         jobject jvariantObj = QMLDataTransfer::toJVariant(ApplicationFunctions::mainEnv, newValue);
         jstring jKey = ApplicationFunctions::mainEnv->NewStringUTF(qPrintable(key));
-        for (const auto& f: callbacks)
+        for (const jobject& c: callbacks)
         {
-            //f(jKey, jvariantObj, l);
+            SingletonModelFunctions::invokeMapChangedCallback(c, jKey, jvariantObj);
         }
     }
 }

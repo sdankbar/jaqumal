@@ -24,8 +24,6 @@ package com.github.sdankbar.qml.cpp.jni.interfaces;
 
 import java.nio.ByteBuffer;
 
-import com.github.sdankbar.qml.JVariant;
-
 /**
  * Interface for those classes wishing to be called back when the C++ or QML
  * layers create an Event.
@@ -40,5 +38,5 @@ public interface EventCallback {
 	 * @param length The length of the array pointed to by data.
 	 * @return The result of the Event or null if no result.
 	 */
-	JVariant invoke(String type, ByteBuffer data);
+	boolean invoke(String type, ByteBuffer data);
 }

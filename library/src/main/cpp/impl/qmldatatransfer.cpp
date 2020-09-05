@@ -390,7 +390,6 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
 
 const std::vector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
 {
-    std::cerr << "roleStack.size=" << roleStack.size() << std::endl;
     return roleStack;
 }
 

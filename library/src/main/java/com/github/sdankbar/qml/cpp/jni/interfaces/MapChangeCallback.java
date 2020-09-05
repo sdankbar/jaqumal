@@ -10,9 +10,8 @@ public interface MapChangeCallback {
 	/**
 	 * Called when a value changes in the map.
 	 *
-	 * @param key          Key/Role name that changed.
-	 * @param newValueData Pointer to the new value.
-	 * @param dataLength   Length of the data pointed to by newValueData.
+	 * @param key  Key/Role name that changed.
+	 * @param data New value.
 	 */
 	void invoke(String key, JVariant data);
 }

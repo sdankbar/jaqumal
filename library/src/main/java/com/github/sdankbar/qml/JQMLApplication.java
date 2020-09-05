@@ -67,14 +67,19 @@ public class JQMLApplication<EType> {
 	private class ApplicationEventListener implements EventCallback {
 
 		@Override
-		public JVariant invoke(final String type, final ByteBuffer buffer) {
+		public boolean invoke(final String type, final ByteBuffer buffer) {
 			try {
 				buffer.order(ByteOrder.nativeOrder());
 				final Optional<JVariant> result = handleEvent(type, buffer);
-				return result.orElse(null);
+				if (result.isPresent()) {
+					result.get().sendToQML(0);
+					return true;
+				} else {
+					return false;
+				}
 			} catch (final Exception e) {
 				log.warn("Exception constructing event " + type, e);
-				return null;
+				return false;
 			}
 		}
 
