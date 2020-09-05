@@ -22,9 +22,7 @@
  */
 package com.github.sdankbar.qml.models;
 
-import java.nio.ByteBuffer;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Arrays;
 
 import com.google.common.base.Preconditions;
 
@@ -58,7 +56,7 @@ public class TreePath {
 		Preconditions.checkArgument(index0 >= 0, "Index cannot be negative");
 
 		final TreePath p = new TreePath(1);
-		p.m.putInt(index0);
+		p.m[0] = index0;
 		return p;
 	}
 
@@ -72,8 +70,8 @@ public class TreePath {
 		Preconditions.checkArgument(index1 >= 0, "Index cannot be negative");
 
 		final TreePath p = new TreePath(2);
-		p.m.putInt(index0);
-		p.m.putInt(index1);
+		p.m[0] = index0;
+		p.m[1] = index1;
 
 		return p;
 	}
@@ -90,9 +88,9 @@ public class TreePath {
 		Preconditions.checkArgument(index2 >= 0, "Index cannot be negative");
 
 		final TreePath p = new TreePath(3);
-		p.m.putInt(index0);
-		p.m.putInt(index1);
-		p.m.putInt(index2);
+		p.m[0] = index0;
+		p.m[1] = index1;
+		p.m[2] = index2;
 		return p;
 	}
 
@@ -112,12 +110,13 @@ public class TreePath {
 		}
 
 		final TreePath p = new TreePath(3 + other.length);
-		p.m.putInt(index0);
-		p.m.putInt(index1);
-		p.m.putInt(index2);
+		p.m[0] = index0;
+		p.m[1] = index1;
+		p.m[2] = index2;
+		int index = 3;
 		for (final int i : other) {
 			Preconditions.checkArgument(i >= 0, "Index cannot be negative");
-			p.m.putInt(i);
+			p.m[index++] = i;
 		}
 		return p;
 	}
@@ -131,54 +130,46 @@ public class TreePath {
 	 */
 	public static TreePath of(final TreePath path, final int index0) {
 		final TreePath p = new TreePath(path.getCount() + 1);
-		final int lastOffset = 4 * path.getCount();
-		int offset = 0;
-		for (; offset < lastOffset; offset += 4) {
-			p.m.putInt(path.m.getInt(offset));
+		for (int i = 0; i < path.getCount(); ++i) {
+			p.m[i] = path.m[i];
 		}
-		p.m.putInt(index0);
+		p.m[p.getCount() - 1] = index0;
 		return p;
 	}
 
-	private final ByteBuffer m;
-	private final int size;
+	private final int[] m;
 
 	private TreePath() {
 		m = null;
-		size = 0;
 	}
 
 	private TreePath(final int count) {
-		m = ByteBuffer.allocateDirect(4 * count);
-		size = count;
+		m = new int[count];
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
 		if (obj == null) {
 			return false;
-		} else if (obj instanceof TreePath) {
-			final TreePath arg = (TreePath) obj;
-			if (arg.size != size) {
-				return false;
-			} else {
-				for (int i = 0; i < size; ++i) {
-					if (m.getInt(4 * i) != arg.m.getInt(4 * i)) {
-						return false;
-					}
-				}
-				return true;
-			}
-		} else {
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
+		final TreePath other = (TreePath) obj;
+		if (!Arrays.equals(m, other.m)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * @return The number of indices contained in this TreePath.
 	 */
 	public int getCount() {
-		return size;
+		return m != null ? m.length : 0;
 	}
 
 	/**
@@ -188,8 +179,8 @@ public class TreePath {
 	 *                                  valid depths for this TreePath.
 	 */
 	public int getIndex(final int depth) {
-		if (0 <= depth && depth < size) {
-			return m.getInt(4 * depth);
+		if (0 <= depth && depth < getCount()) {
+			return m[depth];
 		} else {
 			throw new IllegalArgumentException("Depth [" + depth + "] is not valid for this TreePath");
 		}
@@ -199,8 +190,9 @@ public class TreePath {
 	 * @return The last index in the TreePath.
 	 */
 	public int getLast() {
+		final int size = getCount();
 		if (size > 0) {
-			return m.getInt(4 * (size - 1));
+			return m[size - 1];
 		} else {
 			throw new IllegalArgumentException("Cannot call on root TreePath");
 		}
@@ -208,11 +200,10 @@ public class TreePath {
 
 	@Override
 	public int hashCode() {
-		final HashCodeBuilder builder = new HashCodeBuilder();
-		for (int i = 0; i < size; ++i) {
-			builder.append(m.getInt(i * 4));
-		}
-		return builder.toHashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(m);
+		return result;
 	}
 
 	/**
@@ -221,13 +212,13 @@ public class TreePath {
 	 *         TreePath is returned.
 	 */
 	public TreePath removeFirst() {
+		final int size = getCount();
 		if (size <= 1) {
 			return ROOT_PATH;
 		} else {
 			final TreePath p = new TreePath(size - 1);
-			final int lastOffset = 4 * p.getCount();
-			for (int offset = 0; offset < lastOffset; offset += 4) {
-				p.m.putInt(m.getInt(offset + 4));
+			for (int i = 1; i < p.getCount(); ++i) {
+				p.m[i - 1] = m[i];
 			}
 			return p;
 		}
@@ -239,31 +230,28 @@ public class TreePath {
 	 *         TreePath is returned.
 	 */
 	public TreePath removeLast() {
+		final int size = getCount();
 		if (size <= 1) {
 			return ROOT_PATH;
 		} else {
 			final TreePath p = new TreePath(size - 1);
-			final int lastOffset = 4 * p.getCount();
-			for (int offset = 0; offset < lastOffset; offset += 4) {
-				p.m.putInt(offset, m.getInt(offset));
+			for (int i = 0; i < p.getCount(); ++i) {
+				p.m[i] = m[i];
 			}
 			return p;
 		}
 	}
 
 	public int[] toArray() {
-		final int[] array = new int[size];
-		for (int i = 0; i < size; ++i) {
-			array[i] = m.getInt(i);
-		}
-		return array;
+		return Arrays.copyOf(m, m.length);
 	}
 
 	@Override
 	public String toString() {
+		final int size = getCount();
 		final StringBuilder b = new StringBuilder("TreePath [");
 		for (int i = 0; i < size; ++i) {
-			b.append(m.getInt(i));
+			b.append(m[i]);
 			if (i != (size - 1)) {
 				b.append(", ");
 			}

@@ -40,7 +40,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import org.junit.After;
 import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -94,14 +93,6 @@ public class JVariantTest {
 		assertArrayEquals(new JVariant(3).asByteArray(new byte[2]), new byte[2]);
 		assertArrayEquals(array, v1.asType(byte[].class).get());
 		assertArrayEquals(array, v1.asType(byte[].class, new byte[2]));
-	}
-
-	/**
-	 *
-	 */
-	@After
-	public void cleanup() {
-		JQMLApplication.delete();
 	}
 
 	/**

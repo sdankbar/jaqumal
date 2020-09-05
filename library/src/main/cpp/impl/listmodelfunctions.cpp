@@ -91,6 +91,7 @@ jint JNICALL appendGenericListModelData(JNIEnv* env, jclass, jlong pointer)
         std::vector<QVariant> vars;
         QMLDataTransfer::retrieveAll(vars);
         jint newIndex = modelPtr->appendRowData(vars, QMLDataTransfer::getPendingRoleIndices());
+        QMLDataTransfer::clearPendingData();
         return newIndex;
     }
     else
@@ -271,7 +272,6 @@ void JNICALL putRootValueIntoListModel(JNIEnv* env, jclass, jlong pointer, jstri
         QString keyStr = JNIUtilities::toQString(env, key);
         QVariant dataVar = QMLDataTransfer::retrieve(0);
         modelPtr->putRootValue(keyStr, dataVar);
-
         QMLDataTransfer::clearPendingData();
     }
 }
