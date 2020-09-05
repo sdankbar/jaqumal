@@ -30,6 +30,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -1069,7 +1071,8 @@ public class JVariant {
 				break;
 			}
 			case DATE_TIME: {
-				// TODO
+				final Instant i = (Instant) obj;
+				QMLDataTransfer.setDateTime(i.getEpochSecond(), i.getNano(), role);
 				break;
 			}
 			case DOUBLE: {
@@ -1081,7 +1084,15 @@ public class JVariant {
 				break;
 			}
 			case IMAGE: {
-				// TODO
+				final BufferedImage image = (BufferedImage) obj;
+				final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+				final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
+				b.order(ByteOrder.nativeOrder());
+				for (final int p : pixels) {
+					b.putInt(p);
+				}
+				final byte[] array = b.array();
+				QMLDataTransfer.setImage(image.getWidth(), image.getHeight(), array, role);
 				break;
 			}
 			case INT: {
@@ -1089,7 +1100,8 @@ public class JVariant {
 				break;
 			}
 			case LINE: {
-				// TODO
+				final Line2D l = (Line2D) obj;
+				QMLDataTransfer.setLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2(), role);
 				break;
 			}
 			case LONG: {
@@ -1097,19 +1109,23 @@ public class JVariant {
 				break;
 			}
 			case POINT: {
-				// TODO
+				final Point2D p = (Point2D) obj;
+				QMLDataTransfer.setPoint((int) p.getX(), (int) p.getY(), role);
 				break;
 			}
 			case RECTANGLE: {
-				// TODO
+				final Rectangle2D r = (Rectangle2D) obj;
+				QMLDataTransfer.setLine((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight(), role);
 				break;
 			}
 			case REGULAR_EXPRESSION: {
-				// TODO
+				final Pattern s = (Pattern) obj;
+				QMLDataTransfer.setRegularExpression(s.pattern(), role);
 				break;
 			}
 			case SIZE: {
-				// TODO
+				final Dimension s = (Dimension) obj;
+				QMLDataTransfer.setSize(s.width, s.height, role);
 				break;
 			}
 			case STRING: {
@@ -1129,7 +1145,15 @@ public class JVariant {
 				break;
 			}
 			case POLYLINE: {
-				// TODO
+				@SuppressWarnings("unchecked")
+				final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
+				final double[] array = new double[2 * list.size()];
+				int i = 0;
+				for (final Point2D p : list) {
+					array[i++] = p.getX();
+					array[i++] = p.getY();
+				}
+				QMLDataTransfer.setPolyline(list.size(), array, role);
 				break;
 			}
 			default: {

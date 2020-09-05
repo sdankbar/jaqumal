@@ -34,6 +34,7 @@
 #include <QFont>
 
 #include "jniutilities.h"
+#include <iostream>
 
 namespace
 {
@@ -42,12 +43,12 @@ const std::size_t MAX_ROLES = 256;
 
 JNICALL void setInteger(JNIEnv*, jclass, jint i, jint roleIndex)
 {
-    QMLDataTransfer::store(i, roleIndex);
+    QMLDataTransfer::store(static_cast<int32_t>(i), roleIndex);
 }
 
 JNICALL void setLong(JNIEnv*, jclass, jlong v, jint roleIndex)
 {
-    QMLDataTransfer::store(v, roleIndex);
+    QMLDataTransfer::store(static_cast<int64_t>(v), roleIndex);
 }
 
 JNICALL void setBoolean(JNIEnv*, jclass, jboolean v, jint roleIndex)
@@ -169,10 +170,9 @@ JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, ji
     polygon.reserve(length);
     for (int32_t i = 0; i < length; ++i)
     {
-        double x = *array;
-        double y = *(array + 1);
+        double x = array[2 * i];
+        double y = array[2 * i + 1];
         polygon.append(QPointF(x, y));
-        array += 2;
     }
     QMLDataTransfer::storeRef(polygon, roleIndex);
 
@@ -390,6 +390,7 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
 
 const std::vector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
 {
+    std::cerr << "roleStack.size=" << roleStack.size() << std::endl;
     return roleStack;
 }
 

@@ -24,4 +24,4 @@
 qmake -v
 qmake ./Jaqumal.pro -spec linux-g++
 make qmake_all
-make
+make -j

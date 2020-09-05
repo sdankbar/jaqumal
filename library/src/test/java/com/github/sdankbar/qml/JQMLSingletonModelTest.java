@@ -52,12 +52,16 @@ public class JQMLSingletonModelTest {
 	/**
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 		// Empty Implementation
 	}
 
 	private enum Roles {
-		R1, R2, R3, R4, R5;
+		R1,
+		R2,
+		R3,
+		R4,
+		R5;
 	}
 
 	/**

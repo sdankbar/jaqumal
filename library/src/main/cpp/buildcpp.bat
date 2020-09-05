@@ -24,5 +24,5 @@ Rem
 qmake -v
 qmake ./Jaqumal.pro -spec win32-g++
 mingw32-make qmake_all
-mingw32-make
+mingw32-make -j
 copy libs\Jaqumal.dll ..\resources\win32-x86-64
