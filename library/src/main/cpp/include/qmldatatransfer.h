@@ -49,7 +49,7 @@ public:
     static void retrieve(QVariant& var, size_t i);
     static void retrieve(QVariant& var, int32_t& role, size_t i);
 
-    static jobject toJVariant(const QVariant& value);
+    static jobject toJVariant(JNIEnv* env, const QVariant& value);
     static const std::vector<int32_t>& getPendingRoleIndices();
     static void clearPendingData();
 

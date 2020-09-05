@@ -24,7 +24,6 @@ package com.github.sdankbar.qml;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -236,11 +235,11 @@ public class JVariant {
 		return new JVariant(new Dimension(w, h));
 	}
 
-	private static JVariant fromPolygon(final int[] x, final int[] y) {
+	private static JVariant fromPolygon(final double[] x, final double[] y) {
 		Preconditions.checkArgument(x.length == y.length, "Lengths not equal");
 		final ImmutableList.Builder<Point2D> polygon = ImmutableList.builder();
 		for (int i = 0; i < x.length; ++i) {
-			polygon.add(new Point(x[i], y[i]));
+			polygon.add(new Point2D.Double(x[i], y[i]));
 		}
 		return new JVariant(polygon.build());
 	}
@@ -253,7 +252,7 @@ public class JVariant {
 		return new JVariant(JFont.fromString(str));
 	}
 
-	private static JVariant fromLine(final double x1, final double y1, final double x2, final double y2) {
+	private static JVariant fromLine(final int x1, final int y1, final int x2, final int y2) {
 		return new JVariant(new Line2D.Double(x1, y1, x2, y2));
 	}
 
@@ -261,11 +260,11 @@ public class JVariant {
 		return new JVariant(Pattern.compile(patternStr));
 	}
 
-	private static JVariant fromPoint(final double x, final double y) {
+	private static JVariant fromPoint(final int x, final int y) {
 		return new JVariant(new Point2D.Double(x, y));
 	}
 
-	private static JVariant fromRectangle(final double x, final double y, final double w, final double h) {
+	private static JVariant fromRectangle(final int x, final int y, final int w, final int h) {
 		return new JVariant(new Rectangle2D.Double(x, y, w, h));
 	}
 

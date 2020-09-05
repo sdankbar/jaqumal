@@ -215,13 +215,13 @@ void QMLDataTransfer::initialize(JNIEnv* env)
     fromBufferedImageMethod = env->GetStaticMethodID(jvariantClass, "fromBufferedImage", "(II[I)Lcom/github/sdankbar/qml/JVariant;");
     fromDimensionMethod = env->GetStaticMethodID(jvariantClass, "fromColor", "(I)Lcom/github/sdankbar/qml/JVariant;");
     fromColorMethod = env->GetStaticMethodID(jvariantClass, "fromDimension", "(II)Lcom/github/sdankbar/qml/JVariant;");
-    fromPolygonMethod = env->GetStaticMethodID(jvariantClass, "fromPolygon", "([I[I)Lcom/github/sdankbar/qml/JVariant;");
+    fromPolygonMethod = env->GetStaticMethodID(jvariantClass, "fromPolygon", "([D[D)Lcom/github/sdankbar/qml/JVariant;");
     fromInstanteMethod = env->GetStaticMethodID(jvariantClass, "fromInstant", "(JI)Lcom/github/sdankbar/qml/JVariant;");
     fromJFontMethod = env->GetStaticMethodID(jvariantClass, "fromJFont", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
-    fromLineMethod = env->GetStaticMethodID(jvariantClass, "fromLine", "(DDDD)Lcom/github/sdankbar/qml/JVariant;");
+    fromLineMethod = env->GetStaticMethodID(jvariantClass, "fromLine", "(IIII)Lcom/github/sdankbar/qml/JVariant;");
     fromPatternMethod = env->GetStaticMethodID(jvariantClass, "fromPattern", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
-    fromPointMethod = env->GetStaticMethodID(jvariantClass, "fromPoint", "(DD)Lcom/github/sdankbar/qml/JVariant;");
-    fromRectangleMethod = env->GetStaticMethodID(jvariantClass, "fromRectangle", "(DDDD)Lcom/github/sdankbar/qml/JVariant;");
+    fromPointMethod = env->GetStaticMethodID(jvariantClass, "fromPoint", "(II)Lcom/github/sdankbar/qml/JVariant;");
+    fromRectangleMethod = env->GetStaticMethodID(jvariantClass, "fromRectangle", "(IIII)Lcom/github/sdankbar/qml/JVariant;");
     fromURLMethod = env->GetStaticMethodID(jvariantClass, "fromURL", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
     fromUUIDMethod = env->GetStaticMethodID(jvariantClass, "fromUUID", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
 
@@ -259,9 +259,9 @@ void QMLDataTransfer::initialize(JNIEnv* env)
     env->DeleteLocalRef(javaClass);
 }
 
-void QMLDataTransfer::uninitialize(JNIEnv*)
+void QMLDataTransfer::uninitialize(JNIEnv* env)
 {
-
+    env->DeleteGlobalRef(jvariantClass);
 }
 
 const QVariant& QMLDataTransfer::retrieve(size_t i)
@@ -280,10 +280,112 @@ void QMLDataTransfer::retrieve(QVariant& var, int32_t& role, size_t i)
     role = roleStack[i];
 }
 
-jobject QMLDataTransfer::toJVariant(const QVariant& value)
+jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
 {
-    // TODO
-    return nullptr;
+    switch (value.type()) {
+    case QVariant::Bool: {
+        return env->NewObject(jvariantClass, booleanConstructor, value.toBool());
+    }
+    case QVariant::ByteArray: {
+        const QByteArray a = value.toByteArray();
+        jbyteArray arrayObj = env->NewByteArray(a.length());
+        jbyte* array = env->GetByteArrayElements(arrayObj, nullptr);
+        memcpy(array, a.data(), a.size());
+        env->ReleaseByteArrayElements(arrayObj, array, 0);// Commit and release
+        return env->NewObject(jvariantClass, byteArrayConstructor, arrayObj);
+    }
+    case QVariant::Color: {
+        const QColor c = value.value<QColor>();
+        return env->CallStaticObjectMethod(jvariantClass, fromColorMethod, c.rgba());
+    }
+    case QVariant::DateTime: {
+        const QDateTime d = value.toDateTime();
+        const int64_t seconds = d.toSecsSinceEpoch();
+        const int32_t nanos = d.toMSecsSinceEpoch() * 1000000;
+        return env->CallStaticObjectMethod(jvariantClass, fromInstanteMethod, seconds, nanos);
+    }
+    case QVariant::Double: {
+        return env->NewObject(jvariantClass, doubleConstructor, value.toDouble());
+    }
+    case QVariant::Image: {
+        const QImage i = value.value<QImage>();
+        jbyteArray arrayObj = env->NewByteArray(i.sizeInBytes());
+        jbyte* array = env->GetByteArrayElements(arrayObj, nullptr);
+        memcpy(array, i.constBits(), i.sizeInBytes());
+        env->ReleaseByteArrayElements(arrayObj, array, 0);// Commit and release
+        return env->CallStaticObjectMethod(jvariantClass, fromBufferedImageMethod, i.width(), i.height(), arrayObj);
+    }
+    case QVariant::Int: {
+        return env->NewObject(jvariantClass, integerConstructor, value.toInt());
+    }
+    case QVariant::Line: {
+        const QLine l = value.toLine();
+        return env->CallStaticObjectMethod(jvariantClass, fromLineMethod, l.x1(), l.y1(), l.x2(), l.y2());
+    }
+    case QVariant::LongLong: {
+        return env->NewObject(jvariantClass, longConstructor, value.toLongLong());
+    }
+    case QVariant::Point: {
+        const QPoint p = value.toPoint();
+        return env->CallStaticObjectMethod(jvariantClass, fromPointMethod, p.x(), p.y());
+    }
+    case QVariant::Rect: {
+        const QRect r = value.toRect();
+        return env->CallStaticObjectMethod(jvariantClass, fromRectangleMethod, r.x(), r.y(), r.width(), r.height());
+    }
+    case QVariant::RegExp: {
+        const QString str = value.toRegExp().pattern();
+        jstring jStr = env->NewStringUTF(qPrintable(str));
+        return env->CallStaticObjectMethod(jvariantClass, fromPatternMethod, jStr);
+    }
+    case QVariant::Size: {
+        const QSize s = value.toSize();
+        return env->CallStaticObjectMethod(jvariantClass, fromDimensionMethod, s.width(), s.height());
+    }
+    case QVariant::String: {
+        const QString str = value.toString();
+        jstring jStr = env->NewStringUTF(qPrintable(str));
+        return env->NewObject(jvariantClass, stringConstructor, jStr);
+    }
+    case QVariant::Url: {
+        const QString str = value.toUrl().toString();
+        jstring jStr = env->NewStringUTF(qPrintable(str));
+        return env->CallStaticObjectMethod(jvariantClass, fromURLMethod, jStr);
+    }
+    case QVariant::Uuid: {
+        const QString str = value.toUuid().toString();
+        jstring jStr = env->NewStringUTF(qPrintable(str));
+        return env->CallStaticObjectMethod(jvariantClass, fromUUIDMethod, jStr);
+    }
+    case QVariant::Font: {
+        const QString str = value.value<QFont>().toString();
+        jstring jStr = env->NewStringUTF(qPrintable(str));
+        return env->CallStaticObjectMethod(jvariantClass, fromJFontMethod, jStr);
+    }
+    default:
+        if (value.canConvert<QPolygonF>())
+        {
+            const QPolygonF p = value.value<QPolygonF>();
+            jdoubleArray xArrayObj = env->NewDoubleArray(p.size());
+            jdoubleArray yArrayObj = env->NewDoubleArray(p.size());
+            jdouble* xArray = env->GetDoubleArrayElements(xArrayObj, nullptr);
+            jdouble* yArray = env->GetDoubleArrayElements(yArrayObj, nullptr);
+
+            for (int32_t i = 0; i < p.size(); ++i)
+            {
+                const QPointF& point = p[i];
+                xArray[i] = point.x();
+                yArray[i] = point.y();
+            }
+
+            env->ReleaseDoubleArrayElements(xArrayObj, xArray, 0);// Commit and release
+            env->ReleaseDoubleArrayElements(yArrayObj, yArray, 0);// Commit and release
+            return env->CallStaticObjectMethod(jvariantClass, fromPolygonMethod, xArrayObj, yArrayObj);
+        }
+        else {
+            return nullptr;
+        }
+    }
 }
 
 const std::vector<int32_t>& QMLDataTransfer::getPendingRoleIndices()

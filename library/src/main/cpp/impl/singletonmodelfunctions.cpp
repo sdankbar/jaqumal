@@ -113,7 +113,7 @@ jobject JNICALL getGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr, ji
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        return QMLDataTransfer::toJVariant(modelPtr->getData(roleIndex));
+        return QMLDataTransfer::toJVariant(env, modelPtr->getData(roleIndex));
     }
     else
     {
@@ -299,11 +299,11 @@ void GenericObjectModel::callbackListeners(const QString& key, const QVariant& n
 {
     if (!callbacks.empty())
     {
-        int32_t l;
-        //std::unique_ptr<char> data;//(fromQVariant(newValue, l, true));
+        jobject jvariantObj = QMLDataTransfer::toJVariant(ApplicationFunctions::mainEnv, newValue);
+        jstring jKey = ApplicationFunctions::mainEnv->NewStringUTF(qPrintable(key));
         for (const auto& f: callbacks)
         {
-            //f(key.toStdString().c_str(), data.get(), l);
+            //f(jKey, jvariantObj, l);
         }
     }
 }
