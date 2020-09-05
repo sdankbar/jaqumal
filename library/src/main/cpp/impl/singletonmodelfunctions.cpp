@@ -275,7 +275,7 @@ void GenericObjectModel::setData(const std::vector<int32_t>& roleIndex)
     for (size_t i = 0; i < roleIndex.size(); ++i)
     {
         const int32_t r = roleIndex[i];
-        setData(QMLDataTransfer::retrieve(r), r);
+        setData(QMLDataTransfer::retrieve(i), r);
     }
     QMLDataTransfer::clearPendingData();
 }

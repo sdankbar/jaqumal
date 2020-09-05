@@ -38,7 +38,7 @@
 
 namespace
 {
-const std::size_t MAX_ROLES = 256;
+const std::size_t MAX_SIZE = 256;
 }
 
 JNICALL void setInteger(JNIEnv*, jclass, jint i, jint roleIndex)
@@ -179,6 +179,7 @@ JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, ji
     env->ReleaseDoubleArrayElements(data, array, JNI_ABORT);
 }
 
+int32_t QMLDataTransfer::variantsIndex = 0;
 std::vector<QVariant> QMLDataTransfer::variants;
 std::vector<int32_t> QMLDataTransfer::roleStack;
 
@@ -207,8 +208,8 @@ jmethodID QMLDataTransfer::stringConstructor;
 
 void QMLDataTransfer::initialize(JNIEnv* env)
 {
-    QMLDataTransfer::variants.resize(MAX_ROLES);
-    QMLDataTransfer::roleStack.reserve(MAX_ROLES);
+    QMLDataTransfer::variants.resize(MAX_SIZE);
+    QMLDataTransfer::roleStack.reserve(MAX_SIZE);
 
 
     jvariantClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/JVariant");
@@ -269,23 +270,12 @@ const QVariant& QMLDataTransfer::retrieve(size_t i)
     return variants[i];
 }
 
-void QMLDataTransfer::retrieve(QVariant& var, size_t i)
-{
-    var.swap(variants[i]);
-}
-
-void QMLDataTransfer::retrieve(QVariant& var, int32_t& role, size_t i)
-{
-    var.swap(variants[i]);
-    role = roleStack[i];
-}
-
 void QMLDataTransfer::retrieveAll(std::vector<QVariant>& vec)
 {
     const size_t len = roleStack.size();
     for (size_t i = 0; i < len; ++i)
     {
-        vec.push_back(variants[roleStack[i]]);
+        vec.push_back(variants[i]);
     }
 }
 
@@ -404,6 +394,7 @@ const std::vector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
 
 void QMLDataTransfer::clearPendingData()
 {
+    variantsIndex = 0;
     roleStack.clear();
 }
 

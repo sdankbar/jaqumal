@@ -35,6 +35,11 @@ import org.openjdk.jmh.runner.options.TimeValue;
 public class JMHTest {
 
 	@Test
+	public void nullTest() {
+		// Empty Implementation
+	}
+
+	// @Test
 	public void runBenchmarks() throws RunnerException {
 		final Options options = new OptionsBuilder().include(JMHTest.class.getName() + ".*").mode(Mode.Throughput)
 				.timeUnit(TimeUnit.MICROSECONDS).warmupTime(TimeValue.seconds(1)).warmupIterations(3).threads(1)

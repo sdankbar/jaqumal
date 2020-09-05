@@ -34,20 +34,18 @@ public:
     template<typename T>
     static void store(T data, int32_t role)
     {
-        variants[role].setValue(data);
+        variants[variantsIndex++].setValue(data);
         roleStack.push_back(role);
     }
 
     template<typename T>
     static void storeRef(const T& data, int32_t role)
     {
-        variants[role].setValue(data);
+        variants[variantsIndex++].setValue(data);
         roleStack.push_back(role);
     }
 
     static const QVariant& retrieve(size_t i);
-    static void retrieve(QVariant& var, size_t i);
-    static void retrieve(QVariant& var, int32_t& role, size_t i);
     static void retrieveAll(std::vector<QVariant>& vec);
 
     static jobject toJVariant(JNIEnv* env, const QVariant& value);
@@ -57,6 +55,7 @@ public:
 private:
     QMLDataTransfer();
 
+    static int32_t variantsIndex;
     static std::vector<QVariant> variants;
     static std::vector<int32_t> roleStack;
 

@@ -180,7 +180,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		Objects.requireNonNull(role, "role is null");
 		verifyEventLoopThread();
 
-		data.sendToQML(indexLookup.get(data.toString()).intValue());
+		data.sendToQML(indexLookup.get(role.toString()).intValue());
 		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
@@ -219,7 +219,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		Objects.requireNonNull(role, "role is null");
 
 		verifyEventLoopThread();
-		data.sendToQML(indexLookup.get(data.toString()).intValue());
+		data.sendToQML(indexLookup.get(role.toString()).intValue());
 		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
 		final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,

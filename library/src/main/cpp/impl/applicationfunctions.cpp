@@ -38,7 +38,6 @@
 #include <QApplication>
 #include <iostream>
 #include <functional>
-#include <genericflattreemodel.h>
 #include <singletonmodelfunctions.h>
 #include <listmodelfunctions.h>
 #include <flattreemodelfunctions.h>
@@ -366,14 +365,7 @@ void ApplicationFunctions::invokeCallback(JNIEnv* env, jobject c)
 GenericFlatTreeModel* ApplicationFunctions::createGenericFlatTreeModel(const QString& modelName, const QStringList& roleNames,
                                         const QVector<int>& indices)
 {
-    QHash<int, QByteArray> roleNameMap;
-    for (int32_t i = 0; i < indices.size(); ++i)
-    {
-        roleNameMap[indices[i]] = roleNames[i].toStdString().c_str();
-    }
 
-    GenericFlatTreeModel* modelPtr = new GenericFlatTreeModel(modelName, roleNameMap, 0);
-    m_qmlEngine->rootContext()->setContextProperty(modelName, QVariant::fromValue(modelPtr));
     return modelPtr;
 }
 */

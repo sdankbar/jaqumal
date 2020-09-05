@@ -44,7 +44,6 @@ SOURCES += \
     impl/flattreemodelfunctions.cpp \
     impl/fontfunctions.cpp \
     impl/eventbuilder.cpp \
-    impl/genericflattreemodel.cpp \
     impl/listmodelfunctions.cpp \
     impl/qmllogging.cpp \
     impl/eventdispatcher.cpp \
@@ -65,7 +64,6 @@ HEADERS += \
     include/listmodelfunctions.h \
     include/qmldatatransfer.h \
     include/eventbuilder.h \
-    include/genericflattreemodel.h \
     include/qmllogging.h \
     include/eventdispatcher.h \
     include/singletonmodelfunctions.h \
