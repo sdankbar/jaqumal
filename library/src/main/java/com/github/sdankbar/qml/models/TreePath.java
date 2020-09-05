@@ -140,7 +140,7 @@ public class TreePath {
 	private final int[] m;
 
 	private TreePath() {
-		m = null;
+		m = new int[0];
 	}
 
 	private TreePath(final int count) {
@@ -169,7 +169,7 @@ public class TreePath {
 	 * @return The number of indices contained in this TreePath.
 	 */
 	public int getCount() {
-		return m != null ? m.length : 0;
+		return m.length;
 	}
 
 	/**

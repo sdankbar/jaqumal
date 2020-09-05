@@ -193,7 +193,7 @@ JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
             JNIEnv* qtEnv = ApplicationFunctions::mainEnv;
             ApplicationFunctions::get()->invokeCallback(qtEnv, globalRef);
             qtEnv->DeleteGlobalRef(globalRef);
-        });
+        }, Qt::QueuedConnection);
     }
 }
 

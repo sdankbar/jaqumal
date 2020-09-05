@@ -139,6 +139,8 @@ public class JVariantTest {
 		assertEquals(new JVariant(3).asFont(v), v);
 		assertEquals(v, v1.asType(JFont.class).get());
 		assertEquals(v, v1.asType(JFont.class, JFont.builder().build()));
+
+		JQMLApplication.delete();
 	}
 
 	/**
