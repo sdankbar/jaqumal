@@ -43,7 +43,6 @@ SOURCES += \
     impl/eventfunctions.cpp \
     impl/flattreemodelfunctions.cpp \
     impl/fontfunctions.cpp \
-    impl/genericlistmodel.cpp \
     impl/eventbuilder.cpp \
     impl/genericflattreemodel.cpp \
     impl/listmodelfunctions.cpp \
@@ -65,7 +64,6 @@ HEADERS += \
     include/jniutilities.h \
     include/listmodelfunctions.h \
     include/qmldatatransfer.h \
-    include/genericlistmodel.h \
     include/eventbuilder.h \
     include/genericflattreemodel.h \
     include/qmllogging.h \

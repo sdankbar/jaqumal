@@ -48,6 +48,7 @@ public:
     static const QVariant& retrieve(size_t i);
     static void retrieve(QVariant& var, size_t i);
     static void retrieve(QVariant& var, int32_t& role, size_t i);
+    static void retrieveAll(std::vector<QVariant>& vec);
 
     static jobject toJVariant(JNIEnv* env, const QVariant& value);
     static const std::vector<int32_t>& getPendingRoleIndices();

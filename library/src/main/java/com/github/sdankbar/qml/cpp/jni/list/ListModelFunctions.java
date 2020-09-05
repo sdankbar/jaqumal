@@ -60,7 +60,7 @@ public final class ListModelFunctions {
 
 	public static native boolean isGenericListModelRolePresent(long modelPointer, int index, int roleIndex);
 
-	public static native void putRootValueIntoListModel(long modelPointer, String key, JVariant data);
+	public static native void putRootValueIntoListModel(long modelPointer, String key);
 
 	public static native void removeRootValueFromListModel(long modelPointer, String key);
 

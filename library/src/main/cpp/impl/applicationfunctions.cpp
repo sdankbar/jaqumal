@@ -39,8 +39,9 @@
 #include <iostream>
 #include <functional>
 #include <genericflattreemodel.h>
-#include <genericlistmodel.h>
 #include <singletonmodelfunctions.h>
+#include <listmodelfunctions.h>
+#include <flattreemodelfunctions.h>
 
 #include "qmlimageprovider.h"
 #include <QQmlContext>

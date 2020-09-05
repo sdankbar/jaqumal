@@ -323,6 +323,8 @@ void GenericObjectModel::callbackListeners(const QString& key, const QVariant& n
         {
             SingletonModelFunctions::invokeMapChangedCallback(c, jKey, jvariantObj);
         }
+        ApplicationFunctions::mainEnv->DeleteLocalRef(jvariantObj);
+        ApplicationFunctions::mainEnv->DeleteLocalRef(jKey);
     }
 }
 

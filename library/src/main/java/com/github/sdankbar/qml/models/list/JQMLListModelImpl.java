@@ -432,7 +432,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public void putRootValue(final String key, final JVariant data) {
 		Objects.requireNonNull(key, "key is null");
 		Objects.requireNonNull(data, "data is null");
-		ListModelFunctions.putRootValueIntoListModel(modelPointer, key, data);
+		data.sendToQML(0);
+		ListModelFunctions.putRootValueIntoListModel(modelPointer, key);
 
 	}
 

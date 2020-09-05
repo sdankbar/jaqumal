@@ -28,6 +28,7 @@
 #include <QQmlApplicationEngine>
 #include <userinputsimulator.h>
 #include <QQmlContext>
+#include <QAbstractListModel>
 
 class ListModelFunctions
 {
@@ -38,6 +39,71 @@ public:
 
 private:
 
+};
+
+class GenericListModel : public QAbstractListModel
+{
+    Q_OBJECT
+    Q_PROPERTY(qint32 size READ size NOTIFY sizeChanged)
+    Q_PROPERTY(const QString& modelName READ modelName)
+    Q_PROPERTY(const QVariantMap& root READ root NOTIFY rootChanged)
+
+public:
+    explicit GenericListModel(const QString& modelName, const QHash<int, QByteArray>& roleMap);
+
+    const QString& modelName() const;
+    const QVariantMap& root() const;
+
+    void putRootValue(const QString& key, const QVariant& value);
+    void removeRootValue(const QString& key);
+    const QVariant& getRootValue(const QString& key);
+
+    // Basic functionality:
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    QHash<int, QByteArray> roleNames() const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    //
+
+    Q_INVOKABLE QVariantMap getData(qint32 row) const;
+    Q_INVOKABLE QVariant getData(qint32 row, const QString& propertyName) const;
+
+    int32_t appendRowData(const QVariant& data, int32_t roleIndex);
+    int32_t appendRowData(const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
+
+    void setRowData(qint32 row, const QVariant& data, int32_t roleIndex);
+    void setRowData(qint32 row, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
+
+    void insertRowData(qint32 row, const QVariant& data, int32_t roleIndex);
+    void insertRowData(qint32 row, const std::vector<QVariant>& data, std::vector<int32_t> roleIndex);
+
+    QVariant getRowData(qint32 row, int32_t roleIndex) const;
+
+    void clear(qint32 row, int32_t roleIndex);
+    void clear(qint32 row);
+    void erase(qint32 row);
+
+    bool containsRole(qint32 row, int32_t roleIndex);
+
+    void reorder(const std::vector<int32_t>& ordering);
+
+    qint32 size() const;
+
+signals:
+    void sizeChanged();
+    void rootChanged();
+private:
+
+    void emitSignal(qint32 row);
+
+    // Member variables
+    QString m_modelName;
+    QVariantMap m_root;
+
+    QList<QHash<int32_t, QVariant> > m_rowData;
+    QHash<QString, int> m_stringToIndexRoleMap;
+    QHash<int, QByteArray> m_roleNames;
 };
 
 

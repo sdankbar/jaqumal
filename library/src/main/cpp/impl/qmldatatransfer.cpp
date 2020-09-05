@@ -280,6 +280,15 @@ void QMLDataTransfer::retrieve(QVariant& var, int32_t& role, size_t i)
     role = roleStack[i];
 }
 
+void QMLDataTransfer::retrieveAll(std::vector<QVariant>& vec)
+{
+    const size_t len = roleStack.size();
+    for (size_t i = 0; i < len; ++i)
+    {
+        vec.push_back(variants[roleStack[i]]);
+    }
+}
+
 jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
 {
     switch (value.type()) {
