@@ -60,7 +60,6 @@ public class SingletonMapAccessor extends MapAccessor {
 	public void set(final JVariant value, final int roleIndex) {
 		value.sendToQML(roleIndex);
 		SingletonModelFunctions.setGenericObjectModelData(modelPointer);
-
 	}
 
 	@Override

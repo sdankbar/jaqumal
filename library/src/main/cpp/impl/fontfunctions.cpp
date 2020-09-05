@@ -288,6 +288,7 @@ void FontFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("getBoundingRect2",    "(Ljava/lang/String;IIIIIILjava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getBoundingRect2),
         JNIUtilities::createJNIMethod("getQFontMetrics",    "(Ljava/lang/String;)Ljava/lang/String;",    (void *)&getQFontMetrics),
         JNIUtilities::createJNIMethod("getQFontToString",    "(Ljava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;",    (void *)&getQFontToString),
+        JNIUtilities::createJNIMethod("getQFontInfo",    "(Ljava/lang/String;)Ljava/lang/String",    (void *)&getQFontInfo),
         JNIUtilities::createJNIMethod("getStringWidth",    "(Ljava/lang/String;Ljava/lang/String;)I",    (void *)&getStringWidth),
         JNIUtilities::createJNIMethod("getTightBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getTightBoundingRect),
         JNIUtilities::createJNIMethod("inFont",    "(Ljava/lang/String;I)Z",    (void *)&inFont),

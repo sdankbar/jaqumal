@@ -165,6 +165,7 @@ void JNICALL setGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr)
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
         modelPtr->setData(QMLDataTransfer::getPendingRoleIndices());
+        QMLDataTransfer::clearPendingData();
     }
 }
 
