@@ -58,5 +58,27 @@ private:
 
     static std::vector<QVariant> variants;
     static std::vector<int32_t> roleStack;
+
+    static jclass jvariantClass;
+    static jmethodID fromBufferedImageMethod;
+    static jmethodID fromDimensionMethod;
+    static jmethodID fromColorMethod;
+    static jmethodID fromPolygonMethod;
+    static jmethodID fromInstanteMethod;
+    static jmethodID fromJFontMethod;
+    static jmethodID fromLineMethod;
+    static jmethodID fromPatternMethod;
+    static jmethodID fromPointMethod;
+    static jmethodID fromRectangleMethod;
+    static jmethodID fromURLMethod;
+    static jmethodID fromUUIDMethod;
+
+    static jmethodID booleanConstructor;
+    static jmethodID byteArrayConstructor;
+    static jmethodID doubleConstructor;
+    static jmethodID floatConstructor;
+    static jmethodID integerConstructor;
+    static jmethodID longConstructor;
+    static jmethodID stringConstructor;
 };
 

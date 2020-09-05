@@ -24,10 +24,12 @@ package com.github.sdankbar.qml;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Objects;
@@ -188,7 +190,6 @@ public class JVariant {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(JVariant.class);
-	private static final Type[] TYPE_ARRAY = Type.values();
 
 	/**
 	 * Immutable JVariant containing the empty string.
@@ -214,6 +215,71 @@ public class JVariant {
 	 * Immutable JVariant containing false.
 	 */
 	public static final JVariant FALSE = new JVariant(false);
+
+	private static JVariant fromBufferedImage(final int w, final int h, final int[] array) {
+		final BufferedImage v = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		int i = 0;
+		for (int r = 0; r < h; ++r) {
+			for (int c = 0; c < w; ++c) {
+				v.setRGB(c, r, array[i]);
+				++i;
+			}
+		}
+		return null;
+	}
+
+	private static JVariant fromColor(final int rgba) {
+		return new JVariant(new Color(rgba, true));
+	}
+
+	private static JVariant fromDimension(final int w, final int h) {
+		return new JVariant(new Dimension(w, h));
+	}
+
+	private static JVariant fromPolygon(final int[] x, final int[] y) {
+		Preconditions.checkArgument(x.length == y.length, "Lengths not equal");
+		final ImmutableList.Builder<Point2D> polygon = ImmutableList.builder();
+		for (int i = 0; i < x.length; ++i) {
+			polygon.add(new Point(x[i], y[i]));
+		}
+		return new JVariant(polygon.build());
+	}
+
+	private static JVariant fromInstant(final long epoch, final int nano) {
+		return new JVariant(Instant.ofEpochSecond(epoch, nano));
+	}
+
+	private static JVariant fromJFont(final String str) {
+		return new JVariant(JFont.fromString(str));
+	}
+
+	private static JVariant fromLine(final double x1, final double y1, final double x2, final double y2) {
+		return new JVariant(new Line2D.Double(x1, y1, x2, y2));
+	}
+
+	private static JVariant fromPattern(final String patternStr) {
+		return new JVariant(Pattern.compile(patternStr));
+	}
+
+	private static JVariant fromPoint(final double x, final double y) {
+		return new JVariant(new Point2D.Double(x, y));
+	}
+
+	private static JVariant fromRectangle(final double x, final double y, final double w, final double h) {
+		return new JVariant(new Rectangle2D.Double(x, y, w, h));
+	}
+
+	private static JVariant fromURL(final String str) {
+		try {
+			return new JVariant(new URL(str));
+		} catch (final MalformedURLException e) {
+			return null;
+		}
+	}
+
+	private static JVariant fromUUID(final String str) {
+		return new JVariant(UUID.fromString(str));
+	}
 
 	/**
 	 * Returns a TRUE or FALSE JVariant. Does not allocate memory and thus has

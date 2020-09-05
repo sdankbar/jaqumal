@@ -182,10 +182,56 @@ JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, ji
 std::vector<QVariant> QMLDataTransfer::variants;
 std::vector<int32_t> QMLDataTransfer::roleStack;
 
+
+jclass QMLDataTransfer::jvariantClass;
+jmethodID QMLDataTransfer::fromBufferedImageMethod;
+jmethodID QMLDataTransfer::fromDimensionMethod;
+jmethodID QMLDataTransfer::fromColorMethod;
+jmethodID QMLDataTransfer::fromPolygonMethod;
+jmethodID QMLDataTransfer::fromInstanteMethod;
+jmethodID QMLDataTransfer::fromJFontMethod;
+jmethodID QMLDataTransfer::fromLineMethod;
+jmethodID QMLDataTransfer::fromPatternMethod;
+jmethodID QMLDataTransfer::fromPointMethod;
+jmethodID QMLDataTransfer::fromRectangleMethod;
+jmethodID QMLDataTransfer::fromURLMethod;
+jmethodID QMLDataTransfer::fromUUIDMethod;
+
+jmethodID QMLDataTransfer::booleanConstructor;
+jmethodID QMLDataTransfer::byteArrayConstructor;
+jmethodID QMLDataTransfer::doubleConstructor;
+jmethodID QMLDataTransfer::floatConstructor;
+jmethodID QMLDataTransfer::integerConstructor;
+jmethodID QMLDataTransfer::longConstructor;
+jmethodID QMLDataTransfer::stringConstructor;
+
 void QMLDataTransfer::initialize(JNIEnv* env)
 {
     QMLDataTransfer::variants.resize(MAX_ROLES);
     QMLDataTransfer::roleStack.reserve(MAX_ROLES);
+
+
+    jvariantClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/JVariant");
+    fromBufferedImageMethod = env->GetStaticMethodID(jvariantClass, "fromBufferedImage", "(II[I)Lcom/github/sdankbar/qml/JVariant;");
+    fromDimensionMethod = env->GetStaticMethodID(jvariantClass, "fromColor", "(I)Lcom/github/sdankbar/qml/JVariant;");
+    fromColorMethod = env->GetStaticMethodID(jvariantClass, "fromDimension", "(II)Lcom/github/sdankbar/qml/JVariant;");
+    fromPolygonMethod = env->GetStaticMethodID(jvariantClass, "fromPolygon", "([I[I)Lcom/github/sdankbar/qml/JVariant;");
+    fromInstanteMethod = env->GetStaticMethodID(jvariantClass, "fromInstant", "(JI)Lcom/github/sdankbar/qml/JVariant;");
+    fromJFontMethod = env->GetStaticMethodID(jvariantClass, "fromJFont", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
+    fromLineMethod = env->GetStaticMethodID(jvariantClass, "fromLine", "(DDDD)Lcom/github/sdankbar/qml/JVariant;");
+    fromPatternMethod = env->GetStaticMethodID(jvariantClass, "fromPattern", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
+    fromPointMethod = env->GetStaticMethodID(jvariantClass, "fromPoint", "(DD)Lcom/github/sdankbar/qml/JVariant;");
+    fromRectangleMethod = env->GetStaticMethodID(jvariantClass, "fromRectangle", "(DDDD)Lcom/github/sdankbar/qml/JVariant;");
+    fromURLMethod = env->GetStaticMethodID(jvariantClass, "fromURL", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
+    fromUUIDMethod = env->GetStaticMethodID(jvariantClass, "fromUUID", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
+
+    booleanConstructor = env->GetMethodID(jvariantClass, "<init>", "(Z)V");
+    byteArrayConstructor= env->GetMethodID(jvariantClass, "<init>", "([B)V");
+    doubleConstructor= env->GetMethodID(jvariantClass, "<init>", "(D)V");
+    floatConstructor= env->GetMethodID(jvariantClass, "<init>", "(F)V");
+    integerConstructor= env->GetMethodID(jvariantClass, "<init>", "(I)V");
+    longConstructor= env->GetMethodID(jvariantClass, "<init>", "(J)V");
+    stringConstructor= env->GetMethodID(jvariantClass, "<init>", "(Ljava/lang/String;)V");
 
     JNINativeMethod methods[] = {
         JNIUtilities::createJNIMethod("setInteger",    "(II)V",    (void *)&setInteger),
