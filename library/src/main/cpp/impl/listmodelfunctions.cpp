@@ -46,11 +46,6 @@
 #include <applicationfunctions.h>
 #include <qmldatatransfer.h>
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    createGenericListModel
- * Signature: (Ljava/lang/String;[Ljava/lang/String;[I)J
- */
 jlong JNICALL createGenericListModel(JNIEnv* env, jclass, jstring modelName, jobjectArray roleStrings, jintArray roleIndices)
 {
     if (ApplicationFunctions::check(env))
@@ -78,18 +73,12 @@ jlong JNICALL createGenericListModel(JNIEnv* env, jclass, jstring modelName, job
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    appendGenericListModelData
- * Signature: (J)I
- */
 jint JNICALL appendGenericListModelData(JNIEnv* env, jclass, jlong pointer)
 {
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
-        std::vector<QVariant>& vars = QMLDataTransfer::getPendingVariants();
-        jint newIndex = modelPtr->appendRowData(vars, QMLDataTransfer::getPendingRoleIndices());
+        jint newIndex = modelPtr->appendRowData(QMLDataTransfer::getPendingVariants(), QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
         return newIndex;
     }
@@ -99,11 +88,6 @@ jint JNICALL appendGenericListModelData(JNIEnv* env, jclass, jlong pointer)
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    clearAllGenericListModelData
- * Signature: (JI)V
- */
 void JNICALL clearAllGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint row)
 {
     if (ApplicationFunctions::check(env))
@@ -113,11 +97,6 @@ void JNICALL clearAllGenericListModelData(JNIEnv* env, jclass, jlong pointer, ji
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    clearGenericListModelData
- * Signature: (JII)V
- */
 void JNICALL clearGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint row, jint role)
 {
     if (ApplicationFunctions::check(env))
@@ -127,11 +106,6 @@ void JNICALL clearGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint 
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    eraseGenericListModelData
- * Signature: (JI)V
- */
 void JNICALL eraseGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint row)
 {
     if (ApplicationFunctions::check(env))
@@ -154,11 +128,6 @@ jobject JNICALL getGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    getGenericListModelSize
- * Signature: (J)I
- */
 jint JNICALL getGenericListModelSize(JNIEnv* env, jclass, jlong pointer)
 {
     if (ApplicationFunctions::check(env))
@@ -172,11 +141,6 @@ jint JNICALL getGenericListModelSize(JNIEnv* env, jclass, jlong pointer)
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    insertGenericListModelData
- * Signature: (JI)V
- */
 void JNICALL insertGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint row)
 {
     if (ApplicationFunctions::check(env))
@@ -188,11 +152,6 @@ void JNICALL insertGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    isGenericListModelRolePresent
- * Signature: (JII)Z
- */
 jboolean JNICALL isGenericListModelRolePresent(JNIEnv* env, jclass, jlong pointer, jint row, jint roleIndex)
 {
     if (ApplicationFunctions::check(env))
@@ -206,11 +165,6 @@ jboolean JNICALL isGenericListModelRolePresent(JNIEnv* env, jclass, jlong pointe
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    removeRootValueFromListModel
- * Signature: (JLjava/lang/String;)V
- */
 void JNICALL removeRootValueFromListModel(JNIEnv* env, jclass, jlong pointer, jstring key)
 {
     if (ApplicationFunctions::check(env))
@@ -221,11 +175,6 @@ void JNICALL removeRootValueFromListModel(JNIEnv* env, jclass, jlong pointer, js
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    reorderGenericListModel
- * Signature: (J[I)V
- */
 void JNICALL reorderGenericListModel(JNIEnv* env, jclass, jlong pointer, jintArray orderArray)
 {
     if (ApplicationFunctions::check(env))
@@ -245,11 +194,6 @@ void JNICALL reorderGenericListModel(JNIEnv* env, jclass, jlong pointer, jintArr
     }
 }
 
-/*
- * Class:     com_github_sdankbar_qml_cpp_jni_list_ListModelFunctions
- * Method:    setGenericListModelData
- * Signature: (JI)V
- */
 void JNICALL setGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint row)
 {
     if (ApplicationFunctions::check(env))
@@ -271,7 +215,6 @@ void JNICALL putRootValueIntoListModel(JNIEnv* env, jclass, jlong pointer, jstri
         QMLDataTransfer::clearPendingData();
     }
 }
-
 
 jobject getRootValueFromListModel(JNIEnv* env, jclass, jlong pointer, jstring key)
 {
@@ -380,22 +323,9 @@ int GenericListModel::rowCount(const QModelIndex &parent) const
 
 QVariant GenericListModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    if (index.isValid() && index.row() < m_rowData.size())
     {
-        return QVariant();
-    }
-
-    if (index.row() >= 0 && index.row() < m_rowData.size())
-    {
-        const auto& data = m_rowData[index.row()];
-        if (data.contains(role))
-        {
-            return *data.find(role);
-        }
-        else
-        {
-            return QVariant();
-        }
+        return m_rowData[index.row()][role - Qt::UserRole];
     }
     else
     {
@@ -405,15 +335,10 @@ QVariant GenericListModel::data(const QModelIndex &index, int role) const
 
 bool GenericListModel::setData(const QModelIndex &i, const QVariant &value, int role)
 {
-    if (!i.isValid())
+    if (i.isValid() && i.row() < m_rowData.size())
     {
-        return false;
-    }
-
-    if (i.row() >= 0 && i.row() < m_rowData.size())
-    {
-        auto& data = m_rowData[i.row()];
-        data.insert(role, value);
+        QVector<QVariant>& data = m_rowData[i.row()];
+        data[role - Qt::UserRole] = value;
         emit dataChanged(index(i.row(), 0), index(i.row(), 0));
         return true;
     }
@@ -428,11 +353,11 @@ QVariantMap GenericListModel::getData(qint32 row) const
     QVariantMap map;
     if (0 <= row && row < m_rowData.size())
     {
-        const QHash<int, QVariant>& data = m_rowData[row];
-        for (const auto& k: m_roleNames.keys())
+        const QVector<QVariant>& data = m_rowData[row];
+        for (int32_t roleIndex: m_roleNames.keys())
         {
-            const QString roleName = m_roleNames.value(k);
-            map.insert(roleName, data.value(k));
+            const QString& roleName = m_roleNames[roleIndex];
+            map.insert(roleName, data[roleIndex - Qt::UserRole]);
         }
     }
 
@@ -443,9 +368,16 @@ QVariant GenericListModel::getData(qint32 row, const QString& propertyName) cons
 {
     if (0 <= row && row < m_rowData.size())
     {
-        const QHash<int, QVariant>& data = m_rowData[row];
-        const int key = m_stringToIndexRoleMap.value(propertyName);
-        return data.value(key);
+        const QVector<QVariant>& data = m_rowData[row];
+        if (m_stringToIndexRoleMap.contains(propertyName))
+        {
+            const int key = m_stringToIndexRoleMap.value(propertyName);
+            return data[key - Qt::UserRole];
+        }
+        else
+        {
+            return QVariant();
+        }
     }
     else
     {
@@ -457,15 +389,7 @@ QVariant GenericListModel::getRowData(qint32 row, int32_t roleIndex) const
 {
     if (row < m_rowData.size())
     {
-        auto iter = m_rowData[row].find(roleIndex);
-        if (iter != m_rowData[row].end())
-        {
-            return iter.value();
-        }
-        else
-        {
-            return QVariant();
-        }
+        return m_rowData[row][roleIndex - Qt::UserRole];
     }
     else
     {
@@ -480,13 +404,15 @@ void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data,
         beginInsertRows(QModelIndex(), m_rowData.size(), row);
         while (m_rowData.size() <= row)
         {
-            QHash<int32_t, QVariant> map;
+            QVector<QVariant> map;
+            map.resize(m_stringToIndexRoleMap.size());
             m_rowData.push_back(map);
         }
 
+        QVector<QVariant>& map = m_rowData[row];
         for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
-            m_rowData[row].insert(roleIndex[i], data[i]);
+            map[roleIndex[i] - Qt::UserRole] = data[i];
         }
 
         endInsertRows();
@@ -494,10 +420,10 @@ void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data,
     }
     else
     {
-        QHash<int32_t, QVariant>& entry = m_rowData[row];
+        QVector<QVariant>& entry = m_rowData[row];
         for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
-            entry.insert(roleIndex[i], data[i]);
+            entry[roleIndex[i] - Qt::UserRole] = data[i];
         }
         emit dataChanged(index(row, 0), index(row, 0), roleIndex);
     }
@@ -514,10 +440,11 @@ void GenericListModel::insertRowData(qint32 row, const std::vector<QVariant>& da
 {
     int32_t actualRow = std::min(row, m_rowData.size());
     beginInsertRows(QModelIndex(), actualRow, actualRow);
-    QHash<int32_t, QVariant> map;
+    QVector<QVariant> map;
+    map.resize(m_stringToIndexRoleMap.size());
     for (int32_t i = 0; i < roleIndex.size(); ++i)
     {
-       map.insert(roleIndex[i], data[i]);
+       map[roleIndex[i] - Qt::UserRole] = data[i];
     }
     m_rowData.insert(actualRow, map);
 
@@ -542,12 +469,8 @@ void GenericListModel::clear(qint32 row, int32_t roleIndex)
 {
     if (row < m_rowData.size())
     {
-        auto iter = m_rowData[row].find(roleIndex);
-        if (iter != m_rowData[row].end())
-        {
-            m_rowData[row].remove(roleIndex);
-            emit dataChanged(index(row, 0), index(row, 0));
-        }
+        m_rowData[row][roleIndex - Qt::UserRole] = QVariant();
+        emit dataChanged(index(row, 0), index(row, 0));
     }
 }
 void GenericListModel::clear(qint32 row)
@@ -556,7 +479,8 @@ void GenericListModel::clear(qint32 row)
     {
         if (!m_rowData[row].isEmpty())
         {
-            m_rowData[row].clear();
+            m_rowData[row].resize(0);
+            m_rowData[row].resize(m_stringToIndexRoleMap.size());
             emit dataChanged(index(row, 0), index(row, 0));
         }
     }
@@ -567,7 +491,7 @@ bool GenericListModel::containsRole(qint32 row, int32_t roleIndex)
 {
     if (row < m_rowData.size())
     {
-        return m_rowData[row].contains(roleIndex);
+        return m_rowData[row][roleIndex - Qt::UserRole].isValid();
     }
     else
     {
@@ -577,12 +501,10 @@ bool GenericListModel::containsRole(qint32 row, int32_t roleIndex)
 
 void GenericListModel::reorder(const std::vector<int32_t>& ordering)
 {
-    QVector<QHash<int32_t, QVariant> > swapArea;
+    QVector<QVector<QVariant> > swapArea;
     for (int32_t i = 0; i < m_rowData.size(); ++i)
     {
-        QHash<int32_t, QVariant> temp;
-        temp.swap(m_rowData[ordering[i]]);
-        swapArea.append(temp);
+        swapArea.append(m_rowData[ordering[i]]);
     }
     m_rowData.swap(swapArea);
 }

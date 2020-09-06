@@ -98,7 +98,7 @@ private:
     QString m_modelName;
     QVariantMap m_root;
 
-    QVector<QHash<int32_t, QVariant> > m_rowData;
+    QVector<QVector<QVariant> > m_rowData;
     QHash<QString, int> m_stringToIndexRoleMap;
     QHash<int, QByteArray> m_roleNames;
 };

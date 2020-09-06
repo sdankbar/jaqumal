@@ -556,7 +556,7 @@ qint32 GenericFlatTreeModel::getSize() const
     return m_flatData.size();
 }
 
-void GenericFlatTreeModel::setRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex)
+void GenericFlatTreeModel::setRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
 {
     std::deque<int32_t> indiciesCopy = indicies;
     int32_t added = 0;
@@ -591,7 +591,7 @@ void GenericFlatTreeModel::setRowData(std::deque<int32_t>& indicies, const std::
     }
 }
 
-int32_t GenericFlatTreeModel::appendRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex)
+int32_t GenericFlatTreeModel::appendRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
 {
     std::deque<int32_t> indiciesCopy = indicies;
     int32_t retVal = -1;
@@ -625,7 +625,7 @@ int32_t GenericFlatTreeModel::appendRowData(std::deque<int32_t>& indicies, const
     return retVal;
 }
 
-void GenericFlatTreeModel::insertRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex)
+void GenericFlatTreeModel::insertRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
 {
     std::deque<int32_t> indiciesCopy = indicies;
     if (indicies.size() == 1)

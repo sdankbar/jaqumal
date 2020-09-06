@@ -63,11 +63,11 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    int32_t appendRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
+    int32_t appendRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
-    void setRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
+    void setRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
-    void insertRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
+    void insertRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
     QVariant getRowData(std::deque<int32_t>& indicies, int32_t roleIndex);
     const QHash<int32_t, QVariant>& getRowData(std::deque<int32_t>& indicies);
