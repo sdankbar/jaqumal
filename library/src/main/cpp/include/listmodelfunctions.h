@@ -69,11 +69,11 @@ public:
     Q_INVOKABLE QVariantMap getData(qint32 row) const;
     Q_INVOKABLE QVariant getData(qint32 row, const QString& propertyName) const;
 
-    int32_t appendRowData(const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
+    int32_t appendRowData(const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
-    void setRowData(qint32 row, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
+    void setRowData(qint32 row, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
-    void insertRowData(qint32 row, const std::vector<QVariant>& data, std::vector<int32_t> roleIndex);
+    void insertRowData(qint32 row, const std::vector<QVariant>& data, QVector<int32_t> roleIndex);
 
     QVariant getRowData(qint32 row, int32_t roleIndex) const;
 

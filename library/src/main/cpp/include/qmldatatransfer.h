@@ -24,6 +24,7 @@
 
 #include <jni.h>
 #include <QVariant>
+#include <QVector>
 
 class QMLDataTransfer
 {
@@ -34,30 +35,29 @@ public:
     template<typename T>
     static void store(T data, int32_t role)
     {
-        variants[variantsIndex++].setValue(data);
+        variants[roleStack.size()].setValue(data);
         roleStack.push_back(role);
     }
 
     template<typename T>
     static void storeRef(const T& data, int32_t role)
     {
-        variants[variantsIndex++].setValue(data);
+        variants[roleStack.size()].setValue(data);
         roleStack.push_back(role);
     }
 
     static QVariant& retrieve(size_t i);
 
     static jobject toJVariant(JNIEnv* env, const QVariant& value);
-    static const std::vector<int32_t>& getPendingRoleIndices();
+    static const QVector<int32_t>& getPendingRoleIndices();
     static std::vector<QVariant>& getPendingVariants();
     static void clearPendingData();
 
 private:
     QMLDataTransfer();
 
-    static int32_t variantsIndex;
     static std::vector<QVariant> variants;
-    static std::vector<int32_t> roleStack;
+    static QVector<int32_t> roleStack;
 
     static jclass jvariantClass;
     static jmethodID fromBufferedImageMethod;

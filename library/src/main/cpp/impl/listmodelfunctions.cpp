@@ -255,8 +255,7 @@ void JNICALL setGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint ro
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
-        std::vector<QVariant>& vars = QMLDataTransfer::getPendingVariants();
-        modelPtr->setRowData(row, vars, QMLDataTransfer::getPendingRoleIndices());
+        modelPtr->setRowData(row, QMLDataTransfer::getPendingVariants(), QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
     }
 }
@@ -474,7 +473,7 @@ QVariant GenericListModel::getRowData(qint32 row, int32_t roleIndex) const
     }
 }
 
-void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex)
+void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
 {
     if (m_rowData.size() <= row)
     {
@@ -485,7 +484,7 @@ void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data,
             m_rowData.push_back(map);
         }
 
-        for (size_t i = 0; i < roleIndex.size(); ++i)
+        for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
             m_rowData[row].insert(roleIndex[i], data[i]);
         }
@@ -496,27 +495,27 @@ void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data,
     else
     {
         QHash<int32_t, QVariant>& entry = m_rowData[row];
-        for (size_t i = 0; i < roleIndex.size(); ++i)
+        for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
             entry.insert(roleIndex[i], data[i]);
         }
-        emit dataChanged(index(row, 0), index(row, 0), QVector<int32_t>::fromStdVector(roleIndex));
+        emit dataChanged(index(row, 0), index(row, 0), roleIndex);
     }
 }
 
-int32_t GenericListModel::appendRowData(const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex)
+int32_t GenericListModel::appendRowData(const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
 {
     int32_t newIndex = m_rowData.size();
     insertRowData(m_rowData.size(), data, roleIndex);
     return newIndex;
 }
 
-void GenericListModel::insertRowData(qint32 row, const std::vector<QVariant>& data, std::vector<int32_t> roleIndex)
+void GenericListModel::insertRowData(qint32 row, const std::vector<QVariant>& data, QVector<int32_t> roleIndex)
 {
     int32_t actualRow = std::min(row, m_rowData.size());
     beginInsertRows(QModelIndex(), actualRow, actualRow);
     QHash<int32_t, QVariant> map;
-    for (size_t i = 0; i < roleIndex.size(); ++i)
+    for (int32_t i = 0; i < roleIndex.size(); ++i)
     {
        map.insert(roleIndex[i], data[i]);
     }

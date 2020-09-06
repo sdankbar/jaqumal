@@ -179,9 +179,8 @@ JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, ji
     env->ReleaseDoubleArrayElements(data, array, JNI_ABORT);
 }
 
-int32_t QMLDataTransfer::variantsIndex = 0;
 std::vector<QVariant> QMLDataTransfer::variants;
-std::vector<int32_t> QMLDataTransfer::roleStack;
+QVector<int32_t> QMLDataTransfer::roleStack;
 
 
 jclass QMLDataTransfer::jvariantClass;
@@ -378,7 +377,7 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
     }
 }
 
-const std::vector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
+const QVector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
 {
     return roleStack;
 }
@@ -390,7 +389,6 @@ std::vector<QVariant>& QMLDataTransfer::getPendingVariants()
 
 void QMLDataTransfer::clearPendingData()
 {
-    variantsIndex = 0;
     roleStack.clear();
 }
 
