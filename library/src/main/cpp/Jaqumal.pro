@@ -34,9 +34,14 @@ DEFINES += JAQUMAL_LIBRARY
 
 INCLUDEPATH += include
 
-# TODO discover the include path
-INCLUDEPATH += "C:\Program Files\Java\jdk-14.0.2\include" \
-        "C:\Program Files\Java\jdk-14.0.2\include\win32"
+win32 {
+    INCLUDEPATH += "${JAVA_HOME}\\include" \
+                   "${JAVA_HOME}\\include\\win32"
+}
+unix {
+	INCLUDEPATH += "${JAVA_HOME}/include" \
+                   "${JAVA_HOME}/include/unix"
+}
 
 SOURCES += \
     impl/applicationfunctions.cpp \

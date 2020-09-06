@@ -35,8 +35,6 @@
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
-    std::cout << "Jaqumal Library OnLoad" << std::endl;
-
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_2) != JNI_OK) {
         std::cout << "  bad version" << std::endl;

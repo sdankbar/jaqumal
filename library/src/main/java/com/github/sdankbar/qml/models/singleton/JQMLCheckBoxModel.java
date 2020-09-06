@@ -24,12 +24,11 @@ package com.github.sdankbar.qml.models.singleton;
 
 import java.util.Objects;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 public class JQMLCheckBoxModel {
 
@@ -82,15 +81,11 @@ public class JQMLCheckBoxModel {
 		model.put(Roles.Z, new JVariant(0));
 
 		model.registerChangeListener((key, newValue) -> {
-			try {
-				final Roles r = Roles.valueOf(key);
-				synchronized (listenersMap) {
-					for (final ChangeListener l : listenersMap.get(r)) {
-						l.valueChanged(key, newValue);
-					}
+			final Roles r = Roles.valueOf(key);
+			synchronized (listenersMap) {
+				for (final ChangeListener l : listenersMap.get(r)) {
+					l.valueChanged(key, newValue);
 				}
-			} catch (final IllegalArgumentException e) {
-				// TODO log
 			}
 		});
 	}
