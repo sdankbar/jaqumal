@@ -265,7 +265,7 @@ void QMLDataTransfer::uninitialize(JNIEnv* env)
     env->DeleteGlobalRef(jvariantClass);
 }
 
-const QVariant& QMLDataTransfer::retrieve(size_t i)
+QVariant& QMLDataTransfer::retrieve(size_t i)
 {
     return variants[i];
 }

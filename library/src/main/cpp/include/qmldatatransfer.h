@@ -45,7 +45,7 @@ public:
         roleStack.push_back(role);
     }
 
-    static const QVariant& retrieve(size_t i);
+    static QVariant& retrieve(size_t i);
     static void retrieveAll(std::vector<QVariant>& vec);
 
     static jobject toJVariant(JNIEnv* env, const QVariant& value);

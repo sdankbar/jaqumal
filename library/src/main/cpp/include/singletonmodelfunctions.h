@@ -69,7 +69,7 @@ private slots:
 
 private:
 
-    void setData(const QVariant& data, int32_t roleIndex);
+    void setData(QVariant& data, size_t roleIndex);
     void callbackListeners(const QString& key, const QVariant& newValue);
 
     // Member variables

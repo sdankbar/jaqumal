@@ -25,25 +25,69 @@ package com.github.sdankbar.qml;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
+import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.eventing.NullEventProcessor;
+import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+
 public class JMHTest {
 
-	@Test
-	public void nullTest() {
-		// Empty Implementation
+	private enum Role {
+		R1,
+		R2,
+		R3;
 	}
 
-	// @Test
+	/**
+	 * Shared state.
+	 */
+	@State(Scope.Thread)
+	public static class BenchmarkState {
+		JQMLApplication<NullEventProcessor> app;
+		JQMLSingletonModel<Role> singletonModel;
+
+		/**
+		 * Sets up shared state.
+		 */
+		@Setup(Level.Trial)
+		public void setup() {
+			app = JQMLApplication.create(new String[0], new NullEventFactory<>());
+			singletonModel = app.getModelFactory().createSingletonModel("singleton_model", Role.class);
+		}
+
+		@TearDown(Level.Trial)
+		public void teardown() {
+			JQMLApplication.delete();
+		}
+	}
+
+	@Benchmark
+	public void benchmark_singletonModelSetInteger(final BenchmarkState state) {
+		state.singletonModel.put(Role.R1, JVariant.NULL_INT);// new JVariant(1)
+	}
+
+	@Benchmark
+	public void benchmark_singletonModelSetString(final BenchmarkState state) {
+		state.singletonModel.put(Role.R1, new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+	}
+
+	@Test
 	public void runBenchmarks() throws RunnerException {
 		final Options options = new OptionsBuilder().include(JMHTest.class.getName() + ".*").mode(Mode.Throughput)
-				.timeUnit(TimeUnit.MICROSECONDS).warmupTime(TimeValue.seconds(1)).warmupIterations(3).threads(1)
-				.measurementIterations(3).forks(1).shouldFailOnError(false).shouldDoGC(true).build();
+				.timeUnit(TimeUnit.MICROSECONDS).warmupTime(TimeValue.seconds(1)).warmupIterations(5).threads(1)
+				.measurementIterations(5).forks(1).shouldFailOnError(false).shouldDoGC(true).build();
 
 		new Runner(options).run();
 	}

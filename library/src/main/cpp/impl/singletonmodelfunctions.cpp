@@ -212,10 +212,13 @@ GenericObjectModel::GenericObjectModel(const QString& modelName, const std::vect
       m_modelName(modelName),
       m_roleMap(roles)
 {
-    const int32_t size = static_cast<int32_t>(roles.size());
-    for (int32_t i = 0; i < size; ++i)
+    QVariant nullVar;
+    const size_t size = roles.size();
+    for (size_t i = 0; i < size; ++i)
     {
-        setData(QVariant(), i);
+        const QString& role = m_roleMap[static_cast<uint32_t>(i)];
+        insert(role, nullVar);
+        emit valueChanged(role, nullVar);
     }
     QObject::connect(this, &QQmlPropertyMap::valueChanged, this, &GenericObjectModel::onValueChanged);
 }
@@ -239,15 +242,16 @@ QVariant GenericObjectModel::getData(int32_t roleIndex) const
     }
 }
 
-void GenericObjectModel::setData(const QVariant& data, int32_t roleIndex)
+void GenericObjectModel::setData(QVariant& data, size_t roleIndex)
 {
-    if (0 <= roleIndex && static_cast<uint32_t>(roleIndex) < m_roleMap.size())
+    if (roleIndex < m_roleMap.size())
     {
-        const QString& role = m_roleMap[static_cast<uint32_t>(roleIndex)];
-        if (value(role) != data)
+        const QString& role = m_roleMap[roleIndex];
+        QVariant& currentValue = (*this)[role];
+        if (currentValue != data)
         {
-            insert(role, data);
-            emit valueChanged(role, data);
+            currentValue.swap(data);
+            emit valueChanged(role, currentValue);
         }
     }
     else
@@ -274,8 +278,7 @@ void GenericObjectModel::setData(const std::vector<int32_t>& roleIndex)
 {
     for (size_t i = 0; i < roleIndex.size(); ++i)
     {
-        const int32_t r = roleIndex[i];
-        setData(QMLDataTransfer::retrieve(i), r);
+        setData(QMLDataTransfer::retrieve(i), roleIndex[i]);
     }
     QMLDataTransfer::clearPendingData();
 }
@@ -287,7 +290,8 @@ QVariant GenericObjectModel::getData(const QString& propertyName) const
 
 void GenericObjectModel::clear(int32_t roleIndex)
 {
-    setData(QVariant(), roleIndex);
+    QVariant nullVar;
+    setData(nullVar, roleIndex);
 }
 
 void GenericObjectModel::clear()
