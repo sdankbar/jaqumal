@@ -35,10 +35,6 @@ class ListModelFunctions
 public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
-
-
-private:
-
 };
 
 class GenericListModel : public QAbstractListModel
@@ -69,11 +65,9 @@ public:
     Q_INVOKABLE QVariantMap getData(qint32 row) const;
     Q_INVOKABLE QVariant getData(qint32 row, const QString& propertyName) const;
 
-    int32_t appendRowData(const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
-
-    void setRowData(qint32 row, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
-
-    void insertRowData(qint32 row, const std::vector<QVariant>& data, QVector<int32_t> roleIndex);
+    int32_t appendRowData(std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
+    void setRowData(qint32 row, std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
+    void insertRowData(qint32 row, std::vector<QVariant>& data, QVector<int32_t> roleIndex);
 
     QVariant getRowData(qint32 row, int32_t roleIndex) const;
 
@@ -90,6 +84,7 @@ public:
 signals:
     void sizeChanged();
     void rootChanged();
+
 private:
 
     void emitSignal(qint32 row);

@@ -274,9 +274,9 @@ void GenericObjectModel::setData(const QVariant& data, const QString& propertyNa
     }
 }
 
-void GenericObjectModel::setData(const std::vector<int32_t>& roleIndex)
+void GenericObjectModel::setData(const QVector<int32_t>& roleIndex)
 {
-    for (size_t i = 0; i < roleIndex.size(); ++i)
+    for (int32_t i = 0; i < roleIndex.size(); ++i)
     {
         setData(QMLDataTransfer::retrieve(i), roleIndex[i]);
     }
