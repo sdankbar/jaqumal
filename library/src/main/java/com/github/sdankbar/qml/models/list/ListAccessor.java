@@ -97,7 +97,6 @@ public class ListAccessor extends MapAccessor {
 
 		value.sendToQML(roleIndex);
 		ListModelFunctions.setGenericListModelData(modelPointer, listIndex);
-
 	}
 
 	@Override

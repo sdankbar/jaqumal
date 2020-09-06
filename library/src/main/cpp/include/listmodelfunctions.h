@@ -69,13 +69,10 @@ public:
     Q_INVOKABLE QVariantMap getData(qint32 row) const;
     Q_INVOKABLE QVariant getData(qint32 row, const QString& propertyName) const;
 
-    int32_t appendRowData(const QVariant& data, int32_t roleIndex);
     int32_t appendRowData(const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
 
-    void setRowData(qint32 row, const QVariant& data, int32_t roleIndex);
     void setRowData(qint32 row, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex);
 
-    void insertRowData(qint32 row, const QVariant& data, int32_t roleIndex);
     void insertRowData(qint32 row, const std::vector<QVariant>& data, std::vector<int32_t> roleIndex);
 
     QVariant getRowData(qint32 row, int32_t roleIndex) const;
@@ -101,7 +98,7 @@ private:
     QString m_modelName;
     QVariantMap m_root;
 
-    QList<QHash<int32_t, QVariant> > m_rowData;
+    QVector<QHash<int32_t, QVariant> > m_rowData;
     QHash<QString, int> m_stringToIndexRoleMap;
     QHash<int, QByteArray> m_roleNames;
 };

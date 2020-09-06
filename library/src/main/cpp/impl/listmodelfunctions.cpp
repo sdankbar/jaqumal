@@ -88,8 +88,7 @@ jint JNICALL appendGenericListModelData(JNIEnv* env, jclass, jlong pointer)
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
-        std::vector<QVariant> vars;
-        QMLDataTransfer::retrieveAll(vars);
+        std::vector<QVariant>& vars = QMLDataTransfer::getPendingVariants();
         jint newIndex = modelPtr->appendRowData(vars, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
         return newIndex;
@@ -183,8 +182,7 @@ void JNICALL insertGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
-        std::vector<QVariant> vars;
-        QMLDataTransfer::retrieveAll(vars);
+        std::vector<QVariant>& vars = QMLDataTransfer::getPendingVariants();
         modelPtr->insertRowData(row, vars, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
     }
@@ -257,8 +255,7 @@ void JNICALL setGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint ro
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
-        std::vector<QVariant> vars;
-        QMLDataTransfer::retrieveAll(vars);
+        std::vector<QVariant>& vars = QMLDataTransfer::getPendingVariants();
         modelPtr->setRowData(row, vars, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
     }
@@ -477,30 +474,6 @@ QVariant GenericListModel::getRowData(qint32 row, int32_t roleIndex) const
     }
 }
 
-void GenericListModel::setRowData(qint32 row, const QVariant& data, int32_t roleIndex){
-    if (m_rowData.size() <= row)
-    {
-        beginInsertRows(QModelIndex(), m_rowData.size(), row);
-        while (m_rowData.size() <= row)
-        {
-            QHash<int32_t, QVariant> map;
-            m_rowData.push_back(map);
-        }
-
-        m_rowData[row].insert(roleIndex, data);
-
-        endInsertRows();
-        emit sizeChanged();
-    }
-    else
-    {
-        QVector<int> rolesChanged;
-        rolesChanged.append(roleIndex);
-        m_rowData[row].insert(roleIndex, data);
-        emit dataChanged(index(row, 0), index(row, 0), rolesChanged);
-    }
-}
-
 void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex)
 {
     if (m_rowData.size() <= row)
@@ -522,19 +495,13 @@ void GenericListModel::setRowData(qint32 row, const std::vector<QVariant>& data,
     }
     else
     {
+        QHash<int32_t, QVariant>& entry = m_rowData[row];
         for (size_t i = 0; i < roleIndex.size(); ++i)
         {
-            m_rowData[row].insert(roleIndex[i], data[i]);
+            entry.insert(roleIndex[i], data[i]);
         }
         emit dataChanged(index(row, 0), index(row, 0), QVector<int32_t>::fromStdVector(roleIndex));
     }
-}
-
-int32_t GenericListModel::GenericListModel::appendRowData(const QVariant& data, int32_t roleIndex)
-{
-    int32_t newIndex = m_rowData.size();
-    insertRowData(m_rowData.size(), data, roleIndex);
-    return newIndex;
 }
 
 int32_t GenericListModel::appendRowData(const std::vector<QVariant>& data, const std::vector<int32_t>& roleIndex)
@@ -542,18 +509,6 @@ int32_t GenericListModel::appendRowData(const std::vector<QVariant>& data, const
     int32_t newIndex = m_rowData.size();
     insertRowData(m_rowData.size(), data, roleIndex);
     return newIndex;
-}
-
-void GenericListModel::insertRowData(qint32 row, const QVariant& data, int32_t roleIndex)
-{
-    int32_t actualRow = std::min(row, m_rowData.size());
-    beginInsertRows(QModelIndex(), actualRow, actualRow);
-    QHash<int32_t, QVariant> map;
-    map.insert(roleIndex, data);
-    m_rowData.insert(actualRow, map);
-
-    endInsertRows();
-    emit sizeChanged();
 }
 
 void GenericListModel::insertRowData(qint32 row, const std::vector<QVariant>& data, std::vector<int32_t> roleIndex)
@@ -623,7 +578,7 @@ bool GenericListModel::containsRole(qint32 row, int32_t roleIndex)
 
 void GenericListModel::reorder(const std::vector<int32_t>& ordering)
 {
-    QList<QHash<int32_t, QVariant> > swapArea;
+    QVector<QHash<int32_t, QVariant> > swapArea;
     for (int32_t i = 0; i < m_rowData.size(); ++i)
     {
         QHash<int32_t, QVariant> temp;

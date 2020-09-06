@@ -270,15 +270,6 @@ QVariant& QMLDataTransfer::retrieve(size_t i)
     return variants[i];
 }
 
-void QMLDataTransfer::retrieveAll(std::vector<QVariant>& vec)
-{
-    const size_t len = roleStack.size();
-    for (size_t i = 0; i < len; ++i)
-    {
-        vec.push_back(variants[i]);
-    }
-}
-
 jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
 {
     switch (value.type()) {
@@ -390,6 +381,11 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
 const std::vector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
 {
     return roleStack;
+}
+
+std::vector<QVariant>& QMLDataTransfer::getPendingVariants()
+{
+    return variants;
 }
 
 void QMLDataTransfer::clearPendingData()

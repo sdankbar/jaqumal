@@ -40,6 +40,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
+import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 
 public class JMHTest {
@@ -57,6 +58,7 @@ public class JMHTest {
 	public static class BenchmarkState {
 		JQMLApplication<NullEventProcessor> app;
 		JQMLSingletonModel<Role> singletonModel;
+		JQMLListModel<Role> listModel;
 
 		/**
 		 * Sets up shared state.
@@ -65,6 +67,8 @@ public class JMHTest {
 		public void setup() {
 			app = JQMLApplication.create(new String[0], new NullEventFactory<>());
 			singletonModel = app.getModelFactory().createSingletonModel("singleton_model", Role.class);
+			listModel = app.getModelFactory().createListModel("list_model", Role.class);
+			listModel.add(new JVariant(1), Role.R1);
 		}
 
 		@TearDown(Level.Trial)
@@ -75,12 +79,17 @@ public class JMHTest {
 
 	@Benchmark
 	public void benchmark_singletonModelSetInteger(final BenchmarkState state) {
-		state.singletonModel.put(Role.R1, JVariant.NULL_INT);// new JVariant(1)
+		state.singletonModel.put(Role.R1, new JVariant(1));
 	}
 
 	@Benchmark
 	public void benchmark_singletonModelSetString(final BenchmarkState state) {
 		state.singletonModel.put(Role.R1, new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+	}
+
+	@Benchmark
+	public void benchmark_listModelSetInteger(final BenchmarkState state) {
+		state.listModel.get(0).put(Role.R1, new JVariant(1));
 	}
 
 	@Test

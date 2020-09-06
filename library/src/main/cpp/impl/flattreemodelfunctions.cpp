@@ -117,8 +117,7 @@ jint JNICALL appendGenericFlatTreeModelData(JNIEnv* env, jclass, jlong pointer, 
     {
         auto modelPtr = reinterpret_cast<GenericFlatTreeModel*>(pointer);
         std::deque<int32_t> indicies = toTreePath(env, path);
-        std::vector<QVariant> vars;
-        QMLDataTransfer::retrieveAll(vars);
+        std::vector<QVariant> vars = QMLDataTransfer::getPendingVariants();
         jint ret = modelPtr->appendRowData(indicies, vars, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
         return ret;
@@ -223,8 +222,7 @@ void JNICALL insertGenericFlatTreeModelData(JNIEnv* env, jclass, jlong pointer, 
     {
         auto modelPtr = reinterpret_cast<GenericFlatTreeModel*>(pointer);
         std::deque<int32_t> indicies = toTreePath(env, path);
-        std::vector<QVariant> vars;
-        QMLDataTransfer::retrieveAll(vars);
+        std::vector<QVariant> vars = QMLDataTransfer::getPendingVariants();
         modelPtr->insertRowData(indicies, vars, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
     }
@@ -285,8 +283,7 @@ void JNICALL setGenericFlatTreeModelData(JNIEnv* env, jclass, jlong pointer, jin
     {
         auto modelPtr = reinterpret_cast<GenericFlatTreeModel*>(pointer);
         std::deque<int32_t> indicies = toTreePath(env, path);
-        std::vector<QVariant> vars;
-        QMLDataTransfer::retrieveAll(vars);
+        std::vector<QVariant> vars = QMLDataTransfer::getPendingVariants();
         modelPtr->setRowData(indicies, vars, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
     }
