@@ -35,12 +35,11 @@ DEFINES += JAQUMAL_LIBRARY
 INCLUDEPATH += include
 
 win32 {
-    INCLUDEPATH += "${JAVA_HOME}\\include" \
-                   "${JAVA_HOME}\\include\\win32"
-}
-unix {
-	INCLUDEPATH += "${JAVA_HOME}/include" \
-                   "${JAVA_HOME}/include/unix"
+    INCLUDEPATH += "$$getenv(JAVA_HOME)\include" \
+                   "$$getenv(JAVA_HOME)\include\win32"
+} else {
+        INCLUDEPATH += "$$getenv(JAVA_HOME)/include" \
+                   "$$getenv(JAVA_HOME)/include/unix"
 }
 
 SOURCES += \
