@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.flat_tree.FlatTreeModelFunctions;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.github.sdankbar.qml.models.TreePath;
 import com.google.common.base.Preconditions;
@@ -104,6 +105,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 
 	private final String modelName;
 	private final long modelPointer;
+	private final PutMode putMode;
 	private final AtomicReference<Thread> eventLoopThread;
 	private final Map<String, Integer> indexLookup = new HashMap<>();
 	private final Set<K> keySet = new HashSet<>();
@@ -121,11 +123,13 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 	 * @param eventLoopThread Reference to the Qt Thread.
 	 * @param accessor        Accessor this model will use to to access the C++
 	 *                        portion of this model.
+	 * @param putMode         Specifies how put operations behave.
 	 */
 	public JQMLFlatTreeModel(final String modelName, final Set<K> keys, final AtomicReference<Thread> eventLoopThread,
-			final FlatTreeAccessor accessor) {
+			final FlatTreeAccessor accessor, final PutMode putMode) {
 		super(eventLoopThread);
 		this.modelName = Objects.requireNonNull(modelName, "modelName is null");
+		this.putMode = Objects.requireNonNull(putMode, "putMode is null");
 		this.keySet.addAll(keys);
 		this.accessor = accessor;
 		this.eventLoopThread = eventLoopThread;
@@ -231,7 +235,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 		final int i = p.getIndex(depth);
 		while (i >= searchPoint.getChildrenList().size()) {
 			final JQMLFlatTreeModelMap<K> map = new JQMLFlatTreeModelMap<>(getModelName(), keySet, eventLoopThread,
-					accessor.copy(TreePath.of(parent, searchPoint.getChildrenList().size())), indexLookup);
+					accessor.copy(TreePath.of(parent, searchPoint.getChildrenList().size())), indexLookup, putMode);
 			final Node<K> n = new Node<>(map);
 
 			searchPoint.getChildrenList().add(n);

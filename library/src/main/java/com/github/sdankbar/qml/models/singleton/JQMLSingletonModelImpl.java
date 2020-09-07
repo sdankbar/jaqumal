@@ -84,8 +84,8 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	 *                        portion of this model.
 	 */
 	public JQMLSingletonModelImpl(final String modelName, final Set<K> keys,
-			final AtomicReference<Thread> eventLoopThread, final SingletonMapAccessor accessor) {
-		super(modelName, keys, eventLoopThread, accessor);
+			final AtomicReference<Thread> eventLoopThread, final SingletonMapAccessor accessor, final PutMode putMode) {
+		super(modelName, keys, eventLoopThread, accessor, putMode);
 		this.mapAccessor = accessor;
 
 		int i = 0;

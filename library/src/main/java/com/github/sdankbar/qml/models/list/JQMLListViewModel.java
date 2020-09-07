@@ -32,6 +32,7 @@ import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.ListSelectionChangedEvent;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
@@ -68,7 +69,7 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	/**
 	 * Enum of the various selection modes supported by the JQMLListViewModel.
 	 */
-	public static enum SelectionMode {
+	public enum SelectionMode {
 		/**
 		 * Selection is not allowed
 		 */
@@ -101,13 +102,14 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	 * @param keyClass  Class of the Enum that is used as the new model's key.
 	 * @param app       JQMLApplication object for this application.
 	 * @param mode      The selection mode for the model.
+	 * @param putMode   Specifies how put operations behave.
 	 * @return The new model.
 	 */
 	public static <T extends Enum<T>> JQMLListViewModel<T> create(final String modelName, final Class<T> keyClass,
-			final JQMLApplication<?> app, final SelectionMode mode) {
+			final JQMLApplication<?> app, final SelectionMode mode, final PutMode putMode) {
 		final ImmutableSet<T> userKeys = ImmutableSet.copyOf(EnumSet.allOf(keyClass));
 		checkKeySet(userKeys);
-		return new JQMLListViewModel<>(modelName, userKeys, app, mode);
+		return new JQMLListViewModel<>(modelName, userKeys, app, mode, putMode);
 	}
 
 	/**
@@ -117,12 +119,13 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	 * @param keySet    The set of keys that can be used by the new model.
 	 * @param app       JQMLApplication object for this application.
 	 * @param mode      The selection mode for the model.
+	 * @param putMode   Specifies how put operations behave.
 	 * @return The new model.
 	 */
 	public static <T> JQMLListViewModel<T> create(final String modelName, final ImmutableSet<T> keySet,
-			final JQMLApplication<?> app, final SelectionMode mode) {
+			final JQMLApplication<?> app, final SelectionMode mode, final PutMode putMode) {
 		checkKeySet(keySet);
-		return new JQMLListViewModel<>(modelName, keySet, app, mode);
+		return new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
 	}
 
 	private static <K> K getKey(final ImmutableSet<K> keys, final String keyName) {
@@ -142,20 +145,20 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	private final K isSelectedKey;
 
 	private JQMLListViewModel(final String modelName, final ImmutableSet<K> keys, final JQMLApplication<?> app,
-			final SelectionMode mode) {
+			final SelectionMode mode, final PutMode putMode) {
 		selectionMode = Objects.requireNonNull(mode, "mode is null");
 		isSelectedKey = getKey(keys, "is_selected");
-		listModel = app.getModelFactory().createListModel(modelName, keys);
+		listModel = app.getModelFactory().createListModel(modelName, keys, putMode);
 		listModel.putRootValue(SELECTION_COUNT_KEY, JVariant.NULL_INT);
 		listModel.registerListener(new ListListener<K>() {
 
 			@Override
-			public void added(int index, Map<K, JVariant> map) {
+			public void added(final int index, final Map<K, JVariant> map) {
 				handleAddedElement(map);
 			}
 
 			@Override
-			public void removed(int index, Map<K, JVariant> map) {
+			public void removed(final int index, final Map<K, JVariant> map) {
 				handleRemovdElement(index, map);
 			}
 
@@ -267,8 +270,8 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		}
 	}
 
-	private void handleRemovdElement(int index, final Map<K, JVariant> map) {
-		JVariant v = map.get(isSelectedKey);
+	private void handleRemovdElement(final int index, final Map<K, JVariant> map) {
+		final JVariant v = map.get(isSelectedKey);
 		// If removed element was seleted, fire selection changed event
 		if (v != null && v.asBoolean(false)) {
 			fireSelectionEvent(ImmutableSet.of(Integer.valueOf(index)));

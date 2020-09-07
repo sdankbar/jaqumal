@@ -26,6 +26,7 @@ import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.google.common.collect.ImmutableMap;
@@ -37,7 +38,8 @@ import com.google.common.collect.ImmutableMap;
 public class App {
 
 	public enum ListRole {
-		is_selected, text
+		is_selected,
+		text
 	}
 
 	/**
@@ -47,7 +49,7 @@ public class App {
 	public static void main(final String[] args) throws Exception {
 		final JQMLApplication<NullEventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLListViewModel<ListRole> model = JQMLListViewModel.create("list_model", ListRole.class, app,
-				SelectionMode.SINGLE);
+				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.getModel().add(ImmutableMap.of(ListRole.text, new JVariant("Item 1")));
 		model.getModel().add(ImmutableMap.of(ListRole.text, new JVariant("Item 2")));

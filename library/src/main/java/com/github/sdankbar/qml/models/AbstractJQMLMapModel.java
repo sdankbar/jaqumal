@@ -194,7 +194,19 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 
 	}
 
+	public enum PutMode {
+		/**
+		 * Put functions return the previous value for the key.
+		 */
+		RETURN_PREVIOUS_VALUE,
+		/**
+		 * Put functions always return null. Increases throughput.
+		 */
+		RETURN_NULL
+	}
+
 	protected final String modelName;
+	private final PutMode putMode;
 	protected final Set<K> keys;
 	protected final Map<String, Integer> indexLookup = new HashMap<>();
 
@@ -205,9 +217,10 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	private final MapAccessor accessor;
 
 	protected AbstractJQMLMapModel(final String modelName, final Set<K> keys,
-			final AtomicReference<Thread> eventLoopThread, final MapAccessor accessor) {
+			final AtomicReference<Thread> eventLoopThread, final MapAccessor accessor, final PutMode putMode) {
 		super(eventLoopThread);
 		this.modelName = Objects.requireNonNull(modelName, "modelName is null");
+		this.putMode = Objects.requireNonNull(putMode, "putMode is null");
 		this.keys = Objects.requireNonNull(keys, "keys is null");
 		this.accessor = accessor;
 	}
@@ -313,7 +326,12 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		if (value != null) {
 			final int index = verifyKey(key);
 
-			final JVariant existingValue = accessor.get(index).orElse(null);
+			final JVariant existingValue;
+			if (putMode == PutMode.RETURN_PREVIOUS_VALUE) {
+				existingValue = accessor.get(index).orElse(null);
+			} else {
+				existingValue = null;
+			}
 
 			accessor.set(value, index);
 

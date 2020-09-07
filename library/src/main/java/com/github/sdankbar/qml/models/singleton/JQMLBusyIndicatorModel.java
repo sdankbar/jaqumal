@@ -24,6 +24,7 @@ package com.github.sdankbar.qml.models.singleton;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -54,7 +55,7 @@ public class JQMLBusyIndicatorModel {
 			.build();
 
 	public JQMLBusyIndicatorModel(final String modelName, final JQMLApplication<?> app) {
-		model = app.getModelFactory().createSingletonModel(modelName, Roles.class);
+		model = app.getModelFactory().createSingletonModel(modelName, Roles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.ModelName, new JVariant(modelName));
 		model.put(Roles.Running, new JVariant(false));

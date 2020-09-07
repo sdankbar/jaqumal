@@ -40,6 +40,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.google.common.collect.ImmutableMap;
 
@@ -51,12 +52,16 @@ public class JQMLListModelTest {
 	/**
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 		// Empty Implementation
 	}
 
 	private enum Roles {
-		R1, R2, R3, R4, R5;
+		R1,
+		R2,
+		R3,
+		R4,
+		R5;
 	}
 
 	/**
@@ -66,7 +71,8 @@ public class JQMLListModelTest {
 	public void append() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
 		data.put(Roles.R1, new JVariant(1));
@@ -85,7 +91,8 @@ public class JQMLListModelTest {
 	public void append_all_map() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Collection<Map<Roles, JVariant>> l = new ArrayList<>();
 		final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
@@ -113,7 +120,8 @@ public class JQMLListModelTest {
 	public void append_all_mutable_map() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Collection<Map<Roles, JVariant>> l = new ArrayList<>();
 		final Map<Roles, JVariant> data = new HashMap<>();
@@ -132,7 +140,8 @@ public class JQMLListModelTest {
 	public void append_map() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
 		data.put(Roles.R1, new JVariant(1));
@@ -152,7 +161,8 @@ public class JQMLListModelTest {
 	public void append_map_error() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> data = new HashMap<>();
 		data.put(Roles.R1, new JVariant(1));
@@ -176,7 +186,8 @@ public class JQMLListModelTest {
 	public void clear() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -197,7 +208,8 @@ public class JQMLListModelTest {
 	public void clearFully() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
 		data.put(Roles.R1, new JVariant(1));
@@ -220,7 +232,8 @@ public class JQMLListModelTest {
 	public void clearMap() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -256,7 +269,8 @@ public class JQMLListModelTest {
 	public void contains() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -273,7 +287,8 @@ public class JQMLListModelTest {
 	public void containsAll() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -292,7 +307,8 @@ public class JQMLListModelTest {
 	public void erase() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -309,7 +325,8 @@ public class JQMLListModelTest {
 	public void get() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		assertTrue(model.isEmpty());
 
@@ -341,7 +358,8 @@ public class JQMLListModelTest {
 	public void getModelName() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		assertEquals("other", model.getModelName());
 	}
@@ -353,7 +371,8 @@ public class JQMLListModelTest {
 	public void getSetValues() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -373,7 +392,8 @@ public class JQMLListModelTest {
 	public void indexOf() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -390,7 +410,8 @@ public class JQMLListModelTest {
 	public void insert() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", EnumSet.allOf(Roles.class));
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", EnumSet.allOf(Roles.class),
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(0, new JVariant(1), Roles.R1);
 		model.add(0, new JVariant(3), Roles.R3);
@@ -408,7 +429,8 @@ public class JQMLListModelTest {
 	public void insert_all_map() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Collection<Map<Roles, JVariant>> l = new ArrayList<>();
 		final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
@@ -436,7 +458,8 @@ public class JQMLListModelTest {
 	public void insert_all_mutable_map() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Collection<Map<Roles, JVariant>> l = new ArrayList<>();
 		final Map<Roles, JVariant> data = new HashMap<>();
@@ -455,7 +478,8 @@ public class JQMLListModelTest {
 	public void insert_map() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
 		data.put(Roles.R1, new JVariant(1));
@@ -477,7 +501,8 @@ public class JQMLListModelTest {
 	public void insert_mutable_map() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> data = new HashMap<>();
 		data.put(Roles.R1, new JVariant(1));
@@ -493,7 +518,8 @@ public class JQMLListModelTest {
 	public void isPresent() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", EnumSet.allOf(Roles.class));
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", EnumSet.allOf(Roles.class),
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(0, new JVariant(1), Roles.R1);
 		model.add(0, new JVariant(3), Roles.R3);
@@ -510,7 +536,8 @@ public class JQMLListModelTest {
 	public void iterator() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(2), Roles.R2);
@@ -537,7 +564,8 @@ public class JQMLListModelTest {
 	public void lastIndexOf() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(1), Roles.R1);
@@ -554,7 +582,8 @@ public class JQMLListModelTest {
 	public void listIterator() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(2), Roles.R2);
@@ -604,7 +633,8 @@ public class JQMLListModelTest {
 	public void putAndGetRootValues() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.putRootValue("TEST1", new JVariant("ABC"));
 		assertEquals(new JVariant("ABC"), model.getRootValue("TEST1").get());
@@ -618,7 +648,8 @@ public class JQMLListModelTest {
 	public void removeAll() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -638,7 +669,8 @@ public class JQMLListModelTest {
 	public void removeMap() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.setData(0, Roles.R3, new JVariant(3));
@@ -667,7 +699,8 @@ public class JQMLListModelTest {
 	public void removeObject() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> map = model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -697,7 +730,8 @@ public class JQMLListModelTest {
 	public void removeRootValues() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.putRootValue("TEST1", new JVariant("ABC"));
 		assertEquals(new JVariant("ABC"), model.getRootValue("TEST1").get());
@@ -713,7 +747,8 @@ public class JQMLListModelTest {
 	public void retainAll() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(3), Roles.R3);
@@ -733,7 +768,8 @@ public class JQMLListModelTest {
 	public void set() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		assertEquals(0, model.size());
 
@@ -753,7 +789,8 @@ public class JQMLListModelTest {
 	public void setData() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		assertEquals(0, model.size());
 
@@ -772,7 +809,8 @@ public class JQMLListModelTest {
 	public void sublist() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.setData(0, ImmutableMap.of(Roles.R1, new JVariant(1)));
 		model.setData(1, ImmutableMap.of(Roles.R3, new JVariant(3)));
@@ -792,7 +830,8 @@ public class JQMLListModelTest {
 	public void test_sort() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);// 0
 		model.add(new JVariant(3), Roles.R1);// 1
@@ -821,7 +860,8 @@ public class JQMLListModelTest {
 	public void test_unsupported_set() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.set(0, new HashMap<>());
 	}
@@ -834,7 +874,8 @@ public class JQMLListModelTest {
 	public void toArray() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(2), Roles.R2);
@@ -862,7 +903,8 @@ public class JQMLListModelTest {
 	public void toArray2() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.add(new JVariant(1), Roles.R1);
 		model.add(new JVariant(2), Roles.R2);

@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -52,6 +53,7 @@ import com.google.common.collect.ImmutableMap;
 public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListModel<K> {
 
 	private final String modelName;
+	private final PutMode putMode;
 	private final long modelPointer;
 
 	private final Set<K> keySet;
@@ -73,11 +75,13 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	 * @param eventLoopThread Reference to the Qt Thread.
 	 * @param accessor        Accessor this model will use to to access the C++
 	 *                        portion of this model.
+	 * @param putMode         Specifies how put operations behave.
 	 */
 	public JQMLListModelImpl(final String modelName, final Set<K> keys, final AtomicReference<Thread> eventLoopThread,
-			final ListAccessor accessor) {
+			final ListAccessor accessor, final PutMode putMode) {
 		super(eventLoopThread);
 		this.eventLoopThread = eventLoopThread;
+		this.putMode = Objects.requireNonNull(putMode, "putMode is null");
 		this.modelName = Objects.requireNonNull(modelName, "modelName is null");
 		Objects.requireNonNull(keys, "keys is null");
 
@@ -122,7 +126,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(newIndex), indexLookup);
+				accessor.copy(newIndex), indexLookup, putMode);
 		mapRefs.add(temp);
 
 		fireAddEvent(mapRefs.size() - 1, temp);
@@ -152,7 +156,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(index), indexLookup);
+				accessor.copy(index), indexLookup, putMode);
 		mapRefs.add(index, temp);
 
 		resetMapIndicies();
@@ -184,7 +188,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
 		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(index), indexLookup);
+				accessor.copy(index), indexLookup, putMode);
 		mapRefs.add(index, temp);
 
 		resetMapIndicies();
@@ -223,7 +227,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
 		final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(newIndex), indexLookup);
+				accessor.copy(newIndex), indexLookup, putMode);
 		mapRefs.add(map);
 
 		fireAddEvent(mapRefs.size() - 1, map);
@@ -287,11 +291,13 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean contains(final Object o) {
 		return indexOf(o) != -1;
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean containsAll(final Collection<?> c) {
 		for (final Object o : c) {
@@ -478,6 +484,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean remove(final Object o) {
 		final int index = indexOf(o);
@@ -489,6 +496,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean removeAll(final Collection<?> c) {
 		boolean modified = false;
@@ -566,7 +574,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		boolean added = false;
 		while (mapRefs.size() <= index) {
 			final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-					accessor.copy(mapRefs.size()), indexLookup);
+					accessor.copy(mapRefs.size()), indexLookup, putMode);
 			mapRefs.add(map);
 
 			fireAddEvent(mapRefs.size() - 1, map);

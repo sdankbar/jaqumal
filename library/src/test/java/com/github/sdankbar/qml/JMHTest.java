@@ -40,6 +40,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 
@@ -66,11 +67,15 @@ public class JMHTest {
 		@Setup(Level.Trial)
 		public void setup() {
 			app = JQMLApplication.create(new String[0], new NullEventFactory<>());
-			singletonModel = app.getModelFactory().createSingletonModel("singleton_model", Role.class);
-			listModel = app.getModelFactory().createListModel("list_model", Role.class);
+			singletonModel = app.getModelFactory().createSingletonModel("singleton_model", Role.class,
+					PutMode.RETURN_NULL);
+			listModel = app.getModelFactory().createListModel("list_model", Role.class, PutMode.RETURN_NULL);
 			listModel.add(new JVariant(1), Role.R1);
 		}
 
+		/**
+		 * Cleanup after benchmark
+		 */
 		@TearDown(Level.Trial)
 		public void teardown() {
 			JQMLApplication.delete();

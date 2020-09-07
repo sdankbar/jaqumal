@@ -26,6 +26,7 @@ import java.util.Set;
 
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.exceptions.QMLThreadingException;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.JQMLMapPool;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
@@ -66,7 +67,8 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass);
+	<K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass,
+			final PutMode putMode);
 
 	/**
 	 * Creates a new JQMLFlatTreeModel with Class<K> being its key.
@@ -79,7 +81,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys);
+	<K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys, final PutMode putMode);
 
 	/**
 	 * Creates a new JQMLListModel with Class<K> being its key.
@@ -92,7 +94,8 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass);
+	<K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass,
+			final PutMode putMode);
 
 	/**
 	 * Creates a new JQMLListModel with Class<K> being its key.
@@ -105,7 +108,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K> JQMLListModel<K> createListModel(final String name, final Set<K> keys);
+	<K> JQMLListModel<K> createListModel(final String name, final Set<K> keys, final PutMode putMode);
 
 	/**
 	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
@@ -121,7 +124,7 @@ public interface JQMLModelFactory {
 	 */
 	@QtThread
 	<K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
-			final ImmutableMap<K, JVariant> initialValues);
+			final ImmutableMap<K, JVariant> initialValues, PutMode putMode);
 
 	/**
 	 * Creates a JQMLListModel and wraps it in a JQMLMapPool that manages it.
@@ -136,7 +139,8 @@ public interface JQMLModelFactory {
 	 * @return The new pool.
 	 */
 	@QtThread
-	<K> JQMLMapPool<K> createPool(final String name, final Set<K> keys, final ImmutableMap<K, JVariant> initialValues);
+	<K> JQMLMapPool<K> createPool(final String name, final Set<K> keys, final ImmutableMap<K, JVariant> initialValues,
+			PutMode putMode);
 
 	/**
 	 * Creates a new JQMLSingletonModel with Class<K> being its key.
@@ -149,7 +153,8 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass);
+	<K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass,
+			final PutMode putMode);
 
 	/**
 	 * Creates a new JQMLSingletonModel with Class<K> being its key.
@@ -162,7 +167,7 @@ public interface JQMLModelFactory {
 	 * @throws QMLException          Thrown if a model already exists with name.
 	 */
 	@QtThread
-	<K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys);
+	<K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys, final PutMode putMode);
 
 	/**
 	 * Creates a new JQMLTextInputModel.

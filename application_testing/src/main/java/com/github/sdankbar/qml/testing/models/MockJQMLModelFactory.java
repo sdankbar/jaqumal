@@ -31,6 +31,7 @@ import java.util.Set;
 import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.exceptions.QMLException;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.JQMLMapPool;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
@@ -59,19 +60,21 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	}
 
 	@Override
-	public <K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass,
+			final PutMode putMode) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys) {
+	public <K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys, final PutMode putMode) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass,
+			final PutMode putMode) {
 		checkModelName(name);
 		final JQMLListModel<K> temp = new MockJQMLListModel<>(name);
 		listModels.put(name, temp);
@@ -79,7 +82,7 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	}
 
 	@Override
-	public <K> JQMLListModel<K> createListModel(final String name, final Set<K> keys) {
+	public <K> JQMLListModel<K> createListModel(final String name, final Set<K> keys, final PutMode putMode) {
 		checkModelName(name);
 		final JQMLListModel<K> temp = new MockJQMLListModel<>(name);
 		listModels.put(name, temp);
@@ -88,20 +91,21 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 
 	@Override
 	public <K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
-			final ImmutableMap<K, JVariant> initialValues) {
+			final ImmutableMap<K, JVariant> initialValues, final PutMode putMode) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public <K> JQMLMapPool<K> createPool(final String name, final Set<K> keys,
-			final ImmutableMap<K, JVariant> initialValues) {
+			final ImmutableMap<K, JVariant> initialValues, final PutMode putMode) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass,
+			final PutMode putMode) {
 		checkModelName(name);
 		final JQMLSingletonModel<K> temp = new MockJQMLSingletonModel<>(name);
 		singletonModels.put(name, temp);
@@ -109,7 +113,7 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	}
 
 	@Override
-	public <K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys) {
+	public <K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys, final PutMode putMode) {
 		checkModelName(name);
 		final JQMLSingletonModel<K> temp = new MockJQMLSingletonModel<>(name);
 		singletonModels.put(name, temp);

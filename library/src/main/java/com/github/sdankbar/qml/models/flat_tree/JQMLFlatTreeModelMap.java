@@ -49,11 +49,12 @@ public class JQMLFlatTreeModelMap<K> extends AbstractJQMLMapModel<K> {
 	 * @param accessor        Accessor used be update the C++ portion of the model.
 	 * @param indexLookup     Map from a Key's toString() value to its integer
 	 *                        index.
+	 * @param putMode         Specifies how put operations behave.
 	 */
 	public JQMLFlatTreeModelMap(final String modelName, final Set<K> keys,
 			final AtomicReference<Thread> eventLoopThread, final FlatTreeAccessor accessor,
-			final Map<String, Integer> indexLookup) {
-		super(modelName, keys, eventLoopThread, accessor);
+			final Map<String, Integer> indexLookup, final PutMode putMode) {
+		super(modelName, keys, eventLoopThread, accessor, putMode);
 		this.accessor = Objects.requireNonNull(accessor, "accessor is null");
 		this.indexLookup.putAll(Objects.requireNonNull(indexLookup, "indexLookup is null"));
 	}

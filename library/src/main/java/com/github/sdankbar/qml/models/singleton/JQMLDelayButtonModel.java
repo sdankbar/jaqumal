@@ -33,6 +33,7 @@ import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.ButtonActivateEvent;
 import com.github.sdankbar.qml.eventing.builtin.ButtonClickEvent;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -89,7 +90,7 @@ public class JQMLDelayButtonModel {
 
 	public JQMLDelayButtonModel(final String modelName, final JQMLModelFactory factory,
 			final EventDispatcher<?> dispatcher) {
-		model = factory.createSingletonModel(modelName, Roles.class);
+		model = factory.createSingletonModel(modelName, Roles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.ModelName, new JVariant(modelName));
 		model.put(Roles.IsDefault, new JVariant(false));

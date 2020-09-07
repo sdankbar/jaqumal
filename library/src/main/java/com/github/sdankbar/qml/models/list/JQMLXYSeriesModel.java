@@ -30,6 +30,7 @@ import java.util.Objects;
 import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.JVariant.Type;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -66,7 +67,7 @@ public class JQMLXYSeriesModel {
 	 * @param factory   Model factory to make the list model that backs this model.
 	 */
 	public JQMLXYSeriesModel(final String modelName, final JQMLModelFactory factory) {
-		model = factory.createListModel(modelName, SeriesRoles.class);
+		model = factory.createListModel(modelName, SeriesRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
 	}
 
 	/**
