@@ -22,8 +22,6 @@
  */
 package com.github.sdankbar.qml;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -107,12 +105,12 @@ public class JMHTest {
 
 	@Benchmark
 	public void benchmark_listModelGetInteger(final BenchmarkState state) {
-		assertEquals(1, state.listModel.get(0).get(Role.R1).asInteger());
+		state.listModel.get(0).get(Role.R1);
 	}
 
 	@Benchmark
 	public void benchmark_listModelGetString(final BenchmarkState state) {
-		assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", state.listModel.get(1).get(Role.R2).asString());
+		state.listModel.get(1).get(Role.R2);
 	}
 
 	@Test
