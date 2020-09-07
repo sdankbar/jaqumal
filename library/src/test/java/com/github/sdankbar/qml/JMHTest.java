@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -71,6 +73,7 @@ public class JMHTest {
 					PutMode.RETURN_NULL);
 			listModel = app.getModelFactory().createListModel("list_model", Role.class, PutMode.RETURN_NULL);
 			listModel.add(new JVariant(1), Role.R1);
+			listModel.add(new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), Role.R2);
 		}
 
 		/**
@@ -95,6 +98,21 @@ public class JMHTest {
 	@Benchmark
 	public void benchmark_listModelSetInteger(final BenchmarkState state) {
 		state.listModel.get(0).put(Role.R1, new JVariant(1));
+	}
+
+	@Benchmark
+	public void benchmark_listModelSetString(final BenchmarkState state) {
+		state.listModel.get(0).put(Role.R1, new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+	}
+
+	@Benchmark
+	public void benchmark_listModelGetInteger(final BenchmarkState state) {
+		assertEquals(1, state.listModel.get(0).get(Role.R1).asInteger());
+	}
+
+	@Benchmark
+	public void benchmark_listModelGetString(final BenchmarkState state) {
+		assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", state.listModel.get(1).get(Role.R2).asString());
 	}
 
 	@Test

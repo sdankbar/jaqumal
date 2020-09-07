@@ -385,7 +385,7 @@ QVariant GenericListModel::getData(qint32 row, const QString& propertyName) cons
     }
 }
 
-QVariant GenericListModel::getRowData(qint32 row, int32_t roleIndex) const
+const QVariant& GenericListModel::getRowData(qint32 row, int32_t roleIndex) const
 {
     if (row < m_rowData.size())
     {
@@ -393,7 +393,8 @@ QVariant GenericListModel::getRowData(qint32 row, int32_t roleIndex) const
     }
     else
     {
-        return QVariant();
+        static const QVariant invalid;
+        return invalid;
     }
 }
 
