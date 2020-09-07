@@ -196,7 +196,7 @@ public class JQMLFlatTreeModelTest {
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R2, new JVariant(2));
-		model.insert(TreePath.of(0, 0), Roles.R1, new JVariant(1));
+		model.insert(TreePath.of(0, 0), Roles.R1, new JVariant(3));
 
 		final JQMLFlatTreeModelMap<Roles> map = model.get(TreePath.of(0));
 		assertEquals(new JVariant(1), map.get(Roles.R1));
