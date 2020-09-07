@@ -167,7 +167,7 @@ public class JQMLApplication<EType> {
 				try {
 					executor.submit(ApplicationFunctions::quitQApplication);
 				} catch (final RejectedExecutionException e) {
-					log.debug("Executor has already been shutdown");
+					log.debug("Executor has already been shutdown", e);
 				}
 				while (eventLoopThread.get() != null || SINGLETON_EXISTS.get()) {
 					Thread.yield();

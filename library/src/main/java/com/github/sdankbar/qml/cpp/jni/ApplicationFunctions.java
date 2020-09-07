@@ -22,7 +22,11 @@
  */
 package com.github.sdankbar.qml.cpp.jni;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +42,18 @@ public final class ApplicationFunctions {
 
 	static {
 		logger.info("Load Jaqumal.dll");
-		// TODO load from classpath
-		System.load(new File("C:\\Users\\dankb\\git\\jaqumal\\library\\src\\main\\resources\\win32-x86-64\\Jaqumal.dll")
-				.getAbsolutePath());
+		final BufferedInputStream stream = new BufferedInputStream(
+				ClassLoader.getSystemResourceAsStream("win32-x86-64/Jaqumal.dll"));
+		try {
+			final byte[] libraryData = stream.readAllBytes();
+			final File libraryFile = File.createTempFile("Jaquamal", ".dll");
+			try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(libraryFile))) {
+				writer.write(libraryData);
+			}
+			System.load(libraryFile.getAbsolutePath());
+		} catch (final IOException e) {
+			logger.error("Failed to load Jaqumal.dll", e);
+		}
 		logger.info("Finish - Load Jaqumal.dll");
 	}
 
