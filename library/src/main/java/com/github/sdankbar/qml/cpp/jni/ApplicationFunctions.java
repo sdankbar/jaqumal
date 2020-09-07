@@ -26,6 +26,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -50,6 +51,17 @@ public final class ApplicationFunctions {
 			try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(libraryFile))) {
 				writer.write(libraryData);
 			}
+
+			// Cleanup extracted dlls from previous runs. Only risk is if two Jaqumal apps
+			// are started at the same time, could delete each other's extract dlls.
+			// Once System.load is called, this is less of an issue.
+			final File temporaryDir = libraryFile.getParentFile();
+			final File[] oldDlls = temporaryDir.listFiles((FilenameFilter) (dir, name) -> name.startsWith("Jaquamal")
+					&& name.endsWith(".dll") && !name.equals(libraryFile.getName()));
+			for (final File f : oldDlls) {
+				f.delete();
+			}
+
 			System.load(libraryFile.getAbsolutePath());
 		} catch (final IOException e) {
 			logger.error("Failed to load Jaqumal.dll", e);
