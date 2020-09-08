@@ -573,7 +573,7 @@ void GenericFlatTreeModel::setRowData(std::deque<int32_t>& indicies, const std::
             ++added;
         }
 
-        for (uint32_t i = 0; i < data.size(); ++i)
+        for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
             m_rowData[row].insert(roleIndex[i], data[i]);
         }
@@ -636,7 +636,7 @@ void GenericFlatTreeModel::insertRowData(std::deque<int32_t>& indicies, const st
         int32_t row = indicies[0];
         int32_t actualRow = std::min(row, m_rowData.size());
         QHash<int32_t, QVariant> map;
-        for (uint32_t i = 0; i < data.size(); ++i)
+        for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
             map.insert(roleIndex[i], data[i]);
         }
