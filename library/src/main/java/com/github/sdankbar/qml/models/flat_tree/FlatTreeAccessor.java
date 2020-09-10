@@ -129,7 +129,7 @@ public class FlatTreeAccessor extends MapAccessor {
 
 		checkIndex();
 
-		// TODO call assign
+		FlatTreeModelFunctions.assignGenericFlatTreeModelData(modelPointer, path.toArray());
 	}
 
 }

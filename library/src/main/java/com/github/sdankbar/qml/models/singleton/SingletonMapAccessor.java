@@ -77,7 +77,7 @@ public class SingletonMapAccessor extends MapAccessor {
 			e.getValue().sendToQML(e.getKey().intValue());
 		}
 
-		// TODO call assign
+		SingletonModelFunctions.assignGenericObjectModelData(modelPointer);
 	}
 
 }

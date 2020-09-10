@@ -162,6 +162,15 @@ void JNICALL setGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr)
     }
 }
 
+void JNICALL assignGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
+        modelPtr->assign(QMLDataTransfer::getPendingRoleIndices());
+        QMLDataTransfer::clearPendingData();
+    }
+}
 jclass SingletonModelFunctions::mapChangedClass;
 jmethodID SingletonModelFunctions::mapChangedMethod;
 
@@ -178,6 +187,7 @@ void SingletonModelFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("isGenericObjectModelRolePresent",    "(JI)Z",    (void *)&isGenericObjectModelRolePresent),
         JNIUtilities::createJNIMethod("registerValueChangedCallback",    "(JLcom/github/sdankbar/qml/cpp/jni/interfaces/MapChangeCallback;)V",  (void *)&registerValueChangedCallback),
         JNIUtilities::createJNIMethod("setGenericObjectModelData",    "(J)V",    (void *)&setGenericObjectModelData),
+        JNIUtilities::createJNIMethod("assignGenericObjectModelData",    "(J)V",    (void *)&assignGenericObjectModelData),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/singleton/SingletonModelFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods)/sizeof(JNINativeMethod));
@@ -265,6 +275,12 @@ void GenericObjectModel::setData(const QVariant& data, const QString& propertyNa
             callbackListeners(propertyName, data);
         }
     }
+}
+
+void GenericObjectModel::assign(const QVector<int32_t>& roleIndex)
+{
+    clear();
+    setData(roleIndex);
 }
 
 void GenericObjectModel::setData(const QVector<int32_t>& roleIndex)

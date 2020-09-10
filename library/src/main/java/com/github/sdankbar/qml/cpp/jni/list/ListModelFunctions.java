@@ -67,4 +67,6 @@ public final class ListModelFunctions {
 	public static native void reorderGenericListModel(long modelPointer, int[] ordering);
 
 	public static native void setGenericListModelData(long modelPointer, int row);
+
+	public static native void assignGenericListModelData(long modelPointer, int row);
 }

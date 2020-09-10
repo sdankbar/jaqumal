@@ -49,6 +49,7 @@ public:
 
     const QString& modelName() const;
 
+    void assign(const QVector<int32_t>& roleIndex);
     void setData(const QVector<int32_t>& roleIndex);
     Q_INVOKABLE void setData(const QVariant& data, const QString& propertyName);
 

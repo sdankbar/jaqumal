@@ -287,6 +287,19 @@ void JNICALL setGenericFlatTreeModelData(JNIEnv* env, jclass, jlong pointer, jin
     }
 }
 
+void JNICALL assignGenericFlatTreeModelData(JNIEnv* env, jclass, jlong pointer, jintArray path)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericFlatTreeModel*>(pointer);
+        std::deque<int32_t> indicies = toTreePath(env, path);
+        modelPtr->assignRowData(indicies,
+                             QMLDataTransfer::getPendingVariants(),
+                             QMLDataTransfer::getPendingRoleIndices());
+        QMLDataTransfer::clearPendingData();
+    }
+}
+
 void FlatTreeModelFunctions::initialize(JNIEnv* env)
 {
     JNINativeMethod methods[] = {
@@ -301,6 +314,7 @@ void FlatTreeModelFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("isGenericFlatTreeModelRolePresent",    "(J[II)Z",    (void *)&isGenericFlatTreeModelRolePresent),
         JNIUtilities::createJNIMethod("reorderGenericFlatTreeModel",    "(J[I[I)V",    (void *)&reorderGenericFlatTreeModel),
         JNIUtilities::createJNIMethod("setGenericFlatTreeModelData",    "(J[I)V",    (void *)&setGenericFlatTreeModelData),
+        JNIUtilities::createJNIMethod("assignGenericFlatTreeModelData",    "(J[I)V",    (void *)&assignGenericFlatTreeModelData),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/flat_tree/FlatTreeModelFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods)/sizeof(JNINativeMethod));
@@ -568,6 +582,42 @@ void GenericFlatTreeModel::setRowData(std::deque<int32_t>& indicies, const std::
             ++added;
         }
 
+        for (int32_t i = 0; i < roleIndex.size(); ++i)
+        {
+            m_rowData[row].insert(roleIndex[i], data[i]);
+        }
+    }
+    else
+    {
+        QSharedPointer<GenericFlatTreeModel> p = getSubmodel(indicies[0]);
+        if (p)
+        {
+            indicies.pop_front();
+            p->setRowData(indicies, data, roleIndex);
+        }
+    }
+
+    if (m_depth == 0)
+    {
+        updateFlatData(indiciesCopy, added);
+    }
+}
+
+void GenericFlatTreeModel::assignRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
+{
+    std::deque<int32_t> indiciesCopy = indicies;
+    int32_t added = 0;
+    if (indicies.size() == 1)
+    {
+        int32_t row = indicies[0];
+        while (m_rowData.size() <= row)
+        {
+            QHash<int32_t, QVariant> map;
+            m_rowData.push_back(map);
+            ++added;
+        }
+
+        m_rowData[row].clear();
         for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
             m_rowData[row].insert(roleIndex[i], data[i]);

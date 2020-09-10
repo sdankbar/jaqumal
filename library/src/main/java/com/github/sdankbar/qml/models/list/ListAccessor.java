@@ -119,7 +119,7 @@ public class ListAccessor extends MapAccessor {
 
 		checkIndex();
 
-		// TODO call assign
+		ListModelFunctions.assignGenericListModelData(modelPointer, listIndex);
 	}
 
 	/**

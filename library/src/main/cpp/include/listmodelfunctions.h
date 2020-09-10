@@ -62,6 +62,7 @@ public:
 
     int32_t appendRowData(std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
     void setRowData(qint32 row, std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
+    void assignRowData(qint32 row, std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
     void insertRowData(qint32 row, std::vector<QVariant>& data, QVector<int32_t> roleIndex);
 
     const QVariant& getRowData(qint32 row, int32_t roleIndex) const;

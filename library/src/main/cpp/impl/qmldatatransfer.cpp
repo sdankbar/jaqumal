@@ -38,7 +38,7 @@
 
 namespace
 {
-const std::size_t MAX_SIZE = 256;
+const std::size_t MAX_SIZE = 1024;
 }
 
 JNICALL void setInteger(JNIEnv*, jclass, jint i, jint roleIndex)

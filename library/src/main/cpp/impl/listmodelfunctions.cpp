@@ -198,6 +198,16 @@ void JNICALL setGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint ro
     }
 }
 
+void JNICALL assignGenericListModelData(JNIEnv* env, jclass, jlong pointer, jint row)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
+        modelPtr->assignRowData(row, QMLDataTransfer::getPendingVariants(), QMLDataTransfer::getPendingRoleIndices());
+        QMLDataTransfer::clearPendingData();
+    }
+}
+
 void JNICALL putRootValueIntoListModel(JNIEnv* env, jclass, jlong pointer, jstring key)
 {
     if (ApplicationFunctions::check(env))
@@ -241,6 +251,7 @@ void ListModelFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("getRootValueFromListModel",    "(JLjava/lang/String;)Lcom/github/sdankbar/qml/JVariant;",    (void *)&getRootValueFromListModel),
         JNIUtilities::createJNIMethod("reorderGenericListModel",    "(J[I)V",    (void *)&reorderGenericListModel),
         JNIUtilities::createJNIMethod("setGenericListModelData",    "(JI)V",    (void *)&setGenericListModelData),
+        JNIUtilities::createJNIMethod("assignGenericListModelData",    "(JI)V",    (void *)&assignGenericListModelData),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/list/ListModelFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods)/sizeof(JNINativeMethod));
@@ -421,6 +432,46 @@ void GenericListModel::setRowData(qint32 row, std::vector<QVariant>& data, const
             entry[roleIndex[i] - Qt::UserRole].swap(data[i]);
         }
         emit dataChanged(index(row, 0), index(row, 0), roleIndex);
+    }
+}
+
+void GenericListModel::assignRowData(qint32 row, std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
+{
+    if (m_rowData.size() <= row)
+    {
+        beginInsertRows(QModelIndex(), m_rowData.size(), row);
+        while (m_rowData.size() <= row)
+        {
+            QVector<QVariant> map;
+            map.resize(m_stringToIndexRoleMap.size());
+            m_rowData.push_back(map);
+        }
+
+        QVector<QVariant>& map = m_rowData[row];
+        for (int32_t i = 0; i < map.size(); ++i)
+        {
+            map[i] = QVariant();
+        }
+        for (int32_t i = 0; i < roleIndex.size(); ++i)
+        {
+            map[roleIndex[i] - Qt::UserRole] = data[i];
+        }
+
+        endInsertRows();
+        emit sizeChanged();
+    }
+    else
+    {
+        QVector<QVariant>& entry = m_rowData[row];
+        for (int32_t i = 0; i < entry.size(); ++i)
+        {
+            entry[i] = QVariant();
+        }
+        for (int32_t i = 0; i < roleIndex.size(); ++i)
+        {
+            entry[roleIndex[i] - Qt::UserRole].swap(data[i]);
+        }
+        emit dataChanged(index(row, 0), index(row, 0));
     }
 }
 

@@ -89,6 +89,8 @@ public class FlatTreeModelFunctions {
 
 	public static native void setGenericFlatTreeModelData(long modelPointer, int[] indices);
 
+	public static native void assignGenericFlatTreeModelData(long modelPointer, int[] indices);
+
 	private FlatTreeModelFunctions() {
 		// Empty Implementation
 	}

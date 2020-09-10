@@ -62,6 +62,8 @@ public class SingletonModelFunctions {
 
 	public static native void setGenericObjectModelData(long modelPointer);
 
+	public static native void assignGenericObjectModelData(long modelPointer);
+
 	private SingletonModelFunctions() {
 		// Empty Implementation
 	}

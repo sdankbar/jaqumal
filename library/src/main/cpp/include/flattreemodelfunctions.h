@@ -60,6 +60,7 @@ public:
     int32_t appendRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
     void setRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
+    void assignRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
     void insertRowData(std::deque<int32_t>& indicies, const std::vector<QVariant>& data, const QVector<int32_t>& roleIndex);
 
