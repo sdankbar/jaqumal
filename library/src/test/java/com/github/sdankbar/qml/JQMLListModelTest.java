@@ -156,6 +156,46 @@ public class JQMLListModelTest {
 	/**
 	 *
 	 */
+	@Test
+	public void assign_map() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+
+		assertEquals(new JVariant(1), model.getData(0, Roles.R1).get());
+		assertEquals(new JVariant(5), model.getData(0, Roles.R5).get());
+		assertEquals(new JVariant(2), model.getData(1, Roles.R2).get());
+		assertEquals(new JVariant(4), model.getData(1, Roles.R4).get());
+
+		model.assign(0, ImmutableMap.of(Roles.R3, new JVariant(3)));
+		model.assign(1, ImmutableMap.of(Roles.R3, new JVariant(9)));
+
+		assertEquals(new JVariant(3), model.getData(0, Roles.R3).get());
+		assertEquals(1, model.get(0).size());
+		assertEquals(new JVariant(9), model.getData(1, Roles.R3).get());
+		assertEquals(1, model.get(1).size());
+	}
+
+	/**
+	 *
+	 */
 	@SuppressWarnings("deprecation")
 	@Test(expected = UnsupportedOperationException.class)
 	public void append_map_error() {

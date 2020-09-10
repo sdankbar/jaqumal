@@ -47,4 +47,6 @@ public interface JQMLSingletonModel<K> extends Map<K, JVariant> {
 	 */
 	String getModelName();
 
+	void assign(final Map<K, JVariant> map);
+
 }

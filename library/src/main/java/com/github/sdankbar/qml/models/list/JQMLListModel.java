@@ -184,4 +184,7 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	 */
 	void unregisterListener(final ListListener<K> l);
 
+	void assign(List<Map<K, JVariant>> list);
+
+	void assign(int row, Map<K, JVariant> map);
 }

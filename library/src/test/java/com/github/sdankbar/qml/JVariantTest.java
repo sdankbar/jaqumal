@@ -75,7 +75,7 @@ public class JVariantTest {
 		try {
 			v.asColor();
 			assertTrue(false);
-		} catch (final IllegalArgumentException e) {
+		} catch (@SuppressWarnings("unused") final IllegalArgumentException e) {
 			// Expected
 		}
 	}

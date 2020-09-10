@@ -652,4 +652,32 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		listeners.remove(l);
 	}
 
+	@Override
+	public void assign(final List<Map<K, JVariant>> list) {
+		verifyEventLoopThread();
+		final int reuseCount = Math.min(mapRefs.size(), list.size());
+		for (int i = 0; i < reuseCount; ++i) {
+			final JQMLListModelMap<K> ref = (JQMLListModelMap<K>) mapRefs.get(i);
+			ref.assign(list.get(i));
+		}
+
+		addAll(list.subList(reuseCount, list.size()));
+
+		// TODO optimize
+		if (list.isEmpty()) {
+			clear();
+		} else {
+			while (mapRefs.size() > list.size()) {
+				remove(mapRefs.size() - 1);
+			}
+		}
+	}
+
+	@Override
+	public void assign(final int index, final Map<K, JVariant> map) {
+		verifyEventLoopThread();
+		final JQMLListModelMap<K> ref = (JQMLListModelMap<K>) mapRefs.get(index);
+		ref.assign(map);
+	}
+
 }

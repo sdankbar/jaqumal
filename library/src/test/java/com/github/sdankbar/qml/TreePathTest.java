@@ -72,20 +72,20 @@ public class TreePathTest {
 		try {
 			TreePath.of(-1);
 			assertTrue(false);
-		} catch (final IllegalArgumentException e) {
+		} catch (@SuppressWarnings("unused") final IllegalArgumentException e) {
 			// Expected
 		}
 
 		try {
 			TreePath.of(-1, 0);
 			assertTrue(false);
-		} catch (final IllegalArgumentException e) {
+		} catch (@SuppressWarnings("unused") final IllegalArgumentException e) {
 			// Expected
 		}
 		try {
 			TreePath.of(0, -1);
 			assertTrue(false);
-		} catch (final IllegalArgumentException e) {
+		} catch (@SuppressWarnings("unused") final IllegalArgumentException e) {
 			// Expected
 		}
 	}
@@ -102,7 +102,7 @@ public class TreePathTest {
 		try {
 			TreePath.of().getIndex(0);
 			assertTrue(false);
-		} catch (final IllegalArgumentException e) {
+		} catch (@SuppressWarnings("unused") final IllegalArgumentException e) {
 			// Expected
 		}
 	}
@@ -119,7 +119,7 @@ public class TreePathTest {
 		try {
 			TreePath.of().getLast();
 			assertTrue(false);
-		} catch (final IllegalArgumentException e) {
+		} catch (@SuppressWarnings("unused") final IllegalArgumentException e) {
 			// Expected
 		}
 	}

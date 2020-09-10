@@ -54,7 +54,7 @@ public class DelayedMap<K, V> implements Map<K, V> {
 	/**
 	 * Enumeration of the various write modes for DelayedMap
 	 */
-	public static enum WriteMode {
+	public enum WriteMode {
 		/**
 		 * Writes are immediately sent to the wrapped Map
 		 */

@@ -91,12 +91,12 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 
 	@Override
 	public boolean addAll(final Collection<? extends Map<K, JVariant>> arg0) {
-		return delegate.addAll(arg0.stream().map(m -> new HashMap<>(m)).collect(ImmutableList.toImmutableList()));
+		return delegate.addAll(arg0.stream().map(HashMap::new).collect(ImmutableList.toImmutableList()));
 	}
 
 	@Override
 	public boolean addAll(final int arg0, final Collection<? extends Map<K, JVariant>> arg1) {
-		return delegate.addAll(arg0, arg1.stream().map(m -> new HashMap<>(m)).collect(ImmutableList.toImmutableList()));
+		return delegate.addAll(arg0, arg1.stream().map(HashMap::new).collect(ImmutableList.toImmutableList()));
 	}
 
 	@Override
@@ -255,6 +255,18 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	@Override
 	public void unregisterListener(final ListListener<K> l) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void assign(final List<Map<K, JVariant>> list) {
+		delegate.clear();
+		delegate.addAll(list);
+	}
+
+	@Override
+	public void assign(final int row, final Map<K, JVariant> map) {
+		delegate.get(row).clear();
+		delegate.get(row).putAll(map);
 	}
 
 }

@@ -44,6 +44,9 @@ import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 
+/**
+ * Performance benchmarks.
+ */
 public class JMHTest {
 
 	private enum Role {
@@ -83,36 +86,57 @@ public class JMHTest {
 		}
 	}
 
+	/**
+	 * @param state
+	 */
 	@Benchmark
 	public void benchmark_singletonModelSetInteger(final BenchmarkState state) {
 		state.singletonModel.put(Role.R1, new JVariant(1));
 	}
 
+	/**
+	 * @param state
+	 */
 	@Benchmark
 	public void benchmark_singletonModelSetString(final BenchmarkState state) {
 		state.singletonModel.put(Role.R1, new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
 	}
 
+	/**
+	 * @param state
+	 */
 	@Benchmark
 	public void benchmark_listModelSetInteger(final BenchmarkState state) {
 		state.listModel.get(0).put(Role.R1, new JVariant(1));
 	}
 
+	/**
+	 * @param state
+	 */
 	@Benchmark
 	public void benchmark_listModelSetString(final BenchmarkState state) {
 		state.listModel.get(0).put(Role.R1, new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
 	}
 
+	/**
+	 * @param state
+	 */
 	@Benchmark
 	public void benchmark_listModelGetInteger(final BenchmarkState state) {
 		state.listModel.get(0).get(Role.R1);
 	}
 
+	/**
+	 * @param state
+	 */
 	@Benchmark
 	public void benchmark_listModelGetString(final BenchmarkState state) {
 		state.listModel.get(1).get(Role.R2);
 	}
 
+	/**
+	 * @throws RunnerException
+	 */
 	@Test
 	public void runBenchmarks() throws RunnerException {
 		final Options options = new OptionsBuilder().include(JMHTest.class.getName() + ".*").mode(Mode.Throughput)

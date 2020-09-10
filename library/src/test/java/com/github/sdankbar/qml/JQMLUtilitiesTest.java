@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JQMLUtilities;
 import com.github.sdankbar.qml.exceptions.QMLThreadingException;
 
 /**

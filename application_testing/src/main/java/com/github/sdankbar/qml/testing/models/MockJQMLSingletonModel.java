@@ -111,4 +111,10 @@ public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 		return modelName;
 	}
 
+	@Override
+	public void assign(final Map<K, JVariant> map) {
+		delegate.clear();
+		delegate.putAll(map);
+	}
+
 }

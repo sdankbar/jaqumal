@@ -44,6 +44,7 @@ import com.github.sdankbar.qml.exceptions.IllegalKeyException;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Tests the JQMLSingletonModel class.
@@ -96,15 +97,39 @@ public class JQMLSingletonModelTest {
 		try {
 			model.get(null);
 			assertTrue(false);
-		} catch (final IllegalKeyException e) {
+		} catch (@SuppressWarnings("unused") final IllegalKeyException e) {
 			// Expected
 		}
 		try {
 			model.get(Integer.valueOf(55));
 			assertTrue(false);
-		} catch (final IllegalKeyException e) {
+		} catch (@SuppressWarnings("unused") final IllegalKeyException e) {
 			// Expected
 		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void assignValues() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
+				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.put(Roles.R1, new JVariant(1));
+		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
+
+		assertEquals(new JVariant(1), model.get(Roles.R1));
+		assertEquals(new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))),
+				model.get(Roles.R3));
+
+		model.assign(ImmutableMap.of(Roles.R1, new JVariant(2), Roles.R2, new JVariant(42)));
+
+		assertEquals(new JVariant(2), model.get(Roles.R1));
+		assertEquals(new JVariant(42), model.get(Roles.R2));
+		assertEquals(null, model.get(Roles.R3));
 	}
 
 	/**
@@ -325,7 +350,7 @@ public class JQMLSingletonModelTest {
 		try {
 			iter.next();
 			assertTrue(false);
-		} catch (final NoSuchElementException e) {
+		} catch (@SuppressWarnings("unused") final NoSuchElementException e) {
 			// Expected
 		}
 	}
@@ -354,7 +379,7 @@ public class JQMLSingletonModelTest {
 		try {
 			assertEquals(null, model.get(null));
 			assertTrue(false);
-		} catch (final IllegalKeyException e) {
+		} catch (@SuppressWarnings("unused") final IllegalKeyException e) {
 			// Expected
 		}
 	}
@@ -392,7 +417,7 @@ public class JQMLSingletonModelTest {
 		try {
 			assertEquals(null, model.get(null));
 			assertTrue(false);
-		} catch (final IllegalKeyException e) {
+		} catch (@SuppressWarnings("unused") final IllegalKeyException e) {
 			// Expected
 		}
 	}

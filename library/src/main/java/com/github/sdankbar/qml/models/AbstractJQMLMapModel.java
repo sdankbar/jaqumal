@@ -194,6 +194,9 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 
 	}
 
+	/**
+	 * Enumeration of the various modes for put() operations.
+	 */
 	public enum PutMode {
 		/**
 		 * Put functions return the previous value for the key.
@@ -232,6 +235,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	 * @param map Map to assign to this one.
 	 */
 	public void assign(final Map<K, JVariant> map) {
+		Objects.requireNonNull(map, "map is null");
 		verifyEventLoopThread();
 		accessor.assign(convert(map));
 	}
@@ -363,6 +367,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 
 	@Override
 	public void putAll(final Map<? extends K, ? extends JVariant> map) {
+		Objects.requireNonNull(map, "map is null");
 		verifyEventLoopThread();
 		accessor.set(convert(map));
 	}

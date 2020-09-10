@@ -24,7 +24,6 @@ package com.github.sdankbar.qml.models.singleton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -124,8 +123,4 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 		return modelName;
 	}
 
-	@Override
-	public void assign(final Map<K, JVariant> map) {
-
-	}
 }
