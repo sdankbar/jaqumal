@@ -122,10 +122,10 @@ void JNIUtilities::invokeCallback(JNIEnv* env, jobject callbackObject)
 
 QString JNIUtilities::toQString(JNIEnv* env, jstring str)
 {
-    const char* array = env->GetStringUTFChars(str, NULL);
-    QString qstr = QString::fromUtf8(array);
-    env->ReleaseStringUTFChars(str, array);
-    return qstr;
+    const int32_t strLength = env->GetStringLength(str);
+    QString res(strLength, Qt::Uninitialized);
+    env->GetStringRegion(str, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    return res;
 }
 
 std::string JNIUtilities::toString(JNIEnv* env, jstring str)

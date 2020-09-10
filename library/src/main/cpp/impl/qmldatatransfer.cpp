@@ -88,36 +88,40 @@ JNICALL void setRectangle(JNIEnv*, jclass, jint x, jint y, jint w, jint h, jint 
 
 JNICALL void setString(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const char* array = env->GetStringUTFChars(v, NULL);
-    QMLDataTransfer::storeRef(QString::fromUtf8(array), roleIndex);
-    env->ReleaseStringUTFChars(v, array);
+    const int32_t strLength = env->GetStringLength(v);
+    QString res(strLength, Qt::Uninitialized);
+    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QMLDataTransfer::storeRef(res, roleIndex);
 }
 
 JNICALL void setRegularExpression(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const char* array = env->GetStringUTFChars(v, NULL);
-    QMLDataTransfer::storeRef(QRegExp(QString::fromUtf8(array)), roleIndex);
-    env->ReleaseStringUTFChars(v, array);
+    const int32_t strLength = env->GetStringLength(v);
+    QString res(strLength, Qt::Uninitialized);
+    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QMLDataTransfer::storeRef(QRegExp(res), roleIndex);
 }
 
 JNICALL void setURL(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const char* array = env->GetStringUTFChars(v, NULL);
-    QMLDataTransfer::storeRef(QUrl(QString::fromUtf8(array)), roleIndex);
-    env->ReleaseStringUTFChars(v, array);
+    const int32_t strLength = env->GetStringLength(v);
+    QString res(strLength, Qt::Uninitialized);
+    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QMLDataTransfer::storeRef(QUrl(res), roleIndex);
 }
 
 JNICALL void setUUID(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const char* array = env->GetStringUTFChars(v, NULL);
-    QMLDataTransfer::storeRef(QUuid(QString::fromUtf8(array)), roleIndex);
-    env->ReleaseStringUTFChars(v, array);
+    const int32_t strLength = env->GetStringLength(v);
+    QString res(strLength, Qt::Uninitialized);
+    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QMLDataTransfer::storeRef(QUuid(res), roleIndex);
 }
 
 JNICALL void setByteArray(JNIEnv* env, jclass, jbyteArray v, jint roleIndex)
 {
     const jsize len = env->GetArrayLength(v);
-    jbyte* array = env->GetByteArrayElements(v,NULL);
+    jbyte* array = env->GetByteArrayElements(v, NULL);
     const QByteArray byteArray(reinterpret_cast<const char*>(array), len);
     QMLDataTransfer::storeRef(byteArray, roleIndex);
     env->ReleaseByteArrayElements(v, array, JNI_ABORT);
@@ -324,7 +328,9 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
     }
     case QVariant::RegExp: {
         const QString str = value.toRegExp().pattern();
-        jstring jStr = env->NewStringUTF(qPrintable(str));
+        jstring jStr = env->NewString(
+                    reinterpret_cast<const jchar*>(str.constData()),
+                    str.length());
         return env->CallStaticObjectMethod(jvariantClass, fromPatternMethod, jStr);
     }
     case QVariant::Size: {
@@ -333,22 +339,30 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
     }
     case QVariant::String: {
         const QString str = value.toString();
-        jstring jStr = env->NewStringUTF(qPrintable(str));
+        jstring jStr = env->NewString(
+                    reinterpret_cast<const jchar*>(str.constData()),
+                    str.length());
         return env->NewObject(jvariantClass, stringConstructor, jStr);
     }
     case QVariant::Url: {
         const QString str = value.toUrl().toString();
-        jstring jStr = env->NewStringUTF(qPrintable(str));
+        jstring jStr = env->NewString(
+                    reinterpret_cast<const jchar*>(str.constData()),
+                    str.length());
         return env->CallStaticObjectMethod(jvariantClass, fromURLMethod, jStr);
     }
     case QVariant::Uuid: {
         const QString str = value.toUuid().toString();
-        jstring jStr = env->NewStringUTF(qPrintable(str));
+        jstring jStr = env->NewString(
+                    reinterpret_cast<const jchar*>(str.constData()),
+                    str.length());
         return env->CallStaticObjectMethod(jvariantClass, fromUUIDMethod, jStr);
     }
     case QVariant::Font: {
         const QString str = value.value<QFont>().toString();
-        jstring jStr = env->NewStringUTF(qPrintable(str));
+        jstring jStr = env->NewString(
+                    reinterpret_cast<const jchar*>(str.constData()),
+                    str.length());
         return env->CallStaticObjectMethod(jvariantClass, fromJFontMethod, jStr);
     }
     default:
