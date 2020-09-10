@@ -25,7 +25,7 @@
 
 #include <QObject>
 #include <QMouseEvent>
-#include <functional>
+//#include <functional>
 #include <jni.h>
 
 class EventBuilder : public QObject

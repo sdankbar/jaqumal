@@ -69,7 +69,15 @@ public class SingletonMapAccessor extends MapAccessor {
 		}
 
 		SingletonModelFunctions.setGenericObjectModelData(modelPointer);
+	}
 
+	@Override
+	public void assign(final Map<Integer, JVariant> valuesMap) {
+		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
+			e.getValue().sendToQML(e.getKey().intValue());
+		}
+
+		// TODO call assign
 	}
 
 }

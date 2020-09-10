@@ -46,4 +46,5 @@ public interface JQMLSingletonModel<K> extends Map<K, JVariant> {
 	 * @return The name of the QML model this map is a part of.
 	 */
 	String getModelName();
+
 }

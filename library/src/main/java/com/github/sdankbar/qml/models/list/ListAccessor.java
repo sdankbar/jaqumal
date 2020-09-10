@@ -111,6 +111,17 @@ public class ListAccessor extends MapAccessor {
 
 	}
 
+	@Override
+	public void assign(final Map<Integer, JVariant> valuesMap) {
+		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
+			e.getValue().sendToQML(e.getKey().intValue());
+		}
+
+		checkIndex();
+
+		// TODO call assign
+	}
+
 	/**
 	 * @param listIndex The index into the list model that this accessor works on.
 	 */

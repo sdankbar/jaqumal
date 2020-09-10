@@ -36,13 +36,8 @@
 #include <QFontMetrics>
 #include <QScreen>
 #include <QApplication>
-#include <iostream>
 #include <functional>
 
-#include "qmlimageprovider.h"
-#include <QQmlContext>
-#include <QQuickWindow>
-#include <iostream>
 #include <applicationfunctions.h>
 #include <jniutilities.h>
 #include <qmldatatransfer.h>

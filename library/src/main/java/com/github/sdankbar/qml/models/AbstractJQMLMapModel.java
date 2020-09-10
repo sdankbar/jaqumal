@@ -225,6 +225,17 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		this.accessor = accessor;
 	}
 
+	/**
+	 * Assigns the passed in map to this map. Equivalent to clear() followed by
+	 * putAll().
+	 *
+	 * @param map Map to assign to this one.
+	 */
+	public void assign(final Map<K, JVariant> map) {
+		verifyEventLoopThread();
+		accessor.assign(convert(map));
+	}
+
 	@Override
 	public void clear() {
 		verifyEventLoopThread();
@@ -341,15 +352,19 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		}
 	}
 
-	@Override
-	public void putAll(final Map<? extends K, ? extends JVariant> map) {
-		verifyEventLoopThread();
+	private Map<Integer, JVariant> convert(final Map<? extends K, ? extends JVariant> map) {
 		final Map<Integer, JVariant> dataMap = new HashMap<>();
 		for (final Entry<? extends K, ? extends JVariant> e : map.entrySet()) {
 			final int roleIndex = verifyKey(e.getKey());
 			dataMap.put(Integer.valueOf(roleIndex), e.getValue());
 		}
-		accessor.set(dataMap);
+		return dataMap;
+	}
+
+	@Override
+	public void putAll(final Map<? extends K, ? extends JVariant> map) {
+		verifyEventLoopThread();
+		accessor.set(convert(map));
 	}
 
 	@Override

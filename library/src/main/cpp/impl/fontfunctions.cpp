@@ -38,11 +38,6 @@
 #include <QApplication>
 #include <iostream>
 #include <functional>
-
-#include "qmlimageprovider.h"
-#include <QQmlContext>
-#include <QQuickWindow>
-#include <iostream>
 #include <applicationfunctions.h>
 
 /*

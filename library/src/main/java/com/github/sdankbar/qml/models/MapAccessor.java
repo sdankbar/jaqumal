@@ -35,6 +35,14 @@ public abstract class MapAccessor {
 	protected long modelPointer;
 
 	/**
+	 * Assigns the passed in map to this map. Equivalent to clear() followed by
+	 * putAll().
+	 *
+	 * @param valuesMap Map to assign to this one.
+	 */
+	public abstract void assign(Map<Integer, JVariant> valuesMap);
+
+	/**
 	 * Remove all values from the map.
 	 */
 	public abstract void clear();

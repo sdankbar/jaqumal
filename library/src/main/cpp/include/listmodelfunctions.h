@@ -23,11 +23,6 @@
 #pragma once
 
 #include <jni.h>
-#include <QApplication>
-#include <qmllogging.h>
-#include <QQmlApplicationEngine>
-#include <userinputsimulator.h>
-#include <QQmlContext>
 #include <QAbstractListModel>
 
 class ListModelFunctions

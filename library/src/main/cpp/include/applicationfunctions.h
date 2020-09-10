@@ -27,7 +27,7 @@
 #include <qmllogging.h>
 #include <QQmlApplicationEngine>
 #include <userinputsimulator.h>
-#include <QQmlContext>
+//#include <QQmlContext>
 
 class ApplicationFunctions : public QObject
 {

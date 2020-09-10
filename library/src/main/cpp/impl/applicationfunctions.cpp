@@ -45,7 +45,6 @@
 #include "qmlimageprovider.h"
 #include <QQmlContext>
 #include <QQuickWindow>
-#include <iostream>
 #include <csignal>
 #include <qmltest.h>
 

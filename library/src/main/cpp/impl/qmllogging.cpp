@@ -22,8 +22,8 @@
  */
 #include "qmllogging.h"
 #include <sstream>
-#include <iostream>
 #include <applicationfunctions.h>
+#include <iostream>
 
 QMLLogging* loggingPtr = nullptr;
 

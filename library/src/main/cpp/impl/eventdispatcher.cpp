@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "eventdispatcher.h"
-#include <QSet>
 
 QSet<EventDispatcher*> EventDispatcher::allDispatchers;
 

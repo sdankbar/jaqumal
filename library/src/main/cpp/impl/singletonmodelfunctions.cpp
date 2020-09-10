@@ -24,10 +24,7 @@
 
 #include "jniutilities.h"
 
-#include <eventbuilder.h>
-#include <eventdispatcher.h>
 #include <jpolyline.h>
-#include <QQmlContext>
 #include <QTimer>
 #include <QDateTime>
 #include <QUuid>
@@ -36,12 +33,8 @@
 #include <QFontMetrics>
 #include <QScreen>
 #include <QApplication>
-#include <iostream>
 #include <functional>
-
-#include "qmlimageprovider.h"
-#include <QQmlContext>
-#include <QQuickWindow>
+#include <iostream>
 #include <applicationfunctions.h>
 #include <qmldatatransfer.h>
 

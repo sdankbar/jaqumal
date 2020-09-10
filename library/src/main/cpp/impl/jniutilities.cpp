@@ -26,12 +26,10 @@
 #include "applicationfunctions.h"
 #include "eventfunctions.h"
 #include "fontfunctions.h"
-
+#include <iostream>
 #include "flattreemodelfunctions.h"
 #include "singletonmodelfunctions.h"
 #include "listmodelfunctions.h"
-
-#include <iostream>
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
