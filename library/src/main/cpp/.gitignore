@@ -8,3 +8,4 @@ qrc_*.cpp
 /object_script.Jaqumal.Debug
 /object_script.Jaqumal.Release
 /target_wrapper.sh
+/target_wrapper.bat
