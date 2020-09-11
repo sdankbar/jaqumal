@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
@@ -64,6 +65,11 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		 */
 		void selectionChanged(ImmutableSet<Integer> changedIndices, ImmutableList<Integer> selectedIndices,
 				ImmutableList<Map<K, JVariant>> selected);
+	}
+
+	public enum AssignMode {
+		CLEAR_SELECTION,
+		MAINTAIN_SELECTION
 	}
 
 	/**
@@ -165,6 +171,36 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		});
 
 		app.getEventDispatcher().register(ListSelectionChangedEvent.class, this);
+	}
+
+	public void assign(final List<Map<K, JVariant>> list, final K idKey, final AssignMode mode) {
+		final Set<JVariant> selectedValules;
+		final boolean maintainSelection = mode == AssignMode.MAINTAIN_SELECTION;
+		if (maintainSelection) {
+			selectedValules = getSelected().stream().map(m -> m.get(idKey)).filter(v -> v != null)
+					.collect(ImmutableSet.toImmutableSet());
+		} else {
+			selectedValules = ImmutableSet.of();
+		}
+
+		getModel().assign(list);
+
+		if (maintainSelection) {
+			int i = 0;
+			for (final Map<K, JVariant> map : getModel()) {
+				final JVariant value = map.get(idKey);
+				if (selectedValules.contains(value)) {
+					select(i);
+				} else {
+					map.put(isSelectedKey, JVariant.FALSE);
+				}
+				++i;
+			}
+		} else {
+			for (final Map<K, JVariant> map : getModel()) {
+				map.put(isSelectedKey, JVariant.FALSE);
+			}
+		}
 	}
 
 	/**
@@ -310,7 +346,7 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	public void setSelection(final int index, final boolean isSelected) {
 		if (selectionMode != SelectionMode.NONE && (0 <= index && index < listModel.size())) {
 			final Map<K, JVariant> map = listModel.get(index);
-			final boolean oldState = map.get(isSelectedKey).asBoolean(false);
+			final boolean oldState = map.getOrDefault(isSelectedKey, JVariant.FALSE).asBoolean(false);
 
 			if (oldState != isSelected) {
 

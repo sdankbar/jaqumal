@@ -42,6 +42,7 @@ import org.junit.Test;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -187,10 +188,169 @@ public class JQMLListModelTest {
 		model.assign(0, ImmutableMap.of(Roles.R3, new JVariant(3)));
 		model.assign(1, ImmutableMap.of(Roles.R3, new JVariant(9)));
 
+		assertEquals(2, model.size());
 		assertEquals(new JVariant(3), model.getData(0, Roles.R3).get());
 		assertEquals(1, model.get(0).size());
 		assertEquals(new JVariant(9), model.getData(1, Roles.R3).get());
 		assertEquals(1, model.get(1).size());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void assign_listSameSize() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+
+		assertEquals(new JVariant(1), model.getData(0, Roles.R1).get());
+		assertEquals(new JVariant(5), model.getData(0, Roles.R5).get());
+		assertEquals(new JVariant(2), model.getData(1, Roles.R2).get());
+		assertEquals(new JVariant(4), model.getData(1, Roles.R4).get());
+
+		model.assign(ImmutableList.of(ImmutableMap.of(Roles.R3, new JVariant(3)),
+				ImmutableMap.of(Roles.R3, new JVariant(9))));
+
+		assertEquals(2, model.size());
+		assertEquals(new JVariant(3), model.getData(0, Roles.R3).get());
+		assertEquals(1, model.get(0).size());
+		assertEquals(new JVariant(9), model.getData(1, Roles.R3).get());
+		assertEquals(1, model.get(1).size());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void assign_listGrow() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+
+		assertEquals(new JVariant(1), model.getData(0, Roles.R1).get());
+		assertEquals(new JVariant(5), model.getData(0, Roles.R5).get());
+		assertEquals(new JVariant(2), model.getData(1, Roles.R2).get());
+		assertEquals(new JVariant(4), model.getData(1, Roles.R4).get());
+
+		model.assign(ImmutableList.of(ImmutableMap.of(Roles.R3, new JVariant(3)),
+				ImmutableMap.of(Roles.R3, new JVariant(9)), ImmutableMap.of(Roles.R1, new JVariant(12))));
+
+		assertEquals(3, model.size());
+		assertEquals(new JVariant(3), model.getData(0, Roles.R3).get());
+		assertEquals(1, model.get(0).size());
+		assertEquals(new JVariant(9), model.getData(1, Roles.R3).get());
+		assertEquals(1, model.get(1).size());
+		assertEquals(new JVariant(12), model.getData(2, Roles.R1).get());
+		assertEquals(1, model.get(2).size());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void assign_listShrink() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+
+		assertEquals(new JVariant(1), model.getData(0, Roles.R1).get());
+		assertEquals(new JVariant(5), model.getData(0, Roles.R5).get());
+		assertEquals(new JVariant(2), model.getData(1, Roles.R2).get());
+		assertEquals(new JVariant(4), model.getData(1, Roles.R4).get());
+
+		model.assign(ImmutableList.of(ImmutableMap.of(Roles.R3, new JVariant(3))));
+
+		assertEquals(1, model.size());
+		assertEquals(new JVariant(3), model.getData(0, Roles.R3).get());
+		assertEquals(1, model.get(0).size());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void assign_listClear() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+
+		assertEquals(new JVariant(1), model.getData(0, Roles.R1).get());
+		assertEquals(new JVariant(5), model.getData(0, Roles.R5).get());
+		assertEquals(new JVariant(2), model.getData(1, Roles.R2).get());
+		assertEquals(new JVariant(4), model.getData(1, Roles.R4).get());
+
+		model.assign(ImmutableList.of());
+
+		assertEquals(0, model.size());
 	}
 
 	/**
