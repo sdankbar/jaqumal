@@ -49,18 +49,18 @@ public:
 
     const QString& modelName() const;
 
-    void assign(const QVector<int32_t>& roleIndex);
-    void setData(const QVector<int32_t>& roleIndex);
+    void assign(JNIEnv* env, const QVector<int32_t>& roleIndex);
+    void setData(JNIEnv* env, const QVector<int32_t>& roleIndex);
     Q_INVOKABLE void setData(const QVariant& data, const QString& propertyName);
 
     Q_INVOKABLE QVariant getData(const QString& propertyName) const;
-    QVariant getData(int32_t roleIndex) const;
+    QVariant getData(JNIEnv* env, int32_t roleIndex) const;
 
 
-    void clear(int32_t roleIndex);
-    void clear();
+    void clear(JNIEnv* env, int32_t roleIndex);
+    void clear(JNIEnv* env);
 
-    bool containsRole(int32_t roleIndex);
+    bool containsRole(JNIEnv* env, int32_t roleIndex);
 
     void registerValueChangedCallback(jobject c);
 
@@ -70,7 +70,7 @@ private slots:
 
 private:
 
-    void setData(QVariant& data, size_t roleIndex);
+    void setData(JNIEnv* env, QVariant& data, size_t roleIndex);
     void callbackListeners(const QString& key, const QVariant& newValue);
 
     // Member variables

@@ -82,6 +82,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	 * @param eventLoopThread Reference to the Qt Thread.
 	 * @param accessor        Accessor this model will use to to access the C++
 	 *                        portion of this model.
+	 * @param putMode         The mode that put operations use.
 	 */
 	public JQMLSingletonModelImpl(final String modelName, final Set<K> keys,
 			final AtomicReference<Thread> eventLoopThread, final SingletonMapAccessor accessor, final PutMode putMode) {

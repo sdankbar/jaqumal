@@ -184,7 +184,18 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	 */
 	void unregisterListener(final ListListener<K> l);
 
+	/**
+	 * Assigns the list to this list. Equivalent to clear and addAll.
+	 *
+	 * @param list List to assign to this map.
+	 */
 	void assign(List<Map<K, JVariant>> list);
 
-	void assign(int row, Map<K, JVariant> map);
+	/**
+	 * Assigns the map to the map at index.
+	 *
+	 * @param index Index of the Map to assign to.
+	 * @param map   Map to assign to the target Map.
+	 */
+	void assign(int index, Map<K, JVariant> map);
 }

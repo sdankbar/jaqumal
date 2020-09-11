@@ -78,7 +78,7 @@ void JNICALL clearGenericObjectModel(JNIEnv* env, jclass, jlong longPtr)
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        modelPtr->clear();
+        modelPtr->clear(env);
     }
 }
 
@@ -92,7 +92,7 @@ void JNICALL clearGenericObjectModelRole(JNIEnv* env, jclass, jlong longPtr, jin
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        modelPtr->clear(roleIndex);
+        modelPtr->clear(env, roleIndex);
     }
 }
 
@@ -106,7 +106,7 @@ jobject JNICALL getGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr, ji
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        return QMLDataTransfer::toJVariant(env, modelPtr->getData(roleIndex));
+        return QMLDataTransfer::toJVariant(env, modelPtr->getData(env, roleIndex));
     }
     else
     {
@@ -124,7 +124,7 @@ jboolean JNICALL isGenericObjectModelRolePresent(JNIEnv* env, jclass, jlong long
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        return modelPtr->containsRole(roleIndex);
+        return modelPtr->containsRole(env, roleIndex);
     }
     else
     {
@@ -157,7 +157,7 @@ void JNICALL setGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr)
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        modelPtr->setData(QMLDataTransfer::getPendingRoleIndices());
+        modelPtr->setData(env, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
     }
 }
@@ -167,7 +167,7 @@ void JNICALL assignGenericObjectModelData(JNIEnv* env, jclass, jlong longPtr)
     if (ApplicationFunctions::check(env))
     {
         auto modelPtr = reinterpret_cast<GenericObjectModel*>(longPtr);
-        modelPtr->assign(QMLDataTransfer::getPendingRoleIndices());
+        modelPtr->assign(env, QMLDataTransfer::getPendingRoleIndices());
         QMLDataTransfer::clearPendingData();
     }
 }
@@ -231,7 +231,7 @@ const QString& GenericObjectModel::modelName() const
     return m_modelName;
 }
 
-QVariant GenericObjectModel::getData(int32_t roleIndex) const
+QVariant GenericObjectModel::getData(JNIEnv* env, int32_t roleIndex) const
 {
     if (0 <= roleIndex && static_cast<uint32_t>(roleIndex) < m_roleMap.size())
     {
@@ -239,13 +239,12 @@ QVariant GenericObjectModel::getData(int32_t roleIndex) const
     }
     else
     {
-        //exceptionHandler("Role does not exist");
-        // TODO throw
+        JNIUtilities::throwQMLException(env, "Role does not exist");
         return QVariant();
     }
 }
 
-void GenericObjectModel::setData(QVariant& data, size_t roleIndex)
+void GenericObjectModel::setData(JNIEnv* env, QVariant& data, size_t roleIndex)
 {
     if (roleIndex < m_roleMap.size())
     {
@@ -259,8 +258,7 @@ void GenericObjectModel::setData(QVariant& data, size_t roleIndex)
     }
     else
     {
-        // TODO throw
-        //exceptionHandler("Role does not exist");
+        JNIUtilities::throwQMLException(env, "Role does not exist");
     }
 }
 
@@ -277,17 +275,17 @@ void GenericObjectModel::setData(const QVariant& data, const QString& propertyNa
     }
 }
 
-void GenericObjectModel::assign(const QVector<int32_t>& roleIndex)
+void GenericObjectModel::assign(JNIEnv* env, const QVector<int32_t>& roleIndex)
 {
-    clear();
-    setData(roleIndex);
+    clear(env);
+    setData(env, roleIndex);
 }
 
-void GenericObjectModel::setData(const QVector<int32_t>& roleIndex)
+void GenericObjectModel::setData(JNIEnv* env, const QVector<int32_t>& roleIndex)
 {
     for (int32_t i = 0; i < roleIndex.size(); ++i)
     {
-        setData(QMLDataTransfer::retrieve(i), roleIndex[i]);
+        setData(env, QMLDataTransfer::retrieve(i), roleIndex[i]);
     }
     QMLDataTransfer::clearPendingData();
 }
@@ -297,23 +295,23 @@ QVariant GenericObjectModel::getData(const QString& propertyName) const
     return value(propertyName);
 }
 
-void GenericObjectModel::clear(int32_t roleIndex)
+void GenericObjectModel::clear(JNIEnv* env, int32_t roleIndex)
 {
     QVariant nullVar;
-    setData(nullVar, roleIndex);
+    setData(env, nullVar, roleIndex);
 }
 
-void GenericObjectModel::clear()
+void GenericObjectModel::clear(JNIEnv* env)
 {
     for (uint32_t i = 0; i < m_roleMap.size(); ++i)
     {
-        clear(static_cast<int32_t>(i));
+        clear(env, static_cast<int32_t>(i));
     }
 }
 
-bool GenericObjectModel::containsRole(int32_t roleIndex)
+bool GenericObjectModel::containsRole(JNIEnv* env, int32_t roleIndex)
 {
-    return getData(roleIndex) != QVariant();
+    return getData(env, roleIndex) != QVariant();
 }
 
 void GenericObjectModel::onValueChanged(const QString& key, const QVariant& value)

@@ -67,8 +67,19 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 				ImmutableList<Map<K, JVariant>> selected);
 	}
 
+	/**
+	 * Enumeration of the modes that assign can be in.
+	 */
 	public enum AssignMode {
+		/**
+		 * No items are selected after assign() is called.
+		 */
 		CLEAR_SELECTION,
+		/**
+		 * The items that were selected before the assign() remain selected afterwards.
+		 * One of the values in entry is used to determine which items to reselect,
+		 * rather than using indicies.
+		 */
 		MAINTAIN_SELECTION
 	}
 
@@ -173,7 +184,20 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 		app.getEventDispatcher().register(ListSelectionChangedEvent.class, this);
 	}
 
+	/**
+	 * Assigns the data in list to this list. Equivalent to clear and addAll.
+	 *
+	 * @param list  List to assign to this list.
+	 * @param idKey Key in the Map used to determine which items to reselect. Values
+	 *              of the key should be unique.
+	 * @param mode  The selection mode for the assign operation. Affects if items
+	 *              are reselected after the assignment.
+	 */
 	public void assign(final List<Map<K, JVariant>> list, final K idKey, final AssignMode mode) {
+		Objects.requireNonNull(list, "list is null");
+		Objects.requireNonNull(idKey, "idKey is null");
+		Objects.requireNonNull(mode, "mode is null");
+
 		final Set<JVariant> selectedValules;
 		final boolean maintainSelection = mode == AssignMode.MAINTAIN_SELECTION;
 		if (maintainSelection) {

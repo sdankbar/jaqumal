@@ -47,6 +47,12 @@ public interface JQMLSingletonModel<K> extends Map<K, JVariant> {
 	 */
 	String getModelName();
 
+	/**
+	 * Assigns the data in the passed in map to this map. Equivalent to clear and
+	 * putAll.
+	 *
+	 * @param map Data to assign to this Map.
+	 */
 	void assign(final Map<K, JVariant> map);
 
 }
