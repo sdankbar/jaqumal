@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -391,6 +392,13 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 			}
 		}
 		return count;
+	}
+
+	@Override
+	public String toString() {
+		// ex. {R1=JVariant [type=STRING, obj=A], R3=JVariant [type=INT, obj=3]}
+		return entrySet().stream().map(e -> e.getKey().toString() + "=" + e.getValue().toString())
+				.collect(Collectors.joining(", "));
 	}
 
 	@Override

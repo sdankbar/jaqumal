@@ -634,6 +634,11 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	}
 
 	@Override
+	public String toString() {
+		return mapRefs.toString();
+	}
+
+	@Override
 	public Object[] toArray() {
 		return mapRefs.toArray();
 	}
@@ -655,18 +660,19 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	@Override
 	public void assign(final List<Map<K, JVariant>> list) {
 		verifyEventLoopThread();
-		final int reuseCount = Math.min(mapRefs.size(), list.size());
-		for (int i = 0; i < reuseCount; ++i) {
-			final JQMLListModelMap<K> ref = (JQMLListModelMap<K>) mapRefs.get(i);
-			ref.assign(list.get(i));
-		}
-
-		addAll(list.subList(reuseCount, list.size()));
 
 		// TODO optimize
 		if (list.isEmpty()) {
 			clear();
 		} else {
+			final int reuseCount = Math.min(mapRefs.size(), list.size());
+			for (int i = 0; i < reuseCount; ++i) {
+				final JQMLListModelMap<K> ref = (JQMLListModelMap<K>) mapRefs.get(i);
+				ref.assign(list.get(i));
+			}
+
+			addAll(list.subList(reuseCount, list.size()));
+
 			while (mapRefs.size() > list.size()) {
 				remove(mapRefs.size() - 1);
 			}
