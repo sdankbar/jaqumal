@@ -470,6 +470,7 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
     }
     else
     {
+        // TODO optimize
         const int32_t copyLength = 4 * w * h;
         unsigned char* copy = new unsigned char[copyLength];
         jint* jData = env->GetIntArrayElements(pixelData, nullptr);

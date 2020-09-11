@@ -217,8 +217,8 @@ void QMLDataTransfer::initialize(JNIEnv* env)
 
     jvariantClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/JVariant");
     fromBufferedImageMethod = env->GetStaticMethodID(jvariantClass, "fromBufferedImage", "(II[I)Lcom/github/sdankbar/qml/JVariant;");
-    fromDimensionMethod = env->GetStaticMethodID(jvariantClass, "fromColor", "(I)Lcom/github/sdankbar/qml/JVariant;");
-    fromColorMethod = env->GetStaticMethodID(jvariantClass, "fromDimension", "(II)Lcom/github/sdankbar/qml/JVariant;");
+    fromDimensionMethod = env->GetStaticMethodID(jvariantClass, "fromDimension", "(II)Lcom/github/sdankbar/qml/JVariant;");
+    fromColorMethod = env->GetStaticMethodID(jvariantClass, "fromColor", "(I)Lcom/github/sdankbar/qml/JVariant;");
     fromPolygonMethod = env->GetStaticMethodID(jvariantClass, "fromPolygon", "([D[D)Lcom/github/sdankbar/qml/JVariant;");
     fromInstanteMethod = env->GetStaticMethodID(jvariantClass, "fromInstant", "(JI)Lcom/github/sdankbar/qml/JVariant;");
     fromJFontMethod = env->GetStaticMethodID(jvariantClass, "fromJFont", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
