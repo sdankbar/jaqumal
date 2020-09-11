@@ -154,7 +154,7 @@ JNICALL void addImageProvider(JNIEnv* env, jclass, jstring id, jobject c)
     if (ApplicationFunctions::check(env))
     {
         ApplicationFunctions::get()->addImageProviderObject(
-            JNIUtilities::toQString(env, id), c);
+            JNIUtilities::toQString(env, id), env->NewGlobalRef(c));
     }
 }
 
@@ -360,15 +360,6 @@ void ApplicationFunctions::invokeCallback(JNIEnv* env, jobject c)
     JNIUtilities::invokeCallback(env, c);
 }
 
-/*
-GenericFlatTreeModel* ApplicationFunctions::createGenericFlatTreeModel(const QString& modelName, const QStringList& roleNames,
-                                        const QVector<int>& indices)
-{
-
-    return modelPtr;
-}
-*/
-
 void ApplicationFunctions::loadQML(const QString& filePath)
 {
     m_qmlEngine->load(filePath);
@@ -426,7 +417,21 @@ std::function<QImage(std::string,int32_t,int32_t)> ApplicationFunctions::createI
     std::function<QImage(std::string,int32_t,int32_t)> func = [=] (std::string id, int32_t w, int32_t h) {
         jstring jStr = env->NewStringUTF(id.c_str());
         jobject bufferedImage = env->CallObjectMethod(obj, imageProviderInvoke, jStr, w, h);
-        return toQImage(env, bufferedImage);
+
+        if (env->ExceptionCheck())
+        {
+            std::cerr << "Exception when calling image provider" << std::endl;
+            env->ExceptionClear();
+            return QImage();
+        }
+        else if (bufferedImage != nullptr)
+        {
+            return toQImage(env, bufferedImage);
+        }
+        else
+        {
+            return QImage();
+        }
     };
     return func;
 }
@@ -439,14 +444,39 @@ void cleanupMemory2(void* ptr)
 QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
 {
     jint w = env->CallIntMethod(bufferedImage, bufferedImageGetWidth);
+    if (env->ExceptionCheck())
+    {
+        std::cerr << "Exception when calling converting buffered image to QImage (getWidth)" << std::endl;
+        env->ExceptionClear();
+        return QImage();
+    }
+
     jint h = env->CallIntMethod(bufferedImage, bufferedImageGetHeight);
-    jintArray pixelData = static_cast<jintArray>(env->CallObjectMethod(bufferedImage, bufferedImageGetRGB, 0, 0, w, h, nullptr, 0, w));
-    const int32_t copyLength = 4 * w * h;
-    unsigned char* copy = new unsigned char[copyLength];
-    jint* jData = env->GetIntArrayElements(pixelData, nullptr);
-    memcpy(copy, jData, copyLength);
-    env->ReleaseIntArrayElements(pixelData, jData, JNI_ABORT);
-    return QImage(copy, w, h, QImage::Format_ARGB32, &cleanupMemory2);
+    if (env->ExceptionCheck())
+    {
+        std::cerr << "Exception when calling converting buffered image to QImage (getHeight)" << std::endl;
+        env->ExceptionClear();
+        return QImage();
+    }
+
+    jintArray pixelData = static_cast<jintArray>(
+                env->CallObjectMethod(bufferedImage, bufferedImageGetRGB, 0, 0, w, h, nullptr, 0, w));
+
+    if (env->ExceptionCheck())
+    {
+        std::cerr << "Exception when calling converting buffered image to QImage (getRGB)" << std::endl;
+        env->ExceptionClear();
+        return QImage();
+    }
+    else
+    {
+        const int32_t copyLength = 4 * w * h;
+        unsigned char* copy = new unsigned char[copyLength];
+        jint* jData = env->GetIntArrayElements(pixelData, nullptr);
+        memcpy(copy, jData, copyLength);
+        env->ReleaseIntArrayElements(pixelData, jData, JNI_ABORT);
+        return QImage(copy, w, h, QImage::Format_ARGB32, &cleanupMemory2);
+    }
 }
 
 void ApplicationFunctions::addToContext(const QString& name, const QVariant& value)
