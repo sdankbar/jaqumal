@@ -1133,7 +1133,7 @@ public class JVariant {
 				break;
 			}
 			case URL: {
-				QMLDataTransfer.setString(((URL) obj).toExternalForm(), role);
+				QMLDataTransfer.setURL(((URL) obj).toExternalForm(), role);
 				break;
 			}
 			case UUID: {
