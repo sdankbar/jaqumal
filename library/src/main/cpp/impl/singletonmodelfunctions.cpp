@@ -252,8 +252,9 @@ void GenericObjectModel::setData(JNIEnv* env, QVariant& data, size_t roleIndex)
         QVariant& currentValue = (*this)[role];
         if (currentValue != data)
         {
-            currentValue.swap(data);
-            emit valueChanged(role, currentValue);
+            // Insert() fires the necessary signals for QML to pick up the change.
+            insert(role, data);
+            emit valueChanged(role, data);
         }
     }
     else
