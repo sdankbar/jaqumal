@@ -35,18 +35,14 @@ Window {
     y: 400
     title: qsTr("Throughput")
 
-    PerformanceMonitor {
-        visible: true
-    }
-
-
     Repeater {
         x: 20
         y: 20
         model: list_model
 
         delegate: Text {
-            text: model.text
+            text: model.text + model.R1 + model.R2 +model.R3 +model.R4 +model.R5 +model.R6 +model.R7 +model.R8 +model.R9 +model.R10 +
+                model.R11 + model.R12 +model.R13 +model.R14 +model.R15 +model.R16
             x: model.x
             y: model.y
         }
