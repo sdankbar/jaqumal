@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml.models.flat_tree;
 
-import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
@@ -103,12 +102,10 @@ public class FlatTreeAccessor extends MapAccessor {
 	}
 
 	@Override
-	public void set(final Map<Integer, JVariant> valuesMap) {
-		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			e.getValue().sendToQML(e.getKey().intValue());
-		}
-
+	public void set(final int[] roles, final JVariant[] data) {
 		checkIndex();
+
+		sendToQML(roles, data);
 
 		FlatTreeModelFunctions.setGenericFlatTreeModelData(modelPointer, path.toArray());
 
@@ -122,12 +119,10 @@ public class FlatTreeAccessor extends MapAccessor {
 	}
 
 	@Override
-	public void assign(final Map<Integer, JVariant> valuesMap) {
-		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			e.getValue().sendToQML(e.getKey().intValue());
-		}
-
+	public void assign(final int[] roles, final JVariant[] data) {
 		checkIndex();
+
+		sendToQML(roles, data);
 
 		FlatTreeModelFunctions.assignGenericFlatTreeModelData(modelPointer, path.toArray());
 	}

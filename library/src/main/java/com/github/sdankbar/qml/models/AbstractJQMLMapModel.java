@@ -238,7 +238,11 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	public void assign(final Map<K, JVariant> map) {
 		Objects.requireNonNull(map, "map is null");
 		verifyEventLoopThread();
-		accessor.assign(convert(map));
+		final int size = map.size();
+		final int[] roles = new int[size];
+		final JVariant[] data = new JVariant[size];
+		convert(map, roles, data);
+		accessor.assign(roles, data);
 	}
 
 	@Override
@@ -357,20 +361,25 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		}
 	}
 
-	private Map<Integer, JVariant> convert(final Map<? extends K, ? extends JVariant> map) {
-		final Map<Integer, JVariant> dataMap = new HashMap<>();
+	private void convert(final Map<? extends K, ? extends JVariant> map, final int[] roles, final JVariant[] data) {
+		int i = 0;
 		for (final Entry<? extends K, ? extends JVariant> e : map.entrySet()) {
-			final int roleIndex = verifyKey(e.getKey());
-			dataMap.put(Integer.valueOf(roleIndex), e.getValue());
+			roles[i] = verifyKey(e.getKey());
+			data[i] = e.getValue();
+			++i;
 		}
-		return dataMap;
 	}
 
 	@Override
 	public void putAll(final Map<? extends K, ? extends JVariant> map) {
 		Objects.requireNonNull(map, "map is null");
 		verifyEventLoopThread();
-		accessor.set(convert(map));
+
+		final int size = map.size();
+		final int[] roles = new int[size];
+		final JVariant[] data = new JVariant[size];
+		convert(map, roles, data);
+		accessor.set(roles, data);
 	}
 
 	@Override

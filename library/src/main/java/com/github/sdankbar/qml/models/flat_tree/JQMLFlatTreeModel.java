@@ -431,24 +431,33 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 		accessor.set(data, indexLookup.get(role.toString()).intValue());
 	}
 
+	private void convert(final Map<? extends K, ? extends JVariant> map, final int[] roles, final JVariant[] data) {
+		int i = 0;
+		for (final Entry<? extends K, ? extends JVariant> e : map.entrySet()) {
+			roles[i] = indexLookup.get(e.getKey().toString());
+			data[i] = e.getValue();
+			++i;
+		}
+	}
+
 	/**
 	 * Sets the copies the data in the Map to TreePath.
 	 *
-	 * @param p    The path to place the data.
-	 * @param data A Map to copy data from.
+	 * @param p   The path to place the data.
+	 * @param map A Map to copy data from.
 	 */
-	public void setData(final TreePath p, final Map<K, JVariant> data) {
-		Objects.requireNonNull(data, "data is null");
+	public void setData(final TreePath p, final Map<K, JVariant> map) {
+		Objects.requireNonNull(map, "map is null");
 		Objects.requireNonNull(p, "p is null");
 
 		verifyEventLoopThread();
 
-		final Map<Integer, JVariant> valuesMap = new HashMap<>();
-		for (final Entry<K, JVariant> entry : data.entrySet()) {
-			valuesMap.put(indexLookup.get(entry.getKey().toString()), entry.getValue());
-		}
+		final int size = map.size();
+		final int[] roles = new int[size];
+		final JVariant[] data = new JVariant[size];
+		convert(map, roles, data);
 		accessor.setTreePath(p);
-		accessor.set(valuesMap);
+		accessor.set(roles, data);
 	}
 
 	/**

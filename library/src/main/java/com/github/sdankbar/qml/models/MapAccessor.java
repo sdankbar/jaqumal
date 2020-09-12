@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml.models;
 
-import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
@@ -38,9 +37,10 @@ public abstract class MapAccessor {
 	 * Assigns the passed in map to this map. Equivalent to clear() followed by
 	 * putAll().
 	 *
-	 * @param valuesMap Map to assign to this one.
+	 * @param roles Array of the role integers.
+	 * @param data  Array of the JVariants.
 	 */
-	public abstract void assign(Map<Integer, JVariant> valuesMap);
+	public abstract void assign(int[] roles, JVariant[] data);
 
 	/**
 	 * Remove all values from the map.
@@ -78,9 +78,10 @@ public abstract class MapAccessor {
 	/**
 	 * Puts all of the values in valuesMap into the map.
 	 *
-	 * @param valuesMap Map to insert into this map.
+	 * @param roles Array of the role integers.
+	 * @param data  Array of the JVariants.
 	 */
-	public abstract void set(Map<Integer, JVariant> valuesMap);
+	public abstract void set(int[] roles, JVariant[] data);
 
 	/**
 	 * Sets the pointer to the C++ model behind this map.
@@ -89,6 +90,13 @@ public abstract class MapAccessor {
 	 */
 	public void setModelPointer(final long modelPointer) {
 		this.modelPointer = modelPointer;
+	}
+
+	protected void sendToQML(final int[] roles, final JVariant[] data) {
+		final int size = roles.length;
+		for (int i = 0; i < size; ++i) {
+			data[i].sendToQML(roles[i]);
+		}
 	}
 
 }

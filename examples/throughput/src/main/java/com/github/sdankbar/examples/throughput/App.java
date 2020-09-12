@@ -44,7 +44,7 @@ public class App {
 		y
 	}
 
-	private static final int SIZE = 250;
+	private static final int SIZE = 500;
 	private static final Random rand = new Random();
 
 	/**

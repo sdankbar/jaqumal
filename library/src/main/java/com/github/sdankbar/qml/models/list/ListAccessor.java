@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml.models.list;
 
-import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
@@ -100,24 +99,19 @@ public class ListAccessor extends MapAccessor {
 	}
 
 	@Override
-	public void set(final Map<Integer, JVariant> valuesMap) {
-		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			e.getValue().sendToQML(e.getKey().intValue());
-		}
-
+	public void set(final int[] roles, final JVariant[] data) {
 		checkIndex();
 
-		ListModelFunctions.setGenericListModelData(modelPointer, listIndex);
+		sendToQML(roles, data);
 
+		ListModelFunctions.setGenericListModelData(modelPointer, listIndex);
 	}
 
 	@Override
-	public void assign(final Map<Integer, JVariant> valuesMap) {
-		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			e.getValue().sendToQML(e.getKey().intValue());
-		}
-
+	public void assign(final int[] roles, final JVariant[] data) {
 		checkIndex();
+
+		sendToQML(roles, data);
 
 		ListModelFunctions.assignGenericListModelData(modelPointer, listIndex);
 	}
