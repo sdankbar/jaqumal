@@ -661,7 +661,6 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public void assign(final List<Map<K, JVariant>> list) {
 		verifyEventLoopThread();
 
-		// TODO optimize
 		if (list.isEmpty()) {
 			clear();
 		} else {
@@ -673,6 +672,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 			addAll(list.subList(reuseCount, list.size()));
 
+			// TODO optimize
 			while (mapRefs.size() > list.size()) {
 				remove(mapRefs.size() - 1);
 			}

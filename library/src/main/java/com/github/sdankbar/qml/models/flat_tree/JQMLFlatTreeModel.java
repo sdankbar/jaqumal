@@ -434,7 +434,7 @@ public class JQMLFlatTreeModel<K> extends AbstractJQMLModel implements Iterable<
 	private void convert(final Map<? extends K, ? extends JVariant> map, final int[] roles, final JVariant[] data) {
 		int i = 0;
 		for (final Entry<? extends K, ? extends JVariant> e : map.entrySet()) {
-			roles[i] = indexLookup.get(e.getKey().toString());
+			roles[i] = indexLookup.get(e.getKey().toString()).intValue();
 			data[i] = e.getValue();
 			++i;
 		}
