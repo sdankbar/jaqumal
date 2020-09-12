@@ -39,7 +39,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
         return JNI_ERR;
     }
 
-    JNIUtilities::initialize(env);
+    JNIUtilities::initialize(vm, env);
     QMLDataTransfer::initialize(env);
     ApplicationFunctions::initialize(env);
     EventFunctions::initialize(env);
@@ -68,9 +68,12 @@ jclass JNIUtilities::illegalStateExceptionClass;
 jclass JNIUtilities::qmlExceptionClass;
 jclass JNIUtilities::callbackClass;
 jmethodID JNIUtilities::callbackMethod;
+JavaVM* JNIUtilities::javaVM;
 
-void JNIUtilities::initialize(JNIEnv* env)
+void JNIUtilities::initialize(JavaVM* vm, JNIEnv* env)
 {
+    javaVM = vm;
+
     illegalStateExceptionClass = findClassGlobalReference(env, "java/lang/IllegalStateException");
     qmlExceptionClass = findClassGlobalReference(env, "com/github/sdankbar/qml/exceptions/QMLException");
     callbackClass = findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback");
@@ -134,6 +137,23 @@ std::string JNIUtilities::toString(JNIEnv* env, jstring str)
     std::string stdString = std::string(array);
     env->ReleaseStringUTFChars(str, array);
     return stdString;
+}
+
+JNIEnv* JNIUtilities::attachThread()
+{
+    JNIEnv* threadEnv;
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_2;
+    args.name = NULL;
+    args.group = NULL;
+    javaVM->AttachCurrentThread((void **)&threadEnv, &args);
+
+    return threadEnv;
+}
+
+void JNIUtilities::dettachThread()
+{
+    javaVM->DetachCurrentThread();
 }
 
 JNIUtilities::JNIUtilities()

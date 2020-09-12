@@ -232,11 +232,20 @@ bool ApplicationFunctions::check(JNIEnv* env)
 
 void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const std::string& msg)
 {
-    jstring javaStr = mainEnv->NewStringUTF(msg.c_str());
-    mainEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
-    if (mainEnv->ExceptionCheck()) {
+    JNIEnv* threadEnv = JNIUtilities::attachThread();
+
+    jstring javaStr = threadEnv->NewStringUTF(msg.c_str());
+    threadEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
+    if (threadEnv->ExceptionCheck()) {
         std::cerr << "Exception while logging" << std::endl;
-        mainEnv->ExceptionClear();
+        threadEnv->ExceptionClear();
+    }
+    threadEnv->DeleteLocalRef(javaStr);
+
+    if (mainEnv != threadEnv)
+    {
+        // Only need to detach if not a normal Java thread.
+        JNIUtilities::dettachThread();
     }
 }
 
@@ -417,6 +426,7 @@ std::function<QImage(std::string,int32_t,int32_t)> ApplicationFunctions::createI
     std::function<QImage(std::string,int32_t,int32_t)> func = [=] (std::string id, int32_t w, int32_t h) {
         jstring jStr = env->NewStringUTF(id.c_str());
         jobject bufferedImage = env->CallObjectMethod(obj, imageProviderInvoke, jStr, w, h);
+        env->DeleteLocalRef(jStr);
 
         if (env->ExceptionCheck())
         {

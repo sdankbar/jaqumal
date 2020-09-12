@@ -27,7 +27,7 @@
 class JNIUtilities
 {
 public:
-    static void initialize(JNIEnv* env);
+    static void initialize(JavaVM* vm, JNIEnv* env);
     static void uninitialize(JNIEnv* env);
 
     static JNINativeMethod createJNIMethod(const char* name, const char* sig, void* funcPtr);
@@ -41,6 +41,9 @@ public:
     static QString toQString(JNIEnv* env, jstring str);
     static std::string toString(JNIEnv* env, jstring str);
 
+    static JNIEnv* attachThread();
+    static void dettachThread();
+
 private:
     JNIUtilities();
 
@@ -48,5 +51,6 @@ private:
     static jclass qmlExceptionClass;
     static jclass callbackClass;
     static jmethodID callbackMethod;
+    static JavaVM* javaVM;
 };
 
