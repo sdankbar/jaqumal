@@ -58,12 +58,99 @@ public class App {
 		R13,
 		R14,
 		R15,
-		R16
+		R16,
+		R17,
+		R18,
+		R19,
+		R20,
+		R21,
+		R22,
+		R23,
+		R24,
+		R25,
+		R26,
+		R27,
+		R28,
+		R29,
+		R30,
+		R31,
+		R32,
+		R33,
+		R34,
+		R35,
+		R36,
+		R37,
+		R38,
+		R39,
+		R40,
+		R41,
+		R42,
+		R43,
+		R44,
+		R45,
+		R46,
+		R47,
+		R48,
+		R49,
+		R50,
+		R51,
+		R52,
+		R53,
+		R54,
+		R55,
+		R56,
+		R57,
+		R58,
+		R59,
+		R60,
+		R61,
+		R62,
+		R63,
+		R64,
+		R65,
+		R66,
+		R67,
+		R68,
+		R69,
+		R70,
+		R71,
+		R72,
+		R73,
+		R74,
+		R75,
+		R76,
+		R77,
+		R78,
+		R79,
+		R80,
+		R81,
+		R82,
+		R83,
+		R84,
+		R85,
+		R86,
+		R87,
+		R88,
+		R89,
+		R90,
+		R91,
+		R92,
+		R93,
+		R94,
+		R95,
+		R96,
+		R97,
+		R98,
+		R99,
 	}
 
-	private static final int SIZE = 250;
+	private static final int SIZE = 25;
 	private static final int maxCoord = 800;
 	private static final Random rand = new Random();
+
+	private static long secondStart = System.currentTimeMillis();
+	private static int fpsCount = 0;
+	private static long totalCount = 0;
 
 	/**
 	 * @param args
@@ -96,27 +183,25 @@ public class App {
 				final ImmutableMap.Builder<Roles, JVariant> builder = ImmutableMap.builder();
 				builder.put(Roles.x, new JVariant(rand.nextInt(maxCoord)));
 				builder.put(Roles.y, new JVariant(rand.nextInt(maxCoord)));
-				builder.put(Roles.R1, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R2, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R3, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R4, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R5, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R6, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R7, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R8, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R9, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R10, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R11, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R12, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R13, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R14, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R15, new JVariant(rand.nextInt(32)));
-				builder.put(Roles.R16, new JVariant(rand.nextInt(32)));
+				for (final Roles r : Roles.values()) {
+					if (r != Roles.x && r != Roles.y) {
+						builder.put(r, new JVariant(Integer.toString(rand.nextInt(32))));
+					}
+				}
 				model.get(i).putAll(builder.build());
 			}
 		}
 		final long e = System.currentTimeMillis();
 		System.out.println(e - s + " milli");
+
+		++fpsCount;
+		++totalCount;
+		final long delta = e - secondStart;
+		if (delta >= 1000) {
+			System.out.println("          FPS=" + fpsCount + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			secondStart = e;
+			fpsCount = 0;
+		}
 
 		app.getQMLThreadExecutor().execute(() -> updateModel(app, model));
 	}
