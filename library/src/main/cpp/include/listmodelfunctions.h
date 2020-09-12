@@ -77,6 +77,9 @@ public:
 
     qint32 size() const;
 
+    void lockDataChangedSignal();
+    void unlockDataChangedSignal();
+
 signals:
     void sizeChanged();
     void rootChanged();
@@ -92,6 +95,8 @@ private:
     QVector<QVector<QVariant> > m_rowData;
     QHash<QString, int> m_stringToIndexRoleMap;
     QHash<int, QByteArray> m_roleNames;
+
+    bool m_dataChangedLocked;
 };
 
 

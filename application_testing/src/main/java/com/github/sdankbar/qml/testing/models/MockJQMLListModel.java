@@ -35,6 +35,7 @@ import java.util.Optional;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.ListListener;
+import com.github.sdankbar.qml.models.list.SignalLock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -267,6 +268,11 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	public void assign(final int row, final Map<K, JVariant> map) {
 		delegate.get(row).clear();
 		delegate.get(row).putAll(map);
+	}
+
+	@Override
+	public SignalLock lockSignals() {
+		return new SignalLock(null);
 	}
 
 }

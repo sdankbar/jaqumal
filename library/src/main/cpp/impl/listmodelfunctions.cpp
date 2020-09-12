@@ -220,7 +220,7 @@ void JNICALL putRootValueIntoListModel(JNIEnv* env, jclass, jlong pointer, jstri
     }
 }
 
-jobject getRootValueFromListModel(JNIEnv* env, jclass, jlong pointer, jstring key)
+jobject JNICALL getRootValueFromListModel(JNIEnv* env, jclass, jlong pointer, jstring key)
 {
     if (ApplicationFunctions::check(env))
     {
@@ -231,6 +231,24 @@ jobject getRootValueFromListModel(JNIEnv* env, jclass, jlong pointer, jstring ke
     else
     {
         return nullptr;
+    }
+}
+
+void JNICALL lockDataChangedSignal(JNIEnv* env, jclass, jlong pointer)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
+        modelPtr->lockDataChangedSignal();
+    }
+}
+
+void JNICALL unlockDataChangedSignal(JNIEnv* env, jclass, jlong pointer)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericListModel*>(pointer);
+        modelPtr->unlockDataChangedSignal();
     }
 }
 
@@ -252,6 +270,8 @@ void ListModelFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("reorderGenericListModel",    "(J[I)V",    (void *)&reorderGenericListModel),
         JNIUtilities::createJNIMethod("setGenericListModelData",    "(JI)V",    (void *)&setGenericListModelData),
         JNIUtilities::createJNIMethod("assignGenericListModelData",    "(JI)V",    (void *)&assignGenericListModelData),
+        JNIUtilities::createJNIMethod("lockDataChangedSignal",    "(J)V",    (void *)&lockDataChangedSignal),
+        JNIUtilities::createJNIMethod("unlockDataChangedSignal",    "(J)V",    (void *)&unlockDataChangedSignal),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/list/ListModelFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods)/sizeof(JNINativeMethod));
@@ -266,7 +286,8 @@ void ListModelFunctions::uninitialize(JNIEnv*)
 GenericListModel::GenericListModel(const QString& modelName, const QHash<int, QByteArray>& roleMap)
     : QAbstractListModel(nullptr),
       m_modelName(modelName),
-      m_roleNames(roleMap)
+      m_roleNames(roleMap),
+      m_dataChangedLocked(false)
 {
     auto iter = m_roleNames.constBegin();
     auto end = m_roleNames.constEnd();
@@ -344,7 +365,9 @@ bool GenericListModel::setData(const QModelIndex &i, const QVariant &value, int 
     {
         QVector<QVariant>& data = m_rowData[i.row()];
         data[role - Qt::UserRole] = value;
-        emit dataChanged(index(i.row(), 0), index(i.row(), 0));
+        if (!m_dataChangedLocked) {
+            emit dataChanged(index(i.row(), 0), index(i.row(), 0));
+        }
         return true;
     }
     else
@@ -431,7 +454,9 @@ void GenericListModel::setRowData(qint32 row, std::vector<QVariant>& data, const
         {
             entry[roleIndex[i] - Qt::UserRole].swap(data[i]);
         }
-        emit dataChanged(index(row, 0), index(row, 0), roleIndex);
+        if (!m_dataChangedLocked) {
+            emit dataChanged(index(row, 0), index(row, 0), roleIndex);
+        }
     }
 }
 
@@ -471,7 +496,9 @@ void GenericListModel::assignRowData(qint32 row, std::vector<QVariant>& data, co
         {
             entry[roleIndex[i] - Qt::UserRole].swap(data[i]);
         }
-        emit dataChanged(index(row, 0), index(row, 0));
+        if (!m_dataChangedLocked) {
+            emit dataChanged(index(row, 0), index(row, 0));
+        }
     }
 }
 
@@ -516,7 +543,9 @@ void GenericListModel::clear(qint32 row, int32_t roleIndex)
     if (row < m_rowData.size())
     {
         m_rowData[row][roleIndex - Qt::UserRole] = QVariant();
-        emit dataChanged(index(row, 0), index(row, 0));
+        if (!m_dataChangedLocked) {
+            emit dataChanged(index(row, 0), index(row, 0));
+        }
     }
 }
 void GenericListModel::clear(qint32 row)
@@ -527,7 +556,9 @@ void GenericListModel::clear(qint32 row)
         {
             m_rowData[row].resize(0);
             m_rowData[row].resize(m_stringToIndexRoleMap.size());
-            emit dataChanged(index(row, 0), index(row, 0));
+            if (!m_dataChangedLocked) {
+                emit dataChanged(index(row, 0), index(row, 0));
+            }
         }
     }
 }
@@ -558,5 +589,17 @@ void GenericListModel::reorder(const std::vector<int32_t>& ordering)
 qint32 GenericListModel::size() const
 {
     return m_rowData.size();
+}
+
+void GenericListModel::lockDataChangedSignal()
+{
+    m_dataChangedLocked = true;
+    beginResetModel();
+}
+
+void GenericListModel::unlockDataChangedSignal()
+{
+    m_dataChangedLocked = false;
+    endResetModel();
 }
 

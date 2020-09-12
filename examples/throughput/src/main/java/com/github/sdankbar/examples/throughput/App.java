@@ -30,6 +30,7 @@ import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.github.sdankbar.qml.models.list.SignalLock;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -71,14 +72,13 @@ public class App {
 
 	private static void updateModel(final JQMLApplication<NullEventProcessor> app, final JQMLListModel<Roles> model) {
 		final int maxCoord = 800;
-		final long s = System.currentTimeMillis();
-		for (int i = 0; i < SIZE; ++i) {
-			final ImmutableMap<Roles, JVariant> data = ImmutableMap.of(Roles.x, new JVariant(rand.nextInt(maxCoord)),
-					Roles.y, new JVariant(rand.nextInt(maxCoord)));
-			model.get(i).putAll(data);
+		try (SignalLock c = model.lockSignals()) {
+			for (int i = 0; i < SIZE; ++i) {
+				final ImmutableMap<Roles, JVariant> data = ImmutableMap.of(Roles.x,
+						new JVariant(rand.nextInt(maxCoord)), Roles.y, new JVariant(rand.nextInt(maxCoord)));
+				model.get(i).putAll(data);
+			}
 		}
-		final long e = System.currentTimeMillis();
-		System.out.println(e - s + " milli");
 
 		app.getQMLThreadExecutor().execute(() -> updateModel(app, model));
 	}

@@ -69,4 +69,8 @@ public final class ListModelFunctions {
 	public static native void setGenericListModelData(long modelPointer, int row);
 
 	public static native void assignGenericListModelData(long modelPointer, int row);
+
+	public static native void lockDataChangedSignal(long modelPointer);
+
+	public static native void unlockDataChangedSignal(long modelPointer);
 }

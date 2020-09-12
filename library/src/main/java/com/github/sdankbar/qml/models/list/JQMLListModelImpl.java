@@ -686,4 +686,14 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		ref.assign(map);
 	}
 
+	@Override
+	public SignalLock lockSignals() {
+		ListModelFunctions.lockDataChangedSignal(modelPointer);
+		return new SignalLock(this);
+	}
+
+	void unlockSignals() {
+		ListModelFunctions.unlockDataChangedSignal(modelPointer);
+	}
+
 }
