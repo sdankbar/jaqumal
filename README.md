@@ -20,7 +20,6 @@ See pom.xml for details of the Java libraries used
 * Apache Commons-Lang
 * Apache Commons-Math
 * Guava
-* JNA
 * JUnit4
 * Log4j2
 
@@ -42,6 +41,7 @@ following must be installed/configured before building.
 * sudo yum install gcc-c++
 * sudo yum install mesa-libGL-devel
 * Download Qt 5.11 or newer from https://www.qt.io/download and install it
+* export JAVA_HOME=<path to JDK>
 * Add the path to the Qt binaries, such as qmake, to the PATH variable
      * May need to add the path to the Qt libraries to the LD_LIBRARY_PATH variable 
 
@@ -73,6 +73,7 @@ following must be installed/configured before building.
 * Download Qt 5.11 or newer from https://www.qt.io/download and install the MinGW 64 bit version.  Also install MinGW 64 compiler as well.
 * Add the path to the Qt binaries and libaries, such as qmake and Qt's dlls, to the Path variable
 * Add the path to the MinGW64 bit binaries, such as g++, to the Path variable.
+* Set the JAVA_HOME environment variable to the path to the Java JDK.
 
 Change directories to the root of the Jaqumal git repository and run the following commands.
 
@@ -133,6 +134,4 @@ Provides an example of defining new Event types and sending and receiving those 
 # Future Work
 
 * Create additional specialized models for each QtQuick type.
-* Improve support for setting values in a model on the QML side and listening for changes in Java.
-* Improve performance of the list and flattree models.
-* Write additional unit tests.
+* Decrease boilerplate for sending data from QML to C++.
