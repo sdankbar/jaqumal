@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.Test;
@@ -1050,6 +1051,62 @@ public class JQMLListModelTest {
 		assertEquals(new JVariant(5), model.getData(4, Roles.R1).get());
 		assertEquals(new JVariant(6), model.getData(5, Roles.R1).get());
 		assertEquals(new JVariant(7), model.getData(6, Roles.R1).get());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void test_randomSort() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		final Random r = new Random();
+		final List<Integer> input = new ArrayList<>();
+		r.ints(500, 0, 500).forEach(i -> {
+			input.add(Integer.valueOf(i));
+			model.add(new JVariant(i), Roles.R1);
+		});
+
+		input.sort(Integer::compareTo);
+		model.sort((o1, o2) -> Integer.compare(o1.get(Roles.R1).asInteger(), o2.get(Roles.R1).asInteger()));
+
+		for (int i = 0; i < 500; ++i) {
+			assertEquals(input.get(i).intValue(), model.get(i).get(Roles.R1).asInteger());
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void test_randomAddRemove() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		final Random r = new Random();
+		final List<Map<Roles, JVariant>> input = new ArrayList<>();
+		r.ints(500, 0, 500).forEach(i -> {
+			input.add(ImmutableMap.of(Roles.R1, new JVariant(i)));
+			model.add(new JVariant(i), Roles.R1);
+		});
+
+		for (int i = 0; i < input.size(); ++i) {
+			if (r.nextInt(10) < 2) {
+				input.remove(i);
+				model.remove(i);
+			}
+		}
+
+		for (int i = 0; i < input.size(); ++i) {
+			assertEquals(input.get(i).get(Roles.R1).asInteger(), model.get(i).get(Roles.R1).asInteger());
+		}
+
+		assertEquals(input, model);
 	}
 
 	/**
