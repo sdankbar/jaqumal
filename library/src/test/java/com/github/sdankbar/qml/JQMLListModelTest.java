@@ -1065,16 +1065,22 @@ public class JQMLListModelTest {
 
 		final Random r = new Random();
 		final List<Integer> input = new ArrayList<>();
-		r.ints(500, 0, 500).forEach(i -> {
-			input.add(Integer.valueOf(i));
-			model.add(new JVariant(i), Roles.R1);
-		});
 
-		input.sort(Integer::compareTo);
-		model.sort((o1, o2) -> Integer.compare(o1.get(Roles.R1).asInteger(), o2.get(Roles.R1).asInteger()));
+		for (int count = 0; count < 10; ++count) {
+			r.ints(500, 0, 500).forEach(i -> {
+				input.add(Integer.valueOf(i));
+				model.add(new JVariant(i), Roles.R1);
+			});
 
-		for (int i = 0; i < 500; ++i) {
-			assertEquals(input.get(i).intValue(), model.get(i).get(Roles.R1).asInteger());
+			input.sort(Integer::compareTo);
+			model.sort((o1, o2) -> Integer.compare(o1.get(Roles.R1).asInteger(), o2.get(Roles.R1).asInteger()));
+
+			for (int i = 0; i < 500; ++i) {
+				assertEquals(input.get(i).intValue(), model.get(i).get(Roles.R1).asInteger());
+			}
+
+			input.clear();
+			model.clear();
 		}
 	}
 
@@ -1090,23 +1096,54 @@ public class JQMLListModelTest {
 
 		final Random r = new Random();
 		final List<Map<Roles, JVariant>> input = new ArrayList<>();
-		r.ints(500, 0, 500).forEach(i -> {
-			input.add(ImmutableMap.of(Roles.R1, new JVariant(i)));
-			model.add(new JVariant(i), Roles.R1);
-		});
 
-		for (int i = 0; i < input.size(); ++i) {
-			if (r.nextInt(10) < 2) {
-				input.remove(i);
-				model.remove(i);
+		for (int count = 0; count < 10; ++count) {
+			r.ints(500, 0, 500).forEach(i -> {
+				input.add(ImmutableMap.of(Roles.R1, new JVariant(i)));
+				model.add(new JVariant(i), Roles.R1);
+			});
+
+			for (int i = 0; i < input.size(); ++i) {
+				if (r.nextInt(10) < 2) {
+					input.remove(i);
+					model.remove(i);
+				}
 			}
-		}
 
-		for (int i = 0; i < input.size(); ++i) {
-			assertEquals(input.get(i).get(Roles.R1).asInteger(), model.get(i).get(Roles.R1).asInteger());
-		}
+			for (int i = 0; i < input.size(); ++i) {
+				assertEquals(input.get(i).get(Roles.R1).asInteger(), model.get(i).get(Roles.R1).asInteger());
+			}
 
-		assertEquals(input, model);
+			assertEquals(input, model);
+
+			input.clear();
+			model.clear();
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void test_randomAssign() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		final Random r = new Random();
+		final List<Map<Roles, JVariant>> input = new ArrayList<>();
+
+		for (int count = 0; count < 10; ++count) {
+			r.ints(500, 0, 500).forEach(i -> {
+				input.add(ImmutableMap.of(Roles.R1, new JVariant(i), Roles.R2, new JVariant(Integer.toString(i)),
+						Roles.R3, new JVariant((double) i)));
+			});
+
+			model.assign(input);
+
+			assertEquals(input, model);
+		}
 	}
 
 	/**
