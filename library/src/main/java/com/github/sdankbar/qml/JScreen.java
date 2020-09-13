@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,11 @@ public class JScreen {
 	 */
 	public JScreen(final Rectangle2D geometry, final double dpi) {
 		this.geometry = Objects.requireNonNull(geometry, "geometry is null");
+		this.dpi = dpi;
+	}
+
+	public JScreen(final int x, final int y, final int w, final int h, final double dpi) {
+		geometry = new Rectangle2D.Double(x, y, w, h);
 		this.dpi = dpi;
 	}
 

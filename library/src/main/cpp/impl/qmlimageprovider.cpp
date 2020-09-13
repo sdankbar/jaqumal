@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,8 @@
  * THE SOFTWARE.
  */
 #include "qmlimageprovider.h"
-#include "qmlinterface.h"
 
-QMLImageProvider::QMLImageProvider(std::function<void* (const char*, int, int)> callback) :
+QMLImageProvider::QMLImageProvider(std::function<QImage(std::string,int32_t,int32_t)> callback) :
     QQuickImageProvider(QQuickImageProvider::Image),
     javaImageProviderCallback(callback)
 {
@@ -48,20 +47,10 @@ QImage QMLImageProvider::requestImage(const QString& id, QSize* size, const QSiz
       correctedHeight = requestedSize.height();
     }
     
-    void* data = javaImageProviderCallback(id.toStdString().c_str(), correctedWidth, correctedHeight);
-    if (data != nullptr)
+    QImage ret = javaImageProviderCallback(id.toStdString(), correctedWidth, correctedHeight);
+    if (size)
     {
-        int dataLength = 0;
-        QVariant imageVar = toQVariant(data, dataLength);
-        QImage image = imageVar.value<QImage>();
-        if (size)
-        {
-            *size = image.size();
-        }
-        return image;
+        *size = ret.size();
     }
-    else
-    {
-        return QImage();
-    }
+    return ret;
 }

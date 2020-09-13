@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,10 @@
  */
 package com.github.sdankbar.qml.models.list;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.jna.list.ListQMLAPIFast;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
+import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
 import com.github.sdankbar.qml.models.MapAccessor;
 
 /**
@@ -44,16 +36,6 @@ public class ListAccessor extends MapAccessor {
 
 	private int listIndex;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param javaToCppMemory Memory used for Java to C++ communication.
-	 * @param cppToJavaMemory Memory used for C++ to Java communication.
-	 */
-	public ListAccessor(final SharedJavaCppMemory javaToCppMemory, final SharedJavaCppMemory cppToJavaMemory) {
-		super(javaToCppMemory, cppToJavaMemory);
-	}
-
 	private void checkIndex() {
 		if (listIndex < 0) {
 			throw new IllegalStateException("Map is no longer valid due to its removal from the list model");
@@ -63,8 +45,8 @@ public class ListAccessor extends MapAccessor {
 	@Override
 	public void clear() {
 		checkIndex();
-		ListQMLAPIFast.clearAllGenericListModelData(modelPointer, listIndex);
-		JQMLExceptionHandling.checkExceptions();
+		ListModelFunctions.clearAllGenericListModelData(modelPointer, listIndex);
+
 	}
 
 	/**
@@ -75,19 +57,19 @@ public class ListAccessor extends MapAccessor {
 	 * @return The copied accessor.
 	 */
 	public ListAccessor copy(final int listIndex) {
-		final ListAccessor a = new ListAccessor(javaToCppMemory, cppToJavaMemory);
+		final ListAccessor a = new ListAccessor();
 		a.setModelPointer(modelPointer);
 		a.setListIndex(listIndex);
 		return a;
 	}
 
 	@Override
-	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
+	public Optional<JVariant> get(final int roleIndex) {
 		checkIndex();
 
-		final Pointer received = ListQMLAPIFast.getGenericListModelData(modelPointer, listIndex, roleIndex, length);
-		JQMLExceptionHandling.checkExceptions();
-		return deserialize(received, length.getValue());
+		final JVariant received = ListModelFunctions.getGenericListModelData(modelPointer, listIndex, roleIndex);
+
+		return Optional.ofNullable(received);
 	}
 
 	/**
@@ -98,13 +80,12 @@ public class ListAccessor extends MapAccessor {
 	}
 
 	@Override
-	public Optional<JVariant> remove(final int roleIndex, final IntByReference length) {
+	public Optional<JVariant> remove(final int roleIndex) {
 		checkIndex();
 
-		final Optional<JVariant> existingValue = get(roleIndex, length);
+		final Optional<JVariant> existingValue = get(roleIndex);
 
-		ListQMLAPIFast.clearGenericListModelData(modelPointer, listIndex, roleIndex);
-		JQMLExceptionHandling.checkExceptions();
+		ListModelFunctions.clearGenericListModelData(modelPointer, listIndex, roleIndex);
 
 		return existingValue;
 	}
@@ -113,32 +94,30 @@ public class ListAccessor extends MapAccessor {
 	public void set(final JVariant value, final int roleIndex) {
 		checkIndex();
 
-		value.serialize(javaToCppMemory);
-		ListQMLAPIFast.setGenericListModelData(modelPointer, listIndex, javaToCppMemory.getPointer(), roleIndex);
-		JQMLExceptionHandling.checkExceptions();
+		value.sendToQML(roleIndex);
+		ListModelFunctions.setGenericListModelData(modelPointer, listIndex);
 	}
 
 	@Override
-	public void set(final Map<Integer, JVariant> valuesMap) {
-		final List<JVariant> variantList = new ArrayList<>(valuesMap.size());
-		final int[] array = new int[valuesMap.size()];
-		int i = 0;
-		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			variantList.add(e.getValue());
-			array[i] = e.getKey().intValue();
-			++i;
-		}
-
+	public void set(final int[] roles, final JVariant[] data) {
 		checkIndex();
 
-		JVariant.serialize(variantList, javaToCppMemory);
-		ListQMLAPIFast.setGenericListModelDataMulti(modelPointer, listIndex, javaToCppMemory.getPointer(), array,
-				valuesMap.size());
-		JQMLExceptionHandling.checkExceptions();
+		sendToQML(roles, data);
+
+		ListModelFunctions.setGenericListModelData(modelPointer, listIndex);
+	}
+
+	@Override
+	public void assign(final int[] roles, final JVariant[] data) {
+		checkIndex();
+
+		sendToQML(roles, data);
+
+		ListModelFunctions.assignGenericListModelData(modelPointer, listIndex);
 	}
 
 	/**
-	 * @param listIndex The index indo the list model that this accessor works on.
+	 * @param listIndex The index into the list model that this accessor works on.
 	 */
 	public void setListIndex(final int listIndex) {
 		this.listIndex = listIndex;

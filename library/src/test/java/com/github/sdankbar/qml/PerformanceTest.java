@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JQMLApplication;
-import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 
 /**
@@ -41,7 +40,7 @@ public class PerformanceTest {
 	/**
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 		// Empty Implementation
 	}
 
@@ -64,7 +63,8 @@ public class PerformanceTest {
 	public void getSetValues() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("model", Roles.class);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("model", Roles.class,
+				PutMode.RETURN_NULL);
 
 		for (int iter = 0; iter < 5; ++iter) {
 

@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.sdankbar.qml.JQMLExceptionHandling;
-import com.github.sdankbar.qml.cpp.ApiInstance;
+import com.github.sdankbar.qml.cpp.jni.FontFunctions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
@@ -66,8 +65,8 @@ public class JFont {
 		}
 
 		public JFont build() {
-			return new JFont(ApiInstance.LIB_INSTANCE.getQFontToString(family, pointSize, pixelSize, bold, italic,
-					overline, strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
+			return new JFont(FontFunctions.getQFontToString(family, pointSize, pixelSize, bold, italic, overline,
+					strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
 					letterSpacingType.value, capitalization.value, hintingPreference.value, stretch.value, style.value,
 					styleName, styleHint.value, styleStrategyMask()));
 		}
@@ -190,8 +189,12 @@ public class JFont {
 
 	}
 
-	public static enum Capitalization {
-		MixedCase(0), AllUppercase(1), AllLowercase(2), SmallCaps(3), Capitalize(4);
+	public enum Capitalization {
+		MixedCase(0),
+		AllUppercase(1),
+		AllLowercase(2),
+		SmallCaps(3),
+		Capitalize(4);
 
 		private int value;
 
@@ -200,8 +203,11 @@ public class JFont {
 		}
 	}
 
-	public static enum HintingPreference {
-		PreferDefaultHinting(0), PreferNoHinting(1), PreferVerticalHinting(2), PreferFullHinting(3);
+	public enum HintingPreference {
+		PreferDefaultHinting(0),
+		PreferNoHinting(1),
+		PreferVerticalHinting(2),
+		PreferFullHinting(3);
 
 		private int value;
 
@@ -211,8 +217,9 @@ public class JFont {
 
 	}
 
-	public static enum SpacingType {
-		PercentageSpacing(0), AbsoluteSpacing(1);
+	public enum SpacingType {
+		PercentageSpacing(0),
+		AbsoluteSpacing(1);
 
 		private int value;
 
@@ -221,9 +228,17 @@ public class JFont {
 		}
 	}
 
-	public static enum Stretch {
-		AnyStretch(0), UltraCondensed(50), ExtraCondensed(62), Condensed(75), SemiCondensed(87), Unstretched(100),
-		SemiExpanded(112), Expanded(125), ExtraExpanded(150), UltraExpanded(200);
+	public enum Stretch {
+		AnyStretch(0),
+		UltraCondensed(50),
+		ExtraCondensed(62),
+		Condensed(75),
+		SemiCondensed(87),
+		Unstretched(100),
+		SemiExpanded(112),
+		Expanded(125),
+		ExtraExpanded(150),
+		UltraExpanded(200);
 
 		private int value;
 
@@ -233,19 +248,21 @@ public class JFont {
 
 	}
 
-	public static enum Style {
-		StyleNormal(0), StyleItalic(1), StyleOblique(2);
+	public enum Style {
+		StyleNormal(0),
+		StyleItalic(1),
+		StyleOblique(2);
 
 		static Style fromValue(final int v) {
 			switch (v) {
-			case 0:
-				return StyleNormal;
-			case 1:
-				return StyleItalic;
-			case 2:
-				return StyleOblique;
-			default:
-				throw new IllegalArgumentException();
+				case 0:
+					return StyleNormal;
+				case 1:
+					return StyleItalic;
+				case 2:
+					return StyleOblique;
+				default:
+					throw new IllegalArgumentException();
 			}
 		}
 
@@ -257,32 +274,43 @@ public class JFont {
 
 	}
 
-	public static enum StyleHint {
-		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(3),
-		Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
+	public enum StyleHint {
+		AnyStyle(5),
+		SansSerif(0),
+		Helvetica(0),
+		Serif(1),
+		Times(1),
+		TypeWriter(2),
+		Courier(2),
+		OldEnglish(3),
+		Decorative(3),
+		Monospace(7),
+		Fantasy(8),
+		Cursive(6),
+		System(4);
 
 		static StyleHint fromValue(final int v) {
 			switch (v) {
-			case 0:
-				return SansSerif;
-			case 1:
-				return Serif;
-			case 2:
-				return Courier;
-			case 3:
-				return Decorative;
-			case 4:
-				return System;
-			case 5:
-				return AnyStyle;
-			case 6:
-				return Cursive;
-			case 7:
-				return Monospace;
-			case 8:
-				return Fantasy;
-			default:
-				throw new IllegalArgumentException();
+				case 0:
+					return SansSerif;
+				case 1:
+					return Serif;
+				case 2:
+					return Courier;
+				case 3:
+					return Decorative;
+				case 4:
+					return System;
+				case 5:
+					return AnyStyle;
+				case 6:
+					return Cursive;
+				case 7:
+					return Monospace;
+				case 8:
+					return Fantasy;
+				default:
+					throw new IllegalArgumentException();
 			}
 		}
 
@@ -294,10 +322,20 @@ public class JFont {
 
 	}
 
-	public static enum StyleStrategy {
-		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(0x0010),
-		NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), OpenGLCompatible(0x0200),
-		NoFontMerging(0x8000), PreferNoShaping(0x1000), PreferMatch(0x0020), PreferQuality(0x0040),
+	public enum StyleStrategy {
+		PreferDefault(0x0001),
+		PreferBitmap(0x0002),
+		PreferDevice(0x0004),
+		PreferOutline(0x0008),
+		ForceOutline(0x0010),
+		NoAntialias(0x0100),
+		NoSubpixelAntialias(0x0800),
+		PreferAntialias(0x0080),
+		OpenGLCompatible(0x0200),
+		NoFontMerging(0x8000),
+		PreferNoShaping(0x1000),
+		PreferMatch(0x0020),
+		PreferQuality(0x0040),
 		ForceIntegerMetrics(0x0400);
 
 		private int value;
@@ -307,18 +345,22 @@ public class JFont {
 		}
 	}
 
-	public static enum Weight {
-		Thin(0), ExtraLight(12), Light(25), Normal(50), Medium(57), DemiBold(63), Bold(75), ExtraBold(81), Black(87);
+	public enum Weight {
+		Thin(0),
+		ExtraLight(12),
+		Light(25),
+		Normal(50),
+		Medium(57),
+		DemiBold(63),
+		Bold(75),
+		ExtraBold(81),
+		Black(87);
 
 		private final int value;
 
 		private Weight(final int v) {
 			value = v;
 		}
-	}
-
-	static {
-		JQMLExceptionHandling.register();// Do very early so that exception handling is immediately available.
 	}
 
 	public static Builder builder() {
@@ -406,14 +448,14 @@ public class JFont {
 
 	public JFontInfo getJFontInfo() {
 		if (cachedInfo == null) {
-			cachedInfo = JFontInfo.fromString(ApiInstance.LIB_INSTANCE.getQFontInfo(fontToString));
+			cachedInfo = JFontInfo.fromString(FontFunctions.getQFontInfo(fontToString));
 		}
 		return cachedInfo;
 	}
 
 	public JFontMetrics getJFontMetrics() {
 		if (cachedMetrics == null) {
-			cachedMetrics = JFontMetrics.from(fontToString, ApiInstance.LIB_INSTANCE.getQFontMetrics(fontToString));
+			cachedMetrics = JFontMetrics.from(fontToString, FontFunctions.getQFontMetrics(fontToString));
 		}
 		return cachedMetrics;
 	}

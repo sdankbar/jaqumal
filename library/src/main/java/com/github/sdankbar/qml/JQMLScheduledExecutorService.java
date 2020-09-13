@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.CppInterface.InvokeCallback;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
+import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
 
 /**
  * The JQMLSheduledExecutorService allows for the scheduling of tasks to run on
@@ -164,7 +164,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		Objects.requireNonNull(tasks, "tasks is null");
 		throwIfNotRunning();
 
-		final List<Future<T>> l = tasks.stream().map(t -> submit(t)).collect(Collectors.toList());
+		final List<Future<T>> l = tasks.stream().map(this::submit).collect(Collectors.toList());
 		for (final Future<T> f : l) {
 			try {
 				f.get();
@@ -182,7 +182,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		Objects.requireNonNull(tasks, "tasks is null");
 		throwIfNotRunning();
 
-		final List<Future<T>> l = tasks.stream().map(t -> submit(t)).collect(Collectors.toList());
+		final List<Future<T>> l = tasks.stream().map(this::submit).collect(Collectors.toList());
 
 		final long waitTimeNano = unit.toNanos(timeout);
 		final long startTime = System.nanoTime();
@@ -248,9 +248,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 	public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay, final TimeUnit unit) {
 		Objects.requireNonNull(callable, "callable is null");
 		throwIfNotRunning();
-		return delayedExecutor.schedule(() -> {
-			return submit(callable).get();
-		}, delay, unit);
+		return delayedExecutor.schedule(() -> submit(callable).get(), delay, unit);
 	}
 
 	@Override
@@ -314,8 +312,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		final FutureTask<T> f = new FutureTask<>(task);
 		final ImmediateTask<T> t = new ImmediateTask<>(isRunning, pendingCallbacks, f, invokeAnyQueue);
 
-		ApiInstance.LIB_INSTANCE.invoke(t);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.invoke(t);
 
 		return f;
 	}
@@ -333,8 +330,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		final FutureTask<T> f = new FutureTask<>(new RunnableWrapper<>(task, result));
 		final ImmediateTask<T> t = new ImmediateTask<>(isRunning, pendingCallbacks, f, null);
 
-		ApiInstance.LIB_INSTANCE.invoke(t);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.invoke(t);
 
 		return f;
 	}

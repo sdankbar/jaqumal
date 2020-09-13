@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ package com.github.sdankbar.qml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.CppInterface.LoggingCallback;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
+import com.github.sdankbar.qml.cpp.jni.interfaces.LoggingCallback;
 
 /**
  * Class allows QML to access an SLF4j instance for the purposes of logging.
@@ -38,23 +38,23 @@ public class JQMLLogging {
 		@Override
 		public void invoke(final int type, final String formattedMessage) {
 			switch (type) {
-			case 0:
-				logger.trace(formattedMessage);
-				break;
-			case 1:
-				logger.debug(formattedMessage);
-				break;
-			case 2:
-				logger.info(formattedMessage);
-				break;
-			case 3:
-				logger.warn(formattedMessage);
-				break;
-			case 4:
-				logger.error(formattedMessage);
-				break;
-			default:
-				break;
+				case 0:
+					logger.trace(formattedMessage);
+					break;
+				case 1:
+					logger.debug(formattedMessage);
+					break;
+				case 2:
+					logger.info(formattedMessage);
+					break;
+				case 3:
+					logger.warn(formattedMessage);
+					break;
+				case 4:
+					logger.error(formattedMessage);
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -68,7 +68,7 @@ public class JQMLLogging {
 	 * Constructor
 	 */
 	public JQMLLogging() {
-		ApiInstance.LIB_INSTANCE.setLoggingCallback(c);
+		ApplicationFunctions.setLoggingCallback(c);
 	}
 
 }

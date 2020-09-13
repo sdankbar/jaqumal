@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import com.github.sdankbar.qml.JVariant.Type;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.ButtonClickEvent;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.interfaces.BooleanListener;
 
 /**
@@ -102,7 +103,7 @@ public class JQMLButtonModel {
 
 	public JQMLButtonModel(final String modelName, final JQMLModelFactory factory,
 			final EventDispatcher<?> dispatcher) {
-		model = factory.createSingletonModel(modelName, ButtonRoles.class);
+		model = factory.createSingletonModel(modelName, ButtonRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(ButtonRoles.ModelName, new JVariant(modelName));
 		model.put(ButtonRoles.ActiveFocusOnPressed, new JVariant(true));
@@ -125,21 +126,21 @@ public class JQMLButtonModel {
 
 		model.registerChangeListener((key, newValue) -> {
 			switch (key) {
-			case "Hovered":
-				for (final BooleanListener l : hoverListeners) {
-					l.changed(newValue.asBoolean());
-				}
-				break;
-			case "ActiveFocus":
-				for (final BooleanListener l : focusListeners) {
-					l.changed(newValue.asBoolean());
-				}
-				break;
-			case "Pressed":
-				for (final BooleanListener l : pressedListeners) {
-					l.changed(newValue.asBoolean());
-				}
-				break;
+				case "Hovered":
+					for (final BooleanListener l : hoverListeners) {
+						l.changed(newValue.asBoolean());
+					}
+					break;
+				case "ActiveFocus":
+					for (final BooleanListener l : focusListeners) {
+						l.changed(newValue.asBoolean());
+					}
+					break;
+				case "Pressed":
+					for (final BooleanListener l : pressedListeners) {
+						l.changed(newValue.asBoolean());
+					}
+					break;
 			}
 		});
 

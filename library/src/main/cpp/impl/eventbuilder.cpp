@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,29 @@
  * THE SOFTWARE.
  */
 #include "eventbuilder.h"
-#include "qmlinterface.h"
 #include "iostream"
 #include <QColor>
 #include <QDateTime>
+#include <jniutilities.h>
+#include <applicationfunctions.h>
+#include <qmldatatransfer.h>
 
-std::vector<std::function<void*(const char*, void*, int32_t)> > EventBuilder::EVENT_HANDLERS;
+jobject EventBuilder::EVENT_HANDLER = nullptr;
+jclass EventBuilder::eventCallbackClass;
+jmethodID EventBuilder::eventCallbackMethod;
 
-void EventBuilder::addEventHandler(std::function<void*(const char*, void*, int32_t)> f)
+void EventBuilder::setEventHandler(JNIEnv* env, jobject handler)
 {
-    EVENT_HANDLERS.push_back(f);
+    if (EVENT_HANDLER)
+    {
+        env->DeleteGlobalRef(EVENT_HANDLER);
+    }
+    else
+    {
+        eventCallbackClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/cpp/jni/interfaces/EventCallback");
+        eventCallbackMethod = env->GetMethodID(eventCallbackClass, "invoke", "(Ljava/lang/String;Ljava/nio/ByteBuffer;)Z");
+    }
+    EVENT_HANDLER = handler;
 }
 
 EventBuilder::EventBuilder(QObject* parent) :
@@ -42,7 +55,7 @@ EventBuilder::EventBuilder(QObject* parent) :
 QVariant EventBuilder::fireEvent(const QString& type)
 {
 	QVariant ret;
-    if (!EVENT_HANDLERS.empty())
+    if (EVENT_HANDLER)
     {
         uint32_t size = m_queuedArguements.size();
         char* memory = new char[size];
@@ -50,14 +63,24 @@ QVariant EventBuilder::fireEvent(const QString& type)
         {
             memory[i] = m_queuedArguements[i];
         }
-        for (auto& func: EVENT_HANDLERS)
+
+        JNIEnv* env = ApplicationFunctions::mainEnv;
+        jstring typeStr = env->NewStringUTF(type.toStdString().c_str());
+        jobject buffer = env->NewDirectByteBuffer(memory, size);
+        bool result = ApplicationFunctions::mainEnv->CallObjectMethod(EVENT_HANDLER, eventCallbackMethod, typeStr, buffer);
+        if (env->ExceptionCheck())
         {
-            void* result = func(type.toStdString().c_str(), memory, size);
-            if (result)
-            {
-              ret = toQVariantList(result, 1)[0];
-            }
+            std::cerr << "Exception when calling event handler" << std::endl;
+            env->ExceptionClear();
         }
+        env->DeleteLocalRef(typeStr);
+        env->DeleteLocalRef(buffer);
+        if (result)
+        {
+            ret = QMLDataTransfer::retrieve(0);
+            QMLDataTransfer::clearPendingData();
+        }
+
         delete[] memory;
     }
     else

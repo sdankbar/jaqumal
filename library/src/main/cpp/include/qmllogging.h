@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef QMLLOGGING_H
-#define QMLLOGGING_H
+#pragma once
 
+#include <jni.h>
 #include <QObject>
-#include <functional>
 
 class QMLLogging : public QObject
 {
@@ -41,11 +40,15 @@ public:
     Q_INVOKABLE void warn(const QString& message) const;
     Q_INVOKABLE void error(const QString& message) const;
 
-    void setCallback(void c(int, const char*));
+    void setCallback(jobject obj);
 
 private:
 
-    std::function<void(int, const char*)> javaLoggingCallback;
-};
+    void trace(const std::string& message) const;
+    void debug(const std::string& message) const;
+    void info(const std::string& message) const;
+    void warn(const std::string& message) const;
+    void error(const std::string& message) const;
 
-#endif // QMLLOGGING_H
+    jobject javaLoggingCallback;
+};

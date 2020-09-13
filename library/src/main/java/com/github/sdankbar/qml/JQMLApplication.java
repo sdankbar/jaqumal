@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml;
 
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -43,9 +42,9 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.CppInterface.EventCallback;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
+import com.github.sdankbar.qml.cpp.jni.EventFunctions;
+import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.EventFactory;
@@ -57,7 +56,6 @@ import com.github.sdankbar.qml.images.JQMLImageProvider;
 import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
 import com.github.sdankbar.qml.models.JQMLModelFactoryImpl;
 import com.google.common.collect.ImmutableList;
-import com.sun.jna.Pointer;
 
 /**
  * Starting point for creating a Jaqumal application.
@@ -68,19 +66,20 @@ public class JQMLApplication<EType> {
 
 	private class ApplicationEventListener implements EventCallback {
 
-		private final SharedJavaCppMemory memory = new SharedJavaCppMemory(16 * 1024 * 1024);
-
 		@Override
-		public Pointer invoke(final String type, final Pointer data, final int length) {
-			final ByteBuffer buffer = data.getByteBuffer(0, length);
-
-			final Optional<JVariant> result = handleEvent(type, buffer);
-
-			if (result.isPresent()) {
-				JVariant.serialize(ImmutableList.of(result.get()), memory);
-				return memory.getPointer();
-			} else {
-				return Pointer.NULL;
+		public boolean invoke(final String type, final ByteBuffer buffer) {
+			try {
+				buffer.order(ByteOrder.nativeOrder());
+				final Optional<JVariant> result = handleEvent(type, buffer);
+				if (result.isPresent()) {
+					result.get().sendToQML(0);
+					return true;
+				} else {
+					return false;
+				}
+			} catch (final Exception e) {
+				log.warn("Exception constructing event " + type, e);
+				return false;
 			}
 		}
 
@@ -89,10 +88,6 @@ public class JQMLApplication<EType> {
 	private static final Logger log = LoggerFactory.getLogger(JQMLApplication.class);
 
 	private static AtomicBoolean SINGLETON_EXISTS = new AtomicBoolean();
-
-	static {
-		JQMLExceptionHandling.register();// Do very early so that exception handling is immediately available.
-	}
 
 	/**
 	 * Creates a new JQMLApplication. Only 1 can exist at a time in an address
@@ -117,7 +112,7 @@ public class JQMLApplication<EType> {
 	 */
 	@QtThread
 	public static void delete() {
-		ApiInstance.LIB_INSTANCE.deleteQApplication();
+		ApplicationFunctions.deleteQApplication();
 		SINGLETON_EXISTS.set(false);
 	}
 
@@ -143,18 +138,16 @@ public class JQMLApplication<EType> {
 		this.factory = Objects.requireNonNull(factory, "factory is null");
 		Objects.requireNonNull(argv, "argv is null");
 
-		ApiInstance.LIB_INSTANCE.createQApplication(argv.length, argv);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.createQApplication(argv);
 
-		ApiInstance.LIB_INSTANCE.addEventCallback(listener);
-		JQMLExceptionHandling.checkExceptions();
+		EventFunctions.addEventCallback(listener);
 
 		modelFactory = new JQMLModelFactoryImpl(this, eventLoopThread);
 
 		logger = new JQMLLogging();
 
-		log.info("Qt Compile version={} Qt Runtime version={}", ApiInstance.LIB_INSTANCE.getCompileQtVersion(),
-				ApiInstance.LIB_INSTANCE.getRuntimeQtVersion());
+		log.info("Qt Compile version={} Qt Runtime version={}", ApplicationFunctions.getCompileQtVersion(),
+				ApplicationFunctions.getRuntimeQtVersion());
 	}
 
 	/**
@@ -172,9 +165,9 @@ public class JQMLApplication<EType> {
 			public void run() {
 				shutdownRunning.set(true);
 				try {
-					executor.submit(() -> ApiInstance.LIB_INSTANCE.quitQApplication());
+					executor.submit(ApplicationFunctions::quitQApplication);
 				} catch (final RejectedExecutionException e) {
-					log.debug("Executor has already been shutdown");
+					log.debug("Executor has already been shutdown", e);
 				}
 				while (eventLoopThread.get() != null || SINGLETON_EXISTS.get()) {
 					Thread.yield();
@@ -183,7 +176,7 @@ public class JQMLApplication<EType> {
 		};
 		Runtime.getRuntime().addShutdownHook(shutdownThread);
 
-		ApiInstance.LIB_INSTANCE.execQApplication();
+		ApplicationFunctions.execQApplication();
 		eventLoopThread.set(null);
 
 		for (final FileAlterationMonitor m : fileMonitors) {
@@ -262,8 +255,7 @@ public class JQMLApplication<EType> {
 
 		verifyEventLoopThread();
 
-		ApiInstance.LIB_INSTANCE.loadQMLFile(filePath);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.loadQMLFile(filePath);
 
 		final FileAlterationObserver observer = new FileAlterationObserver(Paths.get(filePath).getParent().toString());
 		final FileAlterationMonitor monitor = new FileAlterationMonitor(250);
@@ -332,8 +324,7 @@ public class JQMLApplication<EType> {
 		Objects.requireNonNull(filePath, "filePath is null");
 		verifyEventLoopThread();
 
-		ApiInstance.LIB_INSTANCE.loadQMLFile(filePath);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.loadQMLFile(filePath);
 	}
 
 	/**
@@ -343,8 +334,7 @@ public class JQMLApplication<EType> {
 	public void quitApp() {
 		verifyEventLoopThread();
 
-		ApiInstance.LIB_INSTANCE.quitQApplication();
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.quitQApplication();
 	}
 
 	/**
@@ -368,8 +358,7 @@ public class JQMLApplication<EType> {
 		Objects.requireNonNull(filePath, "filePath is null");
 		verifyEventLoopThread();
 
-		ApiInstance.LIB_INSTANCE.reloadQMLFile(filePath);
-		JQMLExceptionHandling.checkExceptions();
+		ApplicationFunctions.reloadQMLFile(filePath);
 	}
 
 	/**
@@ -377,22 +366,7 @@ public class JQMLApplication<EType> {
 	 */
 	@QtThread
 	public ImmutableList<JScreen> screens() {
-		final Pointer ptr = ApiInstance.LIB_INSTANCE.getScreens();
-
-		final int count = ptr.getInt(0);
-
-		final ImmutableList.Builder<JScreen> builder = ImmutableList.builder();
-
-		final ByteBuffer buffer = ptr.getByteBuffer(4, count * (8 + 4 * 4));
-		buffer.order(ByteOrder.nativeOrder());
-		for (int i = 0; i < count; ++i) {
-			final double dpi = buffer.getDouble();
-			final Rectangle2D rect = new Rectangle2D.Double(buffer.getInt(), buffer.getInt(), buffer.getInt(),
-					buffer.getInt());
-			builder.add(new JScreen(rect, dpi));
-		}
-
-		return builder.build();
+		return ImmutableList.copyOf(ApplicationFunctions.getScreens());
 	}
 
 	private void verifyEventLoopThread() {

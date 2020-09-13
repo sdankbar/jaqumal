@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,10 +38,9 @@ import java.util.NoSuchElementException;
 import org.junit.After;
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JQMLApplication;
-import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.exceptions.QMLException;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.TreePath;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModelMap;
@@ -55,12 +54,16 @@ public class JQMLFlatTreeModelTest {
 	 * @author me
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 		// Empty Implementation
 	}
 
 	private enum Roles {
-		R1, R2, R3, R4, R5;
+		R1,
+		R2,
+		R3,
+		R4,
+		R5;
 	}
 
 	/**
@@ -70,7 +73,8 @@ public class JQMLFlatTreeModelTest {
 	public void append() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> data = new HashMap<>();
 		data.put(Roles.R1, new JVariant(1));
@@ -98,7 +102,7 @@ public class JQMLFlatTreeModelTest {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other",
-				EnumSet.allOf(Roles.class));
+				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(), Roles.R3, new JVariant(3));
@@ -123,8 +127,10 @@ public class JQMLFlatTreeModelTest {
 	public void duplicateModelName() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model1 = app.getModelFactory().createFlatTreeModel("other", Roles.class);
-		final JQMLFlatTreeModel<Roles> model2 = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model1 = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLFlatTreeModel<Roles> model2 = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 	}
 
 	/**
@@ -134,7 +140,8 @@ public class JQMLFlatTreeModelTest {
 	public void forEach() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R2, new JVariant(2));
@@ -161,7 +168,8 @@ public class JQMLFlatTreeModelTest {
 	public void get() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 
@@ -183,11 +191,12 @@ public class JQMLFlatTreeModelTest {
 	public void insert() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R2, new JVariant(2));
-		model.insert(TreePath.of(0, 0), Roles.R1, new JVariant(1));
+		model.insert(TreePath.of(0, 0), Roles.R1, new JVariant(3));
 
 		final JQMLFlatTreeModelMap<Roles> map = model.get(TreePath.of(0));
 		assertEquals(new JVariant(1), map.get(Roles.R1));
@@ -201,7 +210,8 @@ public class JQMLFlatTreeModelTest {
 	public void isPresent() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R1, new JVariant(1));
@@ -218,7 +228,8 @@ public class JQMLFlatTreeModelTest {
 	public void iteratorError() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.iterator().next();
 	}
@@ -230,7 +241,8 @@ public class JQMLFlatTreeModelTest {
 	public void remove() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R1, new JVariant(1));
@@ -253,7 +265,8 @@ public class JQMLFlatTreeModelTest {
 	public void removeChildren() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R1, new JVariant(1));
@@ -275,7 +288,8 @@ public class JQMLFlatTreeModelTest {
 	public void removeEmptyModel() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.remove(TreePath.of());
 	}
@@ -287,7 +301,8 @@ public class JQMLFlatTreeModelTest {
 	public void removeIntermediateInvalidTreePath() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R1, new JVariant(1));
@@ -305,7 +320,8 @@ public class JQMLFlatTreeModelTest {
 	public void removeInvalidatesMap() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 
@@ -325,7 +341,8 @@ public class JQMLFlatTreeModelTest {
 	public void removeInvalidTreePath() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R1, new JVariant(1));
@@ -347,7 +364,8 @@ public class JQMLFlatTreeModelTest {
 	public void removeRole() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.setData(TreePath.of(0), Roles.R3, new JVariant(3));
@@ -357,7 +375,7 @@ public class JQMLFlatTreeModelTest {
 
 		model.remove(TreePath.of(0), Roles.R1);
 
-		assertEquals(false, model.getData(TreePath.of(0), Roles.R1).isPresent());
+		assertFalse(model.getData(TreePath.of(0), Roles.R1).isPresent());
 		assertEquals(new JVariant(3), model.getData(TreePath.of(0), Roles.R3).get());
 	}
 
@@ -368,7 +386,8 @@ public class JQMLFlatTreeModelTest {
 	public void setDataMap() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> d = new HashMap<>();
 		d.put(Roles.R1, new JVariant(1));
@@ -386,7 +405,8 @@ public class JQMLFlatTreeModelTest {
 	public void size() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(1));
 		model.append(TreePath.of(0), Roles.R1, new JVariant(1));
@@ -403,7 +423,8 @@ public class JQMLFlatTreeModelTest {
 	public void test_sorting() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class);
+		final JQMLFlatTreeModel<Roles> model = app.getModelFactory().createFlatTreeModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.append(TreePath.of(), Roles.R1, new JVariant(0));
 		model.append(TreePath.of(0), Roles.R1, new JVariant(2));

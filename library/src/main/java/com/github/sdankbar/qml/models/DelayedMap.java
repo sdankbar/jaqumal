@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ public class DelayedMap<K, V> implements Map<K, V> {
 	/**
 	 * Enumeration of the various write modes for DelayedMap
 	 */
-	public static enum WriteMode {
+	public enum WriteMode {
 		/**
 		 * Writes are immediately sent to the wrapped Map
 		 */

@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,4 +46,13 @@ public interface JQMLSingletonModel<K> extends Map<K, JVariant> {
 	 * @return The name of the QML model this map is a part of.
 	 */
 	String getModelName();
+
+	/**
+	 * Assigns the data in the passed in map to this map. Equivalent to clear and
+	 * putAll.
+	 *
+	 * @param map Data to assign to this Map.
+	 */
+	void assign(final Map<K, JVariant> map);
+
 }

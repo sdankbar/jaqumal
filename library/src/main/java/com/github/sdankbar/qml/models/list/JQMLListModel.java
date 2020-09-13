@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -184,4 +184,30 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	 */
 	void unregisterListener(final ListListener<K> l);
 
+	/**
+	 * Assigns the list to this list. Equivalent to clear and addAll.
+	 *
+	 * @param list List to assign to this map.
+	 */
+	void assign(List<Map<K, JVariant>> list);
+
+	/**
+	 * Assigns the map to the map at index.
+	 *
+	 * @param index Index of the Map to assign to.
+	 * @param map   Map to assign to the target Map.
+	 */
+	void assign(int index, Map<K, JVariant> map);
+
+	/**
+	 * To be used in a try with resources block.
+	 *
+	 * Locks the list model from emitting signals to QML to indicates data has been
+	 * updated. Instead signals that the entire model has changed. This can be
+	 * faster than signal each entry individually.
+	 *
+	 * @return Lock to be used in the try with resources to ensure the model is
+	 *         unlocked.
+	 */
+	SignalLock lockSignals();
 }

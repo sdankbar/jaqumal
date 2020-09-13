@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.exceptions.IllegalKeyException;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * Abstract base class that provides a Map interface to QML models.
@@ -195,11 +195,24 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 
 	}
 
+	/**
+	 * Enumeration of the various modes for put() operations.
+	 */
+	public enum PutMode {
+		/**
+		 * Put functions return the previous value for the key.
+		 */
+		RETURN_PREVIOUS_VALUE,
+		/**
+		 * Put functions always return null. Increases throughput.
+		 */
+		RETURN_NULL
+	}
+
 	protected final String modelName;
+	private final PutMode putMode;
 	protected final Set<K> keys;
 	protected final Map<String, Integer> indexLookup = new HashMap<>();
-
-	private final IntByReference length = new IntByReference();
 
 	private final KeySet<K> keySet = new KeySet<>(this);
 	private final ValueCollection<K> valueCollection = new ValueCollection<>(this);
@@ -208,11 +221,28 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	private final MapAccessor accessor;
 
 	protected AbstractJQMLMapModel(final String modelName, final Set<K> keys,
-			final AtomicReference<Thread> eventLoopThread, final MapAccessor accessor) {
+			final AtomicReference<Thread> eventLoopThread, final MapAccessor accessor, final PutMode putMode) {
 		super(eventLoopThread);
 		this.modelName = Objects.requireNonNull(modelName, "modelName is null");
+		this.putMode = Objects.requireNonNull(putMode, "putMode is null");
 		this.keys = Objects.requireNonNull(keys, "keys is null");
 		this.accessor = accessor;
+	}
+
+	/**
+	 * Assigns the passed in map to this map. Equivalent to clear() followed by
+	 * putAll().
+	 *
+	 * @param map Map to assign to this one.
+	 */
+	public void assign(final Map<K, JVariant> map) {
+		Objects.requireNonNull(map, "map is null");
+		verifyEventLoopThread();
+		final int size = map.size();
+		final int[] roles = new int[size];
+		final JVariant[] data = new JVariant[size];
+		convert(map, roles, data);
+		accessor.assign(roles, data);
 	}
 
 	@Override
@@ -230,7 +260,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 			if (index == null) {
 				return false;
 			} else {
-				return accessor.get(index.intValue(), length).isPresent();
+				return accessor.get(index.intValue()).isPresent();
 			}
 		}
 	}
@@ -239,7 +269,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 	public boolean containsValue(final Object value) {
 		verifyEventLoopThread();
 		for (int i = 0; i < keys.size(); ++i) {
-			final Optional<JVariant> opt = accessor.get(i, length);
+			final Optional<JVariant> opt = accessor.get(i);
 			if (opt.isPresent() && opt.get().equals(value)) {
 				return true;
 			}
@@ -283,7 +313,7 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		verifyEventLoopThread();
 		final int index = verifyKey(key);
 
-		final Optional<JVariant> opt = accessor.get(index, length);
+		final Optional<JVariant> opt = accessor.get(index);
 		return opt.orElse(null);
 	}
 
@@ -316,7 +346,12 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		if (value != null) {
 			final int index = verifyKey(key);
 
-			final JVariant existingValue = accessor.get(index, length).orElse(null);
+			final JVariant existingValue;
+			if (putMode == PutMode.RETURN_PREVIOUS_VALUE) {
+				existingValue = accessor.get(index).orElse(null);
+			} else {
+				existingValue = null;
+			}
 
 			accessor.set(value, index);
 
@@ -326,22 +361,32 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 		}
 	}
 
+	private void convert(final Map<? extends K, ? extends JVariant> map, final int[] roles, final JVariant[] data) {
+		int i = 0;
+		for (final Entry<? extends K, ? extends JVariant> e : map.entrySet()) {
+			roles[i] = verifyKey(e.getKey());
+			data[i] = e.getValue();
+			++i;
+		}
+	}
+
 	@Override
 	public void putAll(final Map<? extends K, ? extends JVariant> map) {
+		Objects.requireNonNull(map, "map is null");
 		verifyEventLoopThread();
-		final Map<Integer, JVariant> dataMap = new HashMap<>();
-		for (final Entry<? extends K, ? extends JVariant> e : map.entrySet()) {
-			final int roleIndex = verifyKey(e.getKey());
-			dataMap.put(Integer.valueOf(roleIndex), e.getValue());
-		}
-		accessor.set(dataMap);
+
+		final int size = map.size();
+		final int[] roles = new int[size];
+		final JVariant[] data = new JVariant[size];
+		convert(map, roles, data);
+		accessor.set(roles, data);
 	}
 
 	@Override
 	public JVariant remove(final Object key) {
 		verifyEventLoopThread();
 		final int index = verifyKey(key);
-		return accessor.remove(index, length).orElse(null);
+		return accessor.remove(index).orElse(null);
 	}
 
 	@Override
@@ -356,6 +401,13 @@ public abstract class AbstractJQMLMapModel<K> extends AbstractJQMLModel implemen
 			}
 		}
 		return count;
+	}
+
+	@Override
+	public String toString() {
+		// ex. {R1=JVariant [type=STRING, obj=A], R3=JVariant [type=INT, obj=3]}
+		return entrySet().stream().map(e -> e.getKey().toString() + "=" + e.getValue().toString())
+				.collect(Collectors.joining(", "));
 	}
 
 	@Override

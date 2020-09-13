@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,10 +33,9 @@ import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JQMLUtilities;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.QtThread;
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
 import com.github.sdankbar.qml.exceptions.QMLException;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.flat_tree.FlatTreeAccessor;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
@@ -63,9 +62,6 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	private final AtomicReference<Thread> eventLoopThread;
 	private final JQMLPerformanceModel perfModel;
 
-	private final SharedJavaCppMemory cppToJava = new SharedJavaCppMemory(16 * 1024 * 1024);
-	private final SharedJavaCppMemory javaToCpp = new SharedJavaCppMemory(16 * 1024 * 1024);
-
 	private final Set<String> modelName = new HashSet<>();
 
 	/**
@@ -77,8 +73,6 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	public JQMLModelFactoryImpl(final JQMLApplication<?> app, final AtomicReference<Thread> eventLoopThread) {
 		this.app = Objects.requireNonNull(app, "app is null");
 		this.eventLoopThread = Objects.requireNonNull(eventLoopThread, "eventLoopThread is null");
-
-		ApiInstance.LIB_INSTANCE.setSharedMemory(cppToJava.getPointer(), cppToJava.getSize());
 
 		perfModel = new JQMLPerformanceModel("PerfModel", this);
 		app.getEventDispatcher().register(RenderEvent.class, perfModel);
@@ -100,76 +94,77 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 
 	@Override
 	@QtThread
-	public <K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Class<K> enumClass,
+			final PutMode putMode) {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLFlatTreeModel<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new FlatTreeAccessor(javaToCpp, cppToJava));
+		return new JQMLFlatTreeModel<>(name, EnumSet.allOf(enumClass), eventLoopThread, new FlatTreeAccessor(),
+				putMode);
 	}
 
 	@Override
 	@QtThread
-	public <K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys) {
+	public <K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys, final PutMode putMode) {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLFlatTreeModel<>(name, keys, eventLoopThread, new FlatTreeAccessor(javaToCpp, cppToJava));
+		return new JQMLFlatTreeModel<>(name, keys, eventLoopThread, new FlatTreeAccessor(), putMode);
 	}
 
 	@QtThread
 	@Override
-	public <K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLListModel<K> createListModel(final String name, final Class<K> enumClass,
+			final PutMode putMode) {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new ListAccessor(javaToCpp, cppToJava));
+		return new JQMLListModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread, new ListAccessor(), putMode);
 	}
 
 	@QtThread
 	@Override
-	public <K> JQMLListModel<K> createListModel(final String name, final Set<K> keys) {
+	public <K> JQMLListModel<K> createListModel(final String name, final Set<K> keys, final PutMode putMode) {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModelImpl<>(name, keys, eventLoopThread, new ListAccessor(javaToCpp, cppToJava));
+		return new JQMLListModelImpl<>(name, keys, eventLoopThread, new ListAccessor(), putMode);
 	}
 
 	@QtThread
 	@Override
 	public <K extends Enum<K>> JQMLMapPool<K> createPool(final String name, final Class<K> enumClass,
-			final ImmutableMap<K, JVariant> initialValues) {
-		final JQMLListModel<K> model = createListModel(name, enumClass);
+			final ImmutableMap<K, JVariant> initialValues, final PutMode putMode) {
+		final JQMLListModel<K> model = createListModel(name, enumClass, putMode);
 		return new JQMLMapPool<>(model, initialValues);
 	}
 
 	@QtThread
 	@Override
 	public <K> JQMLMapPool<K> createPool(final String name, final Set<K> keys,
-			final ImmutableMap<K, JVariant> initialValues) {
-		final JQMLListModel<K> model = createListModel(name, keys);
+			final ImmutableMap<K, JVariant> initialValues, final PutMode putMode) {
+		final JQMLListModel<K> model = createListModel(name, keys, putMode);
 		return new JQMLMapPool<>(model, initialValues);
 	}
 
 	@Override
 	@QtThread
-	public <K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass) {
+	public <K extends Enum<K>> JQMLSingletonModel<K> createSingletonModel(final String name, final Class<K> enumClass,
+			final PutMode putMode) {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLSingletonModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread,
-				new SingletonMapAccessor(javaToCpp, cppToJava));
+		return new JQMLSingletonModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread, new SingletonMapAccessor(),
+				putMode);
 	}
 
 	@QtThread
 	@Override
-	public <K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys) {
+	public <K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys, final PutMode putMode) {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLSingletonModelImpl<>(name, keys, eventLoopThread,
-				new SingletonMapAccessor(javaToCpp, cppToJava));
+		return new JQMLSingletonModelImpl<>(name, keys, eventLoopThread, new SingletonMapAccessor(), putMode);
 	}
 
 	@Override

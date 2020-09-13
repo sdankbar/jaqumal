@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,8 @@ import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.nio.ByteOrder;
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,7 +41,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
+import com.github.sdankbar.qml.cpp.jni.data_transfer.QMLDataTransfer;
 import com.github.sdankbar.qml.fonts.JFont;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -192,7 +191,6 @@ public class JVariant {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(JVariant.class);
-	private static final Type[] TYPE_ARRAY = Type.values();
 
 	/**
 	 * Immutable JVariant containing the empty string.
@@ -219,145 +217,69 @@ public class JVariant {
 	 */
 	public static final JVariant FALSE = new JVariant(false);
 
-	private static void checkSize(final SharedJavaCppMemory reuse, final int size) {
-		if (size > reuse.getSize()) {
-			throw new IllegalArgumentException("Serialized JVariant does not fit in shared memory");
+	private static JVariant fromBufferedImage(final int w, final int h, final int[] array) {
+		final BufferedImage v = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		int i = 0;
+		for (int r = 0; r < h; ++r) {
+			for (int c = 0; c < w; ++c) {
+				v.setRGB(c, r, array[i]);
+				++i;
+			}
+		}
+		return null;
+	}
+
+	private static JVariant fromColor(final int rgba) {
+		return new JVariant(new Color(rgba, true));
+	}
+
+	private static JVariant fromDimension(final int w, final int h) {
+		return new JVariant(new Dimension(w, h));
+	}
+
+	private static JVariant fromPolygon(final double[] x, final double[] y) {
+		Preconditions.checkArgument(x.length == y.length, "Lengths not equal");
+		final ImmutableList.Builder<Point2D> polygon = ImmutableList.builder();
+		for (int i = 0; i < x.length; ++i) {
+			polygon.add(new Point2D.Double(x[i], y[i]));
+		}
+		return new JVariant(polygon.build());
+	}
+
+	private static JVariant fromInstant(final long epoch, final int nano) {
+		return new JVariant(Instant.ofEpochSecond(epoch, nano));
+	}
+
+	private static JVariant fromJFont(final String str) {
+		return new JVariant(JFont.fromString(str));
+	}
+
+	private static JVariant fromLine(final int x1, final int y1, final int x2, final int y2) {
+		return new JVariant(new Line2D.Double(x1, y1, x2, y2));
+	}
+
+	private static JVariant fromPattern(final String patternStr) {
+		return new JVariant(Pattern.compile(patternStr));
+	}
+
+	private static JVariant fromPoint(final int x, final int y) {
+		return new JVariant(new Point2D.Double(x, y));
+	}
+
+	private static JVariant fromRectangle(final int x, final int y, final int w, final int h) {
+		return new JVariant(new Rectangle2D.Double(x, y, w, h));
+	}
+
+	private static JVariant fromURL(final String str) {
+		try {
+			return new JVariant(new URL(str));
+		} catch (final MalformedURLException e) {
+			return null;
 		}
 	}
 
-	/**
-	 * Given a ByteBuffer, attempts to deserialize the ByteBuffer into a JVariant.
-	 *
-	 * @param buffer Buffer to get the byte to deserialize.
-	 * @return The deserialized JVariant in an Optional or Optional.empty().
-	 */
-	public static Optional<JVariant> deserialize(final ByteBuffer buffer) {
-		Objects.requireNonNull(buffer, "buffer is null");
-		final int index = buffer.get();
-
-		if (index >= TYPE_ARRAY.length) {
-			return Optional.empty();
-		}
-
-		final Type t = TYPE_ARRAY[index];
-		switch (t) {
-		case BOOL: {
-			return Optional.of(new JVariant(buffer.get() != 0 ? Boolean.TRUE : Boolean.FALSE));
-		}
-		case BYTE_ARRAY: {
-			final int length = buffer.getInt();
-			final byte[] array = new byte[length];
-			buffer.get(array);
-			return Optional.of(new JVariant(array));
-		}
-		case COLOR: {
-			return Optional.of(new JVariant(new Color(buffer.getInt(), true)));
-		}
-		case DATE_TIME: {
-			return Optional.of(new JVariant(Instant.ofEpochSecond(buffer.getLong(), buffer.getInt())));
-		}
-		case DOUBLE: {
-			return Optional.of(new JVariant(buffer.getDouble()));
-		}
-		case FLOAT: {
-			return Optional.of(new JVariant(buffer.getFloat()));
-		}
-		case IMAGE: {
-			final int width = buffer.getInt();
-			final int height = buffer.getInt();
-			final BufferedImage v = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-			for (int r = 0; r < height; ++r) {
-				for (int c = 0; c < width; ++c) {
-					v.setRGB(c, r, buffer.getInt());
-				}
-			}
-			return Optional.of(new JVariant(v));
-		}
-		case INT: {
-			return Optional.of(new JVariant(buffer.getInt()));
-		}
-		case LINE: {
-			return Optional.of(new JVariant(
-					new Line2D.Double(buffer.getDouble(), buffer.getDouble(), buffer.getDouble(), buffer.getDouble())));
-		}
-		case LONG: {
-			return Optional.of(new JVariant(buffer.getLong()));
-		}
-		case POINT: {
-			return Optional.of(new JVariant(new Point2D.Double(buffer.getDouble(), buffer.getDouble())));
-		}
-		case RECTANGLE: {
-			return Optional.of(new JVariant(new Rectangle2D.Double(buffer.getDouble(), buffer.getDouble(),
-					buffer.getDouble(), buffer.getDouble())));
-		}
-		case REGULAR_EXPRESSION: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(Pattern.compile(s)));
-		}
-		case SIZE: {
-			final double w = buffer.getDouble();
-			final double h = buffer.getDouble();
-			final Dimension temp = new Dimension();
-			temp.setSize(w, h);
-			return Optional.of(new JVariant(temp));
-		}
-		case STRING: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(s));
-		}
-		case URL: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			try {
-				return Optional.of(new JVariant(new URL(s)));
-			} catch (final MalformedURLException e) {
-				logger.warn("Failed to deserialize JVariant into URL", e);
-				return Optional.empty();
-			}
-		}
-		case UUID: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(UUID.fromString(s)));
-		}
-		case FONT: {
-			final byte[] array = new byte[buffer.getInt()];
-			buffer.get(array);
-			final String s = new String(array, StandardCharsets.UTF_8);
-			return Optional.of(new JVariant(JFont.fromString(s)));
-		}
-		case POLYLINE: {
-			final int count = buffer.getInt();
-			final ImmutableList.Builder<Point2D> builder = ImmutableList.builder();
-			for (int i = 0; i < count; ++i) {
-				builder.add(new Point2D.Double(buffer.getDouble(), buffer.getDouble()));
-			}
-			return Optional.of(new JVariant(builder.build()));
-		}
-		default:
-			return Optional.empty();
-		}
-	}
-
-	/**
-	 * Serializes a list of JVariants into the existing memory provided by
-	 * SharedJavaCppMemory.
-	 *
-	 * @param data  List of JVariants to serialize.
-	 * @param reuse Existing memory to place the serialized JVariants into, one
-	 *              directly after another.
-	 */
-	public static void serialize(final List<JVariant> data, final SharedJavaCppMemory reuse) {
-		int offset = 0;
-		for (final JVariant d : data) {
-			offset += d.serialize(reuse, offset);
-		}
+	private static JVariant fromUUID(final String str) {
+		return new JVariant(UUID.fromString(str));
 	}
 
 	/**
@@ -1134,192 +1056,111 @@ public class JVariant {
 		return t == type;
 	}
 
-	/**
-	 * Serializes this JVariant, storing it at the beginning of the memory provided
-	 * by resuse.
-	 *
-	 * @param reuse The memory to store the serialized JVariant in.
-	 */
-	public void serialize(final SharedJavaCppMemory reuse) {
-		serialize(reuse, 0);
-	}
-
-	private int serialize(final SharedJavaCppMemory reuse, final int offset) {
-		final ByteBuffer buffer = reuse.getBuffer(offset);
+	public void sendToQML(final int role) {
 		switch (type) {
-		case BOOL: {
-			final Boolean v = (Boolean) obj;
-			checkSize(reuse, 2);
-			buffer.put((byte) type.ordinal());
-			buffer.put((byte) (v.booleanValue() ? 1 : 0));
-			break;
-		}
-		case BYTE_ARRAY: {
-			final byte[] v = (byte[]) obj;
-			checkSize(reuse, 1 + 4 + v.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.length);
-			buffer.put(v);
-			break;
-		}
-		case COLOR: {
-			final Color v = (Color) obj;
-			checkSize(reuse, 1 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.getRGB());
-			break;
-		}
-		case DATE_TIME: {
-			final Instant v = (Instant) obj;
-			checkSize(reuse, 1 + 8 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putLong(v.getEpochSecond());
-			buffer.putInt(v.getNano());
-			break;
-		}
-		case DOUBLE: {
-			final Double v = (Double) obj;
-			checkSize(reuse, 1 + 8);
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.doubleValue());
-			break;
-		}
-		case FLOAT: {
-			final Float v = (Float) obj;
-			checkSize(reuse, 1 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putFloat(v.floatValue());
-			break;
-		}
-		case IMAGE: {
-			final BufferedImage v = (BufferedImage) obj;
-			final int[] pixels = v.getRGB(0, 0, v.getWidth(), v.getHeight(), null, 0, v.getWidth());
-			checkSize(reuse, 1 + 4 + 4 + (4 * pixels.length));
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.getWidth());
-			buffer.putInt(v.getHeight());
-			for (final int i : pixels) {
-				buffer.putInt(i);
+			case BOOL: {
+				QMLDataTransfer.setBoolean(((Boolean) obj).booleanValue(), role);
+				break;
 			}
-			break;
-		}
-		case INT: {
-			final Integer v = (Integer) obj;
-			checkSize(reuse, 1 + 4);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(v.intValue());
-			break;
-		}
-		case LINE: {
-			final Line2D v = (Line2D) obj;
-			checkSize(reuse, 1 + 8 + 8 + 8 + 8);
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getX1());
-			buffer.putDouble(v.getY1());
-			buffer.putDouble(v.getX2());
-			buffer.putDouble(v.getY2());
-			break;
-		}
-		case LONG: {
-			final Long v = (Long) obj;
-			checkSize(reuse, 1 + 8);
-
-			buffer.put((byte) type.ordinal());
-			buffer.putLong(v.longValue());
-			break;
-		}
-		case POINT: {
-			final Point2D v = (Point2D) obj;
-			checkSize(reuse, 1 + 8 + 8);
-
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getX());
-			buffer.putDouble(v.getY());
-			break;
-		}
-		case RECTANGLE: {
-			final Rectangle2D v = (Rectangle2D) obj;
-			checkSize(reuse, 1 + 8 + 8 + 8 + 8);
-
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getX());
-			buffer.putDouble(v.getY());
-			buffer.putDouble(v.getWidth());
-			buffer.putDouble(v.getHeight());
-			break;
-		}
-		case REGULAR_EXPRESSION: {
-			final Pattern v = (Pattern) obj;
-			final byte[] utf8 = v.pattern().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case SIZE: {
-			final Dimension v = (Dimension) obj;
-			checkSize(reuse, 1 + 8 + 8);
-			buffer.put((byte) type.ordinal());
-			buffer.putDouble(v.getWidth());
-			buffer.putDouble(v.getHeight());
-			break;
-		}
-		case STRING: {
-			final String v = (String) obj;
-			final byte[] utf8 = v.getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case URL: {
-			final URL v = (URL) obj;
-			final byte[] utf8 = v.toExternalForm().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case UUID: {
-			final UUID v = (UUID) obj;
-			final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case FONT: {
-			final JFont v = (JFont) obj;
-			final byte[] utf8 = v.toString().getBytes(StandardCharsets.UTF_8);
-			checkSize(reuse, 1 + 4 + utf8.length);
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(utf8.length);
-			buffer.put(utf8);
-			break;
-		}
-		case POLYLINE: {
-			@SuppressWarnings("unchecked")
-			final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
-			checkSize(reuse, 1 + 4 + list.size() * (8 + 8));
-			buffer.put((byte) type.ordinal());
-			buffer.putInt(list.size());
-			for (final Point2D p : list) {
-				buffer.putDouble(p.getX());
-				buffer.putDouble(p.getY());
+			case BYTE_ARRAY: {
+				QMLDataTransfer.setByteArray(((byte[]) obj), role);
+				break;
 			}
-			break;
-		}
-		default: {
-			logger.error("Unkonwn type {}", type);
-			throw new IllegalStateException("Unkonwn type " + type);
-		}
+			case COLOR: {
+				QMLDataTransfer.setColor(((Color) obj).getRGB(), role);
+				break;
+			}
+			case DATE_TIME: {
+				final Instant i = (Instant) obj;
+				QMLDataTransfer.setDateTime(i.getEpochSecond(), i.getNano(), role);
+				break;
+			}
+			case DOUBLE: {
+				QMLDataTransfer.setDouble(((Double) obj).doubleValue(), role);
+				break;
+			}
+			case FLOAT: {
+				QMLDataTransfer.setFloat(((Float) obj).floatValue(), role);
+				break;
+			}
+			case IMAGE: {
+				final BufferedImage image = (BufferedImage) obj;
+				final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+				final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
+				b.order(ByteOrder.nativeOrder());
+				for (final int p : pixels) {
+					b.putInt(p);
+				}
+				final byte[] array = b.array();
+				QMLDataTransfer.setImage(image.getWidth(), image.getHeight(), array, role);
+				break;
+			}
+			case INT: {
+				QMLDataTransfer.setInteger(((Integer) obj).intValue(), role);
+				break;
+			}
+			case LINE: {
+				final Line2D l = (Line2D) obj;
+				QMLDataTransfer.setLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2(), role);
+				break;
+			}
+			case LONG: {
+				QMLDataTransfer.setLong(((Long) obj).longValue(), role);
+				break;
+			}
+			case POINT: {
+				final Point2D p = (Point2D) obj;
+				QMLDataTransfer.setPoint((int) p.getX(), (int) p.getY(), role);
+				break;
+			}
+			case RECTANGLE: {
+				final Rectangle2D r = (Rectangle2D) obj;
+				QMLDataTransfer.setLine((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight(), role);
+				break;
+			}
+			case REGULAR_EXPRESSION: {
+				final Pattern s = (Pattern) obj;
+				QMLDataTransfer.setRegularExpression(s.pattern(), role);
+				break;
+			}
+			case SIZE: {
+				final Dimension s = (Dimension) obj;
+				QMLDataTransfer.setSize(s.width, s.height, role);
+				break;
+			}
+			case STRING: {
+				QMLDataTransfer.setString(((String) obj), role);
+				break;
+			}
+			case URL: {
+				QMLDataTransfer.setURL(((URL) obj).toExternalForm(), role);
+				break;
+			}
+			case UUID: {
+				QMLDataTransfer.setUUID(((UUID) obj).toString(), role);
+				break;
+			}
+			case FONT: {
+				QMLDataTransfer.setFont(((JFont) obj).toString(), role);
+				break;
+			}
+			case POLYLINE: {
+				@SuppressWarnings("unchecked")
+				final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
+				final double[] array = new double[2 * list.size()];
+				int i = 0;
+				for (final Point2D p : list) {
+					array[i++] = p.getX();
+					array[i++] = p.getY();
+				}
+				QMLDataTransfer.setPolyline(list.size(), array, role);
+				break;
+			}
+			default: {
+				logger.error("Unkonwn type {}", type);
+				throw new IllegalStateException("Unkonwn type " + type);
+			}
 		}// end switch
-
-		return buffer.position() - offset;
 	}
 
 	/**

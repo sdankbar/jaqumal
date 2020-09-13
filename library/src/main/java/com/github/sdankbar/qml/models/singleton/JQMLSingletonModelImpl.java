@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,23 +22,17 @@
  */
 package com.github.sdankbar.qml.models.singleton;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPI.MapChangeCallback;
-import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPIFast;
+import com.github.sdankbar.qml.cpp.jni.interfaces.MapChangeCallback;
+import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
-import com.sun.jna.Pointer;
 
 /**
  * A model that is available to QML. Represents a single Map from the key type
@@ -61,19 +55,14 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 		}
 
 		@Override
-		public void invoke(final String key, final Pointer newValue, final int length) {
-			if (newValue == null || Pointer.nativeValue(newValue) == 0) {
+		public void invoke(final String key, final JVariant data) {
+			if (data == null) {
 				for (final ChangeListener l : listeners) {
 					l.valueChanged(key, null);
 				}
 			} else {
-				final ByteBuffer buffer = newValue.getByteBuffer(0, length);
-				buffer.order(ByteOrder.nativeOrder());
-				final Optional<JVariant> v = JVariant.deserialize(buffer);
-				if (v.isPresent()) {
-					for (final ChangeListener l : listeners) {
-						l.valueChanged(key, v.get());
-					}
+				for (final ChangeListener l : listeners) {
+					l.valueChanged(key, data);
 				}
 			}
 		}
@@ -82,7 +71,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 
 	private final SingletonMapAccessor mapAccessor;
 	private final MapChangeListener changeCallback = new MapChangeListener();
-	private final Pointer modelPointer;
+	private final long modelPointer;
 
 	/**
 	 * Model constructor.
@@ -93,10 +82,11 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	 * @param eventLoopThread Reference to the Qt Thread.
 	 * @param accessor        Accessor this model will use to to access the C++
 	 *                        portion of this model.
+	 * @param putMode         The mode that put operations use.
 	 */
 	public JQMLSingletonModelImpl(final String modelName, final Set<K> keys,
-			final AtomicReference<Thread> eventLoopThread, final SingletonMapAccessor accessor) {
-		super(modelName, keys, eventLoopThread, accessor);
+			final AtomicReference<Thread> eventLoopThread, final SingletonMapAccessor accessor, final PutMode putMode) {
+		super(modelName, keys, eventLoopThread, accessor, putMode);
 		this.mapAccessor = accessor;
 
 		int i = 0;
@@ -107,9 +97,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 			indexLookup.put(name, Integer.valueOf(i++));
 		}
 
-		modelPointer = ApiInstance.SINGLETON_LIB_INSTANCE.createGenericObjectModel(modelName, roleArray,
-				roleArray.length);
-		JQMLExceptionHandling.checkExceptions();
+		modelPointer = SingletonModelFunctions.createGenericObjectModel(modelName, roleArray);
 
 		mapAccessor.setModelPointer(modelPointer);
 	}
@@ -123,8 +111,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	public void registerChangeListener(final ChangeListener l) {
 		verifyEventLoopThread();
 		if (!changeCallback.hasListeners()) {
-			SingletonQMLAPIFast.registerValueChangedCallback(modelPointer, changeCallback);
-			JQMLExceptionHandling.checkExceptions();
+			SingletonModelFunctions.registerValueChangedCallback(modelPointer, changeCallback);
 		}
 		changeCallback.addListener(Objects.requireNonNull(l, "l is null"));
 	}
@@ -136,4 +123,5 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	public String getModelName() {
 		return modelName;
 	}
+
 }

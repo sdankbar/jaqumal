@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.JQMLMapPool;
 import com.google.common.collect.ImmutableMap;
 
@@ -42,12 +43,16 @@ public class JQMLMapPoolTest {
 	/**
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 		// Empty Implementation
 	}
 
 	private enum Roles {
-		R1, R2, R3, R4, R5;
+		R1,
+		R2,
+		R3,
+		R4,
+		R5;
 	}
 
 	/**
@@ -66,7 +71,7 @@ public class JQMLMapPoolTest {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLMapPool<Roles> pool = app.getModelFactory().createPool("other", Roles.class,
-				ImmutableMap.of(Roles.R1, new JVariant("INIT")));
+				ImmutableMap.of(Roles.R1, new JVariant("INIT")), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> map = pool.request();
 		assertEquals("INIT", map.get(Roles.R1).asString());

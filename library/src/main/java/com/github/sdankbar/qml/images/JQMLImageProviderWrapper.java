@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,8 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
-import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.ApiInstance;
-import com.github.sdankbar.qml.cpp.jna.CppInterface.ImageProviderCallback;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
-import com.sun.jna.Pointer;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
+import com.github.sdankbar.qml.cpp.jni.interfaces.ImageProviderCallback;
 
 /**
  * Wraps a JQMLImageProvider, allowing it to be called from C++.
@@ -39,7 +36,6 @@ public class JQMLImageProviderWrapper implements ImageProviderCallback {
 
 	private final String id;
 	private final JQMLImageProvider provider;
-	private final SharedJavaCppMemory memory = new SharedJavaCppMemory(16 * 1024 * 1024);
 
 	/**
 	 * Constructs new wrapper.
@@ -51,7 +47,7 @@ public class JQMLImageProviderWrapper implements ImageProviderCallback {
 		this.id = Objects.requireNonNull(id, "id null");
 		this.provider = Objects.requireNonNull(provider, "provider is null");
 
-		ApiInstance.LIB_INSTANCE.addImageProvider(id, this);
+		ApplicationFunctions.addImageProvider(id, this);
 	}
 
 	/**
@@ -62,14 +58,12 @@ public class JQMLImageProviderWrapper implements ImageProviderCallback {
 	}
 
 	@Override
-	public Pointer invoke(final String imageID, final int w, final int h) {
+	public BufferedImage invoke(final String imageID, final int w, final int h) {
 		final BufferedImage image = provider.requestImage(imageID, new Dimension(w, h));
 		if (image != null) {
-			final JVariant var = new JVariant(image);
-			var.serialize(memory);
-			return memory.getPointer();
+			return image;
 		} else {
-			return Pointer.NULL;
+			return null;
 		}
 	}
 

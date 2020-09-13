@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,16 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-
 import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.ButtonActivateEvent;
 import com.github.sdankbar.qml.eventing.builtin.ButtonClickEvent;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 public class JQMLDelayButtonModel {
 
@@ -90,7 +90,7 @@ public class JQMLDelayButtonModel {
 
 	public JQMLDelayButtonModel(final String modelName, final JQMLModelFactory factory,
 			final EventDispatcher<?> dispatcher) {
-		model = factory.createSingletonModel(modelName, Roles.class);
+		model = factory.createSingletonModel(modelName, Roles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.ModelName, new JVariant(modelName));
 		model.put(Roles.IsDefault, new JVariant(false));
@@ -107,15 +107,11 @@ public class JQMLDelayButtonModel {
 		model.put(Roles.Z, new JVariant(0));
 
 		model.registerChangeListener((key, newValue) -> {
-			try {
-				final Roles r = Roles.valueOf(key);
-				synchronized (listenersMap) {
-					for (final ChangeListener l : listenersMap.get(r)) {
-						l.valueChanged(key, newValue);
-					}
+			final Roles r = Roles.valueOf(key);
+			synchronized (listenersMap) {
+				for (final ChangeListener l : listenersMap.get(r)) {
+					l.valueChanged(key, newValue);
 				}
-			} catch (final IllegalArgumentException e) {
-				// TODO log
 			}
 		});
 

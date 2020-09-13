@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.QMLReceivableEvent;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 
@@ -42,7 +43,7 @@ public class App {
 	/**
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 		/**
 		 * @param e Event to handle
 		 */
@@ -81,11 +82,11 @@ public class App {
 	public static void main(final String[] args) throws Exception {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLSingletonModel<StopLightRoles> model = app.getModelFactory().createSingletonModel("model",
-				StopLightRoles.class);
+				StopLightRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
 		final JQMLButtonModel button = app.getModelFactory().createButtonModel("walkModel");
 		button.setText("Walk");
 		button.registerOnClicked(() -> System.out.println("Request Walk Signal"));
-		button.registerHoverChanged((b) -> System.out.println(b ? "Hovered" : "Not Hovered"));
+		button.registerHoverChanged(b -> System.out.println(b ? "Hovered" : "Not Hovered"));
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 

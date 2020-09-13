@@ -1,6 +1,6 @@
 #
 # The MIT License
-# Copyright © 2019 Stephen Dankbar
+# Copyright © 2020 Stephen Dankbar
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -34,29 +34,43 @@ DEFINES += JAQUMAL_LIBRARY
 
 INCLUDEPATH += include
 
+win32 {
+    INCLUDEPATH += "$$getenv(JAVA_HOME)\include" \
+                   "$$getenv(JAVA_HOME)\include\win32"
+} else {
+        INCLUDEPATH += "$$getenv(JAVA_HOME)/include" \
+                   "$$getenv(JAVA_HOME)/include/unix"
+}
+
 SOURCES += \
-    impl/qmllibobject.cpp \
-    impl/genericlistmodel.cpp \
+    impl/applicationfunctions.cpp \
+    impl/eventfunctions.cpp \
+    impl/flattreemodelfunctions.cpp \
+    impl/fontfunctions.cpp \
     impl/eventbuilder.cpp \
-    impl/genericobjectmodel.cpp \
-    impl/genericflattreemodel.cpp \
+    impl/listmodelfunctions.cpp \
     impl/qmllogging.cpp \
-    impl/qmlinterface.cpp \
     impl/eventdispatcher.cpp \
+    impl/singletonmodelfunctions.cpp \
     impl/userinputsimulator.cpp \
     impl/qmlimageprovider.cpp \
     impl/jpolyline.cpp \
-    impl/qmltest.cpp
+    impl/qmltest.cpp \
+    impl/qmldatatransfer.cpp \
+    impl/jniutilities.cpp
 
 HEADERS += \
-    include/qmllibobject.h \
-    include/genericlistmodel.h \
+    include/applicationfunctions.h \
+    include/eventfunctions.h \
+    include/flattreemodelfunctions.h \
+    include/fontfunctions.h \
+    include/jniutilities.h \
+    include/listmodelfunctions.h \
+    include/qmldatatransfer.h \
     include/eventbuilder.h \
-    include/genericobjectmodel.h \
-    include/genericflattreemodel.h \
     include/qmllogging.h \
-    include/qmlinterface.h \
     include/eventdispatcher.h \
+    include/singletonmodelfunctions.h \
     include/userinputsimulator.h \
     include/qmlimageprovider.h \
     include/jpolyline.h \

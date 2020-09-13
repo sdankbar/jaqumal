@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ import java.util.Optional;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.ListListener;
+import com.github.sdankbar.qml.models.list.SignalLock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -91,12 +92,12 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 
 	@Override
 	public boolean addAll(final Collection<? extends Map<K, JVariant>> arg0) {
-		return delegate.addAll(arg0.stream().map(m -> new HashMap<>(m)).collect(ImmutableList.toImmutableList()));
+		return delegate.addAll(arg0.stream().map(HashMap::new).collect(ImmutableList.toImmutableList()));
 	}
 
 	@Override
 	public boolean addAll(final int arg0, final Collection<? extends Map<K, JVariant>> arg1) {
-		return delegate.addAll(arg0, arg1.stream().map(m -> new HashMap<>(m)).collect(ImmutableList.toImmutableList()));
+		return delegate.addAll(arg0, arg1.stream().map(HashMap::new).collect(ImmutableList.toImmutableList()));
 	}
 
 	@Override
@@ -255,6 +256,23 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	@Override
 	public void unregisterListener(final ListListener<K> l) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void assign(final List<Map<K, JVariant>> list) {
+		delegate.clear();
+		delegate.addAll(list);
+	}
+
+	@Override
+	public void assign(final int row, final Map<K, JVariant> map) {
+		delegate.get(row).clear();
+		delegate.get(row).putAll(map);
+	}
+
+	@Override
+	public SignalLock lockSignals() {
+		return new SignalLock(null);
 	}
 
 }

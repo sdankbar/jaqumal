@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,12 @@
  */
 package com.github.sdankbar.qml.models.singleton;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 public class JQMLBusyIndicatorModel {
 
@@ -55,7 +55,7 @@ public class JQMLBusyIndicatorModel {
 			.build();
 
 	public JQMLBusyIndicatorModel(final String modelName, final JQMLApplication<?> app) {
-		model = app.getModelFactory().createSingletonModel(modelName, Roles.class);
+		model = app.getModelFactory().createSingletonModel(modelName, Roles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.ModelName, new JVariant(modelName));
 		model.put(Roles.Running, new JVariant(false));
@@ -67,15 +67,11 @@ public class JQMLBusyIndicatorModel {
 		model.put(Roles.Height, new JVariant(50));
 
 		model.registerChangeListener((key, newValue) -> {
-			try {
-				final Roles r = Roles.valueOf(key);
-				synchronized (listenersMap) {
-					for (final ChangeListener l : listenersMap.get(r)) {
-						l.valueChanged(key, newValue);
-					}
+			final Roles r = Roles.valueOf(key);
+			synchronized (listenersMap) {
+				for (final ChangeListener l : listenersMap.get(r)) {
+					l.valueChanged(key, newValue);
 				}
-			} catch (final IllegalArgumentException e) {
-				// TODO log
 			}
 		});
 	}

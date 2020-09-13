@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import java.util.Map;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 
@@ -42,7 +43,7 @@ public class App {
 	 *
 	 *
 	 */
-	public static interface EventProcessor {
+	public interface EventProcessor {
 
 		/**
 		 * @param e
@@ -60,7 +61,8 @@ public class App {
 	}
 
 	private enum PresetColorsRoles {
-		colorName, colorRGB
+		colorName,
+		colorRGB
 	}
 
 	/**
@@ -70,7 +72,7 @@ public class App {
 	public static void main(final String[] args) throws Exception {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new ColorEventFactory());
 		final JQMLListModel<PresetColorsRoles> model = app.getModelFactory().createListModel("presetColors",
-				PresetColorsRoles.class);
+				PresetColorsRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
 		final ColorReadWrite crw = new ColorReadWrite();
 

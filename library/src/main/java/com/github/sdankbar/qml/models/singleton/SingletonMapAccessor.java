@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,10 @@
  */
 package com.github.sdankbar.qml.models.singleton;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-
-import com.github.sdankbar.qml.JQMLExceptionHandling;
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.jna.singleton.SingletonQMLAPIFast;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
+import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
 import com.github.sdankbar.qml.models.MapAccessor;
 
 /**
@@ -42,61 +34,45 @@ import com.github.sdankbar.qml.models.MapAccessor;
  */
 public class SingletonMapAccessor extends MapAccessor {
 
-	/**
-	 * Constructor.
-	 *
-	 * @param javaToCppMemory Memory used for Java to C++ communication.
-	 * @param cppToJavaMemory Memory used for C++ to Java communication.
-	 */
-	public SingletonMapAccessor(final SharedJavaCppMemory javaToCppMemory, final SharedJavaCppMemory cppToJavaMemory) {
-		super(javaToCppMemory, cppToJavaMemory);
-	}
-
 	@Override
 	public void clear() {
-		SingletonQMLAPIFast.clearGenericObjectModel(modelPointer);
-		JQMLExceptionHandling.checkExceptions();
+		SingletonModelFunctions.clearGenericObjectModel(modelPointer);
+
 	}
 
 	@Override
-	public Optional<JVariant> get(final int roleIndex, final IntByReference length) {
-		final Pointer received = SingletonQMLAPIFast.getGenericObjectModelData(modelPointer, roleIndex, length);
-		JQMLExceptionHandling.checkExceptions();
-		return deserialize(received, length.getValue());
+	public Optional<JVariant> get(final int roleIndex) {
+		final JVariant received = SingletonModelFunctions.getGenericObjectModelData(modelPointer, roleIndex);
+		return Optional.ofNullable(received);
 	}
 
 	@Override
-	public Optional<JVariant> remove(final int roleIndex, final IntByReference length) {
-		final Optional<JVariant> existingValue = get(roleIndex, length);
+	public Optional<JVariant> remove(final int roleIndex) {
+		final Optional<JVariant> existingValue = get(roleIndex);
 
-		SingletonQMLAPIFast.clearGenericObjectModelRole(modelPointer, roleIndex);
-		JQMLExceptionHandling.checkExceptions();
+		SingletonModelFunctions.clearGenericObjectModelRole(modelPointer, roleIndex);
 
 		return existingValue;
 	}
 
 	@Override
 	public void set(final JVariant value, final int roleIndex) {
-		value.serialize(javaToCppMemory);
-		SingletonQMLAPIFast.setGenericObjectModelData(modelPointer, javaToCppMemory.getPointer(), roleIndex);
-		JQMLExceptionHandling.checkExceptions();
+		value.sendToQML(roleIndex);
+		SingletonModelFunctions.setGenericObjectModelData(modelPointer);
 	}
 
 	@Override
-	public void set(final Map<Integer, JVariant> valuesMap) {
-		final List<JVariant> values = new ArrayList<>(valuesMap.size());
-		final int[] roles = new int[valuesMap.size()];
-		int i = 0;
-		for (final Map.Entry<Integer, JVariant> e : valuesMap.entrySet()) {
-			values.add(e.getValue());
-			roles[i] = e.getKey().intValue();
-			++i;
-		}
+	public void set(final int[] roles, final JVariant[] data) {
+		sendToQML(roles, data);
 
-		JVariant.serialize(values, javaToCppMemory);
-		SingletonQMLAPIFast.setGenericObjectModelDataMulti(modelPointer, javaToCppMemory.getPointer(), roles,
-				valuesMap.size());
-		JQMLExceptionHandling.checkExceptions();
+		SingletonModelFunctions.setGenericObjectModelData(modelPointer);
+	}
+
+	@Override
+	public void assign(final int[] roles, final JVariant[] data) {
+		sendToQML(roles, data);
+
+		SingletonModelFunctions.assignGenericObjectModelData(modelPointer);
 	}
 
 }

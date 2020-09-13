@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -190,27 +190,27 @@ void MockSetup::qmlEngineAvailable(QQmlEngine *engine)
     engine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));
 }
 
-int runQMLTest(const char* pathToQMLTestFile, char** importPaths, int importPathsCount)
+int runQMLTest(const std::string& pathToQMLTestFile, std::vector<std::string>& importPaths)
 {
     QTEST_SET_MAIN_SOURCE_PATH;
 
     int argc = 3;
-    if (importPathsCount > 0)
+    if (!importPaths.empty())
     {
-        argc = 4 + importPathsCount;
+        argc = 4 + importPaths.size();
     }
 
     char** argv = new char*[argc];
     argv[0] = strdup("");
     argv[1] = strdup("-input");
-    argv[2] = strdup(pathToQMLTestFile);
+    argv[2] = strdup(pathToQMLTestFile.c_str());
 
-    if (importPathsCount > 0)
+    if (!importPaths.empty())
     {
         argv[3] = strdup("-import");
-        for (int i = 0; i < importPathsCount; ++i)
+        for (size_t i = 0; i < importPaths.size(); ++i)
         {
-            argv[4 + i] = strdup(importPaths[i]);
+            argv[4 + i] = strdup(importPaths[i].c_str());
         }
     }
 

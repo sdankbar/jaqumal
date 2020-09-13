@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,52 +22,30 @@
  */
 package com.github.sdankbar.qml.models;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
-import com.google.common.base.Preconditions;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.cpp.memory.SharedJavaCppMemory;
 
 /**
  * Abstract class for modifying maps contained in QML models.
  */
 public abstract class MapAccessor {
 
-	protected final SharedJavaCppMemory javaToCppMemory;
-	protected final SharedJavaCppMemory cppToJavaMemory;
+	protected long modelPointer;
 
-	protected Pointer modelPointer;
-
-	protected MapAccessor(final SharedJavaCppMemory javaToCppMemory, final SharedJavaCppMemory cppToJavaMemory) {
-		this.javaToCppMemory = Objects.requireNonNull(javaToCppMemory, "javaToCppMemory is null");
-		this.cppToJavaMemory = Objects.requireNonNull(cppToJavaMemory, "cppToJavaMemory is null");
-	}
+	/**
+	 * Assigns the passed in map to this map. Equivalent to clear() followed by
+	 * putAll().
+	 *
+	 * @param roles Array of the role integers.
+	 * @param data  Array of the JVariants.
+	 */
+	public abstract void assign(int[] roles, JVariant[] data);
 
 	/**
 	 * Remove all values from the map.
 	 */
 	public abstract void clear();
-
-	protected Optional<JVariant> deserialize(final Pointer p, final int length) {
-		Preconditions.checkArgument(length >= 0, "length must be positive.");
-
-		if (p == null || Pointer.nativeValue(p) == 0) {
-			return Optional.empty();
-		} else if (Pointer.nativeValue(cppToJavaMemory.getPointer()) == Pointer.nativeValue(p)) {
-			return JVariant.deserialize(cppToJavaMemory.getBuffer(0));
-		} else {
-			final ByteBuffer buffer = p.getByteBuffer(0, length);
-			buffer.order(ByteOrder.nativeOrder());
-			return JVariant.deserialize(buffer);
-		}
-	}
 
 	/**
 	 * Return the map's value for the role.
@@ -77,15 +55,7 @@ public abstract class MapAccessor {
 	 *                  of the serialized data being returned.
 	 * @return Value of the role or Optional.empty()
 	 */
-	public abstract Optional<JVariant> get(final int roleIndex, IntByReference length);
-
-	/**
-	 * @return A reference to the shared memory used to send data between Java and
-	 *         C++,
-	 */
-	public SharedJavaCppMemory getJavaToCppMemory() {
-		return javaToCppMemory;
-	}
+	public abstract Optional<JVariant> get(final int roleIndex);
 
 	/**
 	 * Removes the map's value for the role.
@@ -95,7 +65,7 @@ public abstract class MapAccessor {
 	 *                  of the serialized data being returned.
 	 * @return Existing Value of the role or Optional.empty() if it had no value.
 	 */
-	public abstract Optional<JVariant> remove(int roleIndex, final IntByReference length);
+	public abstract Optional<JVariant> remove(int roleIndex);
 
 	/**
 	 * Puts a new value into the map.
@@ -108,17 +78,25 @@ public abstract class MapAccessor {
 	/**
 	 * Puts all of the values in valuesMap into the map.
 	 *
-	 * @param valuesMap Map to insert into this map.
+	 * @param roles Array of the role integers.
+	 * @param data  Array of the JVariants.
 	 */
-	public abstract void set(Map<Integer, JVariant> valuesMap);
+	public abstract void set(int[] roles, JVariant[] data);
 
 	/**
 	 * Sets the pointer to the C++ model behind this map.
 	 *
 	 * @param modelPointer Pointer to the C++ model.
 	 */
-	public void setModelPointer(final Pointer modelPointer) {
-		this.modelPointer = Objects.requireNonNull(modelPointer, "modelPointer is null");
+	public void setModelPointer(final long modelPointer) {
+		this.modelPointer = modelPointer;
+	}
+
+	protected void sendToQML(final int[] roles, final JVariant[] data) {
+		final int size = roles.length;
+		for (int i = 0; i < size; ++i) {
+			data[i].sendToQML(roles[i]);
+		}
 	}
 
 }

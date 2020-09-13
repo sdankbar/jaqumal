@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright © 2019 Stephen Dankbar
+ * Copyright © 2020 Stephen Dankbar
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,13 +32,14 @@ import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 
 /**
  * Model for measuring various QML/Qt metrics.
  */
 public class JQMLPerformanceModel implements BuiltinEventProcessor {
 
-	private static enum Roles {
+	private enum Roles {
 		ModelName, //
 		AVERAGE_RENDER_TIME_MILLI, //
 		AVERAGE_TOTAL_TIME_MILLI, //
@@ -67,7 +68,7 @@ public class JQMLPerformanceModel implements BuiltinEventProcessor {
 	public JQMLPerformanceModel(final String modelName, final JQMLModelFactory factory) {
 		Objects.requireNonNull(factory, "factory is null");
 
-		model = factory.createSingletonModel(modelName, Roles.class);
+		model = factory.createSingletonModel(modelName, Roles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.ModelName, new JVariant(modelName));
 		model.put(Roles.AVERAGE_RENDER_TIME_MILLI, new JVariant(1));
@@ -80,19 +81,19 @@ public class JQMLPerformanceModel implements BuiltinEventProcessor {
 	@Override
 	public void handle(final RenderEvent e) {
 		switch (e.getType()) {
-		case AFTER_RENDER:
-			lastAfterRender = e.getEventTime();
-			break;
-		case BEFORE_RENDER:
-			lastBeforeRender = e.getEventTime();
-			break;
-		case BEFORE_SYNC:
-			lastBeforeSync = e.getEventTime();
-			break;
-		case FRAME_SWAP:
-			lastFrameSwapped = e.getEventTime();
-			updateStatistics();
-			break;
+			case AFTER_RENDER:
+				lastAfterRender = e.getEventTime();
+				break;
+			case BEFORE_RENDER:
+				lastBeforeRender = e.getEventTime();
+				break;
+			case BEFORE_SYNC:
+				lastBeforeSync = e.getEventTime();
+				break;
+			case FRAME_SWAP:
+				lastFrameSwapped = e.getEventTime();
+				updateStatistics();
+				break;
 		}
 	}
 
