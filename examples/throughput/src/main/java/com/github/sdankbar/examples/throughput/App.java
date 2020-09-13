@@ -144,7 +144,7 @@ public class App {
 		R99,
 	}
 
-	private static final int SIZE = 25;
+	private static final int SIZE = 250;
 	private static final int maxCoord = 800;
 	private static final Random rand = new Random();
 

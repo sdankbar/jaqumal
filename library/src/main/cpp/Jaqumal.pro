@@ -1,6 +1,6 @@
 #
 # The MIT License
-# Copyright © 2019 Stephen Dankbar
+# Copyright © 2020 Stephen Dankbar
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
