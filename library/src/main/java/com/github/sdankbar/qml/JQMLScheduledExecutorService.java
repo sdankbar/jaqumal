@@ -64,6 +64,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		private final FutureTask<T> future;
 
 		private final BlockingQueue<T> invokeAnyQueue;
+		private final AtomicBoolean wasInvoked = new AtomicBoolean(false);
 
 		public ImmediateTask(final AtomicBoolean isRunning, final Set<ImmediateTask<?>> taskSet,
 				final FutureTask<T> future, final BlockingQueue<T> invokeAnyQueue) {
@@ -77,6 +78,8 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 
 		@Override
 		public void invoke() {
+			wasInvoked.set(true);
+
 			// TODO check if there is a race condition with invokeAny() then immediately
 			// call shutdown().
 			if (isRunning.get()) {
@@ -155,7 +158,6 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 
 	@Override
 	public void execute(final Runnable command) {
-		throwIfNotRunning();
 		submit(command);
 	}
 
@@ -288,6 +290,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 	public void shutdown() {
 		isRunning.set(false);
 		delayedExecutor.shutdown();
+		pendingCallbacks.removeIf(e -> !e.wasInvoked.get());
 	}
 
 	@Override
@@ -297,6 +300,7 @@ public class JQMLScheduledExecutorService implements ScheduledExecutorService {
 		final List<Runnable> list = new ArrayList<>(
 				pendingCallbacks.stream().map(a -> a.future).collect(Collectors.toList()));
 		list.addAll(delayedExecutor.shutdownNow());
+		pendingCallbacks.removeIf(e -> !e.wasInvoked.get());
 		return list;
 	}
 
