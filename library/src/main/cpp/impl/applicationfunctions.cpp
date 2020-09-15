@@ -141,10 +141,7 @@ JNICALL int runQMLTests(JNIEnv* env, jclass, jstring pathToQMLTestFile, jobjectA
     for (int i = 0; i < count; ++i)
     {
         jstring str = static_cast<jstring>(env->GetObjectArrayElement(importPaths, i));
-        const char* array = env->GetStringUTFChars(str, NULL);
-        std::string temp(array);
-        env->ReleaseStringUTFChars(str, array);
-        paths.push_back(temp);
+        paths.push_back(JNIUtilities::toString(env, str));
     }
     return runQMLTest(path, paths);
 }
@@ -329,10 +326,10 @@ ApplicationFunctions::ApplicationFunctions(int32_t& argc, char** argv) :
 
 ApplicationFunctions::~ApplicationFunctions()
 {
-    m_qmlEngine->clearComponentCache();
-
     if (m_qapp)
     {
+        m_qmlEngine->clearComponentCache();
+
         m_qapp->closeAllWindows();
 
         QList<QObject*> roots = m_qmlEngine->rootObjects();
@@ -421,10 +418,10 @@ jobject ApplicationFunctions::createJScreen(JNIEnv* env, int32_t x, int32_t y, i
     return env->NewObject(jscreenClass, jscreenContructor, x, y, w, h, dpi);
 }
 
-std::function<QImage(std::string,int32_t,int32_t)> ApplicationFunctions::createImageProviderFunctionCallback(JNIEnv* env, jobject obj)
+std::function<QImage(const QString&,int32_t,int32_t)> ApplicationFunctions::createImageProviderFunctionCallback(JNIEnv* env, jobject obj)
 {
-    std::function<QImage(std::string,int32_t,int32_t)> func = [=] (std::string id, int32_t w, int32_t h) {
-        jstring jStr = env->NewStringUTF(id.c_str());
+    std::function<QImage(const QString&,int32_t,int32_t)> func = [=] (const QString& id, int32_t w, int32_t h) {
+        jstring jStr = JNIUtilities::toJString(env, id);
         jobject bufferedImage = env->CallObjectMethod(obj, imageProviderInvoke, jStr, w, h);
         env->DeleteLocalRef(jStr);
 
@@ -480,12 +477,10 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
     }
     else
     {
-        // TODO optimize
-        const int32_t copyLength = 4 * w * h;
-        unsigned char* copy = new unsigned char[copyLength];
-        jint* jData = env->GetIntArrayElements(pixelData, nullptr);
-        memcpy(copy, jData, copyLength);
-        env->ReleaseIntArrayElements(pixelData, jData, JNI_ABORT);
+        const int32_t pixels = w * h;
+        const int32_t byteCount = 4 * pixels;
+        unsigned char* copy = new unsigned char[byteCount];
+        env->GetIntArrayRegion(pixelData, 0, pixels,  reinterpret_cast<jint*>(copy));
         return QImage(copy, w, h, QImage::Format_ARGB32, &cleanupMemory2);
     }
 }

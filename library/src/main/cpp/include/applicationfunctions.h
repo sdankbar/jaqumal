@@ -54,7 +54,7 @@ public:
     QList<QScreen*> getScreensList();
     jobjectArray createJScreenArray(JNIEnv* env, int32_t length);
     jobject createJScreen(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h, double dpi);
-    std::function<QImage(std::string,int32_t,int32_t)> createImageProviderFunctionCallback(JNIEnv* env, jobject obj);
+    std::function<QImage(const QString&,int32_t,int32_t)> createImageProviderFunctionCallback(JNIEnv* env, jobject obj);
 
     void addToContext(const QString& name, const QVariant& value);
 

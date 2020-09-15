@@ -30,11 +30,11 @@
 class QMLImageProvider : public QQuickImageProvider
 {
 public:
-    explicit QMLImageProvider(std::function<QImage(std::string,int32_t,int32_t)> javaImageProviderCallback);
+    explicit QMLImageProvider(std::function<QImage(const QString&,int32_t,int32_t)> javaImageProviderCallback);
     virtual ~QMLImageProvider() override;
 
     virtual QImage requestImage(const QString& id, QSize* size, const QSize& requestedSize) override;
 private:
 
-    std::function<QImage(std::string,int32_t,int32_t)> javaImageProviderCallback;
+    std::function<QImage(const QString&,int32_t,int32_t)> javaImageProviderCallback;
 };

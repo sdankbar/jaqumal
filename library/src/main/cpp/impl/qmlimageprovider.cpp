@@ -22,7 +22,7 @@
  */
 #include "qmlimageprovider.h"
 
-QMLImageProvider::QMLImageProvider(std::function<QImage(std::string,int32_t,int32_t)> callback) :
+QMLImageProvider::QMLImageProvider(std::function<QImage(const std::string&,int32_t,int32_t)> callback) :
     QQuickImageProvider(QQuickImageProvider::Image),
     javaImageProviderCallback(callback)
 {
