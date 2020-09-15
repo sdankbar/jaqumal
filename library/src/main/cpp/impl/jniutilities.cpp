@@ -140,7 +140,7 @@ std::string JNIUtilities::toString(JNIEnv* env, jstring str)
     return stdString;
 }
 
-jstring toJString(JNIEnv* env, const QString& str)
+jstring JNIUtilities::toJString(JNIEnv* env, const QString& str)
 {
     return env->NewString(reinterpret_cast<const jchar*>(str.constData()), str.length());
 }

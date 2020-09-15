@@ -87,7 +87,6 @@ jlong JNICALL createGenericFlatTreeModel(JNIEnv* env, jclass, jstring modelName,
             int index = roleArray[i];
             roleNameMap[index] = n.toUtf8();
         }
-
         env->ReleaseIntArrayElements(roleIndices, roleArray, JNI_ABORT);
 
 
@@ -256,7 +255,7 @@ void JNICALL reorderGenericFlatTreeModel(JNIEnv* env, jclass, jlong pointer, jin
         auto modelPtr = reinterpret_cast<GenericFlatTreeModel*>(pointer);
         std::deque<int32_t> indicies = toTreePath(env, path);
 
-        size_t length = env->GetArrayLength(ordering);
+        const size_t length = env->GetArrayLength(ordering);
         jint* array = env->GetIntArrayElements(ordering, nullptr);
         std::vector<int32_t> orderingVec;
         orderingVec.resize(length);
@@ -264,6 +263,7 @@ void JNICALL reorderGenericFlatTreeModel(JNIEnv* env, jclass, jlong pointer, jin
         {
             orderingVec[i] = array[i];
         }
+        env->ReleaseIntArrayElements(ordering, array, JNI_ABORT);
 
         modelPtr->reorder(indicies, orderingVec);
     }
@@ -323,7 +323,7 @@ void FlatTreeModelFunctions::initialize(JNIEnv* env)
 
 void FlatTreeModelFunctions::uninitialize(JNIEnv*)
 {
-
+    // Empty Implementation
 }
 
 

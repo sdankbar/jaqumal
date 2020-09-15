@@ -26,7 +26,8 @@ QSet<EventDispatcher*> EventDispatcher::allDispatchers;
 
 void EventDispatcher::sendToDispatchers(const QString& eventName, const QVariantMap& args)
 {
-    for (EventDispatcher* d: allDispatchers) {
+    for (EventDispatcher* d: allDispatchers)
+    {
         d->sendTo(eventName, args);
     }
 }
@@ -49,14 +50,18 @@ const QStringList& EventDispatcher::allowedEvents() const
 
 void EventDispatcher::setAllowedEvents(const QStringList& newAllowedEvents)
 {
-    m_allowedEvents = newAllowedEvents;
-    m_fastAllowedEvents = QSet<QString>::fromList(newAllowedEvents);
-    emit allowedEventsChanged();
+    if (m_allowedEvents != newAllowedEvents)
+    {
+        m_allowedEvents = newAllowedEvents;
+        m_fastAllowedEvents = QSet<QString>::fromList(newAllowedEvents);
+        emit allowedEventsChanged();
+    }
 }
 
 void EventDispatcher::sendTo(const QString& eventName, const QVariantMap& args)
 {
-    if (m_fastAllowedEvents.contains(eventName)) {
+    if (m_fastAllowedEvents.contains(eventName))
+    {
         emit eventReceived(eventName, args);
     }
 }

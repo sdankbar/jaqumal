@@ -22,7 +22,7 @@
  */
 #include "qmlimageprovider.h"
 
-QMLImageProvider::QMLImageProvider(std::function<QImage(const std::string&,int32_t,int32_t)> callback) :
+QMLImageProvider::QMLImageProvider(std::function<QImage(const QString&,int32_t,int32_t)> callback) :
     QQuickImageProvider(QQuickImageProvider::Image),
     javaImageProviderCallback(callback)
 {
@@ -47,7 +47,7 @@ QImage QMLImageProvider::requestImage(const QString& id, QSize* size, const QSiz
       correctedHeight = requestedSize.height();
     }
     
-    QImage ret = javaImageProviderCallback(id.toStdString(), correctedWidth, correctedHeight);
+    QImage ret = javaImageProviderCallback(id, correctedWidth, correctedHeight);
     if (size)
     {
         *size = ret.size();
