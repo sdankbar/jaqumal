@@ -53,6 +53,8 @@ Window {
             	model.R90 + model.R91 + model.R92 +model.R93 +model.R94 +model.R95 + model.R96 + model.R97 + model.R98 + model.R99
             x: model.x
             y: model.y
+
+            textFormat: Text.PlainText
         }
     }
 }

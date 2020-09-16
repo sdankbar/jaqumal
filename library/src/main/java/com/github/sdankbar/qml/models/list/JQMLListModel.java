@@ -202,9 +202,10 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	/**
 	 * To be used in a try with resources block.
 	 *
-	 * Locks the list model from emitting signals to QML to indicates data has been
-	 * updated. Instead signals that the entire model has changed. This can be
-	 * faster than signal each entry individually.
+	 * Locks the list model from emitting signals to QML to indicate data has been
+	 * updated. Instead signals that the entire model has changed when the lock is
+	 * closed. This can be faster than signal each entry individually depending on
+	 * how much of the model has changed.
 	 *
 	 * @return Lock to be used in the try with resources to ensure the model is
 	 *         unlocked.
