@@ -89,6 +89,10 @@ public class InvokableWrapper {
 		handlesMap = ImmutableMap.copyOf(findAnnotatedFunctions(invokable));
 	}
 
+	public Object getInvokedObject() {
+		return invokable;
+	}
+
 	public void invoke(final String methodName, final QMLRequestParser parser) {
 		final Method handle = handlesMap.get(methodName);
 		if (handle != null) {
@@ -105,7 +109,7 @@ public class InvokableWrapper {
 				log.warn("Caught Throwable while invoking method", e);
 			}
 		} else {
-			log.warn("[" + methodName + "] is not an invokable method on " + invokable);
+			log.warn("[{}] is not an invokable method on [{}]", methodName, invokable);
 		}
 	}
 

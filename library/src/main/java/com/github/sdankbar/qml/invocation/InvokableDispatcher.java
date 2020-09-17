@@ -22,15 +22,45 @@
  */
 package com.github.sdankbar.qml.invocation;
 
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InvokableDispatcher<T> {
+import com.github.sdankbar.qml.QtThread;
+import com.github.sdankbar.qml.utility.QMLRequestParser;
+import com.google.common.base.Preconditions;
+
+public class InvokableDispatcher {
 
 	private static final Logger log = LoggerFactory.getLogger(InvokableDispatcher.class);
 
-	public void registerInvokable(final Object obj) {
+	private final Map<String, InvokableWrapper> invokables = new HashMap<>();
 
+	public InvokableDispatcher() {
+		// TODO register for c++ call
+	}
+
+	@QtThread
+	public void registerInvokable(final String name, final Object obj) {
+		Objects.requireNonNull(name, "name is null");
+		Objects.requireNonNull(obj, "obj is null");
+		Preconditions.checkArgument(!invokables.containsKey(name), "[%s] is already registered", name);
+
+		invokables.put(name, new InvokableWrapper(obj));
+	}
+
+	public void invoke(final String invokableName, final String methodName, final ByteBuffer data) {
+		final QMLRequestParser parser = new QMLRequestParser(data);
+		final InvokableWrapper wrapper = invokables.get(invokableName);
+		if (wrapper != null) {
+			wrapper.invoke(methodName, parser);
+		} else {
+			log.warn("[{}] is not a valid invokable", invokableName);
+		}
 	}
 
 }
