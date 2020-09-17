@@ -20,26 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.invokation;
-
-import java.util.Objects;
+package com.github.sdankbar.qml.invocation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InvocableWrapper {
+public class InvocableDispatcher<T> {
 
-	private static final Logger log = LoggerFactory.getLogger(InvocableWrapper.class);
+	private static final Logger log = LoggerFactory.getLogger(InvocableDispatcher.class);
 
-	private final Object invokable;
-
-	protected InvocableWrapper(final Object invokable) {
-		this.invokable = Objects.requireNonNull(invokable, "invokable is null");
-
-		// TODO get invokable methods and cache them
-	}
-
-	public void invoke(final String methodName) {
+	public void registerInvokable(final Object obj) {
 
 	}
 
