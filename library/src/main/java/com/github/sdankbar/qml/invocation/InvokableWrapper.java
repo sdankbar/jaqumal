@@ -26,9 +26,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.HashMap;
@@ -53,39 +50,39 @@ public class InvokableWrapper {
 			Dimension.class, double.class, Double.class, float.class, Float.class, Instant.class, int.class,
 			Integer.class, long.class, Long.class, Point2D.class, Rectangle2D.class, String.class);
 
-	private static Map<String, MethodHandle> findAnnotatedFunctions(final Object invokable) {
-		final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-
-		final Map<String, MethodHandle> methodMap = new HashMap<>();
+	private static Map<String, Method> findAnnotatedFunctions(final Object invokable) {
+		final Map<String, Method> methodMap = new HashMap<>();
 		for (final Method m : invokable.getClass().getDeclaredMethods()) {
 			if (m.isAnnotationPresent(JInvokable.class)) {
-				methodMap.put(m.getName(), toMethodHandle(m, lookup).bindTo(invokable));
+				methodMap.put(m.getName(), validateMethod(m));
 			}
 		}
 
 		return methodMap;
 	}
 
-	private static MethodHandle toMethodHandle(final Method m, final MethodHandles.Lookup lookup) {
+	private static Method validateMethod(final Method m) {
 		try {
-			final MethodHandle h = lookup.unreflect(m);
-
-			final int count = h.type().parameterCount();
-			if (count > 1) {
-				for (final Class<?> arg : h.type().parameterList().subList(1, count)) {
+			final Class<?>[] params = m.getParameterTypes();
+			if (params.length == 1) {
+				final Class<?> arg = params[0];
+				Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg) || arg.equals(QMLRequestParser.class),
+						"Class not supported as method parameter: {}", arg);
+			} else {
+				for (final Class<?> arg : params) {
 					Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg),
 							"Class not supported as method parameter: {}", arg);
 				}
 			}
 
-			return h;
-		} catch (IllegalAccessException | SecurityException | IllegalArgumentException e) {
+			return m;
+		} catch (SecurityException | IllegalArgumentException e) {
 			throw new QMLException("Unable to reflect method for " + m, e);
 		}
 	}
 
 	private final Object invokable;
-	private final ImmutableMap<String, MethodHandle> handlesMap;
+	private final ImmutableMap<String, Method> handlesMap;
 
 	public InvokableWrapper(final Object invokable) {
 		this.invokable = Objects.requireNonNull(invokable, "invokable is null");
@@ -93,18 +90,17 @@ public class InvokableWrapper {
 	}
 
 	public void invoke(final String methodName, final QMLRequestParser parser) {
-		final MethodHandle handle = handlesMap.get(methodName);
+		final Method handle = handlesMap.get(methodName);
 		if (handle != null) {
-			final MethodType type = handle.type();
-			final int count = type.parameterCount();
-			final Object[] parameterList = new Object[count];
+			final Class<?>[] type = handle.getParameterTypes();
+			final Object[] parameterList = new Object[type.length];
 
-			for (int i = 0; i < count; ++i) {
-				parameterList[i] = parser.getDataBasedOnClass(type.parameterType(i));
+			for (int i = 0; i < type.length; ++i) {
+				parameterList[i] = parser.getDataBasedOnClass(type[i]);
 			}
 
 			try {
-				handle.invokeWithArguments(parameterList);
+				handle.invoke(invokable, parameterList);
 			} catch (final Throwable e) {
 				log.warn("Caught Throwable while invoking method", e);
 			}
