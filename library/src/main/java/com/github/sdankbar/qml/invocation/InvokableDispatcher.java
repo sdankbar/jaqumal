@@ -25,9 +25,9 @@ package com.github.sdankbar.qml.invocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InvocableDispatcher<T> {
+public class InvokableDispatcher<T> {
 
-	private static final Logger log = LoggerFactory.getLogger(InvocableDispatcher.class);
+	private static final Logger log = LoggerFactory.getLogger(InvokableDispatcher.class);
 
 	public void registerInvokable(final Object obj) {
 

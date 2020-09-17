@@ -34,7 +34,7 @@ import com.github.sdankbar.qml.utility.QMLRequestParser;
 /**
  * Tests the RefectiveEventFactory.
  */
-public class InvocationWrapperTest {
+public class InvokableWrapperTest {
 
 	/**
 	 *
@@ -67,7 +67,7 @@ public class InvocationWrapperTest {
 	@Test
 	public void testInvokeBoolean() {
 		final InvokeObject obj = new InvokeObject();
-		final InvocableWrapper wrapper = new InvocableWrapper(obj);
+		final InvokableWrapper wrapper = new InvokableWrapper(obj);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
 		buffer.put((byte) 1);
@@ -84,7 +84,7 @@ public class InvocationWrapperTest {
 	@Test
 	public void testInvokeInteger() {
 		final InvokeObject obj = new InvokeObject();
-		final InvocableWrapper wrapper = new InvocableWrapper(obj);
+		final InvokableWrapper wrapper = new InvokableWrapper(obj);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
 		buffer.putInt(3);
@@ -101,7 +101,7 @@ public class InvocationWrapperTest {
 	@Test
 	public void testInvokeMultipleParameters() {
 		final InvokeObject obj = new InvokeObject();
-		final InvocableWrapper wrapper = new InvocableWrapper(obj);
+		final InvokableWrapper wrapper = new InvokableWrapper(obj);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
 		buffer.putDouble(4.0);

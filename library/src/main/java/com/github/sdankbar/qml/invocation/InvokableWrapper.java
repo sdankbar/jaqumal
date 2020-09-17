@@ -47,9 +47,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-public class InvocableWrapper {
+public class InvokableWrapper {
 
-	private static final Logger log = LoggerFactory.getLogger(InvocableWrapper.class);
+	private static final Logger log = LoggerFactory.getLogger(InvokableWrapper.class);
 	private static Set<Class<?>> ALLOWED_PARAM_TYPE_SET = ImmutableSet.of(boolean.class, Boolean.class, Color.class,
 			Dimension.class, double.class, Double.class, float.class, Float.class, Instant.class, int.class,
 			Integer.class, long.class, Long.class, Point2D.class, Rectangle2D.class, String.class);
@@ -88,7 +88,7 @@ public class InvocableWrapper {
 	private final Object invokable;
 	private final ImmutableMap<String, MethodHandle> handlesMap;
 
-	protected InvocableWrapper(final Object invokable) {
+	protected InvokableWrapper(final Object invokable) {
 		this.invokable = Objects.requireNonNull(invokable, "invokable is null");
 		handlesMap = ImmutableMap.copyOf(findAnnotatedFunctions(invokable));
 	}
