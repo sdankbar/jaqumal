@@ -28,11 +28,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -60,7 +59,7 @@ public class InvokableWrapper {
 		final Map<String, MethodHandle> methodMap = new HashMap<>();
 		for (final Method m : invokable.getClass().getDeclaredMethods()) {
 			if (m.isAnnotationPresent(JInvokable.class)) {
-				methodMap.put(m.getName(), toMethodHandle(m, lookup));
+				methodMap.put(m.getName(), toMethodHandle(m, lookup).bindTo(invokable));
 			}
 		}
 
@@ -88,7 +87,7 @@ public class InvokableWrapper {
 	private final Object invokable;
 	private final ImmutableMap<String, MethodHandle> handlesMap;
 
-	protected InvokableWrapper(final Object invokable) {
+	public InvokableWrapper(final Object invokable) {
 		this.invokable = Objects.requireNonNull(invokable, "invokable is null");
 		handlesMap = ImmutableMap.copyOf(findAnnotatedFunctions(invokable));
 	}
@@ -96,12 +95,12 @@ public class InvokableWrapper {
 	public void invoke(final String methodName, final QMLRequestParser parser) {
 		final MethodHandle handle = handlesMap.get(methodName);
 		if (handle != null) {
-			final int count = handle.type().parameterCount();
-			final List<Object> parameterList = new ArrayList<>(count + 1);
-			parameterList.add(invokable);
+			final MethodType type = handle.type();
+			final int count = type.parameterCount();
+			final Object[] parameterList = new Object[count];
 
-			for (final Class<?> arg : handle.type().parameterList().subList(1, count)) {
-				parameterList.add(parser.getDataBasedOnClass(arg));
+			for (int i = 0; i < count; ++i) {
+				parameterList[i] = parser.getDataBasedOnClass(type.parameterType(i));
 			}
 
 			try {

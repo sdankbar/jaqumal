@@ -22,6 +22,7 @@
  */
 package com.github.sdankbar.qml;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -40,9 +41,11 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
+import com.github.sdankbar.qml.invocation.InvokableWrapper;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.github.sdankbar.qml.utility.QMLRequestParser;
 
 /**
  * Performance benchmarks.
@@ -56,6 +59,20 @@ public class JMHTest {
 	}
 
 	/**
+	 *
+	 *
+	 */
+	public static class InvokeObject {
+
+		long i = 0;
+
+		@JInvokable
+		public void call3(final int a, final String b) {
+			++i;
+		}
+	}
+
+	/**
 	 * Shared state.
 	 */
 	@State(Scope.Thread)
@@ -63,6 +80,8 @@ public class JMHTest {
 		JQMLApplication<NullEventProcessor> app;
 		JQMLSingletonModel<Role> singletonModel;
 		JQMLListModel<Role> listModel;
+
+		InvokableWrapper wrapper = new InvokableWrapper(new InvokeObject());
 
 		/**
 		 * Sets up shared state.
@@ -75,6 +94,7 @@ public class JMHTest {
 			listModel = app.getModelFactory().createListModel("list_model", Role.class, PutMode.RETURN_NULL);
 			listModel.add(new JVariant(1), Role.R1);
 			listModel.add(new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), Role.R2);
+
 		}
 
 		/**
@@ -132,6 +152,21 @@ public class JMHTest {
 	@Benchmark
 	public void benchmark_listModelGetString(final BenchmarkState state) {
 		state.listModel.get(1).get(Role.R2);
+	}
+
+	/**
+	 * @param state
+	 */
+	@Benchmark
+	public void benchmark_invokableWrapper(final BenchmarkState state) {
+		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.putDouble(4.0);
+		buffer.put("ABCD".getBytes());
+		buffer.put((byte) 0);
+		buffer.position(0);
+		final QMLRequestParser parser = new QMLRequestParser(buffer);
+
+		state.wrapper.invoke("call3", parser);
 	}
 
 	/**
