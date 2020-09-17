@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml.eventing;
 
+import com.github.sdankbar.qml.utility.QMLRequestParser;
+
 /**
  * Convenience EventFactory that always returns null. Helpful if the application
  * does not need Events outside of the BuiltinEvents.
@@ -38,7 +40,7 @@ public class NullEventFactory<T> implements EventFactory<T> {
 	}
 
 	@Override
-	public Event<T> create(final String type, final EventParser parser) {
+	public Event<T> create(final String type, final QMLRequestParser parser) {
 		return null;
 	}
 

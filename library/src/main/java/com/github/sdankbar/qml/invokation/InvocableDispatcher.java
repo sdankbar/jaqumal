@@ -20,28 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.examples.color_editor;
+package com.github.sdankbar.qml.invokation;
 
-import com.github.sdankbar.examples.color_editor.App.EventProcessor;
-import com.github.sdankbar.qml.eventing.Event;
-import com.github.sdankbar.qml.eventing.EventFactory;
-import com.github.sdankbar.qml.utility.QMLRequestParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- *
- */
-public class ColorEventFactory implements EventFactory<EventProcessor> {
+public class InvocableDispatcher<T> {
 
-	@Override
-	public Event<EventProcessor> create(final String type, final QMLRequestParser parser) {
-		switch (type) {
-		case "PresetColorEdited":
-			return new PresetColorEditedEvent(parser.getInteger(), parser.getColor());
-		case "PresetColorNameEdited":
-			return new PresetColorNameEditedEvent(parser.getInteger(), parser.getString());
-		default:
-			return null;
-		}
+	private static final Logger log = LoggerFactory.getLogger(InvocableDispatcher.class);
+
+	public void registerInvokable(final Object obj) {
+
 	}
 
 }

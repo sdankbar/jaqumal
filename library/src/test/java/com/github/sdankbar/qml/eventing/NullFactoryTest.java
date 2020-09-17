@@ -28,8 +28,8 @@ import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
-import com.github.sdankbar.qml.eventing.EventParser;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.utility.QMLRequestParser;
 
 /**
  * Tests the NullFactory.
@@ -42,6 +42,6 @@ public class NullFactoryTest {
 	@Test
 	public void testCreate() throws InterruptedException {
 		final NullEventFactory<?> f = new NullEventFactory<>();
-		assertNull(f.create("", new EventParser(ByteBuffer.allocate(1))));
+		assertNull(f.create("", new QMLRequestParser(ByteBuffer.allocate(1))));
 	}
 }

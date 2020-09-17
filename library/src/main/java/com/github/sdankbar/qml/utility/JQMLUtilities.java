@@ -20,52 +20,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.eventing;
+package com.github.sdankbar.qml.utility;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.concurrent.atomic.AtomicReference;
 
-import java.awt.Color;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
-import org.junit.Test;
-
-import com.github.sdankbar.qml.utility.QMLRequestParser;
+import com.github.sdankbar.qml.exceptions.QMLThreadingException;
 
 /**
- * Tests the EventParser.
+ * Common methods used by this library.
  */
-public class EventParserTest {
+public class JQMLUtilities {
 
 	/**
+	 * Throws a QMLThreadingException if the current thread does not match the
+	 * thread stored in qtThread.
 	 *
+	 * @param qtThread The QT Thread reference to compare to.
 	 */
-	@Test
-	public void getters() {
-		final ByteBuffer buffer = ByteBuffer.allocate(100);
-		buffer.put((byte) 1);
-		buffer.put((byte) 0);
-		buffer.putInt(new Color(30, 31, 32).getRGB());
-		buffer.putDouble(928.1);
-		buffer.putFloat(928.2f);
-		buffer.putInt(13);
-		buffer.putLong(14);
-
-		buffer.put("Hello".getBytes(StandardCharsets.UTF_8));
-
-		buffer.position(0);
-
-		final QMLRequestParser p = new QMLRequestParser(buffer);
-
-		assertTrue(p.getBoolean());
-		assertFalse(p.getBoolean());
-		assertEquals(p.getColor(), new Color(30, 31, 32));
-		assertEquals(p.getDouble(), 928.1, 0.0001);
-		assertEquals(p.getFloat(), 928.2, 0.0001);
-		assertEquals(p.getInteger(), 13);
-		assertEquals(p.getLong(), 14);
-		assertEquals(p.getString(), "Hello");
+	public static void checkThread(final AtomicReference<Thread> qtThread) {
+		final Thread temp = qtThread.get();
+		if (temp != null && Thread.currentThread() != temp) {
+			throw new QMLThreadingException(
+					"Attempted to invoke method from thread other than the Qt EventLoop thread");
+		}
 	}
+
+	private JQMLUtilities() {
+		// Empty Implementation
+	}
+
 }

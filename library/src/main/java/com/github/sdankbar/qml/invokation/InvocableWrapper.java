@@ -20,33 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml;
+package com.github.sdankbar.qml.invokation;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Objects;
 
-import com.github.sdankbar.qml.exceptions.QMLThreadingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Common methods used by this library.
- */
-public class JQMLUtilities {
+public class InvocableWrapper {
 
-	/**
-	 * Throws a QMLThreadingException if the current thread does not match the
-	 * thread stored in qtThread.
-	 *
-	 * @param qtThread The QT Thread reference to compare to.
-	 */
-	public static void checkThread(final AtomicReference<Thread> qtThread) {
-		final Thread temp = qtThread.get();
-		if (temp != null && Thread.currentThread() != temp) {
-			throw new QMLThreadingException(
-					"Attempted to invoke method from thread other than the Qt EventLoop thread");
-		}
+	private static final Logger log = LoggerFactory.getLogger(InvocableWrapper.class);
+
+	private final Object invokable;
+
+	protected InvocableWrapper(final Object invokable) {
+		this.invokable = Objects.requireNonNull(invokable, "invokable is null");
+
+		// TODO get invokable methods and cache them
 	}
 
-	private JQMLUtilities() {
-		// Empty Implementation
+	public void invoke(final String methodName) {
+
 	}
 
 }

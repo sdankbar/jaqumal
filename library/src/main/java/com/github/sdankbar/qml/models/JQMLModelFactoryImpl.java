@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JQMLModelFactory;
-import com.github.sdankbar.qml.JQMLUtilities;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.QtThread;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent;
@@ -48,6 +47,7 @@ import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModelImpl;
 import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
 import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
+import com.github.sdankbar.qml.utility.JQMLUtilities;
 import com.google.common.collect.ImmutableMap;
 
 /**

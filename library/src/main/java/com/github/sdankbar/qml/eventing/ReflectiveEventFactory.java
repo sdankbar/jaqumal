@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.exceptions.QMLException;
+import com.github.sdankbar.qml.utility.QMLRequestParser;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
@@ -101,7 +102,7 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 
 			if (h.type().parameterCount() == 1) {
 				final Class<?> arg = h.type().parameterType(0);
-				Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg) || arg.equals(EventParser.class),
+				Preconditions.checkArgument(ALLOWED_PARAM_TYPE_SET.contains(arg) || arg.equals(QMLRequestParser.class),
 						"Class not supported as constructor parameter: {}", arg);
 			} else {
 				for (final Class<?> arg : h.type().parameterList()) {
@@ -113,36 +114,6 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 			return h;
 		} catch (IllegalAccessException | SecurityException | IllegalArgumentException e) {
 			throw new QMLException("Unable to reflect constructor for " + c, e);
-		}
-	}
-
-	private static Object getParameter(final Class<?> c, final EventParser parser) {
-		if (c.equals(boolean.class) || c.equals(Boolean.class)) {
-			return Boolean.valueOf(parser.getBoolean());
-		} else if (c.equals(Color.class)) {
-			return parser.getColor();
-		} else if (c.equals(Dimension.class)) {
-			return parser.getDimension();
-		} else if (c.equals(double.class) || c.equals(Double.class)) {
-			return Double.valueOf(parser.getDouble());
-		} else if (c.equals(float.class) || c.equals(Float.class)) {
-			return Float.valueOf(parser.getFloat());
-		} else if (c.equals(Instant.class)) {
-			return parser.getInstant();
-		} else if (c.equals(int.class) || c.equals(Integer.class)) {
-			return Integer.valueOf(parser.getInteger());
-		} else if (c.equals(long.class) || c.equals(Long.class)) {
-			return Long.valueOf(parser.getLong());
-		} else if (c.equals(Point2D.class)) {
-			return parser.getPoint();
-		} else if (c.equals(Rectangle2D.class)) {
-			return parser.getRectangle();
-		} else if (c.equals(String.class)) {
-			return parser.getString();
-		} else if (c.equals(EventParser.class)) {
-			return parser;
-		} else {
-			throw new QMLException("Unknown parameter type in constructor");
 		}
 	}
 
@@ -187,14 +158,14 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Event<T> create(final String type, final EventParser parser) {
+	public Event<T> create(final String type, final QMLRequestParser parser) {
 		final MethodHandle h = constructorLookup.get(type);
 		if (h == null) {
 			return null;
 		} else {
 			final List<Object> parameterList = new ArrayList<>(h.type().parameterList().size());
 			for (final Class<?> argClass : h.type().parameterList()) {
-				parameterList.add(getParameter(argClass, parser));
+				parameterList.add(parser.getDataBasedOnClass(argClass));
 			}
 			try {
 				return (Event<T>) h.invokeWithArguments(parameterList);

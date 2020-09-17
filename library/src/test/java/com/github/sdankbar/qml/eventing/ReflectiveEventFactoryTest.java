@@ -39,6 +39,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.github.sdankbar.qml.utility.QMLRequestParser;
+
 /**
  * Tests the RefectiveEventFactory.
  */
@@ -251,7 +253,7 @@ public class ReflectiveEventFactoryTest {
 		/**
 		 * @param p
 		 */
-		public Event3(final EventParser p) {
+		public Event3(final QMLRequestParser p) {
 			a = p.getInteger();
 			b = p.getDouble();
 			c = p.getString();
@@ -298,7 +300,7 @@ public class ReflectiveEventFactoryTest {
 		buffer.put("ABCD".getBytes());
 		buffer.put((byte) 0);
 		buffer.position(0);
-		final EventParser parser = new EventParser(buffer);
+		final QMLRequestParser parser = new QMLRequestParser(buffer);
 		final Event1 e = (Event1) f.create("Event1", parser);
 
 		assertEquals(73, e.getA());
@@ -335,7 +337,7 @@ public class ReflectiveEventFactoryTest {
 		buffer.putInt(8);
 
 		buffer.position(0);
-		final EventParser parser = new EventParser(buffer);
+		final QMLRequestParser parser = new QMLRequestParser(buffer);
 		final Event2 e = (Event2) f.create("Event2", parser);
 
 		assertTrue(e.isA());
@@ -363,7 +365,7 @@ public class ReflectiveEventFactoryTest {
 			buffer.put("ABCD".getBytes());
 			buffer.put((byte) 0);
 			buffer.position(0);
-			final EventParser parser = new EventParser(buffer);
+			final QMLRequestParser parser = new QMLRequestParser(buffer);
 			final Event1 e = (Event1) f.create("Event1", parser);
 
 			assertEquals(73, e.getA());
@@ -391,7 +393,7 @@ public class ReflectiveEventFactoryTest {
 			buffer.putInt(8);
 
 			buffer.position(0);
-			final EventParser parser = new EventParser(buffer);
+			final QMLRequestParser parser = new QMLRequestParser(buffer);
 			final Event2 e = (Event2) f.create("Event2", parser);
 
 			assertTrue(e.isA());
@@ -418,7 +420,7 @@ public class ReflectiveEventFactoryTest {
 		buffer.put("ABCD".getBytes());
 		buffer.put((byte) 0);
 		buffer.position(0);
-		final EventParser parser = new EventParser(buffer);
+		final QMLRequestParser parser = new QMLRequestParser(buffer);
 		final Event3 e = (Event3) f.create("Event3", parser);
 
 		assertEquals(73, e.getA());
@@ -440,7 +442,7 @@ public class ReflectiveEventFactoryTest {
 		buffer.put("ABCD".getBytes());
 		buffer.put((byte) 0);
 		buffer.position(0);
-		final EventParser parser = new EventParser(buffer);
+		final QMLRequestParser parser = new QMLRequestParser(buffer);
 		final Event3 e = (Event3) f.create("Event3", parser);
 
 		assertEquals(73, e.getA());
@@ -457,7 +459,7 @@ public class ReflectiveEventFactoryTest {
 				.createFromInterface(AbstractEventProcessor.class);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
-		final EventParser parser = new EventParser(buffer);
+		final QMLRequestParser parser = new QMLRequestParser(buffer);
 		assertNull(f.create("ComplexClass", parser));
 	}
 
@@ -478,7 +480,7 @@ public class ReflectiveEventFactoryTest {
 		final int iterations = 100000;
 		for (int i = 0; i < iterations; ++i) {
 			buffer.position(0);
-			final EventParser parser = new EventParser(buffer);
+			final QMLRequestParser parser = new QMLRequestParser(buffer);
 			assertTrue(f.create("Event1", parser) != null);
 		}
 		final long end = System.currentTimeMillis();

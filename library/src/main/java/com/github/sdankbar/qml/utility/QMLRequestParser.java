@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.eventing;
+package com.github.sdankbar.qml.utility;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,18 +33,20 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Objects;
 
+import com.github.sdankbar.qml.exceptions.QMLException;
+
 /**
- * The EventParser class allows for the extraction of an Event's data from its
- * serialized format.
+ * The QMLRequestParser class allows for the extraction of a QML request's
+ * (Event or Invocation) data from its serialized format.
  */
-public class EventParser {
+public class QMLRequestParser {
 
 	private final ByteBuffer buffer;
 
 	/**
-	 * @param buffer ByteBuffer containing the Event's data in serialized format.
+	 * @param buffer ByteBuffer containing the requests's data in serialized format.
 	 */
-	public EventParser(final ByteBuffer buffer) {
+	public QMLRequestParser(final ByteBuffer buffer) {
 		this.buffer = Objects.requireNonNull(buffer, "buffer is null");
 	}
 
@@ -136,6 +138,36 @@ public class EventParser {
 		buffer.get();
 
 		return new String(array, StandardCharsets.UTF_8);
+	}
+
+	public Object getDataBasedOnClass(final Class<?> c) {
+		if (c.equals(boolean.class) || c.equals(Boolean.class)) {
+			return Boolean.valueOf(getBoolean());
+		} else if (c.equals(Color.class)) {
+			return getColor();
+		} else if (c.equals(Dimension.class)) {
+			return getDimension();
+		} else if (c.equals(double.class) || c.equals(Double.class)) {
+			return Double.valueOf(getDouble());
+		} else if (c.equals(float.class) || c.equals(Float.class)) {
+			return Float.valueOf(getFloat());
+		} else if (c.equals(Instant.class)) {
+			return getInstant();
+		} else if (c.equals(int.class) || c.equals(Integer.class)) {
+			return Integer.valueOf(getInteger());
+		} else if (c.equals(long.class) || c.equals(Long.class)) {
+			return Long.valueOf(getLong());
+		} else if (c.equals(Point2D.class)) {
+			return getPoint();
+		} else if (c.equals(Rectangle2D.class)) {
+			return getRectangle();
+		} else if (c.equals(String.class)) {
+			return getString();
+		} else if (c.equals(QMLRequestParser.class)) {
+			return this;
+		} else {
+			throw new QMLException("Unknown parameter type in constructor");
+		}
 	}
 
 }

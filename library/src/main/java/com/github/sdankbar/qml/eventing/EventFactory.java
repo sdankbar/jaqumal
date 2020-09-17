@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml.eventing;
 
+import com.github.sdankbar.qml.utility.QMLRequestParser;
+
 /**
  * Because Event's are user defined and can contain arbitrary data, a factory is
  * required to convert the raw data passed from QML to Java into the appropriate
@@ -39,5 +41,5 @@ public interface EventFactory<T> {
 	 * @param parser A parser that can be used to get the Event's data.
 	 * @return The newly created Event or null if unable to create an Event.
 	 */
-	Event<T> create(String type, EventParser parser);
+	Event<T> create(String type, QMLRequestParser parser);
 }

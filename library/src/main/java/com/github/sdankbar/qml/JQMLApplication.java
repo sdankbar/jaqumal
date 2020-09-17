@@ -48,13 +48,14 @@ import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.EventFactory;
-import com.github.sdankbar.qml.eventing.EventParser;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventFactory;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.images.JQMLImageProvider;
 import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
 import com.github.sdankbar.qml.models.JQMLModelFactoryImpl;
+import com.github.sdankbar.qml.utility.QMLRequestParser;
+import com.github.sdankbar.qml.utility.JQMLUtilities;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -227,7 +228,7 @@ public class JQMLApplication<EType> {
 	}
 
 	private Optional<JVariant> handleEvent(final String type, final ByteBuffer data) {
-		final EventParser parser = new EventParser(data);
+		final QMLRequestParser parser = new QMLRequestParser(data);
 		final Event<BuiltinEventProcessor> builtinEvent = builtinFactory.create(type, parser);
 		if (builtinEvent != null) {
 			return dispatcher.submitBuiltin(builtinEvent);

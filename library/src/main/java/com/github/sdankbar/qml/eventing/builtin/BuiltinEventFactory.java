@@ -24,8 +24,8 @@ package com.github.sdankbar.qml.eventing.builtin;
 
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventFactory;
-import com.github.sdankbar.qml.eventing.EventParser;
 import com.github.sdankbar.qml.eventing.builtin.RenderEvent.EventType;
+import com.github.sdankbar.qml.utility.QMLRequestParser;
 
 /**
  * Factory for building BuiltinEvents.
@@ -35,7 +35,7 @@ public class BuiltinEventFactory implements EventFactory<BuiltinEventProcessor> 
 	static private final EventType[] PERF_EVENT_ARRAY = EventType.values();
 
 	@Override
-	public Event<BuiltinEventProcessor> create(final String type, final EventParser parser) {
+	public Event<BuiltinEventProcessor> create(final String type, final QMLRequestParser parser) {
 		switch (type) {
 		case "Builtin-MouseClick":
 			return new MouseClickEvent(parser.getString(), parser.getInteger(), parser.getInteger(),

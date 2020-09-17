@@ -20,28 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.examples.color_editor;
+package com.github.sdankbar.qml;
 
-import com.github.sdankbar.examples.color_editor.App.EventProcessor;
-import com.github.sdankbar.qml.eventing.Event;
-import com.github.sdankbar.qml.eventing.EventFactory;
-import com.github.sdankbar.qml.utility.QMLRequestParser;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- *
+ * Annotation that marks a method as being invokable from QML.
  */
-public class ColorEventFactory implements EventFactory<EventProcessor> {
-
-	@Override
-	public Event<EventProcessor> create(final String type, final QMLRequestParser parser) {
-		switch (type) {
-		case "PresetColorEdited":
-			return new PresetColorEditedEvent(parser.getInteger(), parser.getColor());
-		case "PresetColorNameEdited":
-			return new PresetColorNameEditedEvent(parser.getInteger(), parser.getString());
-		default:
-			return null;
-		}
-	}
-
+@Retention(RetentionPolicy.RUNTIME)
+public @interface JInvokable {
+	// Empty Body
 }

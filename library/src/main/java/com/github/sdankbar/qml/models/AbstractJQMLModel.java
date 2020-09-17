@@ -25,7 +25,7 @@ package com.github.sdankbar.qml.models;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.github.sdankbar.qml.JQMLUtilities;
+import com.github.sdankbar.qml.utility.JQMLUtilities;
 
 /**
  * Abstract model for all models to be made available to QML.
