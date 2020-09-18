@@ -33,6 +33,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +51,7 @@ public class ReflectiveEventFactoryTest {
 	 *
 	 *
 	 */
-	public static interface AbstractEventProcessor {
+	public interface AbstractEventProcessor {
 		/**
 		 * @param e
 		 */
@@ -295,6 +296,7 @@ public class ReflectiveEventFactoryTest {
 		final ReflectiveEventFactory<AbstractEventProcessor> f = new ReflectiveEventFactory<>(Event1.class);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.order(ByteOrder.nativeOrder());
 		buffer.putInt(73);
 		buffer.putDouble(1.5);
 		buffer.put("ABCD".getBytes());
@@ -318,6 +320,7 @@ public class ReflectiveEventFactoryTest {
 		final ReflectiveEventFactory<AbstractEventProcessor> f = new ReflectiveEventFactory<>(Event2.class);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.order(ByteOrder.nativeOrder());
 		buffer.put((byte) 1);
 		buffer.putFloat(1.5f);
 		buffer.putLong(92);
@@ -360,6 +363,7 @@ public class ReflectiveEventFactoryTest {
 
 		{
 			final ByteBuffer buffer = ByteBuffer.allocate(64);
+			buffer.order(ByteOrder.nativeOrder());
 			buffer.putInt(73);
 			buffer.putDouble(1.5);
 			buffer.put("ABCD".getBytes());
@@ -374,6 +378,7 @@ public class ReflectiveEventFactoryTest {
 		}
 		{
 			final ByteBuffer buffer = ByteBuffer.allocate(64);
+			buffer.order(ByteOrder.nativeOrder());
 			buffer.put((byte) 1);
 			buffer.putFloat(1.5f);
 			buffer.putLong(92);
@@ -415,6 +420,7 @@ public class ReflectiveEventFactoryTest {
 		final ReflectiveEventFactory<AbstractEventProcessor> f = new ReflectiveEventFactory<>(Event3.class);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.order(ByteOrder.nativeOrder());
 		buffer.putInt(73);
 		buffer.putDouble(1.5);
 		buffer.put("ABCD".getBytes());
@@ -437,6 +443,7 @@ public class ReflectiveEventFactoryTest {
 				.createFromInterface(AbstractEventProcessor.class);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.order(ByteOrder.nativeOrder());
 		buffer.putInt(73);
 		buffer.putDouble(1.5);
 		buffer.put("ABCD".getBytes());
@@ -471,6 +478,7 @@ public class ReflectiveEventFactoryTest {
 		final ReflectiveEventFactory<AbstractEventProcessor> f = new ReflectiveEventFactory<>(Event1.class);
 
 		final ByteBuffer buffer = ByteBuffer.allocate(64);
+		buffer.order(ByteOrder.nativeOrder());
 		buffer.putInt(73);
 		buffer.putDouble(1.5);
 		buffer.put("ABCD".getBytes());

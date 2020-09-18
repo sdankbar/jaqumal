@@ -73,7 +73,7 @@ public class App {
 
 	}
 
-	public static class TestInvokable {
+	private static class TestInvokable {
 
 		@JInvokable
 		public void function1(final String str) {

@@ -63,6 +63,8 @@ public class InvokableWrapper {
 
 	private static Method validateMethod(final Method m) {
 		try {
+			m.setAccessible(true);
+
 			final Class<?>[] params = m.getParameterTypes();
 			if (params.length == 1) {
 				final Class<?> arg = params[0];

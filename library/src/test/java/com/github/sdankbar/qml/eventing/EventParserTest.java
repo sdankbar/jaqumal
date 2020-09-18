@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.awt.Color;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
@@ -45,6 +46,7 @@ public class EventParserTest {
 	@Test
 	public void getters() {
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
+		buffer.order(ByteOrder.nativeOrder());
 		buffer.put((byte) 1);
 		buffer.put((byte) 0);
 		buffer.putInt(new Color(30, 31, 32).getRGB());
