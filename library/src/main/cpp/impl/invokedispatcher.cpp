@@ -103,7 +103,7 @@ void InvokeDispatcher::invoke(const QString& funcName)
         env->CallObjectMethod(invokableObj, invokeMethod, invokableName, functionName, buffer);
         if (env->ExceptionCheck())
         {
-            std::cerr << "Exception when calling event handler" << std::endl;
+            std::cerr << "Exception when calling invokable" << std::endl;
             env->ExceptionClear();
         }
         env->DeleteLocalRef(invokableName);

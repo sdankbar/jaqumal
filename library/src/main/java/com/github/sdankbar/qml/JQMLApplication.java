@@ -24,7 +24,6 @@ package com.github.sdankbar.qml;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +71,6 @@ public class JQMLApplication<EType> {
 		@Override
 		public boolean invoke(final String type, final ByteBuffer buffer) {
 			try {
-				buffer.order(ByteOrder.nativeOrder());
 				final Optional<JVariant> result = handleEvent(type, buffer);
 				if (result.isPresent()) {
 					result.get().sendToQML(0);

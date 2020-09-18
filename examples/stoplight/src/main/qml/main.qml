@@ -74,6 +74,10 @@ Window {
                     onClicked: {
                         log.info("USER INPUT- clicked RED light")
                         UtilFunc.fireMouseClick("RED", mouse, eventing)
+                        test_invokable.addString("RED INVOKED")
+                        test_invokable.invoke("function1")
+                        test_invokable.addInteger(3)
+                        test_invokable.invoke("function2")
                     }
                 }
                 Rectangle {

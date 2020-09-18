@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.github.sdankbar.qml.JInvokable;
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -72,6 +73,19 @@ public class App {
 
 	}
 
+	public static class TestInvokable {
+
+		@JInvokable
+		public void function1(final String str) {
+			System.out.println("function1=" + str);
+		}
+
+		@JInvokable
+		public void function2(final int c) {
+			System.out.println("function2=" + c);
+		}
+	}
+
 	private static final String[] lightColors = { "green", "yellow", "red" };
 	private static int index = 0;
 
@@ -87,6 +101,9 @@ public class App {
 		button.setText("Walk");
 		button.registerOnClicked(() -> System.out.println("Request Walk Signal"));
 		button.registerHoverChanged(b -> System.out.println(b ? "Hovered" : "Not Hovered"));
+
+		final TestInvokable invokable = new TestInvokable();
+		app.getInvokableDispatcher().registerInvokable("test_invokable", invokable);
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 

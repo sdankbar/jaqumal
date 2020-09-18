@@ -46,5 +46,4 @@ private:
     static jobject invokableObj;
 
     QString m_name;
-    std::vector<char> m_queuedArguements;
 };

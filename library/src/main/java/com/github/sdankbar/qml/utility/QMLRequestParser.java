@@ -29,6 +29,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Objects;
@@ -47,6 +48,7 @@ public class QMLRequestParser {
 	 * @param buffer ByteBuffer containing the requests's data in serialized format.
 	 */
 	public QMLRequestParser(final ByteBuffer buffer) {
+		buffer.order(ByteOrder.nativeOrder());
 		this.buffer = Objects.requireNonNull(buffer, "buffer is null");
 	}
 
