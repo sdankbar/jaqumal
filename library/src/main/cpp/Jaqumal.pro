@@ -52,6 +52,7 @@ SOURCES += \
     impl/listmodelfunctions.cpp \
     impl/qmllogging.cpp \
     impl/eventdispatcher.cpp \
+    impl/requestbuilder.cpp \
     impl/singletonmodelfunctions.cpp \
     impl/userinputsimulator.cpp \
     impl/qmlimageprovider.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
     include/eventbuilder.h \
     include/qmllogging.h \
     include/eventdispatcher.h \
+    include/requestbuilder.h \
     include/singletonmodelfunctions.h \
     include/userinputsimulator.h \
     include/qmlimageprovider.h \

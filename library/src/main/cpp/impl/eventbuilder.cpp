@@ -22,8 +22,6 @@
  */
 #include "eventbuilder.h"
 #include "iostream"
-#include <QColor>
-#include <QDateTime>
 #include <jniutilities.h>
 #include <applicationfunctions.h>
 #include <qmldatatransfer.h>
@@ -47,9 +45,14 @@ void EventBuilder::setEventHandler(JNIEnv* env, jobject handler)
 }
 
 EventBuilder::EventBuilder(QObject* parent) :
-    QObject(parent)
+    RequestBuilder(parent)
 {
     // Empty Implementation
+}
+
+EventBuilder::~EventBuilder()
+{
+   // Empty Implementation
 }
 
 QVariant EventBuilder::fireEvent(const QString& type)
@@ -145,85 +148,4 @@ void EventBuilder::buttonClickEvent(const QString& objectName)
 {
     addString(objectName);
     fireEvent(QStringLiteral("Builtin-ButtonClick"));
-}
-
-void EventBuilder::addBoolean(bool data)
-{
-    m_queuedArguements.push_back(data);
-}
-void EventBuilder::addInteger(qint32 data)
-{
-    const uint32_t size = sizeof(data);
-    const char* ptr = (const char*)(&data);
-    for (uint32_t i = 0; i < size; ++i)
-    {
-        char byte = ptr[i];
-        m_queuedArguements.push_back(byte);
-    }
-}
-void EventBuilder::addLong(qint64 data)
-{
-    const uint32_t size = sizeof(data);
-    const char* ptr = (const char*)(&data);
-    for (uint32_t i = 0; i < size; ++i)
-    {
-        char byte = ptr[i];
-        m_queuedArguements.push_back(byte);
-    }
-}
-void EventBuilder::addFloat(float data)
-{
-    const uint32_t size = sizeof(data);
-    const char* ptr = (const char*)(&data);
-    for (uint32_t i = 0; i < size; ++i)
-    {
-        char byte = ptr[i];
-        m_queuedArguements.push_back(byte);
-    }
-}
-void EventBuilder::addDouble(double data)
-{
-    const uint32_t size = sizeof(data);
-    const char* ptr = (const char*)(&data);
-    for (uint32_t i = 0; i < size; ++i)
-    {
-        char byte = ptr[i];
-        m_queuedArguements.push_back(byte);
-    }
-}
-void EventBuilder::addString(const QString& data)
-{
-    std::string str = data.toStdString();
-    for (uint32_t i = 0; i < str.length(); ++i)
-    {
-        m_queuedArguements.push_back(str[i]);
-    }
-    m_queuedArguements.push_back(0);
-}
-void EventBuilder::addColor(const QColor& data)
-{
-    quint32 argb = data.rgba();
-    addInteger(argb);
-}
-void EventBuilder::addRect(const QRect& data)
-{
-    addInteger(data.x());
-    addInteger(data.y());
-    addInteger(data.width());
-    addInteger(data.height());
-}
-void EventBuilder::addSize(const QSize& data)
-{
-    addInteger(data.width());
-    addInteger(data.height());
-}
-void EventBuilder::addDate(const QDateTime& data)
-{
-    const int64_t milli  = data.toMSecsSinceEpoch();
-    addLong(milli);
-}
-void EventBuilder::addPoint(const QPoint& data)
-{
-    addInteger(data.x());
-    addInteger(data.y());
 }

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.QtThread;
+import com.github.sdankbar.qml.cpp.jni.InvokationFunctions;
 import com.github.sdankbar.qml.utility.QMLRequestParser;
 import com.google.common.base.Preconditions;
 
@@ -41,7 +42,7 @@ public class InvokableDispatcher {
 	private final Map<String, InvokableWrapper> invokables = new HashMap<>();
 
 	public InvokableDispatcher() {
-		// TODO register for c++ call
+		// InvokationFunctions.setCallback(this);
 	}
 
 	@QtThread
@@ -49,6 +50,8 @@ public class InvokableDispatcher {
 		Objects.requireNonNull(name, "name is null");
 		Objects.requireNonNull(obj, "obj is null");
 		Preconditions.checkArgument(!invokables.containsKey(name), "[%s] is already registered", name);
+
+		InvokationFunctions.addInvokable(name);
 
 		invokables.put(name, new InvokableWrapper(obj));
 	}

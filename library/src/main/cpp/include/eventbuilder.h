@@ -25,10 +25,10 @@
 
 #include <QObject>
 #include <QMouseEvent>
-//#include <functional>
+#include <requestbuilder.h>
 #include <jni.h>
 
-class EventBuilder : public QObject
+class EventBuilder : public RequestBuilder
 {
     Q_OBJECT
 public:
@@ -43,6 +43,7 @@ public:
     static void setEventHandler(JNIEnv* env, jobject handler);
 
     explicit EventBuilder(QObject *parent = nullptr);
+    virtual ~EventBuilder();
 
     Q_INVOKABLE QVariant fireEvent(const QString& type);
     Q_INVOKABLE void fireEvent(const QString& type, const QString& data);
@@ -55,26 +56,11 @@ public:
     Q_INVOKABLE void textInputEditingFinishedEvent(const QString& objectName);
     Q_INVOKABLE void perfEvent(PerfEventType t);
 
-    Q_INVOKABLE void addBoolean(bool data);
-    Q_INVOKABLE void addInteger(qint32 data);
-    Q_INVOKABLE void addLong(qint64 data);
-    Q_INVOKABLE void addFloat(float data);
-    Q_INVOKABLE void addDouble(double data);
-    Q_INVOKABLE void addString(const QString& data);
-    Q_INVOKABLE void addColor(const QColor& data);
-    Q_INVOKABLE void addRect(const QRect& data);
-    Q_INVOKABLE void addSize(const QSize& data);
-    Q_INVOKABLE void addDate(const QDateTime& data);
-    Q_INVOKABLE void addPoint(const QPoint& data);
-
-
 private:
 
     static jobject EVENT_HANDLER;
     static jclass eventCallbackClass;
     static jmethodID eventCallbackMethod;
-
-    std::vector<char> m_queuedArguements;
 };
 
 #endif // EVENTBUILDER_H

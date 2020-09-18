@@ -23,28 +23,30 @@
 #pragma once
 
 #include <QObject>
+#include <QMouseEvent>
 #include <jni.h>
-#include <requestbuilder.h>
 
-class InvokeDispatcher : public RequestBuilder
+class RequestBuilder : public QObject
 {
     Q_OBJECT
 public:
-    static void initialize(JNIEnv* env);
-    static void uninitialize(JNIEnv* env);
-    static void setInvokable(jobject invokable);
 
-    InvokeDispatcher(const QString& name);
-    virtual ~InvokeDispatcher();
+    explicit RequestBuilder(QObject *parent = nullptr);
+    virtual ~RequestBuilder();
 
-    Q_INVOKABLE void invoke(const QString& function);
+    Q_INVOKABLE void addBoolean(bool data);
+    Q_INVOKABLE void addInteger(qint32 data);
+    Q_INVOKABLE void addLong(qint64 data);
+    Q_INVOKABLE void addFloat(float data);
+    Q_INVOKABLE void addDouble(double data);
+    Q_INVOKABLE void addString(const QString& data);
+    Q_INVOKABLE void addColor(const QColor& data);
+    Q_INVOKABLE void addRect(const QRect& data);
+    Q_INVOKABLE void addSize(const QSize& data);
+    Q_INVOKABLE void addDate(const QDateTime& data);
+    Q_INVOKABLE void addPoint(const QPoint& data);
 
-private:
+protected:
 
-    static jclass invokeClass;
-    static jmethodID invokeMethod;
-    static jobject invokableObj;
-
-    QString m_name;
     std::vector<char> m_queuedArguements;
 };

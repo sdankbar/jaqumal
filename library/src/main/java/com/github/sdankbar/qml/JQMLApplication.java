@@ -53,9 +53,10 @@ import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.images.JQMLImageProvider;
 import com.github.sdankbar.qml.images.JQMLImageProviderWrapper;
+import com.github.sdankbar.qml.invocation.InvokableDispatcher;
 import com.github.sdankbar.qml.models.JQMLModelFactoryImpl;
-import com.github.sdankbar.qml.utility.QMLRequestParser;
 import com.github.sdankbar.qml.utility.JQMLUtilities;
+import com.github.sdankbar.qml.utility.QMLRequestParser;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -121,6 +122,8 @@ public class JQMLApplication<EType> {
 	private final EventFactory<EType> factory;
 	private final BuiltinEventFactory builtinFactory = new BuiltinEventFactory();
 	private final EventDispatcher<EType> dispatcher = new EventDispatcher<>();
+
+	private final InvokableDispatcher invokables = new InvokableDispatcher();
 
 	private final AtomicReference<Thread> eventLoopThread = new AtomicReference<>();
 
@@ -225,6 +228,10 @@ public class JQMLApplication<EType> {
 	 */
 	public ScheduledExecutorService getQMLThreadExecutor() {
 		return executor;
+	}
+
+	public InvokableDispatcher getInvokableDispatcher() {
+		return invokables;
 	}
 
 	private Optional<JVariant> handleEvent(final String type, final ByteBuffer data) {
