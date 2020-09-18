@@ -23,6 +23,7 @@
 #include "invokedispatcher.h"
 #include "jniutilities.h"
 #include "applicationfunctions.h"
+#include <qmldatatransfer.h>
 #include <iostream>
 
 JNICALL void setCallback(JNIEnv* env, jclass, jobject callback)
@@ -53,7 +54,7 @@ void InvokeDispatcher::setInvokable(jobject invokable)
 void InvokeDispatcher::initialize(JNIEnv* env)
 {
     invokeClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/invocation/InvokableDispatcher");
-    invokeMethod = env->GetMethodID(invokeClass, "invoke", "(Ljava/lang/String;Ljava/lang/String;Ljava/nio/ByteBuffer;)V");
+    invokeMethod = env->GetMethodID(invokeClass, "invoke", "(Ljava/lang/String;Ljava/lang/String;Ljava/nio/ByteBuffer;)Z");
 
 
     JNINativeMethod methods[] = {
@@ -83,7 +84,7 @@ InvokeDispatcher::~InvokeDispatcher()
     // Empty Implementation
 }
 
-void InvokeDispatcher::invoke(const QString& funcName)
+QVariant InvokeDispatcher::invoke(const QString& funcName)
 {
     QVariant ret;
     if (invokableObj)
@@ -100,7 +101,7 @@ void InvokeDispatcher::invoke(const QString& funcName)
         jstring invokableName = JNIUtilities::toJString(env, m_name);// TODO
         // TODO reuse this buffer
         jobject buffer = env->NewDirectByteBuffer(memory, size);
-        env->CallObjectMethod(invokableObj, invokeMethod, invokableName, functionName, buffer);
+        bool result = env->CallObjectMethod(invokableObj, invokeMethod, invokableName, functionName, buffer);
         if (env->ExceptionCheck())
         {
             std::cerr << "Exception when calling invokable" << std::endl;
@@ -109,6 +110,11 @@ void InvokeDispatcher::invoke(const QString& funcName)
         env->DeleteLocalRef(invokableName);
         env->DeleteLocalRef(functionName);
         env->DeleteLocalRef(buffer);
+        if (result)
+        {
+            ret = QMLDataTransfer::retrieve(0);
+            QMLDataTransfer::clearPendingData();
+        }
 
         delete[] memory;
     }
@@ -117,4 +123,6 @@ void InvokeDispatcher::invoke(const QString& funcName)
         std::cerr << "No invokable registered" << std::endl;
     }
     m_queuedArguements.clear();
+
+    return ret;
 }

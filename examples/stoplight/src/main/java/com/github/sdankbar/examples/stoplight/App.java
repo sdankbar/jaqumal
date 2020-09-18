@@ -81,8 +81,9 @@ public class App {
 		}
 
 		@JInvokable
-		public void function2(final int c) {
+		public int function2(final int c) {
 			System.out.println("function2=" + c);
+			return 2 * c;
 		}
 	}
 

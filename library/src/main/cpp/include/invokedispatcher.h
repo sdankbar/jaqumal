@@ -37,7 +37,7 @@ public:
     InvokeDispatcher(const QString& name);
     virtual ~InvokeDispatcher();
 
-    Q_INVOKABLE void invoke(const QString& function);
+    Q_INVOKABLE QVariant invoke(const QString& function);
 
 private:
 

@@ -77,7 +77,7 @@ Window {
                         test_invokable.addString("RED INVOKED")
                         test_invokable.invoke("function1")
                         test_invokable.addInteger(3)
-                        test_invokable.invoke("function2")
+                        console.error("ret="+test_invokable.invoke("function2"))
                     }
                 }
                 Rectangle {

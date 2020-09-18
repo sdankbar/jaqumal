@@ -30,6 +30,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.QtThread;
 import com.github.sdankbar.qml.cpp.jni.InvocationFunctions;
 import com.github.sdankbar.qml.utility.QMLRequestParser;
@@ -56,13 +57,25 @@ public class InvokableDispatcher {
 		invokables.put(name, new InvokableWrapper(obj));
 	}
 
-	public void invoke(final String invokableName, final String methodName, final ByteBuffer data) {
-		final QMLRequestParser parser = new QMLRequestParser(data);
-		final InvokableWrapper wrapper = invokables.get(invokableName);
-		if (wrapper != null) {
-			wrapper.invoke(methodName, parser);
-		} else {
-			log.warn("[{}] is not a valid invokable", invokableName);
+	public boolean invoke(final String invokableName, final String methodName, final ByteBuffer data) {
+		try {
+			final QMLRequestParser parser = new QMLRequestParser(data);
+			final InvokableWrapper wrapper = invokables.get(invokableName);
+			if (wrapper != null) {
+				final JVariant result = wrapper.invoke(methodName, parser);
+				if (result != null) {
+					result.sendToQML(0);
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				log.warn("[{}] is not a valid invokable", invokableName);
+				return false;
+			}
+		} catch (final Exception e) {
+			log.warn("Exception caught during invoke", e);
+			return false;
 		}
 	}
 
