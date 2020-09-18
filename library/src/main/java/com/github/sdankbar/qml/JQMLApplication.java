@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jni.EventFunctions;
+import com.github.sdankbar.qml.cpp.jni.InvocationFunctions;
 import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
@@ -144,6 +145,7 @@ public class JQMLApplication<EType> {
 
 		ApplicationFunctions.createQApplication(argv);
 
+		InvocationFunctions.setCallback(invokables);
 		EventFunctions.addEventCallback(listener);
 
 		modelFactory = new JQMLModelFactoryImpl(this, eventLoopThread);

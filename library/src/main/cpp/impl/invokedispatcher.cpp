@@ -60,7 +60,7 @@ void InvokeDispatcher::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("setCallback",    "(Lcom/github/sdankbar/qml/invocation/InvokableDispatcher;)V",    (void *)&setCallback),
         JNIUtilities::createJNIMethod("addInvokable",    "(Ljava/lang/String;)V",    (void *)&addInvokable)
     };
-    jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/InvokationFunctions");
+    jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/InvocationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));
     env->DeleteLocalRef(javaClass);
 }
