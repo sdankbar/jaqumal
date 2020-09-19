@@ -34,6 +34,7 @@ import com.github.sdankbar.qml.eventing.QMLReceivableEvent;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Traffic light GUI. Shows the usage of a JQMLSingletonModel and
@@ -124,6 +125,7 @@ public class App {
 					app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
 				}
 				app.getEventDispatcher().submit(new TestQMLEvent());
+				app.getInvokableDispatcher().invoke("test_invoke_target", ImmutableMap.of("data", new JVariant(7)));
 			}
 		};
 		app.getQMLThreadExecutor().execute(r);

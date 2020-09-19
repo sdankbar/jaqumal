@@ -48,6 +48,15 @@ Window {
         }
     }
 
+    InvokeTarget {
+        targetName: "test_invoke_target"
+
+        onInvoked: {
+            console.error("invoked target:"+args.data)
+        }
+
+    }
+
     Item {
         anchors.fill: parent
         focus: true
