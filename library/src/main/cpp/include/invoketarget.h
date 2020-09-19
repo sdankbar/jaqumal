@@ -31,6 +31,7 @@ class InvokeTarget : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString targetName READ targetName WRITE setTargetName NOTIFY targetNameChanged)
+    Q_PROPERTY(QVariant returnValue READ returnValue WRITE setReturnValue)
 public:
 
     static QVariant sendToTarget(const QString& name, const QVariantMap& args);
@@ -40,6 +41,9 @@ public:
 
     const QString& targetName() const;
     void setTargetName(const QString& newName);
+
+    const QVariant& returnValue() const;
+    void setReturnValue(const QVariant& newReturnValue);
 
 signals:
     void targetNameChanged();
@@ -52,4 +56,5 @@ private:
     QVariant invoke(const QVariantMap& args);
 
     QString m_name;
+    QVariant m_returnValue;
 };

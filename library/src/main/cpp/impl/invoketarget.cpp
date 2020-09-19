@@ -62,10 +62,20 @@ void InvokeTarget::setTargetName(const QString &newName)
     }
 }
 
+const QVariant& InvokeTarget::returnValue() const
+{
+    return m_returnValue;
+}
+
+void InvokeTarget::setReturnValue(const QVariant& newReturnValue)
+{
+    m_returnValue = newReturnValue;
+}
+
 QVariant InvokeTarget::invoke(const QVariantMap& args)
 {
+    m_returnValue = QVariant();
     emit invoked(args);
-    // TODO
-    return QVariant();
+    return m_returnValue;
 }
 

@@ -53,6 +53,7 @@ Window {
 
         onInvoked: {
             console.error("invoked target:"+args.data)
+            returnValue = args.data + 9
         }
 
     }

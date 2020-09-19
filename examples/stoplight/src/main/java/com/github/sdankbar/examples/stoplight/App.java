@@ -125,7 +125,9 @@ public class App {
 					app.getQMLThreadExecutor().schedule(this, 5, TimeUnit.SECONDS);
 				}
 				app.getEventDispatcher().submit(new TestQMLEvent());
-				app.getInvokableDispatcher().invoke("test_invoke_target", ImmutableMap.of("data", new JVariant(7)));
+				final JVariant invokeRet = app.getInvokableDispatcher().invoke("test_invoke_target",
+						ImmutableMap.of("data", new JVariant(7)));
+				System.err.println("invoke return=" + invokeRet);
 			}
 		};
 		app.getQMLThreadExecutor().execute(r);
