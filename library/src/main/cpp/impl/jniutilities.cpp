@@ -26,7 +26,7 @@
 #include "applicationfunctions.h"
 #include "eventfunctions.h"
 #include "fontfunctions.h"
-#include "invokedispatcher.h"
+#include "invokebuilder.h"
 #include <iostream>
 #include "flattreemodelfunctions.h"
 #include "singletonmodelfunctions.h"
@@ -44,7 +44,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     QMLDataTransfer::initialize(env);
     ApplicationFunctions::initialize(env);
     EventFunctions::initialize(env);
-    InvokeDispatcher::initialize(env);
+    InvokeBuilder::initialize(env);
     FontFunctions::initialize(env);
     FlatTreeModelFunctions::initialize(env);
     ListModelFunctions::initialize(env);

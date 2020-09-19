@@ -20,30 +20,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#pragma once
+#include "invoketarget.h"
 
-#include <QObject>
-#include <jni.h>
-#include <requestbuilder.h>
+QVector<InvokeTarget*> InvokeTarget::allTargets;
 
-class InvokeDispatcher : public RequestBuilder
+QVariant InvokeTarget::sendToTarget(const QString& name, const QVariantMap& args)
 {
-    Q_OBJECT
-public:
-    static void initialize(JNIEnv* env);
-    static void uninitialize(JNIEnv* env);
-    static void setInvokable(jobject invokable);
+    QVariant ret;
+    for (InvokeTarget* d: allTargets)
+    {
+        if (d->targetName() == name)
+        {
+            ret = d->invoke(args);
+        }
+    }
+    return ret;
+}
 
-    InvokeDispatcher(const QString& name);
-    virtual ~InvokeDispatcher();
+InvokeTarget::InvokeTarget(QObject* parent) :
+    QObject(parent)
+{
+    allTargets.push_back(this);
+}
 
-    Q_INVOKABLE QVariant invoke(const QString& function);
+InvokeTarget::~InvokeTarget()
+{
+    allTargets.removeAll(this);
+}
 
-private:
+const QString& InvokeTarget::targetName() const
+{
+    return m_name;
+}
 
-    static jclass invokeClass;
-    static jmethodID invokeMethod;
-    static jobject invokableObj;
+void InvokeTarget::setTargetName(const QString &newName)
+{
+    if (m_name != newName)
+    {
+        m_name = newName;
+        emit targetNameChanged();
+    }
+}
 
-    QString m_name;
-};
+QVariant InvokeTarget::invoke(const QVariantMap& args)
+{
+    emit invoked(args);
+    // TODO
+    return QVariant();
+}
+

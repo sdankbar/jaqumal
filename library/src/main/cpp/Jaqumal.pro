@@ -48,7 +48,8 @@ SOURCES += \
     impl/flattreemodelfunctions.cpp \
     impl/fontfunctions.cpp \
     impl/eventbuilder.cpp \
-    impl/invokedispatcher.cpp \
+    impl/invokebuilder.cpp \
+    impl/invoketarget.cpp \
     impl/listmodelfunctions.cpp \
     impl/qmllogging.cpp \
     impl/eventdispatcher.cpp \
@@ -66,7 +67,8 @@ HEADERS += \
     include/eventfunctions.h \
     include/flattreemodelfunctions.h \
     include/fontfunctions.h \
-    include/invokedispatcher.h \
+    include/invokebuilder.h \
+    include/invoketarget.h \
     include/jniutilities.h \
     include/listmodelfunctions.h \
     include/qmldatatransfer.h \

@@ -26,6 +26,7 @@
 
 #include <eventbuilder.h>
 #include <eventdispatcher.h>
+#include <invoketarget.h>
 #include <jpolyline.h>
 #include <QQmlContext>
 #include <QTimer>
@@ -197,6 +198,7 @@ void ApplicationFunctions::create(int* argc, char** argv)
 {
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
     qmlRegisterType<EventDispatcher>("com.github.sdankbar.jaqumal", 0, 4, "EventDispatcher");
+    qmlRegisterType<InvokeTarget>("com.github.sdankbar.jaqumal", 0, 4, "InvokeTarget");
     qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
     qmlRegisterUncreatableType<GenericFlatTreeModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericFlatTreeModel", "Cannot create GenericFlatTreeModel");
     qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");

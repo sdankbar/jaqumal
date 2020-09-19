@@ -20,16 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "invokedispatcher.h"
+#include "invokebuilder.h"
 #include "jniutilities.h"
 #include "applicationfunctions.h"
+#include "invoketarget.h"
 #include <qmldatatransfer.h>
 #include <iostream>
 
 JNICALL void setCallback(JNIEnv* env, jclass, jobject callback)
 {
     jobject globalRef = env->NewGlobalRef(callback);
-    InvokeDispatcher::setInvokable(globalRef);
+    InvokeBuilder::setInvokable(globalRef);
 }
 
 JNICALL void addInvokable(JNIEnv* env, jclass, jstring name)
@@ -37,21 +38,38 @@ JNICALL void addInvokable(JNIEnv* env, jclass, jstring name)
     if (ApplicationFunctions::check(env))
     {
         QString nameStr = JNIUtilities::toQString(env, name);
-        InvokeDispatcher* ptr = new InvokeDispatcher(nameStr);
+        InvokeBuilder* ptr = new InvokeBuilder(nameStr);
         ApplicationFunctions::get()->addToContext(nameStr, ptr);
     }
 }
 
-jclass InvokeDispatcher::invokeClass;
-jmethodID InvokeDispatcher::invokeMethod;
-jobject InvokeDispatcher::invokableObj;
+JNICALL jobject invokeQML(JNIEnv* env, jclass, jstring name, jobjectArray keys)
+{
+    QString targetName = JNIUtilities::toQString(env, name);
 
-void InvokeDispatcher::setInvokable(jobject invokable)
+    QVariantMap map;
+    const size_t count = env->GetArrayLength(keys);
+    for (size_t i = 0; i < count; ++i)
+    {
+        jstring jStr = static_cast<jstring>(env->GetObjectArrayElement(keys, i));
+        map.insert(JNIUtilities::toQString(env, jStr), QMLDataTransfer::retrieve(i));
+    }
+    QMLDataTransfer::clearPendingData();
+
+    QVariant ret = InvokeTarget::sendToTarget(targetName, map);
+    return QMLDataTransfer::toJVariant(env, ret);
+}
+
+jclass InvokeBuilder::invokeClass;
+jmethodID InvokeBuilder::invokeMethod;
+jobject InvokeBuilder::invokableObj;
+
+void InvokeBuilder::setInvokable(jobject invokable)
 {
     invokableObj = invokable;
 }
 
-void InvokeDispatcher::initialize(JNIEnv* env)
+void InvokeBuilder::initialize(JNIEnv* env)
 {
     invokeClass = JNIUtilities::findClassGlobalReference(env, "com/github/sdankbar/qml/invocation/InvokableDispatcher");
     invokeMethod = env->GetMethodID(invokeClass, "invoke", "(Ljava/lang/String;Ljava/lang/String;Ljava/nio/ByteBuffer;)Z");
@@ -59,32 +77,33 @@ void InvokeDispatcher::initialize(JNIEnv* env)
 
     JNINativeMethod methods[] = {
         JNIUtilities::createJNIMethod("setCallback",    "(Lcom/github/sdankbar/qml/invocation/InvokableDispatcher;)V",    (void *)&setCallback),
-        JNIUtilities::createJNIMethod("addInvokable",    "(Ljava/lang/String;)V",    (void *)&addInvokable)
+        JNIUtilities::createJNIMethod("addInvokable",    "(Ljava/lang/String;)V",    (void *)&addInvokable),
+        JNIUtilities::createJNIMethod("invokeQML",    "(Ljava/lang/String;[Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;",    (void *)&invokeQML)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/InvocationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));
     env->DeleteLocalRef(javaClass);
 }
 
-void InvokeDispatcher::uninitialize(JNIEnv* env)
+void InvokeBuilder::uninitialize(JNIEnv* env)
 {
     env->DeleteGlobalRef(invokeClass);
     env->DeleteGlobalRef(invokableObj);
 }
 
-InvokeDispatcher::InvokeDispatcher(const QString& name) :
+InvokeBuilder::InvokeBuilder(const QString& name) :
     RequestBuilder(nullptr),
     m_name(name)
 {
     // Empty Implementation
 }
 
-InvokeDispatcher::~InvokeDispatcher()
+InvokeBuilder::~InvokeBuilder()
 {
     // Empty Implementation
 }
 
-QVariant InvokeDispatcher::invoke(const QString& funcName)
+QVariant InvokeBuilder::invoke(const QString& funcName)
 {
     QVariant ret;
     if (invokableObj)

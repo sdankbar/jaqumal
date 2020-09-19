@@ -22,11 +22,14 @@
  */
 package com.github.sdankbar.qml.cpp.jni;
 
+import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.invocation.InvokableDispatcher;
 
 public class InvocationFunctions {
 	public static native void setCallback(final InvokableDispatcher c);
 
 	public static native void addInvokable(final String name);
+
+	public static native JVariant invokeQML(String name, String[] keys);
 
 }

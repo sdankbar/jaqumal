@@ -25,6 +25,7 @@ package com.github.sdankbar.qml.invocation;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class InvokableDispatcher {
 		invokables.put(name, new InvokableWrapper(obj));
 	}
 
-	public boolean invoke(final String invokableName, final String methodName, final ByteBuffer data) {
+	private boolean invoke(final String invokableName, final String methodName, final ByteBuffer data) {
 		try {
 			final QMLRequestParser parser = new QMLRequestParser(data);
 			final InvokableWrapper wrapper = invokables.get(invokableName);
@@ -77,6 +78,24 @@ public class InvokableDispatcher {
 			log.warn("Exception caught during invoke", e);
 			return false;
 		}
+	}
+
+	public JVariant invoke(final String target, final Map<String, JVariant> args) {
+		Objects.requireNonNull(target, "target is null");
+		Objects.requireNonNull(args, "args is null");
+		Preconditions.checkArgument(!args.containsKey(null), "Contains null key");
+		Preconditions.checkArgument(!args.containsValue(null), "Contains null value");
+
+		final String[] keys = new String[args.size()];
+		int i = 0;
+		for (final Entry<String, JVariant> entry : args.entrySet()) {
+			keys[i] = entry.getKey();
+			entry.getValue().sendToQML(i);
+			++i;
+		}
+
+		// Send request to c++
+		return InvocationFunctions.invokeQML(target, keys);
 	}
 
 }
