@@ -109,17 +109,11 @@ QVariant InvokeBuilder::invoke(const QString& funcName)
     if (invokableObj)
     {
         const uint32_t size = m_queuedArguements.size();
-        char* memory = new char[size];
-        for (uint32_t i = 0; i < size; ++i)
-        {
-            memory[i] = m_queuedArguements[i];
-        }
 
         JNIEnv* env = ApplicationFunctions::mainEnv;
         jstring functionName = JNIUtilities::toJString(env, funcName);
-        jstring invokableName = JNIUtilities::toJString(env, m_name);// TODO
-        // TODO reuse this buffer
-        jobject buffer = env->NewDirectByteBuffer(memory, size);
+        jstring invokableName = JNIUtilities::toJString(env, m_name);
+        jobject buffer = env->NewDirectByteBuffer(m_queuedArguements.data(), size);
         bool result = env->CallObjectMethod(invokableObj, invokeMethod, invokableName, functionName, buffer);
         if (env->ExceptionCheck())
         {
@@ -134,8 +128,6 @@ QVariant InvokeBuilder::invoke(const QString& funcName)
             ret = QMLDataTransfer::retrieve(0);
             QMLDataTransfer::clearPendingData();
         }
-
-        delete[] memory;
     }
     else
     {

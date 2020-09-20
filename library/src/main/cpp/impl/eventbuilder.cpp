@@ -61,16 +61,10 @@ QVariant EventBuilder::fireEvent(const QString& type)
     if (EVENT_HANDLER)
     {
         const uint32_t size = m_queuedArguements.size();
-        char* memory = new char[size];
-        for (uint32_t i = 0; i < size; ++i)
-        {
-            memory[i] = m_queuedArguements[i];
-        }
 
         JNIEnv* env = ApplicationFunctions::mainEnv;
         jstring typeStr = JNIUtilities::toJString(env, type);
-        // TODO reuse this buffer
-        jobject buffer = env->NewDirectByteBuffer(memory, size);
+        jobject buffer = env->NewDirectByteBuffer(m_queuedArguements.data(), size);
         bool result = ApplicationFunctions::mainEnv->CallObjectMethod(EVENT_HANDLER, eventCallbackMethod, typeStr, buffer);
         if (env->ExceptionCheck())
         {
@@ -84,8 +78,6 @@ QVariant EventBuilder::fireEvent(const QString& type)
             ret = QMLDataTransfer::retrieve(0);
             QMLDataTransfer::clearPendingData();
         }
-
-        delete[] memory;
     }
     else
     {
