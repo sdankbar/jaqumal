@@ -39,7 +39,6 @@ public:
     static void invokeCallback(JNIEnv* env, jobject callbackObject);
 
     static QString toQString(JNIEnv* env, jstring str);
-    static std::string toString(JNIEnv* env, jstring str);
     static jstring toJString(JNIEnv* env, const QString& str);
 
     static JNIEnv* attachThread();

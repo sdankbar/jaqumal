@@ -26,7 +26,7 @@
 #include <QString>
 #include <QVariant>
 
-extern int runQMLTest(const std::string& pathToQMLTestFile, std::vector<std::string>& importPaths);
+extern int runQMLTest(const QString& pathToQMLTestFile, std::vector<QString>& importPaths);
 
 class QQmlEngine;
 

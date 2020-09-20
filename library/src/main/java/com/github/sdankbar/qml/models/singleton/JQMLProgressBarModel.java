@@ -22,6 +22,9 @@
  */
 package com.github.sdankbar.qml.models.singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
@@ -30,6 +33,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
 public class JQMLProgressBarModel {
+
+	private static final Logger log = LoggerFactory.getLogger(JQMLProgressBarModel.class);
 
 	public enum Roles {
 		ModelName, //
@@ -90,7 +95,7 @@ public class JQMLProgressBarModel {
 					}
 				}
 			} catch (final IllegalArgumentException e) {
-				// TODO log
+				log.warn("Failed to convert to Roles", e);
 			}
 		});
 	}

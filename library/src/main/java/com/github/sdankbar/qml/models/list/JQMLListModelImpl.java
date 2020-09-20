@@ -673,7 +673,6 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 			addAll(list.subList(reuseCount, list.size()));
 
-			// TODO optimize
 			while (mapRefs.size() > list.size()) {
 				remove(mapRefs.size() - 1);
 			}

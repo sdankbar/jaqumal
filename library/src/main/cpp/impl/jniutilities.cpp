@@ -133,15 +133,6 @@ QString JNIUtilities::toQString(JNIEnv* env, jstring str)
     return res;
 }
 
-std::string JNIUtilities::toString(JNIEnv* env, jstring str)
-{
-    // TODO optimize
-    const char* array = env->GetStringUTFChars(str, NULL);
-    std::string stdString = std::string(array);
-    env->ReleaseStringUTFChars(str, array);
-    return stdString;
-}
-
 jstring JNIUtilities::toJString(JNIEnv* env, const QString& str)
 {
     return env->NewString(reinterpret_cast<const jchar*>(str.constData()), str.length());

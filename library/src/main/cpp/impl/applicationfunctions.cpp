@@ -136,13 +136,13 @@ JNICALL void quitQApplication(JNIEnv* env, jclass)
 
 JNICALL int runQMLTests(JNIEnv* env, jclass, jstring pathToQMLTestFile, jobjectArray importPaths)
 {
-    std::string path = JNIUtilities::toString(env, pathToQMLTestFile);
+    QString path = JNIUtilities::toQString(env, pathToQMLTestFile);
     const int32_t count = env->GetArrayLength(importPaths);
-    std::vector<std::string> paths;
+    std::vector<QString> paths;
     for (int i = 0; i < count; ++i)
     {
         jstring str = static_cast<jstring>(env->GetObjectArrayElement(importPaths, i));
-        paths.push_back(JNIUtilities::toString(env, str));
+        paths.push_back(JNIUtilities::toQString(env, str));
     }
     return runQMLTest(path, paths);
 }

@@ -190,7 +190,7 @@ void MockSetup::qmlEngineAvailable(QQmlEngine *engine)
     engine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));
 }
 
-int runQMLTest(const std::string& pathToQMLTestFile, std::vector<std::string>& importPaths)
+int runQMLTest(const QString& pathToQMLTestFile, std::vector<QString>& importPaths)
 {
     QTEST_SET_MAIN_SOURCE_PATH;
 
@@ -203,14 +203,14 @@ int runQMLTest(const std::string& pathToQMLTestFile, std::vector<std::string>& i
     char** argv = new char*[argc];
     argv[0] = strdup("");
     argv[1] = strdup("-input");
-    argv[2] = strdup(pathToQMLTestFile.c_str());
+    argv[2] = strdup(pathToQMLTestFile.toStdString().c_str());
 
     if (!importPaths.empty())
     {
         argv[3] = strdup("-import");
         for (size_t i = 0; i < importPaths.size(); ++i)
         {
-            argv[4 + i] = strdup(importPaths[i].c_str());
+            argv[4 + i] = strdup(importPaths[i].toStdString().c_str());
         }
     }
 
