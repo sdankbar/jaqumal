@@ -39,6 +39,8 @@ import com.github.sdankbar.qml.models.flat_tree.FlatTreeAccessor;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.JQMLListModelImpl;
+import com.github.sdankbar.qml.models.list.JQMLListViewModel;
+import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.list.ListAccessor;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
@@ -49,6 +51,7 @@ import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
 import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
 import com.github.sdankbar.qml.utility.JQMLUtilities;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The JQMLModelFactory allows for the creation of Singleton, List, and Tree
@@ -57,6 +60,15 @@ import com.google.common.collect.ImmutableMap;
  * Should not be instantiated by application code.
  */
 public class JQMLModelFactoryImpl implements JQMLModelFactory {
+
+	private static <K> void checkForIsSelectedInKeySet(final ImmutableSet<K> keys) {
+		for (final K v : keys) {
+			if (v.toString().equals("is_selected")) {
+				return;
+			}
+		}
+		throw new IllegalArgumentException("Key set must contain \"is_selected\"");
+	}
 
 	private final JQMLApplication<?> app;
 	private final AtomicReference<Thread> eventLoopThread;
@@ -183,6 +195,23 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 
 		return new JQMLXYSeriesModel(name, this);
+	}
+
+	@Override
+	@QtThread()
+	public <K extends Enum<K>> JQMLListViewModel<K> createListViewModel(final String modelName, final Class<K> keyClass,
+			final SelectionMode mode, final PutMode putMode) {
+		final ImmutableSet<K> userKeys = ImmutableSet.copyOf(EnumSet.allOf(keyClass));
+		checkForIsSelectedInKeySet(userKeys);
+		return new JQMLListViewModel<>(modelName, userKeys, app, mode, putMode);
+	}
+
+	@Override
+	@QtThread()
+	public <K> JQMLListViewModel<K> createListViewModel(final String modelName, final ImmutableSet<K> keySet,
+			final SelectionMode mode, final PutMode putMode) {
+		checkForIsSelectedInKeySet(keySet);
+		return new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
 	}
 
 }

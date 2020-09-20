@@ -30,11 +30,14 @@ import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.JQMLMapPool;
 import com.github.sdankbar.qml.models.flat_tree.JQMLFlatTreeModel;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.github.sdankbar.qml.models.list.JQMLListViewModel;
+import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The JQMLModelFactory allows for the creation of Singleton, List, and Tree
@@ -189,5 +192,29 @@ public interface JQMLModelFactory {
 	 */
 	@QtThread()
 	JQMLXYSeriesModel createXYSeriesModel(final String name);
+
+	/**
+	 * Creates a new model.
+	 *
+	 * @param modelName Name of the model. Must be unique.
+	 * @param keyClass  Class of the Enum that is used as the new model's key.
+	 * @param mode      The selection mode for the model.
+	 * @param putMode   Specifies how put operations behave.
+	 * @return The new model.
+	 */
+	<K extends Enum<K>> JQMLListViewModel<K> createListViewModel(final String modelName, final Class<K> keyClass,
+			final SelectionMode mode, final PutMode putMode);
+
+	/**
+	 * Creates a new model.
+	 *
+	 * @param modelName Name of the model. Must be unique.
+	 * @param keySet    The set of keys that can be used by the new model.
+	 * @param mode      The selection mode for the model.
+	 * @param putMode   Specifies how put operations behave.
+	 * @return The new model.
+	 */
+	<K> JQMLListViewModel<K> createListViewModel(final String modelName, final ImmutableSet<K> keySet,
+			final SelectionMode mode, final PutMode putMode);
 
 }

@@ -23,7 +23,6 @@
 package com.github.sdankbar.qml.models.list;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -105,48 +104,6 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 
 	private static final String SELECTION_COUNT_KEY = "selectionCount";
 
-	private static <K> void checkKeySet(final ImmutableSet<K> keys) {
-		for (final K v : keys) {
-			if (v.toString().equals("is_selected")) {
-				return;
-			}
-		}
-		throw new IllegalArgumentException("Key set must contain \"is_selected\"");
-	}
-
-	/**
-	 * Creates a new model.
-	 *
-	 * @param modelName Name of the model. Must be unique.
-	 * @param keyClass  Class of the Enum that is used as the new model's key.
-	 * @param app       JQMLApplication object for this application.
-	 * @param mode      The selection mode for the model.
-	 * @param putMode   Specifies how put operations behave.
-	 * @return The new model.
-	 */
-	public static <T extends Enum<T>> JQMLListViewModel<T> create(final String modelName, final Class<T> keyClass,
-			final JQMLApplication<?> app, final SelectionMode mode, final PutMode putMode) {
-		final ImmutableSet<T> userKeys = ImmutableSet.copyOf(EnumSet.allOf(keyClass));
-		checkKeySet(userKeys);
-		return new JQMLListViewModel<>(modelName, userKeys, app, mode, putMode);
-	}
-
-	/**
-	 * Creates a new model.
-	 *
-	 * @param modelName Name of the model. Must be unique.
-	 * @param keySet    The set of keys that can be used by the new model.
-	 * @param app       JQMLApplication object for this application.
-	 * @param mode      The selection mode for the model.
-	 * @param putMode   Specifies how put operations behave.
-	 * @return The new model.
-	 */
-	public static <T> JQMLListViewModel<T> create(final String modelName, final ImmutableSet<T> keySet,
-			final JQMLApplication<?> app, final SelectionMode mode, final PutMode putMode) {
-		checkKeySet(keySet);
-		return new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
-	}
-
 	private static <K> K getKey(final ImmutableSet<K> keys, final String keyName) {
 		for (final K v : keys) {
 			if (v.toString().equals(keyName)) {
@@ -163,7 +120,7 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 
 	private final K isSelectedKey;
 
-	private JQMLListViewModel(final String modelName, final ImmutableSet<K> keys, final JQMLApplication<?> app,
+	public JQMLListViewModel(final String modelName, final ImmutableSet<K> keys, final JQMLApplication<?> app,
 			final SelectionMode mode, final PutMode putMode) {
 		selectionMode = Objects.requireNonNull(mode, "mode is null");
 		isSelectedKey = getKey(keys, "is_selected");

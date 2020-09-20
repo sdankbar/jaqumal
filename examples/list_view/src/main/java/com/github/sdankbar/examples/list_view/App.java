@@ -38,8 +38,7 @@ import com.google.common.collect.ImmutableMap;
 public class App {
 
 	public enum ListRole {
-		is_selected,
-		text
+		is_selected, text
 	}
 
 	/**
@@ -48,8 +47,8 @@ public class App {
 	 */
 	public static void main(final String[] args) throws Exception {
 		final JQMLApplication<NullEventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<ListRole> model = JQMLListViewModel.create("list_model", ListRole.class, app,
-				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLListViewModel<ListRole> model = app.getModelFactory().createListViewModel("list_model",
+				ListRole.class, SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.getModel().add(ImmutableMap.of(ListRole.text, new JVariant("Item 1")));
 		model.getModel().add(ImmutableMap.of(ListRole.text, new JVariant("Item 2")));

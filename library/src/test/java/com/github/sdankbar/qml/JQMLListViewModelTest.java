@@ -69,7 +69,7 @@ public class JQMLListViewModelTest {
 	public void assign_mapClearSelection() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
@@ -122,7 +122,7 @@ public class JQMLListViewModelTest {
 	public void assign_mapMaintainSelection() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
@@ -175,7 +175,7 @@ public class JQMLListViewModelTest {
 	public void getSelected1() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
@@ -217,7 +217,7 @@ public class JQMLListViewModelTest {
 	public void getSelected2() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
@@ -246,7 +246,7 @@ public class JQMLListViewModelTest {
 	public void getSelected3() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
@@ -277,7 +277,7 @@ public class JQMLListViewModelTest {
 	public void getSelectedOptional() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
@@ -328,7 +328,7 @@ public class JQMLListViewModelTest {
 	public void getAllSelected() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.MULTIPLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
@@ -376,7 +376,7 @@ public class JQMLListViewModelTest {
 	public void getAllSelected_default() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+		final JQMLListViewModel<Roles> model = app.getModelFactory().createListViewModel("list_view", Roles.class,
 				SelectionMode.MULTIPLE, PutMode.RETURN_PREVIOUS_VALUE);
 
 		{
