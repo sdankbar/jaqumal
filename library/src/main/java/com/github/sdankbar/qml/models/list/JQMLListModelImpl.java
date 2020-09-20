@@ -701,7 +701,13 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public <L> ImmutableList<L> asMappedList(final K key, final Class<L> t) {
 		Objects.requireNonNull(key, "key is null");
 		Objects.requireNonNull(t, "t is null");
-		return stream().map(m -> m.get(key).asType(t).get()).collect(ImmutableList.toImmutableList());
+		return stream().map(m -> {
+			final JVariant var = m.get(key);
+			Preconditions.checkArgument(var != null, "Missing data in map for key %s", key);
+			final Optional<L> opt = var.asType(t);
+			Preconditions.checkArgument(opt.isPresent(), "Data %s cannot be cast to %s", var, t.getName());
+			return opt.get();
+		}).collect(ImmutableList.toImmutableList());
 	}
 
 	@Override
@@ -722,7 +728,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public void swap(final int source, final int destination) {
 		final int length = size();
 		Preconditions.checkArgument(0 <= source && source < length, "Source outside valid range, %s", source);
-		Preconditions.checkArgument(0 <= destination && destination < length, "destination outside valid range, %s",
+		Preconditions.checkArgument(0 <= destination && destination < length, "Destination outside valid range, %s",
 				destination);
 		if (source != destination) {
 			final Map<K, JVariant> sourceMap = ImmutableMap.copyOf(get(source));

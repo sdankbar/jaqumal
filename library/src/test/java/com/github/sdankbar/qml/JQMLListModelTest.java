@@ -59,11 +59,7 @@ public class JQMLListModelTest {
 	}
 
 	private enum Roles {
-		R1,
-		R2,
-		R3,
-		R4,
-		R5;
+		R1, R2, R3, R4, R5;
 	}
 
 	/**
@@ -1216,5 +1212,127 @@ public class JQMLListModelTest {
 		}
 
 		assertEquals(2, count);
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void asMappedList1() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(1), Roles.R2, new JVariant("2")));
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(3), Roles.R2, new JVariant("4")));
+
+		assertEquals(ImmutableList.of(1, 3), model.asMappedList(Roles.R1, Integer.class));
+		assertEquals(ImmutableList.of("2", "4"), model.asMappedList(Roles.R2, String.class));
+	}
+
+	/**
+	 *
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void asMappedList2() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(1), Roles.R2, new JVariant("2")));
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(3), Roles.R2, new JVariant("4")));
+
+		assertEquals(ImmutableList.of(1, 3), model.asMappedList(Roles.R1, String.class));
+	}
+
+	/**
+	 *
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void asMappedList3() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.add(ImmutableMap.of(Roles.R2, new JVariant("2")));
+		model.add(ImmutableMap.of(Roles.R2, new JVariant("4")));
+
+		assertEquals(ImmutableList.of(1, 3), model.asMappedList(Roles.R1, String.class));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void asMappedList_default1() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(1), Roles.R2, new JVariant("2")));
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(3), Roles.R2, new JVariant("4")));
+
+		assertEquals(ImmutableList.of(1, 3), model.asMappedList(Roles.R1, Integer.class, null));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void asMappedList_default2() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(1), Roles.R2, new JVariant("2")));
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(3), Roles.R2, new JVariant("4")));
+
+		assertEquals(ImmutableList.of("", ""), model.asMappedList(Roles.R1, String.class, ""));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void asMappedList_default3() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.add(ImmutableMap.of());
+		model.add(ImmutableMap.of());
+
+		assertEquals(ImmutableList.of(0, 0), model.asMappedList(Roles.R1, Integer.class, 0));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void test_swapped() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(1), Roles.R2, new JVariant("2")));
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(3), Roles.R2, new JVariant("4")));
+		model.add(ImmutableMap.of(Roles.R1, new JVariant(5), Roles.R2, new JVariant("6")));
+
+		final ImmutableList<ImmutableMap<Roles, JVariant>> expected = ImmutableList.of(
+				ImmutableMap.of(Roles.R1, new JVariant(5), Roles.R2, new JVariant("6")),
+				ImmutableMap.of(Roles.R1, new JVariant(3), Roles.R2, new JVariant("4")),
+				ImmutableMap.of(Roles.R1, new JVariant(1), Roles.R2, new JVariant("2")));
+		model.swap(0, 2);
+		assertEquals(expected, model);
+
+		model.swap(1, 1);
+		assertEquals(expected, model);
 	}
 }

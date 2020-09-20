@@ -24,6 +24,7 @@ package com.github.sdankbar.qml.testing.models;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -273,6 +274,32 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	@Override
 	public SignalLock lockSignals() {
 		return new SignalLock(null);
+	}
+
+	@Override
+	public <L> ImmutableList<L> asMappedList(final K key, final Class<L> t) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+		return stream().map(m -> m.get(key).asType(t).get()).collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public <L> ImmutableList<L> asMappedList(final K key, final Class<L> t, final L defaultValue) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+		return stream().map(m -> {
+			final JVariant var = m.get(key);
+			if (var != null) {
+				return var.asType(t, defaultValue);
+			} else {
+				return defaultValue;
+			}
+		}).collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public void swap(final int source, final int destination) {
+		Collections.swap(this, source, destination);
 	}
 
 }

@@ -25,6 +25,7 @@ package com.github.sdankbar.qml;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Test;
@@ -50,12 +51,7 @@ public class JQMLListViewModelTest {
 	}
 
 	private enum Roles {
-		R1,
-		R2,
-		R3,
-		R4,
-		R5,
-		is_selected;
+		R1, R2, R3, R4, R5, is_selected;
 	}
 
 	/**
@@ -170,6 +166,255 @@ public class JQMLListViewModelTest {
 		assertEquals(ImmutableList.of(Integer.valueOf(1)), model.getSelectedIndices());
 		assertEquals(ImmutableList.of(ImmutableMap.of(Roles.R1, new JVariant("B"), Roles.R3, new JVariant(9),
 				Roles.is_selected, JVariant.TRUE)), model.getSelected());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void getSelected1() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("A"));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("B"));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.getModel().add(data.build());
+		}
+
+		model.select(1);
+
+		assertEquals(new JVariant("A"), model.getModel().getData(0, Roles.R1).get());
+		assertEquals(new JVariant(5), model.getModel().getData(0, Roles.R5).get());
+		assertEquals(new JVariant("B"), model.getModel().getData(1, Roles.R1).get());
+		assertEquals(new JVariant(4), model.getModel().getData(1, Roles.R4).get());
+
+		assertEquals(ImmutableList.of(Integer.valueOf(1)), model.getSelectedIndices());
+		{
+			assertEquals("B", model.getSelected(Roles.R1, String.class));
+		}
+		{
+			assertEquals(4, model.getSelected(Roles.R4, Integer.class).intValue());
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void getSelected2() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("A"));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("B"));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.getModel().add(data.build());
+		}
+
+		model.getSelected(Roles.R1, String.class);
+	}
+
+	/**
+	 *
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void getSelected3() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("A"));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("B"));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.getModel().add(data.build());
+		}
+
+		model.select(1);
+
+		model.getSelected(Roles.R4, String.class);
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void getSelectedOptional() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+				SelectionMode.SINGLE, PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("A"));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("B"));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.getModel().add(data.build());
+		}
+
+		model.select(1);
+
+		assertEquals(new JVariant("A"), model.getModel().getData(0, Roles.R1).get());
+		assertEquals(new JVariant(5), model.getModel().getData(0, Roles.R5).get());
+		assertEquals(new JVariant("B"), model.getModel().getData(1, Roles.R1).get());
+		assertEquals(new JVariant(4), model.getModel().getData(1, Roles.R4).get());
+
+		assertEquals(ImmutableList.of(Integer.valueOf(1)), model.getSelectedIndices());
+		{
+			assertEquals(Optional.empty(), model.getSelectedOptional(Roles.R4, String.class));
+		}
+		{
+			assertEquals(Optional.empty(), model.getSelectedOptional(Roles.R2, String.class));
+		}
+		{
+			assertEquals("B", model.getSelectedOptional(Roles.R1, String.class).get());
+		}
+
+		model.deselectAll();
+		{
+
+			assertEquals(Optional.empty(), model.getSelectedOptional(Roles.R2, String.class));
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void getAllSelected() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+				SelectionMode.MULTIPLE, PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("A"));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("B"));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("C"));
+			data.put(Roles.R4, new JVariant(3));
+
+			model.getModel().add(data.build());
+		}
+
+		model.select(1);
+		model.select(2);
+
+		{
+			assertEquals(ImmutableList.of("B", "C"), model.getAllSelected(Roles.R1, String.class));
+		}
+		{
+			assertEquals(ImmutableList.of(), model.getAllSelected(Roles.R1, Integer.class));
+		}
+		{
+			assertEquals(ImmutableList.of(), model.getAllSelected(Roles.R2, Integer.class));
+		}
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void getAllSelected_default() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListViewModel<Roles> model = JQMLListViewModel.create("list_view", Roles.class, app,
+				SelectionMode.MULTIPLE, PutMode.RETURN_PREVIOUS_VALUE);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("A"));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("B"));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.getModel().add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant("C"));
+			data.put(Roles.R4, new JVariant(3));
+
+			model.getModel().add(data.build());
+		}
+
+		model.select(1);
+		model.select(2);
+
+		{
+			assertEquals(ImmutableList.of("B", "C"), model.getAllSelected(Roles.R1, String.class, null));
+		}
+		{
+			assertEquals(ImmutableList.of(9, 9), model.getAllSelected(Roles.R1, Integer.class, 9));
+		}
+		{
+			assertEquals(ImmutableList.of("", ""), model.getAllSelected(Roles.R2, String.class, ""));
+		}
 	}
 
 }
