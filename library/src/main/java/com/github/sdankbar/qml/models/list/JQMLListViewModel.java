@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import com.github.sdankbar.qml.JQMLApplication;
@@ -34,6 +35,7 @@ import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.ListSelectionChangedEvent;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
@@ -310,6 +312,56 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 			}
 		}
 		return builder.build();
+	}
+
+	public <L> L getSelected(final K key, final Class<L> t) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+
+		final ImmutableList<Map<K, JVariant>> selected = getSelected();
+		Preconditions.checkArgument(selected.size() == 1, "Number of selected is %s, must be 1", selected.size());
+		final JVariant value = selected.get(0).get(key);
+		Preconditions.checkArgument(value != null, "value for key on selected item isn't present");
+		final Optional<L> opt = value.asType(t);
+		Preconditions.checkArgument(opt.isPresent(), "value for key cannot be converted to %s", t.getName());
+		return opt.get();
+	}
+
+	public <L> Optional<L> getSelectedOptional(final K key, final Class<L> t) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+
+		final ImmutableList<Map<K, JVariant>> selected = getSelected();
+		if (selected.size() != 1) {
+			return Optional.empty();
+		}
+		final JVariant value = selected.get(0).get(key);
+		if (value != null) {
+			return value.asType(t);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public <L> ImmutableList<L> getAllSelected(final K key, final Class<L> t) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+		final ImmutableList<Map<K, JVariant>> selected = getSelected();
+		return selected.stream().map(m -> m.get(key)).filter(var -> var != null && var.isInstanceOf(t))
+				.map(m -> m.asType(t).get()).collect(ImmutableList.toImmutableList());
+	}
+
+	public <L> ImmutableList<L> getAllSelected(final K key, final Class<L> t, final L defaultValue) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+		final ImmutableList<Map<K, JVariant>> selected = getSelected();
+		return selected.stream().map(m -> m.get(key)).map(var -> {
+			if (var == null || !var.isInstanceOf(t)) {
+				return defaultValue;
+			} else {
+				return var.asType(t, defaultValue);
+			}
+		}).collect(ImmutableList.toImmutableList());
 	}
 
 	/**

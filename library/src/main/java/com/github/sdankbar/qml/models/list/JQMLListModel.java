@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.JVariant.Type;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -211,4 +213,9 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	 *         unlocked.
 	 */
 	SignalLock lockSignals();
+
+	<L> ImmutableList<L> asMappedList(K key, Class<L> t);
+	<L> ImmutableList<L> asMappedList(K key, Class<L> t, L defaultValue);
+
+	void swap(int source, int destination);
 }

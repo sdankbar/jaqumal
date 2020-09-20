@@ -41,6 +41,7 @@ import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -694,6 +695,42 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 	void unlockSignals() {
 		ListModelFunctions.unlockDataChangedSignal(modelPointer);
+	}
+
+	@Override
+	public <L> ImmutableList<L> asMappedList(final K key, final Class<L> t) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+		return stream().map(m -> m.get(key).asType(t).get()).collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public <L> ImmutableList<L> asMappedList(final K key, final Class<L> t, final L defaultValue) {
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(t, "t is null");
+		return stream().map(m -> {
+			final JVariant var = m.get(key);
+			if (var != null) {
+				return var.asType(t, defaultValue);
+			} else {
+				return defaultValue;
+			}
+		}).collect(ImmutableList.toImmutableList());
+	}
+
+	@Override
+	public void swap(final int source, final int destination) {
+		final int length = size();
+		Preconditions.checkArgument(0 <= source && source < length, "Source outside valid range, %s", source);
+		Preconditions.checkArgument(0 <= destination && destination < length, "destination outside valid range, %s",
+				destination);
+		if (source != destination) {
+			final Map<K, JVariant> sourceMap = ImmutableMap.copyOf(get(source));
+			final Map<K, JVariant> destinationMap = get(destination);
+
+			assign(source, destinationMap);
+			assign(destination, sourceMap);
+		}
 	}
 
 }
