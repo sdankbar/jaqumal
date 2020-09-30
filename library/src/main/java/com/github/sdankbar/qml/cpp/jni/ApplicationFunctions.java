@@ -46,10 +46,12 @@ public final class ApplicationFunctions {
 		final BufferedInputStream stream = new BufferedInputStream(
 				ClassLoader.getSystemResourceAsStream("win32-x86-64/Jaqumal.dll"));
 		try {
-			final byte[] libraryData = stream.readAllBytes();
 			final File libraryFile = File.createTempFile("Jaquamal", ".dll");
 			try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(libraryFile))) {
-				writer.write(libraryData);
+				int b;
+				while ((b = stream.read()) != -1) {
+					writer.write(b);
+				}
 			}
 
 			// Cleanup extracted dlls from previous runs. Only risk is if two Jaqumal apps
