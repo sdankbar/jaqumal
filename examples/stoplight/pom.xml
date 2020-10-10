@@ -30,7 +30,7 @@
 	<parent>
 		<groupId>com.github.sdankbar.jaqumal</groupId>
 		<artifactId>examples</artifactId>
-		<version>0.5.1-SNAPSHOT</version>
+		<version>0.5.1-${os.family}-SNAPSHOT</version>
 	</parent>
 	<artifactId>stoplight</artifactId>
 	<packaging>jar</packaging>

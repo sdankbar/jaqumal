@@ -47,8 +47,8 @@ following must be installed/configured before building.
 
 Change directories to the root of the Jaqumal git repository and run the following commands.
 
-- mvn -DskipTests install
-- mvn install
+- mvn -DskipTests -Dos.family=linux install
+- mvn -Dos.family=linux install
 
 The first attempt to build must skip tests so that the C++ library, which is used in the unit tests, is available.
 
@@ -77,8 +77,8 @@ following must be installed/configured before building.
 
 Change directories to the root of the Jaqumal git repository and run the following commands.
 
-- mvn -DskipTests install
-- mvn install
+- mvn -DskipTests -Dos.family=windows install
+- mvn -Dos.family=windows install
 
 The first attempt to build must skip tests so that the C++ library, which is used in the unit tests, is available.
 
