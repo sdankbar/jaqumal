@@ -64,6 +64,10 @@ import com.google.common.collect.ImmutableList;
  */
 public class JVariant {
 
+	public interface Storable {
+		void store(int role);
+	}
+
 	/**
 	 * Enumeration of the types supported by JVariant.
 	 */
@@ -187,7 +191,11 @@ public class JVariant {
 		 * 4 native endian order bytes for count and for each point 8 native endian
 		 * order bytes for x, 8 native endian order bytes for y
 		 */
-		POLYLINE
+		POLYLINE,
+		/**
+		 * User defined type.
+		 */
+		CUSTOM
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(JVariant.class);
@@ -280,6 +288,10 @@ public class JVariant {
 
 	private static JVariant fromUUID(final String str) {
 		return new JVariant(UUID.fromString(str));
+	}
+
+	private static JVariant fromStorable(final Storable obj) {
+		return new JVariant(obj);
 	}
 
 	/**
@@ -540,6 +552,11 @@ public class JVariant {
 	 */
 	public JVariant(final UUID v) {
 		type = Type.UUID;
+		obj = Objects.requireNonNull(v, "v is null");
+	}
+
+	public JVariant(final Storable v) {
+		type = Type.CUSTOM;
 		obj = Objects.requireNonNull(v, "v is null");
 	}
 
@@ -924,6 +941,19 @@ public class JVariant {
 		}
 	}
 
+	public Storable asStorable() {
+		Preconditions.checkArgument(type == Type.CUSTOM, "Wrong type, type is {}", type);
+		return (Storable) obj;
+	}
+
+	public Storable asStorable(final Storable defaultValue) {
+		if (type == Type.CUSTOM) {
+			return (Storable) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
 	/**
 	 * @param c The type to attempt to cast this JVariant's value to.
 	 * @return This JVariant's value cast to type T wrapped in an Optional or
@@ -1058,108 +1088,112 @@ public class JVariant {
 
 	public void sendToQML(final int role) {
 		switch (type) {
-			case BOOL: {
-				QMLDataTransfer.setBoolean(((Boolean) obj).booleanValue(), role);
-				break;
+		case BOOL: {
+			QMLDataTransfer.setBoolean(((Boolean) obj).booleanValue(), role);
+			break;
+		}
+		case BYTE_ARRAY: {
+			QMLDataTransfer.setByteArray(((byte[]) obj), role);
+			break;
+		}
+		case COLOR: {
+			QMLDataTransfer.setColor(((Color) obj).getRGB(), role);
+			break;
+		}
+		case DATE_TIME: {
+			final Instant i = (Instant) obj;
+			QMLDataTransfer.setDateTime(i.getEpochSecond(), i.getNano(), role);
+			break;
+		}
+		case DOUBLE: {
+			QMLDataTransfer.setDouble(((Double) obj).doubleValue(), role);
+			break;
+		}
+		case FLOAT: {
+			QMLDataTransfer.setFloat(((Float) obj).floatValue(), role);
+			break;
+		}
+		case IMAGE: {
+			final BufferedImage image = (BufferedImage) obj;
+			final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+			final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
+			b.order(ByteOrder.nativeOrder());
+			for (final int p : pixels) {
+				b.putInt(p);
 			}
-			case BYTE_ARRAY: {
-				QMLDataTransfer.setByteArray(((byte[]) obj), role);
-				break;
+			final byte[] array = b.array();
+			QMLDataTransfer.setImage(image.getWidth(), image.getHeight(), array, role);
+			break;
+		}
+		case INT: {
+			QMLDataTransfer.setInteger(((Integer) obj).intValue(), role);
+			break;
+		}
+		case LINE: {
+			final Line2D l = (Line2D) obj;
+			QMLDataTransfer.setLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2(), role);
+			break;
+		}
+		case LONG: {
+			QMLDataTransfer.setLong(((Long) obj).longValue(), role);
+			break;
+		}
+		case POINT: {
+			final Point2D p = (Point2D) obj;
+			QMLDataTransfer.setPoint((int) p.getX(), (int) p.getY(), role);
+			break;
+		}
+		case RECTANGLE: {
+			final Rectangle2D r = (Rectangle2D) obj;
+			QMLDataTransfer.setLine((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight(), role);
+			break;
+		}
+		case REGULAR_EXPRESSION: {
+			final Pattern s = (Pattern) obj;
+			QMLDataTransfer.setRegularExpression(s.pattern(), role);
+			break;
+		}
+		case SIZE: {
+			final Dimension s = (Dimension) obj;
+			QMLDataTransfer.setSize(s.width, s.height, role);
+			break;
+		}
+		case STRING: {
+			QMLDataTransfer.setString(((String) obj), role);
+			break;
+		}
+		case URL: {
+			QMLDataTransfer.setURL(((URL) obj).toExternalForm(), role);
+			break;
+		}
+		case UUID: {
+			QMLDataTransfer.setUUID(((UUID) obj).toString(), role);
+			break;
+		}
+		case FONT: {
+			QMLDataTransfer.setFont(((JFont) obj).toString(), role);
+			break;
+		}
+		case POLYLINE: {
+			@SuppressWarnings("unchecked")
+			final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
+			final double[] array = new double[2 * list.size()];
+			int i = 0;
+			for (final Point2D p : list) {
+				array[i++] = p.getX();
+				array[i++] = p.getY();
 			}
-			case COLOR: {
-				QMLDataTransfer.setColor(((Color) obj).getRGB(), role);
-				break;
-			}
-			case DATE_TIME: {
-				final Instant i = (Instant) obj;
-				QMLDataTransfer.setDateTime(i.getEpochSecond(), i.getNano(), role);
-				break;
-			}
-			case DOUBLE: {
-				QMLDataTransfer.setDouble(((Double) obj).doubleValue(), role);
-				break;
-			}
-			case FLOAT: {
-				QMLDataTransfer.setFloat(((Float) obj).floatValue(), role);
-				break;
-			}
-			case IMAGE: {
-				final BufferedImage image = (BufferedImage) obj;
-				final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-				final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
-				b.order(ByteOrder.nativeOrder());
-				for (final int p : pixels) {
-					b.putInt(p);
-				}
-				final byte[] array = b.array();
-				QMLDataTransfer.setImage(image.getWidth(), image.getHeight(), array, role);
-				break;
-			}
-			case INT: {
-				QMLDataTransfer.setInteger(((Integer) obj).intValue(), role);
-				break;
-			}
-			case LINE: {
-				final Line2D l = (Line2D) obj;
-				QMLDataTransfer.setLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(), (int) l.getY2(), role);
-				break;
-			}
-			case LONG: {
-				QMLDataTransfer.setLong(((Long) obj).longValue(), role);
-				break;
-			}
-			case POINT: {
-				final Point2D p = (Point2D) obj;
-				QMLDataTransfer.setPoint((int) p.getX(), (int) p.getY(), role);
-				break;
-			}
-			case RECTANGLE: {
-				final Rectangle2D r = (Rectangle2D) obj;
-				QMLDataTransfer.setLine((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight(), role);
-				break;
-			}
-			case REGULAR_EXPRESSION: {
-				final Pattern s = (Pattern) obj;
-				QMLDataTransfer.setRegularExpression(s.pattern(), role);
-				break;
-			}
-			case SIZE: {
-				final Dimension s = (Dimension) obj;
-				QMLDataTransfer.setSize(s.width, s.height, role);
-				break;
-			}
-			case STRING: {
-				QMLDataTransfer.setString(((String) obj), role);
-				break;
-			}
-			case URL: {
-				QMLDataTransfer.setURL(((URL) obj).toExternalForm(), role);
-				break;
-			}
-			case UUID: {
-				QMLDataTransfer.setUUID(((UUID) obj).toString(), role);
-				break;
-			}
-			case FONT: {
-				QMLDataTransfer.setFont(((JFont) obj).toString(), role);
-				break;
-			}
-			case POLYLINE: {
-				@SuppressWarnings("unchecked")
-				final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
-				final double[] array = new double[2 * list.size()];
-				int i = 0;
-				for (final Point2D p : list) {
-					array[i++] = p.getX();
-					array[i++] = p.getY();
-				}
-				QMLDataTransfer.setPolyline(list.size(), array, role);
-				break;
-			}
-			default: {
-				logger.error("Unkonwn type {}", type);
-				throw new IllegalStateException("Unkonwn type " + type);
-			}
+			QMLDataTransfer.setPolyline(list.size(), array, role);
+			break;
+		}
+		case CUSTOM: {
+			((Storable) obj).store(role);
+			break;
+		}
+		default: {
+			logger.error("Unkonwn type {}", type);
+			throw new IllegalStateException("Unkonwn type " + type);
+		}
 		}// end switch
 	}
 

@@ -41,6 +41,17 @@ namespace
 const std::size_t MAX_SIZE = 1024;
 }
 
+void QMLDataTransferStore(const QVariant& var, int32_t role)
+{
+    QMLDataTransfer::store(var, role);
+}
+
+void QMLDataTransferSetJVariantConverter(
+        std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func)
+{
+    QMLDataTransfer::setJVariantConverter(func);
+}
+
 JNICALL void setInteger(JNIEnv*, jclass, jint i, jint roleIndex)
 {
     QMLDataTransfer::store(static_cast<int32_t>(i), roleIndex);
@@ -183,6 +194,7 @@ JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, ji
     env->ReleaseDoubleArrayElements(data, array, JNI_ABORT);
 }
 
+std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> QMLDataTransfer::toJVariantFunc;
 std::vector<QVariant> QMLDataTransfer::variants;
 QVector<int32_t> QMLDataTransfer::roleStack;
 
@@ -200,6 +212,7 @@ jmethodID QMLDataTransfer::fromPointMethod;
 jmethodID QMLDataTransfer::fromRectangleMethod;
 jmethodID QMLDataTransfer::fromURLMethod;
 jmethodID QMLDataTransfer::fromUUIDMethod;
+jmethodID QMLDataTransfer::fromStorableMethod;
 
 jmethodID QMLDataTransfer::booleanConstructor;
 jmethodID QMLDataTransfer::byteArrayConstructor;
@@ -228,6 +241,8 @@ void QMLDataTransfer::initialize(JNIEnv* env)
     fromRectangleMethod = env->GetStaticMethodID(jvariantClass, "fromRectangle", "(IIII)Lcom/github/sdankbar/qml/JVariant;");
     fromURLMethod = env->GetStaticMethodID(jvariantClass, "fromURL", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
     fromUUIDMethod = env->GetStaticMethodID(jvariantClass, "fromUUID", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
+    fromStorableMethod = env->GetStaticMethodID(jvariantClass, "fromStorable",
+                                                "(Lcom/github/sdankbar/qml/JVariant$Storable;)Lcom/github/sdankbar/qml/JVariant;");
 
     booleanConstructor = env->GetMethodID(jvariantClass, "<init>", "(Z)V");
     byteArrayConstructor= env->GetMethodID(jvariantClass, "<init>", "([B)V");
@@ -271,6 +286,18 @@ void QMLDataTransfer::uninitialize(JNIEnv* env)
 QVariant& QMLDataTransfer::retrieve(size_t i)
 {
     return variants[i];
+}
+
+void QMLDataTransfer::store(const QVariant& data, int32_t role)
+{
+    variants[roleStack.size()] = data;
+    roleStack.push_back(role);
+}
+
+void QMLDataTransfer::setJVariantConverter(
+        std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func)
+{
+    toJVariantFunc = func;
 }
 
 jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
@@ -385,7 +412,12 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
             env->ReleaseDoubleArrayElements(yArrayObj, yArray, 0);// Commit and release
             return env->CallStaticObjectMethod(jvariantClass, fromPolygonMethod, xArrayObj, yArrayObj);
         }
-        else {
+        else if (toJVariantFunc)
+        {
+            return toJVariantFunc(env, fromStorableMethod, value);
+        }
+        else
+        {
             return nullptr;
         }
     }
