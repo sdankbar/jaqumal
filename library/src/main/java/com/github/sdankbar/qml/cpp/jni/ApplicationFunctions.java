@@ -22,53 +22,16 @@
  */
 package com.github.sdankbar.qml.cpp.jni;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.sdankbar.qml.JScreen;
 import com.github.sdankbar.qml.cpp.jni.interfaces.ImageProviderCallback;
 import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
 import com.github.sdankbar.qml.cpp.jni.interfaces.LoggingCallback;
+import com.github.sdankbar.qml.utility.LibraryUtilities;
 
 public final class ApplicationFunctions {
 
-	private static final Logger logger = LoggerFactory.getLogger(ApplicationFunctions.class);
-
 	static {
-		logger.info("Load Jaqumal.dll");
-		final BufferedInputStream stream = new BufferedInputStream(
-				ClassLoader.getSystemResourceAsStream("win32-x86-64/Jaqumal.dll"));
-		try {
-			final File libraryFile = File.createTempFile("Jaquamal", ".dll");
-			try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(libraryFile))) {
-				int b;
-				while ((b = stream.read()) != -1) {
-					writer.write(b);
-				}
-			}
-
-			// Cleanup extracted dlls from previous runs. Only risk is if two Jaqumal apps
-			// are started at the same time, could delete each other's extract dlls.
-			// Once System.load is called, this is less of an issue.
-			final File temporaryDir = libraryFile.getParentFile();
-			final File[] oldDlls = temporaryDir.listFiles((FilenameFilter) (dir, name) -> name.startsWith("Jaquamal")
-					&& name.endsWith(".dll") && !name.equals(libraryFile.getName()));
-			for (final File f : oldDlls) {
-				f.delete();
-			}
-
-			System.load(libraryFile.getAbsolutePath());
-		} catch (final IOException e) {
-			logger.error("Failed to load Jaqumal.dll", e);
-		}
-		logger.info("Finish - Load Jaqumal.dll");
+		LibraryUtilities.loadLibrary("Jaqumal");
 	}
 
 	private ApplicationFunctions() {

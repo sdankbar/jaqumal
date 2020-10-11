@@ -54,6 +54,8 @@ public class App {
 		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("test_model", Roles.class,
 				PutMode.RETURN_PREVIOUS_VALUE);
 
+		Native.print();
+
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 
 		app.execute();

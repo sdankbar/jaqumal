@@ -24,12 +24,18 @@
 
 #include <jni.h>
 #include <QObject>
+#include <QQuickPaintedItem>
+
+class NewType : public QQuickPaintedItem  {
+public:
+    NewType(QQuickItem* parent = nullptr);
+
+    virtual void paint(QPainter *painter);
+};
 
 class RegisterNewType : public QObject
 {
 public:
-    static void initialize(JNIEnv* env);
-    static void uninitialize(JNIEnv* env);
 
 private:
     RegisterNewType();

@@ -25,3 +25,4 @@ qmake -v
 qmake ./NewType.pro -spec win32-g++
 mingw32-make qmake_all
 mingw32-make -j
+copy libs\NewType.dll ..\resources\win32-x86-64

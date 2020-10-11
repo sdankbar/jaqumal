@@ -20,40 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "registerNewType.h"
-#include <QPainter>
-#include <iostream>
+package com.github.sdankbar.examples.new_type;
 
-jint JNI_OnLoad(JavaVM* vm, void*)
-{
-    JNIEnv* env;
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_2) != JNI_OK) {
-        std::cout << "  bad version" << std::endl;
-        return JNI_ERR;
-    }
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    std::cout << "RegisterNewType OnLoad" << std::endl;
+import com.github.sdankbar.qml.utility.LibraryUtilities;
 
-    qmlRegisterType<NewType>("com.github.sdankbar.jaqumal", 0, 4, "NewType");
+public final class Native {
 
-    // Return the JNI Version as required by method
-    return JNI_VERSION_1_2;
+	private static final Logger logger = LoggerFactory.getLogger(Native.class);
+
+	static {
+		LibraryUtilities.loadLibrary("NewType");
+	}
+
+	private Native() {
+		// Empty Implementation
+	}
+
+	public static void print() {
+		System.out.println("Hello World");
+	}
+
 }
-
-void JNI_OnUnload(JavaVM* vm, void*)
-{
-    std::cout << "RegisterNewType OnUnload" << std::endl;
-}
-
-NewType::NewType(QQuickItem* parent) :
-    QQuickPaintedItem(parent)
-{
-    std::cout << "Construct" << std::endl;
-}
-
-void NewType::paint(QPainter* painter)
-{
-    std::cout << "Paint" << std::endl;
-    painter->drawText(50, 50, "Hello NewType");
-}
-

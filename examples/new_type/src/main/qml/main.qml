@@ -30,135 +30,20 @@ import com.github.sdankbar.jaqumal 0.4
 
 Window {
     visible: true
-    width: 800
-    height: 600
+    width: 200
+    height: 200
     x: 400
     y: 400
-    title: qsTr("ColorEditor")
+    title: qsTr("NewType")
     id: mainWindow
 
-    readonly property int presetListWidth: 350
-
-    EventBuilder {
-        id: eventing
+    Text {
+      text: "Hello World"
     }
-    
-    Connections {
-        target: presetColors
-    
-        onSizeChanged: {
-            console.error("New size is "+ presetColors.size)
-        }
-    }
-
-    Row {
-        Rectangle {
-            width: presetListWidth
-            height: 600
-            border.width: 1
-            border.color: "gray"
-
-            ScrollView {
-                anchors.fill: parent
-                ListView {
-                    anchors.fill: parent
-                    spacing: 1
-
-                    model: presetColors
-                    delegate: presetColorsDelegate
-                }
-            }
-        }
-
-        Item {
-            width: 70
-            height: 600
-            Column {
-                property int spaceForPadding: (parent.height - 2 * 50)
-                topPadding: spaceForPadding / 4
-                bottomPadding: spaceForPadding / 4
-                spacing: spaceForPadding / 4
-
-                JButton {
-                    model: addPresetColor
-                    width: 60
-                    height: 50
-                }
-
-                JButton {
-                    model: saveColors
-                    width: 60
-                    height: 50
-                }
-            }
-        }
-    }
-
-    Component {
-        id: presetColorsDelegate
-        Item {
-            width: presetListWidth
-            height: 28
-
-            Row {
-                leftPadding: 5
-                spacing: 5
-
-                Rectangle {
-                    width: 200
-                    height: parent.height
-                    border.width: 2
-                    border.color: "black"
-
-                    TextInput {
-                        text: colorName
-                        width: 200
-                        x: 5
-                        y: 2
-
-                        onEditingFinished: {
-                            eventing.addInteger(index)
-                            eventing.addString(text)
-                            console.error("fireEvent returned ("+eventing.fireEvent("PresetColorNameEdited")+")")
-                        }
-
-                        onAccepted: {
-                            focus = false
-                        }
-                    }
-                }
-                Rectangle {
-                    width: 50
-                    height: parent.height
-
-                    color: colorRGB
-                }
-
-                Button {
-                    width: 70
-                    text: "Edit"
-
-                    onClicked: {
-                        presetColorPicker.editedColorIndex = index
-                        presetColorPicker.open()
-                    }
-                }
-            }
-        }
-    }
-
-    ColorDialog {
-        id: presetColorPicker
-        title: "Select a color"
-
-        property var editedColorIndex
-
-        modality: Qt.ApplicationModal
-
-        onAccepted: {
-            eventing.addInteger(editedColorIndex)
-            eventing.addColor(color)
-            console.error("fireEvent returned ("+eventing.fireEvent("PresetColorEdited")+")")
-        }
+    NewType {
+    	x: 0
+    	y: 0
+    	width: 150
+    	height: 100
     }
 }
