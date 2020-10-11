@@ -33,14 +33,14 @@ extern JNINativeMethod JNIUtilitiescreateJNIMethod(
 
 jobject convert(JNIEnv* env, jmethodID method, const QVariant& var)
 {
-    //if (var.canConvert<QSharedPointer<StringPosition>>()) {
-        //QSharedPointer<StringPosition> ptr = var.value<QSharedPointer<StringPosition>>();
+    if (var.canConvert<QSharedPointer<StringPosition>>()) {
+        QSharedPointer<StringPosition> ptr = var.value<QSharedPointer<StringPosition>>();
         // TODO
         //env->CallStaticObjectMethod(method)
         return nullptr;
-    //} else {
+    } else {
         return nullptr;
-    //}
+    }
 }
 
 JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, jint roleIndex)
@@ -49,6 +49,8 @@ JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, j
     QSharedPointer<StringPosition> ptr = QSharedPointer<StringPosition>::create("A", x, y);
     //QMLDataTransferStore(var, roleIndex);
 }
+
+Q_DECLARE_METATYPE(StringPosition);
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
@@ -59,6 +61,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     }
 
     //QMLDataTransferSetJVariantConverter(&convert);
+
 
     qmlRegisterType<NewType>("com.github.sdankbar.jaqumal", 0, 4, "NewType");
 
@@ -73,7 +76,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     return JNI_VERSION_1_2;
 }
 
-void JNI_OnUnload(JavaVM* vm, void*)
+void JNI_OnUnload(JavaVM*, void*)
 {
    // Empty Implementation
 }
@@ -88,6 +91,24 @@ void NewType::paint(QPainter* painter)
 {
     std::cout << "Paint" << std::endl;
     painter->drawText(50, 50, "Hello NewType");
+}
+
+StringPosition::StringPosition():
+    QObject(nullptr),
+    str(""),
+    x(0),
+    y(0)
+{
+    // Empty Implementation
+}
+
+StringPosition::StringPosition(const StringPosition& arg):
+    QObject(arg.parent()),
+    str(arg.str),
+    x(arg.x),
+    y(arg.y)
+{
+    // Empty Implementation
 }
 
 StringPosition::StringPosition(const QString& str2, int32_t x2, int32_t y2) :
