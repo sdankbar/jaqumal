@@ -25,10 +25,10 @@
 #include <QSharedPointer>
 #include <iostream>
 
-extern void QMLDataTransferStore(const QVariant& var, int32_t role);
-extern void QMLDataTransferSetJVariantConverter(
+void QMLDataTransferStore(const QVariant& var, int32_t role);
+void QMLDataTransferSetJVariantConverter(
         std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func);
-extern JNINativeMethod JNIUtilitiescreateJNIMethod(
+Q_DECL_IMPORT JNINativeMethod JNIUtilitiescreateJNIMethod(
         const char* name, const char* sig, void* funcPtr);
 
 jobject convert(JNIEnv* env, jmethodID method, const QVariant& var)
@@ -66,7 +66,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
     qmlRegisterType<NewType>("com.github.sdankbar.jaqumal", 0, 4, "NewType");
 
     JNINativeMethod methods[] = {
-        //JNIUtilitiescreateJNIMethod("setTestStorable",    "(Ljava/lang/String;III)V",    (void *)&setTestStorable)
+        JNIUtilitiescreateJNIMethod("setTestStorable",    "(Ljava/lang/String;III)V",    (void *)&setTestStorable)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/examples/new_type/Native");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));

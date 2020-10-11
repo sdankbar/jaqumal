@@ -28,7 +28,6 @@ TEMPLATE = lib
 OBJECTS_DIR = objs
 MOC_DIR = mocs
 DESTDIR = libs
-CONFIG += qmltestcase
 
 INCLUDEPATH += include
 
@@ -39,6 +38,9 @@ win32 {
     INCLUDEPATH += "$$getenv(JAVA_HOME)/include" \
                    "$$getenv(JAVA_HOME)/include/unix"
 }
+
+# TODO figure out a better way to access the .a on Windows
+LIBS += "../../../../../library/src/main/cpp/libs/libJaqumal.a"
 
 SOURCES += \
     impl/registerNewType.cpp

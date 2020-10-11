@@ -24,7 +24,7 @@
 #include "jni.h"
 #include <QString>
 
-extern JNINativeMethod JNIUtilitiescreateJNIMethod(const char* name, const char* sig, void* funcPtr);
+Q_DECL_EXPORT JNINativeMethod JNIUtilitiescreateJNIMethod(const char* name, const char* sig, void* funcPtr);
 
 class JNIUtilities
 {

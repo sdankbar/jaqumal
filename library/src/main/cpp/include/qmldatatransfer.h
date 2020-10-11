@@ -26,8 +26,8 @@
 #include <QVariant>
 #include <QVector>
 
-extern void QMLDataTransferStore(const QVariant& var, int32_t role);
-extern void QMLDataTransferSetJVariantConverter(
+void QMLDataTransferStore(const QVariant& var, int32_t role);
+void QMLDataTransferSetJVariantConverter(
         std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func);
 
 class QMLDataTransfer
