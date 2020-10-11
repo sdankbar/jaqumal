@@ -76,7 +76,6 @@ HEADERS += \
     include/qmllogging.h \
     include/eventdispatcher.h \
     include/requestbuilder.h \
-    include/sharedexports.h \
     include/singletonmodelfunctions.h \
     include/userinputsimulator.h \
     include/qmlimageprovider.h \
