@@ -41,8 +41,8 @@ public class App {
 
 	}
 
-	private enum PresetColorsRoles {
-		colorName, colorRGB
+	private enum Roles {
+		data
 	}
 
 	/**
@@ -51,8 +51,8 @@ public class App {
 	 */
 	public static void main(final String[] args) throws Exception {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<PresetColorsRoles> model = app.getModelFactory().createListModel("presetColors",
-				PresetColorsRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("test_model", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 
