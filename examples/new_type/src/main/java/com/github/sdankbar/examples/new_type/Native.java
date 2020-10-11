@@ -39,6 +39,8 @@ public final class Native {
 		// Empty Implementation
 	}
 
+	public static native void setTestStorable(String str, int x, int y, int roleIndex);
+
 	public static void print() {
 		System.out.println("Hello World");
 	}

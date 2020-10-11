@@ -33,6 +33,15 @@ public:
     virtual void paint(QPainter *painter);
 };
 
+class StringPosition {
+public:
+    StringPosition(const QString& str, int32_t x, int32_t y);
+private:
+    QString str;
+    int32_t x;
+    int32_t y;
+};
+
 class RegisterNewType : public QObject
 {
 public:

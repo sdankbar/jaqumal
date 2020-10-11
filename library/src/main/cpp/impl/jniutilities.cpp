@@ -32,6 +32,11 @@
 #include "singletonmodelfunctions.h"
 #include "listmodelfunctions.h"
 
+JNINativeMethod JNIUtilitiescreateJNIMethod(const char* name, const char* sig, void* funcPtr)
+{
+    JNIUtilities::createJNIMethod(name, sig, funcPtr);
+}
+
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
     JNIEnv* env;

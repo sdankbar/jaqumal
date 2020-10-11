@@ -22,7 +22,33 @@
  */
 #include "registerNewType.h"
 #include <QPainter>
+#include <QSharedPointer>
 #include <iostream>
+
+extern void QMLDataTransferStore(const QVariant& var, int32_t role);
+extern void QMLDataTransferSetJVariantConverter(
+        std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func);
+extern JNINativeMethod JNIUtilitiescreateJNIMethod(
+        const char* name, const char* sig, void* funcPtr);
+
+jobject convert(JNIEnv* env, jmethodID method, const QVariant& var)
+{
+    //if (var.canConvert<QSharedPointer<StringPosition>>()) {
+        //QSharedPointer<StringPosition> ptr = var.value<QSharedPointer<StringPosition>>();
+        // TODO
+        //env->CallStaticObjectMethod(method)
+        return nullptr;
+    //} else {
+        return nullptr;
+    //}
+}
+
+JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, jint roleIndex)
+{
+    QVariant var;
+    QSharedPointer<StringPosition> ptr = QSharedPointer<StringPosition>::create("A", x, y);
+    //QMLDataTransferStore(var, roleIndex);
+}
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
@@ -32,9 +58,16 @@ jint JNI_OnLoad(JavaVM* vm, void*)
         return JNI_ERR;
     }
 
-    std::cout << "RegisterNewType OnLoad" << std::endl;
+    //QMLDataTransferSetJVariantConverter(&convert);
 
     qmlRegisterType<NewType>("com.github.sdankbar.jaqumal", 0, 4, "NewType");
+
+    JNINativeMethod methods[] = {
+        //JNIUtilitiescreateJNIMethod("setTestStorable",    "(Ljava/lang/String;III)V",    (void *)&setTestStorable)
+    };
+    jclass javaClass = env->FindClass("com/github/sdankbar/examples/new_type/Native");
+    env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));
+    env->DeleteLocalRef(javaClass);
 
     // Return the JNI Version as required by method
     return JNI_VERSION_1_2;
@@ -42,7 +75,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
 
 void JNI_OnUnload(JavaVM* vm, void*)
 {
-    std::cout << "RegisterNewType OnUnload" << std::endl;
+   // Empty Implementation
 }
 
 NewType::NewType(QQuickItem* parent) :
@@ -55,5 +88,13 @@ void NewType::paint(QPainter* painter)
 {
     std::cout << "Paint" << std::endl;
     painter->drawText(50, 50, "Hello NewType");
+}
+
+StringPosition::StringPosition(const QString& str2, int32_t x2, int32_t y2) :
+    str(str2),
+    x(x2),
+    y(y2)
+{
+    // Empty Implementation
 }
 
