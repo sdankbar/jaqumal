@@ -23,6 +23,7 @@
 package com.github.sdankbar.examples.new_type;
 
 import com.github.sdankbar.qml.JQMLApplication;
+import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
@@ -55,8 +56,7 @@ public class App {
 				PutMode.RETURN_PREVIOUS_VALUE);
 
 		Native.print();
-		// model.put(Roles.data, new JVariant(new TestStorable("Storable String", 15,
-		// 35)));
+		model.put(Roles.data, new JVariant(new TestStorable("Storable String", 15, 35)));
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 

@@ -39,11 +39,19 @@ jmethodID testStorableConstructor;
 
 jobject convert(JNIEnv* env, jclass jvariantClass, jmethodID method, const QVariant& var)
 {
+    std::cerr << "Convert" << std::endl;
     if (var.canConvert<QSharedPointer<StringPosition>>()) {
         QSharedPointer<StringPosition> ptr = var.value<QSharedPointer<StringPosition>>();
-        jstring str = JNIUtilities_toJString(env, ptr->getString());
-        jobject jobj = env->NewObject(testStorableClass, testStorableConstructor, str, ptr->getX(), ptr->getY());
-        return env->CallStaticObjectMethod(jvariantClass, method, jobj);
+        if (ptr)
+        {
+            jstring str = JNIUtilities_toJString(env, ptr->getString());
+            jobject jobj = env->NewObject(testStorableClass, testStorableConstructor, str, ptr->getX(), ptr->getY());
+            return env->CallStaticObjectMethod(jvariantClass, method, jobj);
+        }
+        else
+        {
+            return nullptr;
+        }
     } else {
         return nullptr;
     }
@@ -51,8 +59,13 @@ jobject convert(JNIEnv* env, jclass jvariantClass, jmethodID method, const QVari
 
 JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, jint roleIndex)
 {
-    QVariant var = QVariant(QSharedPointer<StringPosition>::create(JNIUtilities_toQString(env, str), x, y));
+    std::cerr << "A" << std::endl;
+    QString qstr = JNIUtilities_toQString(env, str);
+    std::cerr << "B" << std::endl;
+    QVariant var = QVariant(QSharedPointer<StringPosition>::create(qstr, x, y));
+    std::cerr << "C" << std::endl;
     QMLDataTransfer_Store(var, roleIndex);
+    std::cerr << "D" << std::endl;
 }
 
 Q_DECLARE_METATYPE(StringPosition);
