@@ -47,7 +47,7 @@ void QMLDataTransfer_Store(const QVariant& var, int32_t role)
 }
 
 void QMLDataTransfer_SetJVariantConverter(
-        std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func)
+        std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> func)
 {
     QMLDataTransfer::setJVariantConverter(func);
 }
@@ -194,7 +194,7 @@ JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, ji
     env->ReleaseDoubleArrayElements(data, array, JNI_ABORT);
 }
 
-std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> QMLDataTransfer::toJVariantFunc;
+std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> QMLDataTransfer::toJVariantFunc;
 std::vector<QVariant> QMLDataTransfer::variants;
 QVector<int32_t> QMLDataTransfer::roleStack;
 
@@ -295,7 +295,7 @@ void QMLDataTransfer::store(const QVariant& data, int32_t role)
 }
 
 void QMLDataTransfer::setJVariantConverter(
-        std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func)
+        std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> func)
 {
     toJVariantFunc = func;
 }
@@ -414,7 +414,7 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
         }
         else if (toJVariantFunc)
         {
-            return toJVariantFunc(env, fromStorableMethod, value);
+            return toJVariantFunc(env, jvariantClass, fromStorableMethod, value);
         }
         else
         {

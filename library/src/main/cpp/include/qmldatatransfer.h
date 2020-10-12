@@ -28,7 +28,7 @@
 
 Q_DECL_EXPORT void QMLDataTransfer_Store(const QVariant& var, int32_t role);
 Q_DECL_EXPORT void QMLDataTransfer_SetJVariantConverter(
-        std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func);
+        std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> func);
 
 class QMLDataTransfer
 {
@@ -37,7 +37,7 @@ public:
     static void uninitialize(JNIEnv* env);
 
     static void setJVariantConverter(
-            std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func);
+            std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> func);
     static void store(const QVariant& data, int32_t role);
 
     template<typename T>
@@ -64,7 +64,7 @@ public:
 private:
     QMLDataTransfer();
 
-    static std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> toJVariantFunc;
+    static std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> toJVariantFunc;
 
     static std::vector<QVariant> variants;
     static QVector<int32_t> roleStack;

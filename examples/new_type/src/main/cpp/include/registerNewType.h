@@ -38,6 +38,11 @@ public:
     StringPosition();
     StringPosition(const StringPosition& arg);
     StringPosition(const QString& str, int32_t x, int32_t y);
+
+    const QString& getString() const;
+    int32_t getX() const;
+    int32_t getY() const;
+
 private:
     QString str;
     int32_t x;

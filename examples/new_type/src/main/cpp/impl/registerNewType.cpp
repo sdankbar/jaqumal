@@ -27,20 +27,23 @@
 
 Q_DECL_IMPORT void QMLDataTransfer_Store(const QVariant& var, int32_t role);
 Q_DECL_IMPORT void QMLDataTransfer_SetJVariantConverter(
-        std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func);
+        std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> func);
 Q_DECL_IMPORT JNINativeMethod JNIUtilities_createJNIMethod(
         const char* name, const char* sig, void* funcPtr);
 Q_DECL_EXPORT jclass JNIUtilities_findClassGlobalReference(JNIEnv* env, const char* name);
 Q_DECL_EXPORT QString JNIUtilities_toQString(JNIEnv* env, jstring str);
 Q_DECL_EXPORT jstring JNIUtilities_toJString(JNIEnv* env, const QString& str);
 
-jobject convert(JNIEnv* env, jmethodID method, const QVariant& var)
+jclass testStorableClass;
+jmethodID testStorableConstructor;
+
+jobject convert(JNIEnv* env, jclass jvariantClass, jmethodID method, const QVariant& var)
 {
     if (var.canConvert<QSharedPointer<StringPosition>>()) {
         QSharedPointer<StringPosition> ptr = var.value<QSharedPointer<StringPosition>>();
-        // TODO
-        //env->CallStaticObjectMethod(method)
-        return nullptr;
+        jstring str = JNIUtilities_toJString(env, ptr->getString());
+        jobject jobj = env->NewObject(testStorableClass, testStorableConstructor, str, ptr->getX(), ptr->getY());
+        return env->CallStaticObjectMethod(jvariantClass, method, jobj);
     } else {
         return nullptr;
     }
@@ -48,9 +51,8 @@ jobject convert(JNIEnv* env, jmethodID method, const QVariant& var)
 
 JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, jint roleIndex)
 {
-    QVariant var;
-    QSharedPointer<StringPosition> ptr = QSharedPointer<StringPosition>::create("A", x, y);
-    //QMLDataTransferStore(var, roleIndex);
+    QVariant var = QVariant(QSharedPointer<StringPosition>::create(JNIUtilities_toQString(env, str), x, y));
+    QMLDataTransfer_Store(var, roleIndex);
 }
 
 Q_DECLARE_METATYPE(StringPosition);
@@ -63,7 +65,7 @@ jint JNI_OnLoad(JavaVM* vm, void*)
         return JNI_ERR;
     }
 
-    //QMLDataTransferSetJVariantConverter(&convert);
+    QMLDataTransfer_SetJVariantConverter(&convert);
 
 
     qmlRegisterType<NewType>("com.github.sdankbar.jaqumal", 0, 4, "NewType");
@@ -120,5 +122,18 @@ StringPosition::StringPosition(const QString& str2, int32_t x2, int32_t y2) :
     y(y2)
 {
     // Empty Implementation
+}
+
+const QString& StringPosition::getString() const
+{
+    return str;
+}
+int32_t StringPosition::getX() const
+{
+    return x;
+}
+int32_t StringPosition::getY() const
+{
+    return y;
 }
 
