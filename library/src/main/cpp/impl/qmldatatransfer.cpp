@@ -41,12 +41,12 @@ namespace
 const std::size_t MAX_SIZE = 1024;
 }
 
-void QMLDataTransferStore(const QVariant& var, int32_t role)
+void QMLDataTransfer_Store(const QVariant& var, int32_t role)
 {
     QMLDataTransfer::store(var, role);
 }
 
-void QMLDataTransferSetJVariantConverter(
+void QMLDataTransfer_SetJVariantConverter(
         std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func)
 {
     QMLDataTransfer::setJVariantConverter(func);

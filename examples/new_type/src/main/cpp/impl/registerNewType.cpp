@@ -25,11 +25,14 @@
 #include <QSharedPointer>
 #include <iostream>
 
-Q_DECL_IMPORT void QMLDataTransferStore(const QVariant& var, int32_t role);
-Q_DECL_IMPORT void QMLDataTransferSetJVariantConverter(
+Q_DECL_IMPORT void QMLDataTransfer_Store(const QVariant& var, int32_t role);
+Q_DECL_IMPORT void QMLDataTransfer_SetJVariantConverter(
         std::function<jobject(JNIEnv*, jmethodID, const QVariant&)> func);
-Q_DECL_IMPORT JNINativeMethod JNIUtilitiescreateJNIMethod(
+Q_DECL_IMPORT JNINativeMethod JNIUtilities_createJNIMethod(
         const char* name, const char* sig, void* funcPtr);
+Q_DECL_EXPORT jclass JNIUtilities_findClassGlobalReference(JNIEnv* env, const char* name);
+Q_DECL_EXPORT QString JNIUtilities_toQString(JNIEnv* env, jstring str);
+Q_DECL_EXPORT jstring JNIUtilities_toJString(JNIEnv* env, const QString& str);
 
 jobject convert(JNIEnv* env, jmethodID method, const QVariant& var)
 {
@@ -47,7 +50,7 @@ JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, j
 {
     QVariant var;
     QSharedPointer<StringPosition> ptr = QSharedPointer<StringPosition>::create("A", x, y);
-    QMLDataTransferStore(var, roleIndex);
+    //QMLDataTransferStore(var, roleIndex);
 }
 
 Q_DECLARE_METATYPE(StringPosition);
@@ -60,13 +63,13 @@ jint JNI_OnLoad(JavaVM* vm, void*)
         return JNI_ERR;
     }
 
-    QMLDataTransferSetJVariantConverter(&convert);
+    //QMLDataTransferSetJVariantConverter(&convert);
 
 
     qmlRegisterType<NewType>("com.github.sdankbar.jaqumal", 0, 4, "NewType");
 
     JNINativeMethod methods[] = {
-        JNIUtilitiescreateJNIMethod("setTestStorable",    "(Ljava/lang/String;III)V",    (void *)&setTestStorable)
+        JNIUtilities_createJNIMethod("setTestStorable",    "(Ljava/lang/String;III)V",    (void *)&setTestStorable)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/examples/new_type/Native");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));

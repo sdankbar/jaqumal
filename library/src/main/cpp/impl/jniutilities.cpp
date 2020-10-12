@@ -32,10 +32,23 @@
 #include "singletonmodelfunctions.h"
 #include "listmodelfunctions.h"
 
-JNINativeMethod JNIUtilitiescreateJNIMethod(const char* name, const char* sig, void* funcPtr)
+JNINativeMethod JNIUtilities_createJNIMethod(const char* name, const char* sig, void* funcPtr)
 {
-    JNIUtilities::createJNIMethod(name, sig, funcPtr);
+    return JNIUtilities::createJNIMethod(name, sig, funcPtr);
 }
+jclass JNIUtilities_findClassGlobalReference(JNIEnv* env, const char* name)
+{
+    return JNIUtilities::findClassGlobalReference(env, name);
+}
+QString JNIUtilities_toQString(JNIEnv* env, jstring str)
+{
+    return JNIUtilities::toQString(env, str);
+}
+jstring JNIUtilities_toJString(JNIEnv* env, const QString& str)
+{
+    return JNIUtilities::toJString(env, str);
+}
+
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {

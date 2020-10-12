@@ -24,7 +24,10 @@
 #include "jni.h"
 #include <QString>
 
-Q_DECL_EXPORT JNINativeMethod JNIUtilitiescreateJNIMethod(const char* name, const char* sig, void* funcPtr);
+Q_DECL_EXPORT JNINativeMethod JNIUtilities_createJNIMethod(const char* name, const char* sig, void* funcPtr);
+Q_DECL_EXPORT jclass JNIUtilities_findClassGlobalReference(JNIEnv* env, const char* name);
+Q_DECL_EXPORT QString JNIUtilities_toQString(JNIEnv* env, jstring str);
+Q_DECL_EXPORT jstring JNIUtilities_toJString(JNIEnv* env, const QString& str);
 
 class JNIUtilities
 {
