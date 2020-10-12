@@ -87,7 +87,8 @@ void JNI_OnUnload(JavaVM*, void*)
 }
 
 NewType::NewType(QQuickItem* parent) :
-    QQuickPaintedItem(parent)
+    QQuickPaintedItem(parent),
+    m_data()
 {
     std::cout << "Construct" << std::endl;
 }
@@ -95,7 +96,33 @@ NewType::NewType(QQuickItem* parent) :
 void NewType::paint(QPainter* painter)
 {
     std::cout << "Paint" << std::endl;
-    painter->drawText(50, 50, "Hello NewType");
+    if (m_data)
+    {
+        painter->drawText(m_data->getX(), m_data->getY(), m_data->getString());
+    }
+    else
+    {
+        painter->drawText(50, 50, "Hello NewType");
+    }
+}
+
+QVariant NewType::data() const
+{
+    QVariant var = QVariant(m_data);
+    return var;
+}
+void NewType::setData(const QVariant& newData)
+{
+    if (newData.canConvert<QSharedPointer<StringPosition>>())
+    {
+        QSharedPointer<StringPosition> newPtr = newData.value<QSharedPointer<StringPosition>>();
+        if (m_data != newPtr)
+        {
+            m_data = newPtr;
+            update();
+            emit dataChanged();
+        }
+    }
 }
 
 StringPosition::StringPosition():

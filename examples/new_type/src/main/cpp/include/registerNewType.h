@@ -26,13 +26,6 @@
 #include <QObject>
 #include <QQuickPaintedItem>
 
-class NewType : public QQuickPaintedItem  {
-public:
-    NewType(QQuickItem* parent = nullptr);
-
-    virtual void paint(QPainter *painter);
-};
-
 class StringPosition : public QObject {
 public:
     StringPosition();
@@ -49,14 +42,25 @@ private:
     int32_t y;
 };
 
-class RegisterNewType : public QObject
-{
+class NewType : public QQuickPaintedItem  {
+    Q_OBJECT
+    Q_PROPERTY(QVariant data READ data WRITE setData NOTIFY dataChanged)
 public:
+    NewType(QQuickItem* parent = nullptr);
+
+    virtual void paint(QPainter *painter);
+
+    QVariant data() const;
+    void setData(const QVariant& newData);
+
+signals:
+    void dataChanged();
 
 private:
-    RegisterNewType();
-    ~RegisterNewType();
+
+    QSharedPointer<StringPosition> m_data;
 };
+
 
 
 

@@ -25,7 +25,7 @@ package com.github.sdankbar.examples.new_type;
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
-import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 
 /**
  * Example application that allow for editing a set of colors.
@@ -51,10 +51,12 @@ public class App {
 	 */
 	public static void main(final String[] args) throws Exception {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("test_model", Roles.class,
+		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("test_model", Roles.class,
 				PutMode.RETURN_PREVIOUS_VALUE);
 
 		Native.print();
+		// model.put(Roles.data, new JVariant(new TestStorable("Storable String", 15,
+		// 35)));
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 
