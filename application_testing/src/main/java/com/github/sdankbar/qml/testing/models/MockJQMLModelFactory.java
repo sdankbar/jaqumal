@@ -169,7 +169,9 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	public <K extends Enum<K>> JQMLListViewModel<K> createListViewModel(final String modelName, final Class<K> keyClass,
 			final SelectionMode mode, final PutMode putMode) {
 		final ImmutableSet<K> userKeys = ImmutableSet.copyOf(EnumSet.allOf(keyClass));
-		return new JQMLListViewModel<>(modelName, userKeys, app, mode, putMode);
+		final JQMLListViewModel<K> model = new JQMLListViewModel<>(modelName, userKeys, app, mode, putMode);
+		listViewModels.put(modelName, model);
+		return model;
 	}
 
 	@Override
