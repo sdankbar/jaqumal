@@ -26,7 +26,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -51,22 +50,13 @@ public class LibraryUtilities {
 		final InputStream windowsLib = ClassLoader.getSystemResourceAsStream(loadDir + "/" + libName + extension);
 		final BufferedInputStream stream = new BufferedInputStream(windowsLib);
 		try {
-			final File libraryFile = File.createTempFile(libName, extension);
+			final File libraryFile = new File(libName + extension);
+			libraryFile.delete();
 			try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(libraryFile))) {
 				int b;
 				while ((b = stream.read()) != -1) {
 					writer.write(b);
 				}
-			}
-
-			// Cleanup extracted dlls from previous runs. Only risk is if two Jaqumal apps
-			// are started at the same time, could delete each other's extract dlls.
-			// Once System.load is called, this is less of an issue.
-			final File temporaryDir = libraryFile.getParentFile();
-			final File[] oldDlls = temporaryDir.listFiles((FilenameFilter) (dir, name) -> name.startsWith(libName)
-					&& name.endsWith(extension) && !name.equals(libraryFile.getName()));
-			for (final File f : oldDlls) {
-				f.delete();
 			}
 
 			System.load(libraryFile.getAbsolutePath());
