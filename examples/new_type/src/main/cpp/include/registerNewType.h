@@ -60,7 +60,7 @@ signals:
 
 private:
 
-    StringPosition m_data;
+    QSharedPointer<StringPosition> m_data;
 };
 
 

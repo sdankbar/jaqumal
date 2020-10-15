@@ -38,14 +38,15 @@ jclass testStorableClass;
 jmethodID testStorableConstructor;
 
 Q_DECLARE_METATYPE(StringPosition);
+Q_DECLARE_METATYPE(QSharedPointer<StringPosition>);
 
 jobject convert(JNIEnv* env, jclass jvariantClass, jmethodID method, const QVariant& var)
 {
-    if (var.canConvert<StringPosition>()) {
-        StringPosition ptr = var.value<StringPosition>();
+    if (var.canConvert<QSharedPointer<StringPosition>>()) {
+        QSharedPointer<StringPosition> ptr = var.value<QSharedPointer<StringPosition>>();
 
-        jstring str = JNIUtilities_toJString(env, ptr.getString());
-        jobject jobj = env->NewObject(testStorableClass, testStorableConstructor, str, ptr.getX(), ptr.getY());
+        jstring str = JNIUtilities_toJString(env, ptr->getString());
+        jobject jobj = env->NewObject(testStorableClass, testStorableConstructor, str, ptr->getX(), ptr->getY());
         return env->CallStaticObjectMethod(jvariantClass, method, jobj);
     } else {
         return nullptr;
@@ -55,8 +56,7 @@ jobject convert(JNIEnv* env, jclass jvariantClass, jmethodID method, const QVari
 JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, jint roleIndex)
 {
     QString qstr = JNIUtilities_toQString(env, str);
-    StringPosition temp(qstr, x, y);
-    QVariant var = QVariant::fromValue(temp);
+    QVariant var = QVariant::fromValue(QSharedPointer<StringPosition>::create(qstr, x, y));
     QMLDataTransfer_Store(var, roleIndex);
 }
 
@@ -91,14 +91,14 @@ void JNI_OnUnload(JavaVM*, void*)
 
 NewType::NewType(QQuickItem* parent) :
     QQuickPaintedItem(parent),
-    m_data("Hello New Type", 50, 50)
+    m_data(QSharedPointer<StringPosition>::create("Hello New Type", 50, 50))
 {
 	// Empty Implementation
 }
 
 void NewType::paint(QPainter* painter)
 {
-    painter->drawText(m_data.getX(), m_data.getY(), m_data.getString());
+    painter->drawText(m_data->getX(), m_data->getY(), m_data->getString());
 }
 
 QVariant NewType::data() const
@@ -108,9 +108,9 @@ QVariant NewType::data() const
 }
 void NewType::setData(const QVariant& newData)
 {
-    if (newData.canConvert<StringPosition>())
+    if (newData.canConvert<QSharedPointer<StringPosition>>())
     {
-        StringPosition newPtr = newData.value<StringPosition>();
+        QSharedPointer<StringPosition> newPtr = newData.value<QSharedPointer<StringPosition>>();
         m_data = newPtr;
         emit dataChanged();
         update();
