@@ -36,6 +36,8 @@ public:
     int32_t getX() const;
     int32_t getY() const;
 
+    StringPosition& operator=(const StringPosition& rhs);
+
 private:
     QString str;
     int32_t x;
@@ -58,7 +60,7 @@ signals:
 
 private:
 
-    QSharedPointer<StringPosition> m_data;
+    StringPosition m_data;
 };
 
 

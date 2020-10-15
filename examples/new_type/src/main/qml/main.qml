@@ -45,5 +45,6 @@ Window {
     	y: 0
     	width: 150
     	height: 100
+        data: test_model.data
     }
 }

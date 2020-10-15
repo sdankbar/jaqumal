@@ -37,21 +37,16 @@ Q_DECL_EXPORT jstring JNIUtilities_toJString(JNIEnv* env, const QString& str);
 jclass testStorableClass;
 jmethodID testStorableConstructor;
 
+Q_DECLARE_METATYPE(StringPosition);
+
 jobject convert(JNIEnv* env, jclass jvariantClass, jmethodID method, const QVariant& var)
 {
-    std::cerr << "Convert" << std::endl;
-    if (var.canConvert<QSharedPointer<StringPosition>>()) {
-        QSharedPointer<StringPosition> ptr = var.value<QSharedPointer<StringPosition>>();
-        if (ptr)
-        {
-            jstring str = JNIUtilities_toJString(env, ptr->getString());
-            jobject jobj = env->NewObject(testStorableClass, testStorableConstructor, str, ptr->getX(), ptr->getY());
-            return env->CallStaticObjectMethod(jvariantClass, method, jobj);
-        }
-        else
-        {
-            return nullptr;
-        }
+    if (var.canConvert<StringPosition>()) {
+        StringPosition ptr = var.value<StringPosition>();
+
+        jstring str = JNIUtilities_toJString(env, ptr.getString());
+        jobject jobj = env->NewObject(testStorableClass, testStorableConstructor, str, ptr.getX(), ptr.getY());
+        return env->CallStaticObjectMethod(jvariantClass, method, jobj);
     } else {
         return nullptr;
     }
@@ -59,16 +54,11 @@ jobject convert(JNIEnv* env, jclass jvariantClass, jmethodID method, const QVari
 
 JNICALL void setTestStorable(JNIEnv* env, jclass, jstring str, jint x, jint y, jint roleIndex)
 {
-    std::cerr << "A" << std::endl;
     QString qstr = JNIUtilities_toQString(env, str);
-    std::cerr << "B" << std::endl;
-    QVariant var = QVariant(QSharedPointer<StringPosition>::create(qstr, x, y));
-    std::cerr << "C" << std::endl;
+    StringPosition temp(qstr, x, y);
+    QVariant var = QVariant::fromValue(temp);
     QMLDataTransfer_Store(var, roleIndex);
-    std::cerr << "D" << std::endl;
 }
-
-Q_DECLARE_METATYPE(StringPosition);
 
 jint JNI_OnLoad(JavaVM* vm, void*)
 {
@@ -101,40 +91,29 @@ void JNI_OnUnload(JavaVM*, void*)
 
 NewType::NewType(QQuickItem* parent) :
     QQuickPaintedItem(parent),
-    m_data()
+    m_data("Hello New Type", 50, 50)
 {
-    std::cout << "Construct" << std::endl;
+	// Empty Implementation
 }
 
 void NewType::paint(QPainter* painter)
 {
-    std::cout << "Paint" << std::endl;
-    if (m_data)
-    {
-        painter->drawText(m_data->getX(), m_data->getY(), m_data->getString());
-    }
-    else
-    {
-        painter->drawText(50, 50, "Hello NewType");
-    }
+    painter->drawText(m_data.getX(), m_data.getY(), m_data.getString());
 }
 
 QVariant NewType::data() const
 {
-    QVariant var = QVariant(m_data);
+    QVariant var = QVariant::fromValue(m_data);
     return var;
 }
 void NewType::setData(const QVariant& newData)
 {
-    if (newData.canConvert<QSharedPointer<StringPosition>>())
+    if (newData.canConvert<StringPosition>())
     {
-        QSharedPointer<StringPosition> newPtr = newData.value<QSharedPointer<StringPosition>>();
-        if (m_data != newPtr)
-        {
-            m_data = newPtr;
-            update();
-            emit dataChanged();
-        }
+        StringPosition newPtr = newData.value<StringPosition>();
+        m_data = newPtr;
+        emit dataChanged();
+        update();
     }
 }
 
@@ -162,6 +141,17 @@ StringPosition::StringPosition(const QString& str2, int32_t x2, int32_t y2) :
     y(y2)
 {
     // Empty Implementation
+}
+
+StringPosition& StringPosition::operator=(const StringPosition& rhs)
+{
+    if (this != &rhs)
+    {
+        str = rhs.str;
+        x = rhs.x;
+        y = rhs.y;
+    }
+    return *this;
 }
 
 const QString& StringPosition::getString() const
