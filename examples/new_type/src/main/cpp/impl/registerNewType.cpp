@@ -99,13 +99,13 @@ NewType::NewType(QQuickItem* parent) :
 void NewType::paint(QPainter* painter)
 {
     QBrush b(QColor(128, 128, 128));
-    painter->fillRect(m_data->getX(), m_data->getY(), 50, 50, b);
+    painter->fillRect(0, 0, 50, 50, b);
     painter->setPen(QPen(QColor(128, 0, 0)));
-    painter->drawRect(m_data->getX(), m_data->getY(), 50, 50);
+    painter->drawRect(0, 0, 50, 50);
     painter->setPen(QPen(QColor(0, 0, 0)));
     for (int i = 0; i < 50; i += 5)
     {
-        painter->drawText(m_data->getX() + i, m_data->getY() + i, m_data->getString());
+        painter->drawText(i, i, m_data->getString());
     }
 }
 
@@ -121,6 +121,10 @@ void NewType::setData(const QVariant& newData)
         QSharedPointer<StringPosition> newPtr = newData.value<QSharedPointer<StringPosition>>();
         m_data = newPtr;
         emit dataChanged();
+
+        setX(m_data->getX());
+        setY(m_data->getY());
+
         update();
     }
 }
