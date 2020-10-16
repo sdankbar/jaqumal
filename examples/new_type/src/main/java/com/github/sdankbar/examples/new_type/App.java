@@ -22,11 +22,15 @@
  */
 package com.github.sdankbar.examples.new_type;
 
+import java.util.Random;
+
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
+import com.github.sdankbar.qml.eventing.NullEventProcessor;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
-import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.github.sdankbar.qml.models.list.JQMLListModel;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Example application that allow for editing a set of colors.
@@ -34,32 +38,56 @@ import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
  */
 public class App {
 
-	/**
-	 *
-	 *
-	 */
-	public interface EventProcessor {
-
-	}
-
 	private enum Roles {
 		data
 	}
+
+	private static final int SIZE = 250;
+	private static final int maxCoord = 800;
+	private static final Random rand = new Random();
+
+	private static long secondStart = System.currentTimeMillis();
+	private static int fpsCount = 0;
 
 	/**
 	 * @param args
 	 * @throws Exception
 	 */
 	public static void main(final String[] args) throws Exception {
-		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("test_model", Roles.class,
-				PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLApplication<NullEventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("list_model", Roles.class,
+				PutMode.RETURN_NULL);
 
-		Native.print();
-		model.put(Roles.data, new JVariant(new TestStorable("Storable String", 15, 35)));
+		while (model.size() < SIZE) {
+			final TestStorable storable = new TestStorable(Integer.toString(model.size()), rand.nextInt(maxCoord),
+					rand.nextInt(maxCoord));
+			final ImmutableMap<Roles, JVariant> data = ImmutableMap.of(Roles.data, new JVariant(storable));
+			model.add(data);
+		}
 
-		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
+		app.loadQMLFile("./src/main/qml/main.qml");
+
+		app.getQMLThreadExecutor().execute(() -> updateModel(app, model));
 
 		app.execute();
+	}
+
+	private static void updateModel(final JQMLApplication<NullEventProcessor> app, final JQMLListModel<Roles> model) {
+		for (int i = 0; i < SIZE; ++i) {
+			final TestStorable storable = new TestStorable(Integer.toString(rand.nextInt(32)), rand.nextInt(maxCoord),
+					rand.nextInt(maxCoord));
+			model.get(i).put(Roles.data, new JVariant(storable));
+		}
+		final long e = System.currentTimeMillis();
+
+		++fpsCount;
+		final long delta = e - secondStart;
+		if (delta >= 1000) {
+			System.out.println("          FPS=" + fpsCount);
+			secondStart = e;
+			fpsCount = 0;
+		}
+
+		app.getQMLThreadExecutor().execute(() -> updateModel(app, model));
 	}
 }
