@@ -30,20 +30,23 @@ import com.github.sdankbar.jaqumal 0.4
 
 Window {
     visible: true
-    width: 200
-    height: 200
+    width: 850
+    height: 850
     x: 400
     y: 400
-    title: qsTr("NewType")
-    id: mainWindow
+    title: qsTr("New Type Throughput")
 
-    Text {
-      text: "Hello World"
-    }
-    NewType {
-    	x: 0
-    	y: 0
-    	width: 150
-    	height: 100
+    Repeater {
+        x: 20
+        y: 20
+        model: list_model
+
+        delegate: NewType {
+            data: model.data
+            x: 0
+            y: 0
+            width: 200
+            height: 200
+        }
     }
 }

@@ -26,9 +26,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.zip.Adler32;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -48,25 +49,41 @@ public class LibraryUtilities {
 
 	private static void loadLibrary(final String libName, final String loadDir, final String extension) {
 		logger.info("Load " + libName + extension);
-		final InputStream windowsLib = ClassLoader.getSystemResourceAsStream(loadDir + "/" + libName + extension);
-		final BufferedInputStream stream = new BufferedInputStream(windowsLib);
+		BufferedInputStream stream = getResourceStream(loadDir + "/" + libName + extension);
 		try {
-			final File libraryFile = File.createTempFile(libName, extension);
-			try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(libraryFile))) {
+			final File libraryFile = new File(libName + extension);
+
+			boolean alreadyUpToDate = false;
+			if (libraryFile.exists()) {
+				final Adler32 hash = new Adler32();
+				hash.update(Files.readAllBytes(libraryFile.toPath()));
+				final long existingHash = hash.getValue();
+
+				hash.reset();
 				int b;
 				while ((b = stream.read()) != -1) {
-					writer.write(b);
+					hash.update(b);
+				}
+				final long newHash = hash.getValue();
+
+				alreadyUpToDate = existingHash == newHash;
+				if (!alreadyUpToDate) {
+					// Reset the stream so it can be read again
+					stream = getResourceStream(loadDir + "/" + libName + extension);
 				}
 			}
 
-			// Cleanup extracted dlls from previous runs. Only risk is if two Jaqumal apps
-			// are started at the same time, could delete each other's extract dlls.
-			// Once System.load is called, this is less of an issue.
-			final File temporaryDir = libraryFile.getParentFile();
-			final File[] oldDlls = temporaryDir.listFiles((FilenameFilter) (dir, name) -> name.startsWith(libName)
-					&& name.endsWith(extension) && !name.equals(libraryFile.getName()));
-			for (final File f : oldDlls) {
-				f.delete();
+			if (!alreadyUpToDate) {
+				logger.info("Storing " + libraryFile);
+				libraryFile.delete();
+				try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(libraryFile))) {
+					int b;
+					while ((b = stream.read()) != -1) {
+						writer.write(b);
+					}
+				}
+			} else {
+				logger.info("Check sum of " + libraryFile + " matches, using as is.");
 			}
 
 			System.load(libraryFile.getAbsolutePath());
@@ -74,6 +91,11 @@ public class LibraryUtilities {
 			logger.error("Failed to load " + libName + extension, e);
 		}
 		logger.info("Finish - Load " + libName + extension);
+	}
+
+	private static BufferedInputStream getResourceStream(final String resource) {
+		final InputStream windowsLib = ClassLoader.getSystemResourceAsStream(resource);
+		return new BufferedInputStream(windowsLib);
 	}
 
 	private LibraryUtilities() {
