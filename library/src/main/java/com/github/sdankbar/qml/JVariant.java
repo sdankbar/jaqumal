@@ -1145,7 +1145,7 @@ public class JVariant {
 		}
 		case RECTANGLE: {
 			final Rectangle2D r = (Rectangle2D) obj;
-			QMLDataTransfer.setLine((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight(), role);
+			QMLDataTransfer.setRectangle((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight(), role);
 			break;
 		}
 		case REGULAR_EXPRESSION: {
