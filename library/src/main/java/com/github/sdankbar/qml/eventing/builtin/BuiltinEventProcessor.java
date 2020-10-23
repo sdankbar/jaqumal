@@ -98,4 +98,13 @@ public interface BuiltinEventProcessor {
 	default void handle(final TextInputEditingFinishedEvent e) {
 		// Empty Implementation
 	}
+
+	/**
+	 * Sent to QML to cause a ListView to scroll.
+	 *
+	 * @param e The BuiltinEvent to handle.
+	 */
+	default void handle(final RequestScrollListToPositionEvent e) {
+		// Empty Implementation
+	}
 }

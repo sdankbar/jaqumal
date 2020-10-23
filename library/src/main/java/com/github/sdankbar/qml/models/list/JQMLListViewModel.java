@@ -31,8 +31,11 @@ import java.util.Set;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.builtin.BuiltinEventProcessor;
 import com.github.sdankbar.qml.eventing.builtin.ListSelectionChangedEvent;
+import com.github.sdankbar.qml.eventing.builtin.RequestScrollListToPositionEvent;
+import com.github.sdankbar.qml.eventing.builtin.RequestScrollListToPositionEvent.PositionMode;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -115,6 +118,7 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 
 	private final JQMLListModel<K> listModel;
 	private final SelectionMode selectionMode;
+	private final EventDispatcher<?> dispatcher;
 
 	private final List<SelectionListener<K>> selectionListeners = new ArrayList<>();
 
@@ -140,7 +144,8 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 
 		});
 
-		app.getEventDispatcher().register(ListSelectionChangedEvent.class, this);
+		dispatcher = app.getEventDispatcher();
+		dispatcher.register(ListSelectionChangedEvent.class, this);
 	}
 
 	/**
@@ -358,6 +363,31 @@ public class JQMLListViewModel<K> implements BuiltinEventProcessor {
 	 */
 	public void registerSelectionListener(final SelectionListener<K> l) {
 		selectionListeners.add(Objects.requireNonNull(l, "l is null"));
+	}
+
+	/**
+	 * Scrolls the ListView attached to this model to the provided index.
+	 *
+	 * @param index Index to scroll to.
+	 * @param mode  Scrolling behavior.
+	 */
+	public void positionViewAtIndex(final int index, final PositionMode mode) {
+		dispatcher.submitBuiltin(new RequestScrollListToPositionEvent(listModel.getModelName(), index, mode));
+	}
+
+	/**
+	 * Scrolls the ListView attached to this model to the first selected item in the
+	 * list.  If no item is selected, no action is taken.
+	 *
+	 * @param mode Scrolling behavior.
+	 */
+	public void positionViewAtFirstSelectedIndex(final PositionMode mode) {
+		final ImmutableList<Integer> indices = getSelectedIndices();
+
+		if (!indices.isEmpty()) {
+			final int index = indices.get(0).intValue();
+			positionViewAtIndex(index, mode);
+		}
 	}
 
 	/**

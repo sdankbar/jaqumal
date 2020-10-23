@@ -32,6 +32,36 @@ ListView {
         id: eventing
     }
 
+    EventDispatcher {
+        id: dispatch
+        allowedEvents: ["RequestScrollListToPositionEvent"]
+
+        onEventReceived: {
+            if (model !== null && model.modelName === args.model_name) {
+                switch (args.position_mode) {
+                case 0:
+                    internalView.positionViewAtIndex(args.index, ListView.Beginning)
+                    break
+                case 1:
+                    internalView.positionViewAtIndex(args.index, ListView.Center)
+                    break
+                case 2:
+                    internalView.positionViewAtIndex(args.index, ListView.End)
+                    break
+                case 3:
+                    internalView.positionViewAtIndex(args.index, ListView.Visible)
+                    break
+                case 4:
+                    internalView.positionViewAtIndex(args.index, ListView.Contain)
+                    break
+                case 5:
+                    internalView.positionViewAtIndex(args.index, ListView.SnapPosition)
+                    break
+                }
+            }
+        }
+    }
+
 	QtObject {
 		id: internal
 		property bool blockEvent: false;
