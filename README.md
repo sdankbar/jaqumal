@@ -123,9 +123,9 @@ The Jaqumal library is not thread safe and most functions should only be called 
 
 ##### QML Profiling
 
-To profile QML, uncomment the line "CONFIG += qml_debug" in Jaqumal.pro and rebuild Jaqumal.  Then on the application being profiled, pass "-qmljsdebugger=port:3456,block,services:CanvasFrameRate,EngineControl,DebugMessages" as the 2nd command line argument.  Suggest "java" as the first argument.
-Once the application has started, it will wait for profiler to attach.  In QtCreator, go to Analyze -> QML Profiler (Attach to Waiting Application).  Specify
-the same port number as passed to the application (3456).
+To profile QML, pass "-qmljsdebugger=port:3456,block,services:CanvasFrameRate,EngineControl,DebugMessages" as the 2nd command line argument to the application to profile.
+Suggest "java" as the first argument.  Once the application has started, it will wait for a profiler to attach.  In QtCreator, go to Analyze -> QML Profiler (Attach to Waiting Application).
+Specify the same port number as passed to the application (3456).
 
 # Examples
 

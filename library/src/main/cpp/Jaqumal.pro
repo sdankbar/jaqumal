@@ -29,7 +29,6 @@ OBJECTS_DIR = objs
 MOC_DIR = mocs
 DESTDIR = libs
 CONFIG += qmltestcase
-#CONFIG += qml_debug
 
 DEFINES += JAQUMAL_LIBRARY
 
