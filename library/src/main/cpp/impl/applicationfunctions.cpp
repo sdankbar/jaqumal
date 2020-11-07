@@ -236,7 +236,7 @@ void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const st
     jstring javaStr = threadEnv->NewStringUTF(msg.c_str());
     threadEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
     if (threadEnv->ExceptionCheck()) {
-        std::cerr << "Exception while logging" << std::endl;
+        std::cerr << "Exception while logging: " << msg << std::endl;
         threadEnv->ExceptionClear();
     }
     threadEnv->DeleteLocalRef(javaStr);
@@ -315,9 +315,9 @@ void signal_handler(int)
 
 ApplicationFunctions::ApplicationFunctions(int32_t& argc, char** argv) :
     m_qapp(new QApplication(argc, argv)),
-    m_logging(),
     m_qmlEngine(new QQmlApplicationEngine(m_qapp)),
-    m_uiSim()
+    m_uiSim(),
+    m_logging()
 {
     m_qmlEngine->rootContext()->setContextProperty("log", QVariant::fromValue(&m_logging));
     m_qmlEngine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));

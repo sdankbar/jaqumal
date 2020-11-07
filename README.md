@@ -121,6 +121,12 @@ NOTE: Care should be taken when modifying a model from inside a model changed ca
 
 The Jaqumal library is not thread safe and most functions should only be called from the Qt Thread.  The Qt Thread is the Java thread that has called QApplication.execute().  If a function that must be called from the Qt Thread is called from another thread, a QMLThreadingException will be thrown.  JQMLApplication provides a ScheduledExecutorService that allows Java code to be run asychronously on the Qt Thread.
 
+##### QML Profiling
+
+To profile QML, uncomment the line "CONFIG += qml_debug" in Jaqumal.pro and rebuild Jaqumal.  Then on the application being profiled, pass "-qmljsdebugger=port:3456,block,services:CanvasFrameRate,EngineControl,DebugMessages" as the 2nd command line argument.  Suggest "java" as the first argument.
+Once the application has started, it will wait for profiler to attach.  In QtCreator, go to Analyze -> QML Profiler (Attach to Waiting Application).  Specify
+the same port number as passed to the application (3456).
+
 # Examples
 
 ##### StopLight

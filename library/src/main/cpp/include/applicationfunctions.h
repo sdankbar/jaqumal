@@ -88,9 +88,9 @@ private:
     static jmethodID bufferedImageGetRGB;
 
     QApplication* m_qapp;
-    QMLLogging m_logging;
     QQmlApplicationEngine* m_qmlEngine;
     UserInputSimulator m_uiSim;
+    QMLLogging m_logging;
 };
 
 
