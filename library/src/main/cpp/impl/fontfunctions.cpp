@@ -198,9 +198,7 @@ jstring JNICALL getQFontToString(JNIEnv* env, jclass, jstring family, jint point
         f.setStyleName(JNIUtilities::toQString(env, (styleName)));
         f.setStyleHint(static_cast<QFont::StyleHint>(styleHint), static_cast<QFont::StyleStrategy>(styleStrategy));
 
-        static std::string ret;
-        ret = f.toString().toStdString();
-        return env->NewStringUTF(qPrintable(f.toString()));
+        return JNIUtilities::toJString(env, f.toString());
     }
     else
     {

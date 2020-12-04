@@ -491,7 +491,7 @@ QVariant GenericFlatTreeModel::getRowData(std::deque<int32_t>& indicies, int32_t
 
 const QHash<int32_t, QVariant>& GenericFlatTreeModel::getRowData(std::deque<int32_t>& indicies)
 {
-    static QHash<int32_t, QVariant> empty;
+    static const QHash<int32_t, QVariant> empty;
     if (indicies.size() == 1)
     {
         int32_t row = indicies[0];
@@ -521,14 +521,13 @@ const QHash<int32_t, QVariant>& GenericFlatTreeModel::getRowData(std::deque<int3
 
 QVariant GenericFlatTreeModel::getRowData(qint32 flatRow, qint32 roleIndex) const
 {
-    static QVariant empty;
     if (0 <= flatRow && flatRow < m_flatData.size())
     {
         return m_flatData[flatRow]->value(roleIndex);
     }
     else
     {
-        return empty;
+        return QVariant();
     }
 }
 

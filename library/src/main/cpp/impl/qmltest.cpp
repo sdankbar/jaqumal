@@ -161,7 +161,7 @@ MockEventDispatcher::~MockEventDispatcher()
 
 const QStringList& MockEventDispatcher::allowedEvents() const
 {
-    static QStringList l;
+    static const QStringList l;
     return l;
 }
 
