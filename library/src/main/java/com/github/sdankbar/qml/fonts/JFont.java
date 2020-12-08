@@ -64,11 +64,18 @@ public class JFont {
 			// Empty Implementation
 		}
 
+		/**
+		 * @return The JFont for this builder's settings. May return an existing JFont.
+		 */
 		public JFont build() {
-			return new JFont(FontFunctions.getQFontToString(family, pointSize, pixelSize, bold, italic, overline,
-					strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
+			return cache.getFont(this);
+		}
+
+		JFont privateBuild(final int fontIndex) {
+			return new JFont(FontFunctions.getQFontToString(fontIndex, family, pointSize, pixelSize, bold, italic,
+					overline, strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
 					letterSpacingType.value, capitalization.value, hintingPreference.value, stretch.value, style.value,
-					styleName, styleHint.value, styleStrategyMask()));
+					styleName, styleHint.value, styleStrategyMask()), fontIndex);
 		}
 
 		public Builder setBold(final boolean b) {
@@ -187,14 +194,131 @@ public class JFont {
 			return mask;
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (bold ? 1231 : 1237);
+			result = prime * result + ((capitalization == null) ? 0 : capitalization.hashCode());
+			result = prime * result + ((family == null) ? 0 : family.hashCode());
+			result = prime * result + (fixedPitch ? 1231 : 1237);
+			result = prime * result + fontWeight;
+			result = prime * result + ((hintingPreference == null) ? 0 : hintingPreference.hashCode());
+			result = prime * result + (italic ? 1231 : 1237);
+			result = prime * result + (kerning ? 1231 : 1237);
+			long temp;
+			temp = Double.doubleToLongBits(letterSpacing);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result + ((letterSpacingType == null) ? 0 : letterSpacingType.hashCode());
+			result = prime * result + (overline ? 1231 : 1237);
+			result = prime * result + pixelSize;
+			result = prime * result + pointSize;
+			result = prime * result + ((stretch == null) ? 0 : stretch.hashCode());
+			result = prime * result + (strikeout ? 1231 : 1237);
+			result = prime * result + ((style == null) ? 0 : style.hashCode());
+			result = prime * result + ((styleHint == null) ? 0 : styleHint.hashCode());
+			result = prime * result + ((styleName == null) ? 0 : styleName.hashCode());
+			result = prime * result + ((styleStrategy == null) ? 0 : styleStrategy.hashCode());
+			result = prime * result + (underline ? 1231 : 1237);
+			temp = Double.doubleToLongBits(wordSpacing);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			return result;
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final Builder other = (Builder) obj;
+			if (bold != other.bold) {
+				return false;
+			}
+			if (capitalization != other.capitalization) {
+				return false;
+			}
+			if (family == null) {
+				if (other.family != null) {
+					return false;
+				}
+			} else if (!family.equals(other.family)) {
+				return false;
+			}
+			if (fixedPitch != other.fixedPitch) {
+				return false;
+			}
+			if (fontWeight != other.fontWeight) {
+				return false;
+			}
+			if (hintingPreference != other.hintingPreference) {
+				return false;
+			}
+			if (italic != other.italic) {
+				return false;
+			}
+			if (kerning != other.kerning) {
+				return false;
+			}
+			if (Double.doubleToLongBits(letterSpacing) != Double.doubleToLongBits(other.letterSpacing)) {
+				return false;
+			}
+			if (letterSpacingType != other.letterSpacingType) {
+				return false;
+			}
+			if (overline != other.overline) {
+				return false;
+			}
+			if (pixelSize != other.pixelSize) {
+				return false;
+			}
+			if (pointSize != other.pointSize) {
+				return false;
+			}
+			if (stretch != other.stretch) {
+				return false;
+			}
+			if (strikeout != other.strikeout) {
+				return false;
+			}
+			if (style != other.style) {
+				return false;
+			}
+			if (styleHint != other.styleHint) {
+				return false;
+			}
+			if (styleName == null) {
+				if (other.styleName != null) {
+					return false;
+				}
+			} else if (!styleName.equals(other.styleName)) {
+				return false;
+			}
+			if (styleStrategy == null) {
+				if (other.styleStrategy != null) {
+					return false;
+				}
+			} else if (!styleStrategy.equals(other.styleStrategy)) {
+				return false;
+			}
+			if (underline != other.underline) {
+				return false;
+			}
+			if (Double.doubleToLongBits(wordSpacing) != Double.doubleToLongBits(other.wordSpacing)) {
+				return false;
+			}
+			return true;
+		}
+
 	}
 
 	public enum Capitalization {
-		MixedCase(0),
-		AllUppercase(1),
-		AllLowercase(2),
-		SmallCaps(3),
-		Capitalize(4);
+		MixedCase(0), AllUppercase(1), AllLowercase(2), SmallCaps(3), Capitalize(4);
 
 		private int value;
 
@@ -204,10 +328,7 @@ public class JFont {
 	}
 
 	public enum HintingPreference {
-		PreferDefaultHinting(0),
-		PreferNoHinting(1),
-		PreferVerticalHinting(2),
-		PreferFullHinting(3);
+		PreferDefaultHinting(0), PreferNoHinting(1), PreferVerticalHinting(2), PreferFullHinting(3);
 
 		private int value;
 
@@ -218,8 +339,7 @@ public class JFont {
 	}
 
 	public enum SpacingType {
-		PercentageSpacing(0),
-		AbsoluteSpacing(1);
+		PercentageSpacing(0), AbsoluteSpacing(1);
 
 		private int value;
 
@@ -229,16 +349,8 @@ public class JFont {
 	}
 
 	public enum Stretch {
-		AnyStretch(0),
-		UltraCondensed(50),
-		ExtraCondensed(62),
-		Condensed(75),
-		SemiCondensed(87),
-		Unstretched(100),
-		SemiExpanded(112),
-		Expanded(125),
-		ExtraExpanded(150),
-		UltraExpanded(200);
+		AnyStretch(0), UltraCondensed(50), ExtraCondensed(62), Condensed(75), SemiCondensed(87), Unstretched(100),
+		SemiExpanded(112), Expanded(125), ExtraExpanded(150), UltraExpanded(200);
 
 		private int value;
 
@@ -249,20 +361,18 @@ public class JFont {
 	}
 
 	public enum Style {
-		StyleNormal(0),
-		StyleItalic(1),
-		StyleOblique(2);
+		StyleNormal(0), StyleItalic(1), StyleOblique(2);
 
 		static Style fromValue(final int v) {
 			switch (v) {
-				case 0:
-					return StyleNormal;
-				case 1:
-					return StyleItalic;
-				case 2:
-					return StyleOblique;
-				default:
-					throw new IllegalArgumentException();
+			case 0:
+				return StyleNormal;
+			case 1:
+				return StyleItalic;
+			case 2:
+				return StyleOblique;
+			default:
+				throw new IllegalArgumentException();
 			}
 		}
 
@@ -275,42 +385,31 @@ public class JFont {
 	}
 
 	public enum StyleHint {
-		AnyStyle(5),
-		SansSerif(0),
-		Helvetica(0),
-		Serif(1),
-		Times(1),
-		TypeWriter(2),
-		Courier(2),
-		OldEnglish(3),
-		Decorative(3),
-		Monospace(7),
-		Fantasy(8),
-		Cursive(6),
-		System(4);
+		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(3),
+		Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
 
 		static StyleHint fromValue(final int v) {
 			switch (v) {
-				case 0:
-					return SansSerif;
-				case 1:
-					return Serif;
-				case 2:
-					return Courier;
-				case 3:
-					return Decorative;
-				case 4:
-					return System;
-				case 5:
-					return AnyStyle;
-				case 6:
-					return Cursive;
-				case 7:
-					return Monospace;
-				case 8:
-					return Fantasy;
-				default:
-					throw new IllegalArgumentException();
+			case 0:
+				return SansSerif;
+			case 1:
+				return Serif;
+			case 2:
+				return Courier;
+			case 3:
+				return Decorative;
+			case 4:
+				return System;
+			case 5:
+				return AnyStyle;
+			case 6:
+				return Cursive;
+			case 7:
+				return Monospace;
+			case 8:
+				return Fantasy;
+			default:
+				throw new IllegalArgumentException();
 			}
 		}
 
@@ -323,19 +422,9 @@ public class JFont {
 	}
 
 	public enum StyleStrategy {
-		PreferDefault(0x0001),
-		PreferBitmap(0x0002),
-		PreferDevice(0x0004),
-		PreferOutline(0x0008),
-		ForceOutline(0x0010),
-		NoAntialias(0x0100),
-		NoSubpixelAntialias(0x0800),
-		PreferAntialias(0x0080),
-		OpenGLCompatible(0x0200),
-		NoFontMerging(0x8000),
-		PreferNoShaping(0x1000),
-		PreferMatch(0x0020),
-		PreferQuality(0x0040),
+		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(0x0010),
+		NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), OpenGLCompatible(0x0200),
+		NoFontMerging(0x8000), PreferNoShaping(0x1000), PreferMatch(0x0020), PreferQuality(0x0040),
 		ForceIntegerMetrics(0x0400);
 
 		private int value;
@@ -346,15 +435,7 @@ public class JFont {
 	}
 
 	public enum Weight {
-		Thin(0),
-		ExtraLight(12),
-		Light(25),
-		Normal(50),
-		Medium(57),
-		DemiBold(63),
-		Bold(75),
-		ExtraBold(81),
-		Black(87);
+		Thin(0), ExtraLight(12), Light(25), Normal(50), Medium(57), DemiBold(63), Bold(75), ExtraBold(81), Black(87);
 
 		private final int value;
 
@@ -371,11 +452,13 @@ public class JFont {
 		Objects.requireNonNull(str, "str is null");
 
 		if (str.matches("\\w*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
-			return new JFont(str);
+			return new JFont(str, -1);
 		} else {
 			throw new IllegalArgumentException(str + " is not a valid font string");
 		}
 	}
+
+	private static final JFontCache cache = new JFontCache();
 
 	private final String fontToString;
 
@@ -390,11 +473,13 @@ public class JFont {
 	private final boolean fixedPitch;// 8
 	private final Optional<String> styleName;
 
+	private final int fontIndex;
 	private JFontInfo cachedInfo = null;
 	private JFontMetrics cachedMetrics = null;
 
-	private JFont(final String toStr) {
+	private JFont(final String toStr, final int fontIndex) {
 		fontToString = toStr;
+		this.fontIndex = fontIndex;
 		final String[] tokens = fontToString.split(",");
 		Preconditions.checkArgument(tokens.length == 10 || tokens.length == 11,
 				"FontToString is not 10 or 11 comma separated values");
@@ -503,6 +588,14 @@ public class JFont {
 			b.setStyleName(styleName.get());// 10
 		}
 		return b;
+	}
+
+	/**
+	 * @return This JFont's index. Can be used for fast lookups. Guaranteed to be
+	 *         unique for a given set of font settings.
+	 */
+	public int getFontIndex() {
+		return fontIndex;
 	}
 
 	@Override

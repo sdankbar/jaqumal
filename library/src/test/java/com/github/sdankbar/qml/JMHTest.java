@@ -41,6 +41,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
+import com.github.sdankbar.qml.fonts.JFont;
 import com.github.sdankbar.qml.invocation.InvokableWrapper;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
@@ -53,9 +54,7 @@ import com.github.sdankbar.qml.utility.QMLRequestParser;
 public class JMHTest {
 
 	private enum Role {
-		R1,
-		R2,
-		R3;
+		R1, R2, R3;
 	}
 
 	/**
@@ -124,10 +123,27 @@ public class JMHTest {
 
 	/**
 	 * @param state
+	 * @return blackhole
+	 */
+	@Benchmark
+	public JFont benchmark_jfont_build(final BenchmarkState state) {
+		return JFont.builder().build();
+	}
+
+	/**
+	 * @param state
 	 */
 	@Benchmark
 	public void benchmark_listModelSetInteger(final BenchmarkState state) {
 		state.listModel.get(0).put(Role.R1, new JVariant(1));
+	}
+
+	/**
+	 * @param state
+	 */
+	@Benchmark
+	public void benchmark_listModelSetFont(final BenchmarkState state) {
+		state.listModel.get(0).put(Role.R1, new JVariant(JFont.builder().build()));
 	}
 
 	/**

@@ -31,6 +31,7 @@
 #include "flattreemodelfunctions.h"
 #include "singletonmodelfunctions.h"
 #include "listmodelfunctions.h"
+#include <math.h>
 
 JNINativeMethod JNIUtilities_createJNIMethod(const char* name, const char* sig, void* funcPtr)
 {
@@ -47,6 +48,10 @@ QString JNIUtilities_toQString(JNIEnv* env, jstring str)
 jstring JNIUtilities_toJString(JNIEnv* env, const QString& str)
 {
     return JNIUtilities::toJString(env, str);
+}
+const QFont& JNIUtilities_getFont(size_t fontIndex)
+{
+    return JNIUtilities::getFont(fontIndex);
 }
 
 
@@ -89,6 +94,7 @@ jclass JNIUtilities::qmlExceptionClass;
 jclass JNIUtilities::callbackClass;
 jmethodID JNIUtilities::callbackMethod;
 JavaVM* JNIUtilities::javaVM;
+std::vector<QFont> JNIUtilities::fontCache;
 
 void JNIUtilities::initialize(JavaVM* vm, JNIEnv* env)
 {
@@ -171,6 +177,21 @@ JNIEnv* JNIUtilities::attachThread()
 void JNIUtilities::dettachThread()
 {
     javaVM->DetachCurrentThread();
+}
+
+const QFont& JNIUtilities::getFont(size_t fontIndex)
+{
+   return fontCache[fontIndex];
+}
+
+void JNIUtilities::cacheFont(size_t fontIndex, const QFont& font)
+{
+    if (fontIndex >= fontCache.size())
+    {
+        size_t initSize = 32;
+        fontCache.resize(qMax(initSize, 2 * fontCache.size()));
+    }
+    fontCache[fontIndex] = font;
 }
 
 JNIUtilities::JNIUtilities()

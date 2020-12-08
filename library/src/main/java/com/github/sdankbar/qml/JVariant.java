@@ -1171,7 +1171,13 @@ public class JVariant {
 			break;
 		}
 		case FONT: {
-			QMLDataTransfer.setFont(((JFont) obj).toString(), role);
+			final JFont f = (JFont) obj;
+			final int fontIndex = f.getFontIndex();
+			if (fontIndex >= 0) {
+				QMLDataTransfer.setFont(fontIndex, role);
+			} else {
+				QMLDataTransfer.setFont(f.toString(), role);
+			}
 			break;
 		}
 		case POLYLINE: {

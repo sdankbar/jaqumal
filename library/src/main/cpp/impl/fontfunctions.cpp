@@ -160,9 +160,9 @@ jstring JNICALL getQFontMetrics(JNIEnv* env, jclass, jstring fontToString)
 /*
  * Class:     com_github_sdankbar_qml_cpp_jni_FontFunctions
  * Method:    getQFontToString
- * Signature: (Ljava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;
+ * Signature: (ILjava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;
  */
-jstring JNICALL getQFontToString(JNIEnv* env, jclass, jstring family, jint pointSize,
+jstring JNICALL getQFontToString(JNIEnv* env, jclass, jint fontIndex, jstring family, jint pointSize,
                                  jint pixelSize, jboolean bold, jboolean italic, jboolean overline,
                                  jboolean strikeout, jboolean underline, jboolean fixedPitch,
                                  jboolean kerning, jint fontWeight, jdouble wordSpacing,
@@ -197,6 +197,8 @@ jstring JNICALL getQFontToString(JNIEnv* env, jclass, jstring family, jint point
         f.setStyle(static_cast<QFont::Style>(style));
         f.setStyleName(JNIUtilities::toQString(env, (styleName)));
         f.setStyleHint(static_cast<QFont::StyleHint>(styleHint), static_cast<QFont::StyleStrategy>(styleStrategy));
+
+        JNIUtilities::cacheFont(fontIndex, f);
 
         return JNIUtilities::toJString(env, f.toString());
     }
@@ -280,7 +282,7 @@ void FontFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("getBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getBoundingRect),
         JNIUtilities::createJNIMethod("getBoundingRect2",    "(Ljava/lang/String;IIIIIILjava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getBoundingRect2),
         JNIUtilities::createJNIMethod("getQFontMetrics",    "(Ljava/lang/String;)Ljava/lang/String;",    (void *)&getQFontMetrics),
-        JNIUtilities::createJNIMethod("getQFontToString",    "(Ljava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;",    (void *)&getQFontToString),
+        JNIUtilities::createJNIMethod("getQFontToString",    "(ILjava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;",    (void *)&getQFontToString),
         JNIUtilities::createJNIMethod("getQFontInfo",    "(Ljava/lang/String;)Ljava/lang/String;",    (void *)&getQFontInfo),
         JNIUtilities::createJNIMethod("getStringWidth",    "(Ljava/lang/String;Ljava/lang/String;)I",    (void *)&getStringWidth),
         JNIUtilities::createJNIMethod("getTightBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getTightBoundingRect),

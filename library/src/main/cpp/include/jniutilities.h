@@ -23,11 +23,13 @@
 #pragma once
 #include "jni.h"
 #include <QString>
+#include <QFont>
 
 Q_DECL_EXPORT JNINativeMethod JNIUtilities_createJNIMethod(const char* name, const char* sig, void* funcPtr);
 Q_DECL_EXPORT jclass JNIUtilities_findClassGlobalReference(JNIEnv* env, const char* name);
 Q_DECL_EXPORT QString JNIUtilities_toQString(JNIEnv* env, jstring str);
 Q_DECL_EXPORT jstring JNIUtilities_toJString(JNIEnv* env, const QString& str);
+Q_DECL_EXPORT const QFont& JNIUtilities_getFont(size_t fontIndex);
 
 class JNIUtilities
 {
@@ -49,6 +51,9 @@ public:
     static JNIEnv* attachThread();
     static void dettachThread();
 
+    static const QFont& getFont(size_t fontIndex);
+    static void cacheFont(size_t fontIndex, const QFont& font);
+
 private:
     JNIUtilities();
 
@@ -57,5 +62,6 @@ private:
     static jclass callbackClass;
     static jmethodID callbackMethod;
     static JavaVM* javaVM;
+    static std::vector<QFont> fontCache;
 };
 

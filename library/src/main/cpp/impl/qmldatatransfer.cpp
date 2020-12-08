@@ -167,14 +167,16 @@ JNICALL void setImage(JNIEnv* env, jclass, jint w, jint h, jbyteArray data, jint
 
 JNICALL void setFont(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const char* array = env->GetStringUTFChars(v, NULL);
-
-    QString str = QString::fromUtf8(array);
+    QString str = JNIUtilities::toQString(env, v);
     QFont f;
     f.fromString(str);
     QMLDataTransfer::storeRef(f, roleIndex);
+}
 
-    env->ReleaseStringUTFChars(v, array);
+JNICALL void setFont2(JNIEnv*, jclass, jint fontIndex, jint roleIndex)
+{
+    const QFont& f = JNIUtilities::getFont(fontIndex);
+    QMLDataTransfer::storeRef(f, roleIndex);
 }
 
 JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, jint roleIndex)
@@ -271,6 +273,7 @@ void QMLDataTransfer::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("setDateTime",    "(JII)V",    (void *)&setDateTime),
         JNIUtilities::createJNIMethod("setImage",    "(II[BI)V",    (void *)&setImage),
         JNIUtilities::createJNIMethod("setFont",    "(Ljava/lang/String;I)V",    (void *)&setFont),
+        JNIUtilities::createJNIMethod("setFont",    "(II)V",    (void *)&setFont2),
         JNIUtilities::createJNIMethod("setPolyline",    "(I[DI)V",    (void *)&setPolyline),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/data_transfer/QMLDataTransfer");

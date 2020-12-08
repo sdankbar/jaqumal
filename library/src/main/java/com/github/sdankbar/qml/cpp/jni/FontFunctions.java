@@ -38,10 +38,11 @@ public class FontFunctions {
 	 * \return The value of QFront::toString() after returning QFont constructed
 	 * from the various parameters passed to this function.
 	 */
-	public static native String getQFontToString(String family, int pointSize, int pixelSize, boolean bold,
-			boolean italic, boolean overline, boolean strikeout, boolean underline, boolean fixedPitch, boolean kerning,
-			int fontWeight, double wordSpacing, double letteringSpacing, int letterSpacingType, int capitalization,
-			int hintingPreference, int stretch, int style, String styleName, int styleHint, int styleStrategy);
+	public static native String getQFontToString(int fontIndex, String family, int pointSize, int pixelSize,
+			boolean bold, boolean italic, boolean overline, boolean strikeout, boolean underline, boolean fixedPitch,
+			boolean kerning, int fontWeight, double wordSpacing, double letteringSpacing, int letterSpacingType,
+			int capitalization, int hintingPreference, int stretch, int style, String styleName, int styleHint,
+			int styleStrategy);
 
 	public static native int getStringWidth(String fontToString, String text);
 
