@@ -138,8 +138,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	/**
 	 * Inserts the map's data at index into this list model.
 	 *
-	 * @param index The index in the list model to insert the data at. If index is >
-	 *              than the length of the list, empty data is automatically
+	 * @param index The index in the list model to insert the data at. If index is
+	 *              &gt; than the length of the list, empty data is automatically
 	 *              appended to the model.
 	 * @param map   The data to insert into the model.
 	 *
@@ -170,8 +170,8 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	/**
 	 * Inserts the data at index into this list model.
 	 *
-	 * @param index The index in the list model to insert the data at. If index is >
-	 *              than the length of the list, empty data is automatically
+	 * @param index The index in the list model to insert the data at. If index is
+	 *              &gt; than the length of the list, empty data is automatically
 	 *              appended to the model.
 	 * @param data  The data to insert into the model.
 	 * @param role  The role to associate with the data.

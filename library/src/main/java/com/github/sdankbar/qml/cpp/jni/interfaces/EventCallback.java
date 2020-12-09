@@ -32,10 +32,9 @@ public interface EventCallback {
 	/**
 	 * Called when an Event is created.
 	 *
-	 * @param type   The type of the event.
-	 * @param data   The data for the event. The data stored is specific for an
-	 *               Event type.
-	 * @param length The length of the array pointed to by data.
+	 * @param type The type of the event.
+	 * @param data The data for the event. The data stored is specific for an Event
+	 *             type.
 	 * @return The result of the Event or null if no result.
 	 */
 	boolean invoke(String type, ByteBuffer data);

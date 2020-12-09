@@ -68,7 +68,7 @@ public class ReflectiveEventFactory<T> implements EventFactory<T> {
 			Integer.class, long.class, Long.class, Point2D.class, Rectangle2D.class, String.class);
 
 	/**
-	 * Given an interface containing functions that take Event<T> subclasses as
+	 * Given an interface containing functions that take Event&lt;T&gt; subclasses as
 	 * arguments, returns a ReflectiveEventFactory that can construct all of the
 	 * Event types that are handled by that interface and are supported by
 	 * ReflectiveEventFactory.

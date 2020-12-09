@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
-import com.github.sdankbar.qml.JVariant.Type;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -51,8 +50,8 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	/**
 	 * Inserts the map's data at index into this list model.
 	 *
-	 * @param index The index in the list model to insert the data at. If index is >
-	 *              than the length of the list, empty data is automatically
+	 * @param index The index in the list model to insert the data at. If index is
+	 *              &gt; than the length of the list, empty data is automatically
 	 *              appended to the model.
 	 * @param map   The data to insert into the model.
 	 *
@@ -64,8 +63,8 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	/**
 	 * Inserts the data at index into this list model.
 	 *
-	 * @param index The index in the list model to insert the data at. If index is >
-	 *              than the length of the list, empty data is automatically
+	 * @param index The index in the list model to insert the data at. If index is
+	 *              &gt; than the length of the list, empty data is automatically
 	 *              appended to the model.
 	 * @param data  The data to insert into the model.
 	 * @param role  The role to associate with the data.
@@ -215,6 +214,7 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	SignalLock lockSignals();
 
 	<L> ImmutableList<L> asMappedList(K key, Class<L> t);
+
 	<L> ImmutableList<L> asMappedList(K key, Class<L> t, L defaultValue);
 
 	void swap(int source, int destination);

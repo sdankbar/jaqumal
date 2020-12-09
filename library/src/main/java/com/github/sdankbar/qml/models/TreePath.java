@@ -208,7 +208,7 @@ public class TreePath {
 
 	/**
 	 * @return A new TreePath that matches this TreePath except that it has had its
-	 *         first index removed. If this TreePath has depth <= 1, the root
+	 *         first index removed. If this TreePath has depth &lt;= 1, the root
 	 *         TreePath is returned.
 	 */
 	public TreePath removeFirst() {
@@ -226,7 +226,7 @@ public class TreePath {
 
 	/**
 	 * @return A new TreePath that matches this TreePath except that it has had its
-	 *         last index removed. If this TreePath has depth <= 1, the root
+	 *         last index removed. If this TreePath has depth &lt;= 1, the root
 	 *         TreePath is returned.
 	 */
 	public TreePath removeLast() {

@@ -262,13 +262,13 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	@Override
 	public void assign(final List<Map<K, JVariant>> list) {
 		delegate.clear();
-		delegate.addAll(list);
+		delegate.addAll(list.stream().map(HashMap::new).collect(ImmutableList.toImmutableList()));
 	}
 
 	@Override
 	public void assign(final int row, final Map<K, JVariant> map) {
 		delegate.get(row).clear();
-		delegate.get(row).putAll(map);
+		delegate.get(row).putAll(new HashMap<>(map));
 	}
 
 	@Override

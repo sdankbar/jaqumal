@@ -36,7 +36,6 @@ public class FlatTreeModelFunctions {
 	 * @param roleNames   An array of role names.
 	 * @param roleIndices An array of the indices for each role. Maps to the names
 	 *                    in roleNames.
-	 * @param length      Length of roleNames and roleIndices.
 	 * @return A Pointer to the new model.
 	 */
 	public static native long createGenericFlatTreeModel(String modelName, String[] roleNames, int[] roleIndices);
@@ -47,9 +46,6 @@ public class FlatTreeModelFunctions {
 	 * @param modelPointer Pointer to the model to be modified.
 	 * @param indicies     Serialized TreePath containing the node to add the data
 	 *                     to.
-	 * @param elementCount Count of the number of indexes in indices.
-	 * @param data         The data to add.
-	 * @param roleIndex    The role the data will be attached to.
 	 * @return The index the new node.
 	 */
 	public static native int appendGenericFlatTreeModelData(long modelPointer, int[] indicies);
@@ -60,7 +56,6 @@ public class FlatTreeModelFunctions {
 	 * @param modelPointer Pointer to the model to be modified.
 	 * @param indicies     Serialized TreePath containing the node to clear the data
 	 *                     from.
-	 * @param elementCount Count of the number of indexes in indices.
 	 */
 	public static native void clearAllGenericFlatTreeModelData(long modelPointer, int[] indicies);
 
@@ -68,9 +63,8 @@ public class FlatTreeModelFunctions {
 	 * Removes data for the specified role for the node given by indices.
 	 *
 	 * @param modelPointer Pointer to the model to be modified.
-	 * @param indicies     Serialized TreePath containing the node to clear the data
+	 * @param indices      Serialized TreePath containing the node to clear the data
 	 *                     from.
-	 * @param elementCount Count of the number of indexes in indices.
 	 * @param roleIndex    Role to clear
 	 */
 	public static native void clearGenericFlatTreeModelData(long modelPointer, int[] indices, int roleIndex);

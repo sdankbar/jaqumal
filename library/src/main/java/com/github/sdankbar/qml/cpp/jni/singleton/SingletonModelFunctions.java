@@ -30,11 +30,8 @@ public class SingletonModelFunctions {
 	/**
 	 * Creates a new SingletonModel.
 	 *
-	 * @param modelName   The name of the model.
-	 * @param roleNames   An array of role names.
-	 * @param roleIndices An array of the indices for each role. Maps to the names
-	 *                    in roleNames.
-	 * @param length      Length of roleNames and roleIndices.
+	 * @param modelName The name of the model.
+	 * @param roleNames An array of role names.
 	 * @return A Pointer to the new model.
 	 */
 	public static native long createGenericObjectModel(String modelName, String[] roleNames);

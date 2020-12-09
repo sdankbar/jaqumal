@@ -186,7 +186,7 @@ public class JVariant {
 		 */
 		FONT,
 		/**
-		 * ImmutableList<Point2D>
+		 * ImmutableList&lt;Point2D&gt;
 		 *
 		 * 4 native endian order bytes for count and for each point 8 native endian
 		 * order bytes for x, 8 native endian order bytes for y
@@ -839,8 +839,8 @@ public class JVariant {
 
 	/**
 	 * @param defaultValue Value to return if JVariant is not a POLYLINE
-	 * @return The JVariant's value as an ImmutableList<Point2D> or the defaultValue
-	 *         if not the correct type.
+	 * @return The JVariant's value as an ImmutableList&lt;Point2D&gt; or the
+	 *         defaultValue if not the correct type.
 	 */
 	@SuppressWarnings("unchecked")
 	public ImmutableList<Point2D> asPolyline(final ImmutableList<Point2D> defaultValue) {

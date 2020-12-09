@@ -41,7 +41,6 @@ public final class ApplicationFunctions {
 	/**
 	 * Creates a new QApplication.
 	 *
-	 * @param argc Command line argument count
 	 * @param argv Command line arguments
 	 */
 	public static native void createQApplication(String[] argv);

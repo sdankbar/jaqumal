@@ -60,7 +60,7 @@ public interface JQMLModelFactory {
 	JQMLButtonModel createButtonModel(final String name);
 
 	/**
-	 * Creates a new JQMLFlatTreeModel with Class<K> being its key.
+	 * Creates a new JQMLFlatTreeModel with Class&lt;K&gt; being its key.
 	 *
 	 * @param name      Name of the model.
 	 * @param enumClass Class of the Enum that is used as the new model's key.
@@ -74,7 +74,7 @@ public interface JQMLModelFactory {
 			final PutMode putMode);
 
 	/**
-	 * Creates a new JQMLFlatTreeModel with Class<K> being its key.
+	 * Creates a new JQMLFlatTreeModel with Class&lt;K&gt; being its key.
 	 *
 	 * @param name Name of the model.
 	 * @param keys The set of keys that can be used by the new model.
@@ -87,7 +87,7 @@ public interface JQMLModelFactory {
 	<K> JQMLFlatTreeModel<K> createFlatTreeModel(final String name, final Set<K> keys, final PutMode putMode);
 
 	/**
-	 * Creates a new JQMLListModel with Class<K> being its key.
+	 * Creates a new JQMLListModel with Class&lt;K&gt; being its key.
 	 *
 	 * @param name      Name of the model.
 	 * @param enumClass Class of the Enum that is used as the new model's key.
@@ -101,7 +101,7 @@ public interface JQMLModelFactory {
 			final PutMode putMode);
 
 	/**
-	 * Creates a new JQMLListModel with Class<K> being its key.
+	 * Creates a new JQMLListModel with Class&lt;K&gt; being its key.
 	 *
 	 * @param name Name of the model.
 	 * @param keys The set of keys that can be used by the new model.
@@ -146,7 +146,7 @@ public interface JQMLModelFactory {
 			PutMode putMode);
 
 	/**
-	 * Creates a new JQMLSingletonModel with Class<K> being its key.
+	 * Creates a new JQMLSingletonModel with Class&lt;K&gt; being its key.
 	 *
 	 * @param name      Name of the model.
 	 * @param enumClass Class of the Enum that is used as the new model's key.
@@ -160,7 +160,7 @@ public interface JQMLModelFactory {
 			final PutMode putMode);
 
 	/**
-	 * Creates a new JQMLSingletonModel with Class<K> being its key.
+	 * Creates a new JQMLSingletonModel with Class&lt;K&gt; being its key.
 	 *
 	 * @param name Name of the model.
 	 * @param keys The set of keys that can be used by the new model.

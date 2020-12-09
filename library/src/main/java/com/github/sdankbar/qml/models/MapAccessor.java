@@ -51,8 +51,6 @@ public abstract class MapAccessor {
 	 * Return the map's value for the role.
 	 *
 	 * @param roleIndex Index of the role to return the value of.
-	 * @param length    Reference to an integer that will be populated with length
-	 *                  of the serialized data being returned.
 	 * @return Value of the role or Optional.empty()
 	 */
 	public abstract Optional<JVariant> get(final int roleIndex);
@@ -61,8 +59,6 @@ public abstract class MapAccessor {
 	 * Removes the map's value for the role.
 	 *
 	 * @param roleIndex Index of the role to remove.
-	 * @param length    Reference to an integer that will be populated with length
-	 *                  of the serialized data being returned.
 	 * @return Existing Value of the role or Optional.empty() if it had no value.
 	 */
 	public abstract Optional<JVariant> remove(int roleIndex);

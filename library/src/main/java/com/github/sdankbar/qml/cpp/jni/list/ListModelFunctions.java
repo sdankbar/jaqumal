@@ -37,7 +37,6 @@ public final class ListModelFunctions {
 	 * @param roleNames   An array of role names.
 	 * @param roleIndices An array of the indices for each role. Maps to the names
 	 *                    in roleNames.
-	 * @param length      Length of roleNames and roleIndices.
 	 * @return A Pointer to the new model.
 	 */
 	public static native long createGenericListModel(String modelName, String[] roleNames, int[] roleIndices);
