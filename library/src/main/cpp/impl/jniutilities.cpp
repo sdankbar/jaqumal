@@ -153,26 +153,6 @@ void JNIUtilities::invokeCallback(JNIEnv* env, jobject callbackObject)
     }
 }
 
-QString JNIUtilities::toQString(JNIEnv* env, jstring str)
-{
-    const int32_t strLength = env->GetStringLength(str);
-    QString res(strLength, Qt::Uninitialized);
-    env->GetStringRegion(str, 0, strLength, reinterpret_cast<jchar*>(res.data()));
-    return res;
-}
-
-void JNIUtilities::storeInQString(JNIEnv* env, jstring str, QString& output)
-{
-    const int32_t strLength = env->GetStringLength(str);
-    output.resize(strLength);
-    env->GetStringRegion(str, 0, strLength, reinterpret_cast<jchar*>(output.data()));
-}
-
-jstring JNIUtilities::toJString(JNIEnv* env, const QString& str)
-{
-    return env->NewString(reinterpret_cast<const jchar*>(str.constData()), str.length());
-}
-
 JNIEnv* JNIUtilities::attachThread()
 {
     JNIEnv* threadEnv;
@@ -188,11 +168,6 @@ JNIEnv* JNIUtilities::attachThread()
 void JNIUtilities::dettachThread()
 {
     javaVM->DetachCurrentThread();
-}
-
-const QFont& JNIUtilities::getFont(size_t fontIndex)
-{
-   return fontCache[fontIndex];
 }
 
 void JNIUtilities::cacheFont(size_t fontIndex, const QFont& font)

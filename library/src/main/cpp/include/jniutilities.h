@@ -46,14 +46,34 @@ public:
 
     static void invokeCallback(JNIEnv* env, jobject callbackObject);
 
-    static QString toQString(JNIEnv* env, jstring str);
-    static void storeInQString(JNIEnv* env, jstring str, QString& output);
-    static jstring toJString(JNIEnv* env, const QString& str);
+    static inline QString toQString(JNIEnv* env, jstring str)
+    {
+        const int32_t strLength = env->GetStringLength(str);
+        QString res(strLength, Qt::Uninitialized);
+        env->GetStringRegion(str, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+        return res;
+    }
+
+    static inline void storeInQString(JNIEnv* env, jstring str, QString& output)
+    {
+        const int32_t strLength = env->GetStringLength(str);
+        output.resize(strLength);
+        env->GetStringRegion(str, 0, strLength, reinterpret_cast<jchar*>(output.data()));
+    }
+
+    static inline jstring toJString(JNIEnv* env, const QString& str)
+    {
+        return env->NewString(reinterpret_cast<const jchar*>(str.constData()), str.length());
+    }
 
     static JNIEnv* attachThread();
     static void dettachThread();
 
-    static const QFont& getFont(size_t fontIndex);
+    static inline const QFont& getFont(size_t fontIndex)
+    {
+        return fontCache[fontIndex];
+    }
+
     static void cacheFont(size_t fontIndex, const QFont& font);
 
 private:

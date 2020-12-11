@@ -38,28 +38,45 @@ public:
 
     static void setJVariantConverter(
             std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> func);
-    static void store(const QVariant& data, int32_t role);
+    static inline void store(const QVariant& data, int32_t role)
+    {
+        variants[roleStack.size()] = data;
+        roleStack.push_back(role);
+    }
 
     template<typename T>
-    static void store(T data, int32_t role)
+    static inline void store(T data, int32_t role)
     {
         variants[roleStack.size()].setValue(data);
         roleStack.push_back(role);
     }
 
     template<typename T>
-    static void storeRef(const T& data, int32_t role)
+    static inline void storeRef(const T& data, int32_t role)
     {
         variants[roleStack.size()].setValue(data);
         roleStack.push_back(role);
     }
 
-    static QVariant& retrieve(size_t i);
+    static inline QVariant& retrieve(size_t i)
+    {
+        return variants[i];
+    }
 
+    static inline const QVector<int32_t>& getPendingRoleIndices()
+    {
+        return roleStack;
+    }
+    static inline std::vector<QVariant>& getPendingVariants()
+    {
+        return variants;
+    }
+    static inline void clearPendingData()
+    {
+        roleStack.clear();
+    }
+    
     static jobject toJVariant(JNIEnv* env, const QVariant& value);
-    static const QVector<int32_t>& getPendingRoleIndices();
-    static std::vector<QVariant>& getPendingVariants();
-    static void clearPendingData();
 
 private:
     QMLDataTransfer();

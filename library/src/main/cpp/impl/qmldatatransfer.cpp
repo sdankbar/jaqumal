@@ -99,33 +99,25 @@ JNICALL void setRectangle(JNIEnv*, jclass, jint x, jint y, jint w, jint h, jint 
 
 JNICALL void setString(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const int32_t strLength = env->GetStringLength(v);
-    QString res(strLength, Qt::Uninitialized);
-    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QString res = JNIUtilities::toQString(env, v);
     QMLDataTransfer::storeRef(res, roleIndex);
 }
 
 JNICALL void setRegularExpression(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const int32_t strLength = env->GetStringLength(v);
-    QString res(strLength, Qt::Uninitialized);
-    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QString res = JNIUtilities::toQString(env, v);
     QMLDataTransfer::storeRef(QRegExp(res), roleIndex);
 }
 
 JNICALL void setURL(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const int32_t strLength = env->GetStringLength(v);
-    QString res(strLength, Qt::Uninitialized);
-    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QString res = JNIUtilities::toQString(env, v);
     QMLDataTransfer::storeRef(QUrl(res), roleIndex);
 }
 
 JNICALL void setUUID(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
-    const int32_t strLength = env->GetStringLength(v);
-    QString res(strLength, Qt::Uninitialized);
-    env->GetStringRegion(v, 0, strLength, reinterpret_cast<jchar*>(res.data()));
+    QString res = JNIUtilities::toQString(env, v);
     QMLDataTransfer::storeRef(QUuid(res), roleIndex);
 }
 
@@ -276,17 +268,6 @@ void QMLDataTransfer::uninitialize(JNIEnv* env)
     env->DeleteGlobalRef(jvariantClass);
 }
 
-QVariant& QMLDataTransfer::retrieve(size_t i)
-{
-    return variants[i];
-}
-
-void QMLDataTransfer::store(const QVariant& data, int32_t role)
-{
-    variants[roleStack.size()] = data;
-    roleStack.push_back(role);
-}
-
 void QMLDataTransfer::setJVariantConverter(
         std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> func)
 {
@@ -414,21 +395,6 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
             return nullptr;
         }
     }
-}
-
-const QVector<int32_t>& QMLDataTransfer::getPendingRoleIndices()
-{
-    return roleStack;
-}
-
-std::vector<QVariant>& QMLDataTransfer::getPendingVariants()
-{
-    return variants;
-}
-
-void QMLDataTransfer::clearPendingData()
-{
-    roleStack.clear();
 }
 
 QMLDataTransfer::QMLDataTransfer()

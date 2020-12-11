@@ -29,10 +29,7 @@ class EventFunctions
 public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
-
-
 private:
-
 };
 
 

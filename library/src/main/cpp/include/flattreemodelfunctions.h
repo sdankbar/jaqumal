@@ -31,10 +31,7 @@ class FlatTreeModelFunctions
 public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
-
-
 private:
-
 };
 
 class GenericFlatTreeModel : public QAbstractListModel
