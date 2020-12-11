@@ -22,16 +22,15 @@
  */
 package com.github.sdankbar.qml.fonts;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Provides methods for fast access to JFonts.
  */
 public final class JFontCache {
 
-	private final Map<JFont.Builder, JFont> builderCache = new HashMap<>();
-	private final Map<String, JFont> stringCache = new HashMap<>();
+	private volatile ImmutableMap<JFont.Builder, JFont> builderCache = ImmutableMap.of();
+	private volatile ImmutableMap<String, JFont> stringCache = ImmutableMap.of();
 	private int index = 0;
 
 	/**
@@ -40,15 +39,21 @@ public final class JFontCache {
 	 * @param builder Builder that describes the JFont to return.
 	 * @return The JFont for the provided builder.
 	 */
-	public synchronized JFont getFont(final JFont.Builder builder) {
+	public JFont getFont(final JFont.Builder builder) {
 		final JFont cachedFont = builderCache.get(builder);
 		if (cachedFont != null) {
 			return cachedFont;
 		} else {
-			final int fontIndex = index++;
-			final JFont f = new JFont(builder.getQFontString(fontIndex), fontIndex);
-			builderCache.put(builder, f);
-			return f;
+			synchronized (this) {
+				final int fontIndex = index++;
+				final JFont f = new JFont(builder.getQFontString(fontIndex), fontIndex);
+				final ImmutableMap.Builder<JFont.Builder, JFont> mapBuilder = ImmutableMap.builder();
+				mapBuilder.putAll(builderCache);
+				mapBuilder.put(builder, f);
+				builderCache = mapBuilder.build();
+				return f;
+			}
+
 		}
 	}
 
@@ -58,15 +63,20 @@ public final class JFontCache {
 	 * @param fontStr String from QFont used to construct a JFont.
 	 * @return The JFont for the provided builder.
 	 */
-	public synchronized JFont getFont(final String fontStr) {
+	public JFont getFont(final String fontStr) {
 		final JFont cachedFont = stringCache.get(fontStr);
 		if (cachedFont != null) {
 			return cachedFont;
 		} else {
-			final int fontIndex = index++;
-			final JFont f = new JFont(fontStr, fontIndex);
-			stringCache.put(fontStr, f);
-			return f;
+			synchronized (this) {
+				final int fontIndex = index++;
+				final JFont f = new JFont(fontStr, fontIndex);
+				final ImmutableMap.Builder<String, JFont> mapBuilder = ImmutableMap.builder();
+				mapBuilder.putAll(stringCache);
+				mapBuilder.put(fontStr, f);
+				stringCache = mapBuilder.build();
+				return f;
+			}
 		}
 	}
 
