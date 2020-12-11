@@ -28,6 +28,7 @@
 Q_DECL_EXPORT JNINativeMethod JNIUtilities_createJNIMethod(const char* name, const char* sig, void* funcPtr);
 Q_DECL_EXPORT jclass JNIUtilities_findClassGlobalReference(JNIEnv* env, const char* name);
 Q_DECL_EXPORT QString JNIUtilities_toQString(JNIEnv* env, jstring str);
+Q_DECL_EXPORT void JNIUtilities_storeInQString(JNIEnv* env, jstring str, QString& output);
 Q_DECL_EXPORT jstring JNIUtilities_toJString(JNIEnv* env, const QString& str);
 Q_DECL_EXPORT const QFont& JNIUtilities_getFont(size_t fontIndex);
 
@@ -46,6 +47,7 @@ public:
     static void invokeCallback(JNIEnv* env, jobject callbackObject);
 
     static QString toQString(JNIEnv* env, jstring str);
+    static void storeInQString(JNIEnv* env, jstring str, QString& output);
     static jstring toJString(JNIEnv* env, const QString& str);
 
     static JNIEnv* attachThread();

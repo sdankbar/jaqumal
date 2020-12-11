@@ -45,6 +45,10 @@ QString JNIUtilities_toQString(JNIEnv* env, jstring str)
 {
     return JNIUtilities::toQString(env, str);
 }
+void JNIUtilities_storeInQString(JNIEnv* env, jstring str, QString& output)
+{
+    JNIUtilities::storeInQString(env, str, output);
+}
 jstring JNIUtilities_toJString(JNIEnv* env, const QString& str)
 {
     return JNIUtilities::toJString(env, str);
@@ -155,6 +159,13 @@ QString JNIUtilities::toQString(JNIEnv* env, jstring str)
     QString res(strLength, Qt::Uninitialized);
     env->GetStringRegion(str, 0, strLength, reinterpret_cast<jchar*>(res.data()));
     return res;
+}
+
+void JNIUtilities::storeInQString(JNIEnv* env, jstring str, QString& output)
+{
+    const int32_t strLength = env->GetStringLength(str);
+    output.resize(strLength);
+    env->GetStringRegion(str, 0, strLength, reinterpret_cast<jchar*>(output.data()));
 }
 
 jstring JNIUtilities::toJString(JNIEnv* env, const QString& str)
