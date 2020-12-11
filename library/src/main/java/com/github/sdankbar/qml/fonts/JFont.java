@@ -71,11 +71,11 @@ public class JFont {
 			return cache.getFont(this);
 		}
 
-		JFont privateBuild(final int fontIndex) {
-			return new JFont(FontFunctions.getQFontToString(fontIndex, family, pointSize, pixelSize, bold, italic,
-					overline, strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
+		String getQFontString(final int fontIndex) {
+			return FontFunctions.getQFontToString(fontIndex, family, pointSize, pixelSize, bold, italic, overline,
+					strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
 					letterSpacingType.value, capitalization.value, hintingPreference.value, stretch.value, style.value,
-					styleName, styleHint.value, styleStrategyMask()), fontIndex);
+					styleName, styleHint.value, styleStrategyMask());
 		}
 
 		public Builder setBold(final boolean b) {
@@ -452,7 +452,7 @@ public class JFont {
 		Objects.requireNonNull(str, "str is null");
 
 		if (str.matches("\\w*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
-			return new JFont(str, -1);
+			return cache.getFont(str);
 		} else {
 			throw new IllegalArgumentException(str + " is not a valid font string");
 		}
@@ -477,8 +477,9 @@ public class JFont {
 	private JFontInfo cachedInfo = null;
 	private JFontMetrics cachedMetrics = null;
 
-	private JFont(final String toStr, final int fontIndex) {
-		fontToString = toStr;
+	JFont(final String toStr, final int fontIndex) {
+		Preconditions.checkArgument(fontIndex >= 0, "fontIndex must not be negative");
+		fontToString = Objects.requireNonNull(toStr, "toStr is null");
 		this.fontIndex = fontIndex;
 		final String[] tokens = fontToString.split(",");
 		Preconditions.checkArgument(tokens.length == 10 || tokens.length == 11,

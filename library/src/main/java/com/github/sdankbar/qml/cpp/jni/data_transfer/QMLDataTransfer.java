@@ -61,8 +61,6 @@ public class QMLDataTransfer {
 
 	public static native void setImage(int w, int h, byte[] data, int roleIndex);
 
-	public static native void setFont(String v, int roleIndex);
-
 	public static native void setFont(int fontIndex, int roleIndex);
 
 	public static native void setPolyline(int length, double[] data, int roleIndex);

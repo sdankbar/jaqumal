@@ -30,7 +30,8 @@ import java.util.Map;
  */
 public final class JFontCache {
 
-	private final Map<JFont.Builder, JFont> cache = new HashMap<>();
+	private final Map<JFont.Builder, JFont> builderCache = new HashMap<>();
+	private final Map<String, JFont> stringCache = new HashMap<>();
 	private int index = 0;
 
 	/**
@@ -40,13 +41,31 @@ public final class JFontCache {
 	 * @return The JFont for the provided builder.
 	 */
 	public synchronized JFont getFont(final JFont.Builder builder) {
-		final JFont cachedFont = cache.get(builder);
+		final JFont cachedFont = builderCache.get(builder);
 		if (cachedFont != null) {
 			return cachedFont;
 		} else {
 			final int fontIndex = index++;
-			final JFont f = builder.privateBuild(fontIndex);
-			cache.put(builder, f);
+			final JFont f = new JFont(builder.getQFontString(fontIndex), fontIndex);
+			builderCache.put(builder, f);
+			return f;
+		}
+	}
+
+	/**
+	 * Retrieve a JFont from the cache or create it if it is not in the cache.
+	 *
+	 * @param fontStr String from QFont used to construct a JFont.
+	 * @return The JFont for the provided builder.
+	 */
+	public synchronized JFont getFont(final String fontStr) {
+		final JFont cachedFont = stringCache.get(fontStr);
+		if (cachedFont != null) {
+			return cachedFont;
+		} else {
+			final int fontIndex = index++;
+			final JFont f = new JFont(fontStr, fontIndex);
+			stringCache.put(fontStr, f);
 			return f;
 		}
 	}
