@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml.fonts;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -31,7 +33,7 @@ public final class JFontCache {
 
 	private volatile ImmutableMap<JFont.Builder, JFont> builderCache = ImmutableMap.of();
 	private volatile ImmutableMap<String, JFont> stringCache = ImmutableMap.of();
-	private int index = 0;
+	private final AtomicInteger index = new AtomicInteger();
 
 	/**
 	 * Retrieve a JFont from the cache or create it if it is not in the cache.
@@ -40,20 +42,18 @@ public final class JFontCache {
 	 * @return The JFont for the provided builder.
 	 */
 	public JFont getFont(final JFont.Builder builder) {
-		final JFont cachedFont = builderCache.get(builder);
+		final ImmutableMap<JFont.Builder, JFont> local = builderCache;
+		final JFont cachedFont = local.get(builder);
 		if (cachedFont != null) {
 			return cachedFont;
 		} else {
-			synchronized (this) {
-				final int fontIndex = index++;
-				final JFont f = new JFont(builder.getQFontString(fontIndex), fontIndex);
-				final ImmutableMap.Builder<JFont.Builder, JFont> mapBuilder = ImmutableMap.builder();
-				mapBuilder.putAll(builderCache);
-				mapBuilder.put(builder, f);
-				builderCache = mapBuilder.build();
-				return f;
-			}
-
+			final int fontIndex = index.getAndIncrement();
+			final JFont f = new JFont(builder.getQFontString(fontIndex), fontIndex);
+			final ImmutableMap.Builder<JFont.Builder, JFont> mapBuilder = ImmutableMap.builder();
+			mapBuilder.putAll(local);
+			mapBuilder.put(builder, f);
+			builderCache = mapBuilder.build();
+			return f;
 		}
 	}
 
@@ -64,19 +64,18 @@ public final class JFontCache {
 	 * @return The JFont for the provided builder.
 	 */
 	public JFont getFont(final String fontStr) {
-		final JFont cachedFont = stringCache.get(fontStr);
+		final ImmutableMap<String, JFont> local = stringCache;
+		final JFont cachedFont = local.get(fontStr);
 		if (cachedFont != null) {
 			return cachedFont;
 		} else {
-			synchronized (this) {
-				final int fontIndex = index++;
-				final JFont f = new JFont(fontStr, fontIndex);
-				final ImmutableMap.Builder<String, JFont> mapBuilder = ImmutableMap.builder();
-				mapBuilder.putAll(stringCache);
-				mapBuilder.put(fontStr, f);
-				stringCache = mapBuilder.build();
-				return f;
-			}
+			final int fontIndex = index.getAndIncrement();
+			final JFont f = new JFont(fontStr, fontIndex);
+			final ImmutableMap.Builder<String, JFont> mapBuilder = ImmutableMap.builder();
+			mapBuilder.putAll(local);
+			mapBuilder.put(fontStr, f);
+			stringCache = mapBuilder.build();
+			return f;
 		}
 	}
 
