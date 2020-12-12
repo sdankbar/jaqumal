@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml.fonts;
 
-import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -34,30 +33,43 @@ import com.google.common.collect.ImmutableSet;
 public class JFont {
 
 	public static class Builder {
+
+		private int applyMask(final boolean state, final int input, final int mask) {
+			if (state) {
+				return input | mask;
+			} else {
+				return input & ~mask;
+			}
+		}
+
+		private static final int BOLD_MASK = 0x01;// 00000001
+		private static final int ITALIC_MASK = 0x02;// 00000010
+		private static final int OVERLINE_MASK = 0x04;// 00000100
+		private static final int STRIKEOUT_MASK = 0x08;// 00001000
+		private static final int UNDERLINE_MASK = 0x10;// 00010000
+		private static final int FIXED_PITCH_MASK = 0x20;// 00100000
+		private static final int KERNING_MASK = 0x40;// 01000000
+
 		private String family = "";
 		private int pointSize = -1;
 		private int pixelSize = -1;
 
-		private boolean bold = false;
-		private boolean italic = false;
-		private boolean overline = false;
-		private boolean strikeout = false;
-		private boolean underline = false;
-		private boolean fixedPitch = false;
-		private boolean kerning = false;
+		// bold, italic, overline, strikeout, underline, fixed pitch, and kerning
+		// boolean values stored in this mask. Use constants above to get and set.
+		private int mask = 0;
 
 		private double wordSpacing = 0;
 
 		private double letterSpacing = 0;
-		private SpacingType letterSpacingType = SpacingType.AbsoluteSpacing;
+		private int letterSpacingType = SpacingType.AbsoluteSpacing.value;
 
-		private Capitalization capitalization = Capitalization.MixedCase;
-		private HintingPreference hintingPreference = HintingPreference.PreferNoHinting;
-		private Stretch stretch = Stretch.Unstretched;
-		private Style style = Style.StyleNormal;
+		private int capitalization = Capitalization.MixedCase.value;
+		private int hintingPreference = HintingPreference.PreferNoHinting.value;
+		private int stretch = Stretch.Unstretched.value;
+		private int style = Style.StyleNormal.value;
 		private String styleName = "";
-		private StyleHint styleHint = StyleHint.AnyStyle;
-		private final EnumSet<StyleStrategy> styleStrategy = EnumSet.of(StyleStrategy.PreferDefault);
+		private int styleHint = StyleHint.AnyStyle.value;
+		private int styleStrategyMask = 0;
 		private int fontWeight = Weight.Normal.value;
 
 		private Builder() {
@@ -72,19 +84,20 @@ public class JFont {
 		}
 
 		String getQFontString(final int fontIndex) {
-			return FontFunctions.getQFontToString(fontIndex, family, pointSize, pixelSize, bold, italic, overline,
-					strikeout, underline, fixedPitch, kerning, fontWeight, wordSpacing, letterSpacing,
-					letterSpacingType.value, capitalization.value, hintingPreference.value, stretch.value, style.value,
-					styleName, styleHint.value, styleStrategyMask());
+			return FontFunctions.getQFontToString(fontIndex, family, pointSize, pixelSize, (mask & BOLD_MASK) != 0,
+					(mask & ITALIC_MASK) != 0, (mask & OVERLINE_MASK) != 0, (mask & STRIKEOUT_MASK) != 0,
+					(mask & UNDERLINE_MASK) != 0, (mask & FIXED_PITCH_MASK) != 0, (mask & KERNING_MASK) != 0,
+					fontWeight, wordSpacing, letterSpacing, letterSpacingType, capitalization, hintingPreference,
+					stretch, style, styleName, styleHint, styleStrategyMask);
 		}
 
 		public Builder setBold(final boolean b) {
-			bold = b;
+			mask = applyMask(b, mask, BOLD_MASK);
 			return this;
 		}
 
 		public Builder setCapitalization(final Capitalization c) {
-			capitalization = Objects.requireNonNull(c, "c is null");
+			capitalization = Objects.requireNonNull(c, "c is null").value;
 			return this;
 		}
 
@@ -94,33 +107,33 @@ public class JFont {
 		}
 
 		public Builder setFixedPitch(final boolean fixedPitch) {
-			this.fixedPitch = fixedPitch;
+			mask = applyMask(fixedPitch, mask, FIXED_PITCH_MASK);
 			return this;
 		}
 
 		public Builder setHintingPreference(final HintingPreference h) {
-			hintingPreference = Objects.requireNonNull(h, "h is null");
+			hintingPreference = Objects.requireNonNull(h, "h is null").value;
 			return this;
 		}
 
 		public Builder setItalic(final boolean b) {
-			italic = b;
+			mask = applyMask(b, mask, ITALIC_MASK);
 			return this;
 		}
 
 		public Builder setKerning(final boolean kerning) {
-			this.kerning = kerning;
+			mask = applyMask(kerning, mask, KERNING_MASK);
 			return this;
 		}
 
 		public Builder setLetterSpacing(final SpacingType t, final double s) {
-			letterSpacingType = Objects.requireNonNull(t, "t is null");
+			letterSpacingType = Objects.requireNonNull(t, "t is null").value;
 			letterSpacing = s;
 			return this;
 		}
 
 		public Builder setOverline(final boolean b) {
-			overline = b;
+			mask = applyMask(b, mask, OVERLINE_MASK);
 			return this;
 		}
 
@@ -139,24 +152,23 @@ public class JFont {
 		}
 
 		public Builder setStretch(final Stretch s) {
-			stretch = Objects.requireNonNull(s, "s is null");
+			stretch = Objects.requireNonNull(s, "s is null").value;
 			return this;
 		}
 
 		public Builder setStrikeout(final boolean b) {
-			strikeout = b;
+			mask = applyMask(b, mask, STRIKEOUT_MASK);
 			return this;
 		}
 
 		public Builder setStyle(final Style s) {
-			style = Objects.requireNonNull(s, "s is null");
+			style = Objects.requireNonNull(s, "s is null").value;
 			return this;
 		}
 
 		public Builder setStyleHint(final StyleHint h, final Set<StyleStrategy> s) {
-			styleHint = Objects.requireNonNull(h, "h is null");
-			styleStrategy.clear();
-			styleStrategy.addAll(Objects.requireNonNull(s, "s is null"));
+			styleHint = Objects.requireNonNull(h, "h is null").value;
+			styleStrategyMask = calculateStyleStrategyMask(Objects.requireNonNull(s, "s is null"));
 			return this;
 		}
 
@@ -166,7 +178,7 @@ public class JFont {
 		}
 
 		public Builder setUnderline(final boolean b) {
-			underline = b;
+			mask = applyMask(b, mask, UNDERLINE_MASK);
 			return this;
 		}
 
@@ -186,7 +198,7 @@ public class JFont {
 			return this;
 		}
 
-		private int styleStrategyMask() {
+		private int calculateStyleStrategyMask(final Set<StyleStrategy> styleStrategy) {
 			int mask = 0;
 			for (final StyleStrategy s : styleStrategy) {
 				mask = mask | s.value;
@@ -198,28 +210,22 @@ public class JFont {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + (bold ? 1231 : 1237);
-			result = prime * result + ((capitalization == null) ? 0 : capitalization.hashCode());
+			result = prime * result + capitalization;
 			result = prime * result + ((family == null) ? 0 : family.hashCode());
-			result = prime * result + (fixedPitch ? 1231 : 1237);
 			result = prime * result + fontWeight;
-			result = prime * result + ((hintingPreference == null) ? 0 : hintingPreference.hashCode());
-			result = prime * result + (italic ? 1231 : 1237);
-			result = prime * result + (kerning ? 1231 : 1237);
+			result = prime * result + hintingPreference;
 			long temp;
 			temp = Double.doubleToLongBits(letterSpacing);
 			result = prime * result + (int) (temp ^ (temp >>> 32));
-			result = prime * result + ((letterSpacingType == null) ? 0 : letterSpacingType.hashCode());
-			result = prime * result + (overline ? 1231 : 1237);
+			result = prime * result + letterSpacingType;
+			result = prime * result + mask;
 			result = prime * result + pixelSize;
 			result = prime * result + pointSize;
-			result = prime * result + ((stretch == null) ? 0 : stretch.hashCode());
-			result = prime * result + (strikeout ? 1231 : 1237);
-			result = prime * result + ((style == null) ? 0 : style.hashCode());
-			result = prime * result + ((styleHint == null) ? 0 : styleHint.hashCode());
+			result = prime * result + stretch;
+			result = prime * result + style;
+			result = prime * result + styleHint;
 			result = prime * result + ((styleName == null) ? 0 : styleName.hashCode());
-			result = prime * result + ((styleStrategy == null) ? 0 : styleStrategy.hashCode());
-			result = prime * result + (underline ? 1231 : 1237);
+			result = prime * result + styleStrategyMask;
 			temp = Double.doubleToLongBits(wordSpacing);
 			result = prime * result + (int) (temp ^ (temp >>> 32));
 			return result;
@@ -237,9 +243,6 @@ public class JFont {
 				return false;
 			}
 			final Builder other = (Builder) obj;
-			if (bold != other.bold) {
-				return false;
-			}
 			if (capitalization != other.capitalization) {
 				return false;
 			}
@@ -250,19 +253,10 @@ public class JFont {
 			} else if (!family.equals(other.family)) {
 				return false;
 			}
-			if (fixedPitch != other.fixedPitch) {
-				return false;
-			}
 			if (fontWeight != other.fontWeight) {
 				return false;
 			}
 			if (hintingPreference != other.hintingPreference) {
-				return false;
-			}
-			if (italic != other.italic) {
-				return false;
-			}
-			if (kerning != other.kerning) {
 				return false;
 			}
 			if (Double.doubleToLongBits(letterSpacing) != Double.doubleToLongBits(other.letterSpacing)) {
@@ -271,7 +265,7 @@ public class JFont {
 			if (letterSpacingType != other.letterSpacingType) {
 				return false;
 			}
-			if (overline != other.overline) {
+			if (mask != other.mask) {
 				return false;
 			}
 			if (pixelSize != other.pixelSize) {
@@ -281,9 +275,6 @@ public class JFont {
 				return false;
 			}
 			if (stretch != other.stretch) {
-				return false;
-			}
-			if (strikeout != other.strikeout) {
 				return false;
 			}
 			if (style != other.style) {
@@ -299,14 +290,7 @@ public class JFont {
 			} else if (!styleName.equals(other.styleName)) {
 				return false;
 			}
-			if (styleStrategy == null) {
-				if (other.styleStrategy != null) {
-					return false;
-				}
-			} else if (!styleStrategy.equals(other.styleStrategy)) {
-				return false;
-			}
-			if (underline != other.underline) {
+			if (styleStrategyMask != other.styleStrategyMask) {
 				return false;
 			}
 			if (Double.doubleToLongBits(wordSpacing) != Double.doubleToLongBits(other.wordSpacing)) {
