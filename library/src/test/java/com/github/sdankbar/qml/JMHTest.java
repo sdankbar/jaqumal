@@ -22,6 +22,7 @@
  */
 package com.github.sdankbar.qml;
 
+import java.awt.Dimension;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
@@ -79,6 +80,7 @@ public class JMHTest {
 		JQMLApplication<NullEventProcessor> app;
 		JQMLSingletonModel<Role> singletonModel;
 		JQMLListModel<Role> listModel;
+		JFont defaultFont;
 
 		InvokableWrapper wrapper = new InvokableWrapper(new InvokeObject());
 
@@ -93,7 +95,7 @@ public class JMHTest {
 			listModel = app.getModelFactory().createListModel("list_model", Role.class, PutMode.RETURN_NULL);
 			listModel.add(new JVariant(1), Role.R1);
 			listModel.add(new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), Role.R2);
-
+			defaultFont = JFont.builder().build();
 		}
 
 		/**
@@ -128,6 +130,15 @@ public class JMHTest {
 	@Benchmark
 	public JFont benchmark_jfont_build(final BenchmarkState state) {
 		return JFont.builder().build();
+	}
+
+	/**
+	 * @param state
+	 * @return blackhole
+	 */
+	@Benchmark
+	public JFont benchmark_jfont_scaleToFit(final BenchmarkState state) {
+		return state.defaultFont.scaleTextToFit(new Dimension(300, 50), "Hello World", 5);
 	}
 
 	/**

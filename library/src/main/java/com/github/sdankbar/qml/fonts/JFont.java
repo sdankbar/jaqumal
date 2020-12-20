@@ -22,6 +22,7 @@
  */
 package com.github.sdankbar.qml.fonts;
 
+import java.awt.Dimension;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -581,6 +582,14 @@ public class JFont {
 	 */
 	public int getFontIndex() {
 		return fontIndex;
+	}
+
+	public JFont scaleTextToFit(final Dimension bounds, final String inputText, final int minimumPointSize) {
+		Objects.requireNonNull(bounds, "bounds is null");
+		Objects.requireNonNull(inputText, "inputText is null");
+		Preconditions.checkArgument(minimumPointSize >= 1, "minimumPointSize < 1");
+		return JFont.fromString(
+				FontFunctions.scaleToFit(bounds.width, bounds.height, inputText, getFontIndex(), minimumPointSize));
 	}
 
 	@Override

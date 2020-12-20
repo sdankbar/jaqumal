@@ -270,6 +270,36 @@ jboolean JNICALL inFont(JNIEnv* env, jclass, jstring fontToString, jint characte
     }
 }
 
+jstring JNICALL scaleToFit(JNIEnv* env, jclass, jint w, jint h, jstring inputString,
+                           jint fontIndex, jint minimumPointSize)
+{
+    QString qStr = JNIUtilities::toQString(env, inputString);
+    QFont workingFont = JNIUtilities::getFont(fontIndex);
+    QFontMetrics metrics(workingFont);
+
+    QRect constraint(0, 0, w, h);
+    // TODO allow passing flags
+    int32_t pointSize = workingFont.pointSize();
+    QRect bounds = metrics.boundingRect(constraint, 0, qStr);
+    while (bounds.width() > w || bounds.height() > h)
+    {
+        --pointSize;
+        if (pointSize < minimumPointSize)
+        {
+            break;
+        }
+        else
+        {
+            workingFont.setPointSize(pointSize);
+            metrics = QFontMetrics(workingFont);
+            bounds = metrics.boundingRect(constraint, 0, qStr);
+        }
+    }
+
+    return JNIUtilities::toJString(env, workingFont.toString());
+}
+
+
 jclass FontFunctions::rectangleClass;
 jmethodID FontFunctions::rectangleConstructor;
 
@@ -287,6 +317,7 @@ void FontFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("getStringWidth",    "(Ljava/lang/String;Ljava/lang/String;)I",    (void *)&getStringWidth),
         JNIUtilities::createJNIMethod("getTightBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getTightBoundingRect),
         JNIUtilities::createJNIMethod("inFont",    "(Ljava/lang/String;I)Z",    (void *)&inFont),
+        JNIUtilities::createJNIMethod("scaleToFit",    "(IILjava/lang/String;II)Ljava/lang/String;",    (void *)&scaleToFit),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/FontFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));

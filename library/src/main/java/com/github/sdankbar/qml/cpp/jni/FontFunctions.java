@@ -54,4 +54,7 @@ public class FontFunctions {
 	 * @return True if the font contains the character.
 	 */
 	public static native boolean inFont(String fontToString, int character);
+
+	public static native String scaleToFit(final int w, final int h, final String inputString, final int fontIndex,
+			final int minimumPointSize);
 }
