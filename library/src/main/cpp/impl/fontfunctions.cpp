@@ -270,33 +270,45 @@ jboolean JNICALL inFont(JNIEnv* env, jclass, jstring fontToString, jint characte
     }
 }
 
-jstring JNICALL scaleToFit(JNIEnv* env, jclass, jint w, jint h, jstring inputString,
-                           jint fontIndex, jint minimumPointSize)
+inline int32_t getSize(const QFont& f)
+{
+    if (f.pointSize() > 0)
+    {
+        return f.pointSize();
+    }
+    else
+    {
+        return f.pixelSize();
+    }
+}
+
+jint JNICALL scaleToFit(JNIEnv* env, jclass, jint w, jint h, jstring inputString,
+                           jint fontIndex, jint minimumSize)
 {
     QString qStr = JNIUtilities::toQString(env, inputString);
-    QFont workingFont = JNIUtilities::getFont(fontIndex);
-    QFontMetrics metrics(workingFont);
 
-    QRect constraint(0, 0, w, h);
+    const QRect constraint(0, 0, w, h);
     // TODO allow passing flags
-    int32_t pointSize = workingFont.pointSize();
-    QRect bounds = metrics.boundingRect(constraint, 0, qStr);
+    const int32_t startingSize = getSize(JNIUtilities::getFont(fontIndex));
+    int32_t workingIndex = fontIndex;
+    int32_t lastFittingIndex = workingIndex;
+    const int32_t maxIndex = workingIndex + (startingSize - minimumSize);
+    QRect bounds = JNIUtilities::getFontMetrics(workingIndex).boundingRect(constraint, 0, qStr);
     while (bounds.width() > w || bounds.height() > h)
     {
-        --pointSize;
-        if (pointSize < minimumPointSize)
+        lastFittingIndex = workingIndex;
+        ++workingIndex;
+        if (workingIndex > maxIndex)
         {
             break;
         }
         else
         {
-            workingFont.setPointSize(pointSize);
-            metrics = QFontMetrics(workingFont);
-            bounds = metrics.boundingRect(constraint, 0, qStr);
+            bounds = JNIUtilities::getFontMetrics(workingIndex).boundingRect(constraint, 0, qStr);
         }
     }
 
-    return JNIUtilities::toJString(env, workingFont.toString());
+    return lastFittingIndex;
 }
 
 
@@ -317,7 +329,7 @@ void FontFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("getStringWidth",    "(Ljava/lang/String;Ljava/lang/String;)I",    (void *)&getStringWidth),
         JNIUtilities::createJNIMethod("getTightBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getTightBoundingRect),
         JNIUtilities::createJNIMethod("inFont",    "(Ljava/lang/String;I)Z",    (void *)&inFont),
-        JNIUtilities::createJNIMethod("scaleToFit",    "(IILjava/lang/String;II)Ljava/lang/String;",    (void *)&scaleToFit),
+        JNIUtilities::createJNIMethod("scaleToFit",    "(IILjava/lang/String;II)I",    (void *)&scaleToFit),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/FontFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));

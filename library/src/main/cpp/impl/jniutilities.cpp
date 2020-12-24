@@ -32,6 +32,7 @@
 #include "singletonmodelfunctions.h"
 #include "listmodelfunctions.h"
 #include <math.h>
+#include <QFontMetrics>
 
 JNINativeMethod JNIUtilities_createJNIMethod(const char* name, const char* sig, void* funcPtr)
 {
@@ -99,6 +100,7 @@ jclass JNIUtilities::callbackClass;
 jmethodID JNIUtilities::callbackMethod;
 JavaVM* JNIUtilities::javaVM;
 std::vector<QFont> JNIUtilities::fontCache;
+std::vector<QFontMetrics> JNIUtilities::fontMetricsCache;
 
 void JNIUtilities::initialize(JavaVM* vm, JNIEnv* env)
 {
@@ -175,9 +177,12 @@ void JNIUtilities::cacheFont(size_t fontIndex, const QFont& font)
     if (fontIndex >= fontCache.size())
     {
         size_t initSize = 32;
-        fontCache.resize(qMax(initSize, 2 * fontCache.size()));
+        size_t newSize = qMax(initSize, 2 * fontCache.size());
+        fontCache.resize(newSize);
+        fontMetricsCache.resize(newSize, QFontMetrics(QFont()));
     }
     fontCache[fontIndex] = font;
+    fontMetricsCache[fontIndex] = QFontMetrics(font);
 }
 
 JNIUtilities::JNIUtilities()

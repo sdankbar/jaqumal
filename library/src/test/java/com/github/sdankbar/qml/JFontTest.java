@@ -26,8 +26,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.awt.Dimension;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -120,10 +118,11 @@ public class JFontTest {
 	@Test
 	public void test_scaleTextToFit() {
 		final JFont f = JFont.builder().setFamily("Arial").setPointSize(20).build();
-		assertEquals(20, f.scaleTextToFit(new Dimension(200, 50), "Hello World", 10).getPointSize());
-		assertEquals(20, f.scaleTextToFit(new Dimension(140, 50), "Hello World", 10).getPointSize());
-		assertEquals(14, f.scaleTextToFit(new Dimension(100, 50), "Hello World", 10).getPointSize());
-		assertEquals(7, f.scaleTextToFit(new Dimension(50, 50), "Hello World", 5).getPointSize());
+		assertEquals(20, f.scaleTextToFit(200, 50, "Hello World", 10).getPointSize());
+		assertEquals(20, f.scaleTextToFit(140, 50, "Hello World", 10).getPointSize());
+		assertEquals(15, f.scaleTextToFit(100, 50, "Hello World", 10).getPointSize());
+		assertEquals(8, f.scaleTextToFit(50, 50, "Hello World", 5).getPointSize());
+		assertEquals(5, f.scaleTextToFit(5, 50, "Hello World", 5).getPointSize());
 	}
 
 }

@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml;
 
-import java.awt.Dimension;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
@@ -138,7 +137,7 @@ public class JMHTest {
 	 */
 	@Benchmark
 	public JFont benchmark_jfont_scaleToFit(final BenchmarkState state) {
-		return state.defaultFont.scaleTextToFit(new Dimension(300, 50), "Hello World", 5);
+		return state.defaultFont.scaleTextToFit(300, 50, "Hello World", 5);
 	}
 
 	/**

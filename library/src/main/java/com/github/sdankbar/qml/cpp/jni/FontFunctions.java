@@ -55,6 +55,6 @@ public class FontFunctions {
 	 */
 	public static native boolean inFont(String fontToString, int character);
 
-	public static native String scaleToFit(final int w, final int h, final String inputString, final int fontIndex,
+	public static native int scaleToFit(final int w, final int h, final String inputString, final int fontIndex,
 			final int minimumPointSize);
 }

@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml.fonts;
 
-import java.awt.Dimension;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -75,6 +74,25 @@ public class JFont {
 
 		private Builder() {
 			// Empty Implementation
+		}
+
+		public Builder(final Builder arg) {
+			Objects.requireNonNull(arg, "arg is null");
+			family = arg.family;
+			pointSize = arg.pointSize;
+			pixelSize = arg.pixelSize;
+			mask = arg.mask;
+			wordSpacing = arg.wordSpacing;
+			letterSpacing = arg.letterSpacing;
+			letterSpacingType = arg.letterSpacingType;
+			capitalization = arg.capitalization;
+			hintingPreference = arg.hintingPreference;
+			stretch = arg.stretch;
+			style = arg.style;
+			styleName = arg.styleName;
+			styleHint = arg.styleHint;
+			styleStrategyMask = arg.styleStrategyMask;
+			fontWeight = arg.fontWeight;
 		}
 
 		/**
@@ -139,15 +157,21 @@ public class JFont {
 		}
 
 		public Builder setPixelSize(final int size) {
-			Preconditions.checkArgument(size > 0, "size must be > 0");
+			Preconditions.checkArgument(0 < size && size <= MAX_FONT_SIZE, "size must be > 0 and <= MAX_FONT_SIZE");
 			pointSize = -1;
 			pixelSize = size;
 			return this;
 		}
 
 		public Builder setPointSize(final int size) {
-			Preconditions.checkArgument(size > 0, "size must be > 0");
+			Preconditions.checkArgument(0 < size && size <= MAX_FONT_SIZE, "size must be > 0 and <= MAX_FONT_SIZE");
 			pointSize = size;
+			pixelSize = -1;
+			return this;
+		}
+
+		public Builder setDefaultSize() {
+			pointSize = -1;
 			pixelSize = -1;
 			return this;
 		}
@@ -429,8 +453,39 @@ public class JFont {
 		}
 	}
 
+	/**
+	 * Maximum support point and pixel size.
+	 */
+	public static final int MAX_FONT_SIZE = 256;
+
 	public static Builder builder() {
 		return new Builder();
+	}
+
+	static Builder builder(final String fontStr) {
+		Objects.requireNonNull(fontStr, "fontStr is null");
+		final String[] tokens = fontStr.split(",");
+		Preconditions.checkArgument(tokens.length == 10 || tokens.length == 11,
+				"FontToString is not 10 or 11 comma separated values");
+		final Builder builder = new Builder();
+		builder.setFamily(tokens[0]);
+		final int point = Integer.parseInt(tokens[1]);
+		if (point > 0) {
+			builder.setPointSize(point);
+		} else {
+			builder.setPixelSize(Integer.parseInt(tokens[2]));
+		}
+		builder.setStyleHint(StyleHint.fromValue(Integer.parseInt(tokens[3])), ImmutableSet.of());
+		builder.setWeight(Integer.parseInt(tokens[4]));
+		builder.setStyle(Style.fromValue(Integer.parseInt(tokens[5])));
+		builder.setUnderline(tokens[6].equals("1"));
+		builder.setStrikeout(tokens[7].equals("1"));
+		builder.setFixedPitch(tokens[8].equals("1"));
+		// token[9] always false
+		if (tokens.length == 11) {
+			builder.setStyleName(tokens[10]);
+		}
+		return builder;
 	}
 
 	public static JFont fromString(final String str) {
@@ -584,12 +639,12 @@ public class JFont {
 		return fontIndex;
 	}
 
-	public JFont scaleTextToFit(final Dimension bounds, final String inputText, final int minimumPointSize) {
-		Objects.requireNonNull(bounds, "bounds is null");
+	public JFont scaleTextToFit(final int w, final int h, final String inputText, final int minimumPointSize) {
+		Preconditions.checkArgument(w > 0, "w < 1");
+		Preconditions.checkArgument(h > 0, "h < 1");
 		Objects.requireNonNull(inputText, "inputText is null");
-		Preconditions.checkArgument(minimumPointSize >= 1, "minimumPointSize < 1");
-		return JFont.fromString(
-				FontFunctions.scaleToFit(bounds.width, bounds.height, inputText, getFontIndex(), minimumPointSize));
+		Preconditions.checkArgument(minimumPointSize > 0, "minimumPointSize < 1");
+		return cache.getFont(FontFunctions.scaleToFit(w, h, inputText, fontIndex, minimumPointSize));
 	}
 
 	@Override

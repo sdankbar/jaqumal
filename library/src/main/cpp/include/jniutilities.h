@@ -24,6 +24,7 @@
 #include "jni.h"
 #include <QString>
 #include <QFont>
+#include <QFontMetrics>
 
 Q_DECL_EXPORT JNINativeMethod JNIUtilities_createJNIMethod(const char* name, const char* sig, void* funcPtr);
 Q_DECL_EXPORT jclass JNIUtilities_findClassGlobalReference(JNIEnv* env, const char* name);
@@ -74,6 +75,11 @@ public:
         return fontCache[fontIndex];
     }
 
+    static inline const QFontMetrics& getFontMetrics(size_t fontIndex)
+    {
+        return fontMetricsCache[fontIndex];
+    }
+
     static void cacheFont(size_t fontIndex, const QFont& font);
 
 private:
@@ -85,5 +91,6 @@ private:
     static jmethodID callbackMethod;
     static JavaVM* javaVM;
     static std::vector<QFont> fontCache;
+    static std::vector<QFontMetrics> fontMetricsCache;
 };
 
