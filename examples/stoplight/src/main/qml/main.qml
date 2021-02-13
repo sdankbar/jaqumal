@@ -25,6 +25,7 @@ import QtQuick 2.10
 import QtQuick.Window 2.10
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
+import QtQuick.Controls 1.4
 import com.github.sdankbar.jaqumal 0.4
 
 Window {
