@@ -104,10 +104,10 @@ Window {
                     opacity: model.lightColor === "green" ? 1 : 0.2
                     radius: 50
                 }
-                JButton {
+                Button {
                     width: 100
                     height: 100
-                    model: walkModel
+                    text: "Walk"
                 }
             }
         }

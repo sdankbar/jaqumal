@@ -43,12 +43,6 @@ public class BuiltinEventFactory implements EventFactory<BuiltinEventProcessor> 
 		case "Builtin-MouseWheel":
 			return new MouseWheelEvent(parser.getString(), parser.getInteger(), parser.getInteger(),
 					parser.getInteger(), parser.getInteger(), parser.getInteger(), parser.getInteger());
-		case "Builtin-ButtonClick":
-			return new ButtonClickEvent(parser.getString());
-		case "Builtin-TextInputAccepted":
-			return new TextInputAcceptedEvent(parser.getString());
-		case "Builtin-TextInputEditingFinished":
-			return new TextInputEditingFinishedEvent(parser.getString());
 		case "Builtin-PerformanceEvent":
 			return new RenderEvent(PERF_EVENT_ARRAY[parser.getInteger()]);
 		case "ListSelectionChangedEvent":

@@ -119,25 +119,8 @@ void EventBuilder::mouseWheelEvent(const QString& objectName, qint32 angleDeltaX
     fireEvent(QStringLiteral("Builtin-MouseWheel"));
 }
 
-void EventBuilder::textInputAcceptedEvent(const QString& objectName)
-{
-    addString(objectName);
-    fireEvent("Builtin-TextInputAccepted");
-}
-void EventBuilder::textInputEditingFinishedEvent(const QString& objectName)
-{
-    addString(objectName);
-    fireEvent("Builtin-TextInputEditingFinished");
-}
-
 void EventBuilder::perfEvent(PerfEventType t)
 {
     addInteger(t);
     fireEvent("Builtin-PerformanceEvent");
-}
-
-void EventBuilder::buttonClickEvent(const QString& objectName)
-{
-    addString(objectName);
-    fireEvent(QStringLiteral("Builtin-ButtonClick"));
 }

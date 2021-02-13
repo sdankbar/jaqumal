@@ -41,9 +41,7 @@ import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
-import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
-import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -64,12 +62,6 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		if (!modelName.add(Objects.requireNonNull(name, "name is null"))) {
 			throw new QMLException("Model with name [" + name + "] already exists");
 		}
-	}
-
-	@Override
-	public JQMLButtonModel createButtonModel(final String name) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -131,12 +123,6 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		final JQMLSingletonModel<K> temp = new MockJQMLSingletonModel<>(name);
 		singletonModels.put(name, temp);
 		return temp;
-	}
-
-	@Override
-	public JQMLTextInputModel createTextInputModel(final String name) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

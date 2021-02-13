@@ -51,9 +51,6 @@ public:
     Q_INVOKABLE void mouseClickEvent(const QString& objectName, qint32 x, qint32 y, qint32 button, qint32 buttons, qint32 modifiers, bool wasHeld);
     Q_INVOKABLE void mouseWheelEvent(const QString& objectName, qint32 angleDeltaX, qint32 angleDeltaY,
                                      qint32 buttons, qint32 modifiers, qint32 x, qint32 y);
-    Q_INVOKABLE void buttonClickEvent(const QString& objectName);
-    Q_INVOKABLE void textInputAcceptedEvent(const QString& objectName);
-    Q_INVOKABLE void textInputEditingFinishedEvent(const QString& objectName);
     Q_INVOKABLE void perfEvent(PerfEventType t);
 
 private:

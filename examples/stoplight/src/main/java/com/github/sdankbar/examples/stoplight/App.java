@@ -32,7 +32,6 @@ import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.QMLReceivableEvent;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
-import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.google.common.collect.ImmutableMap;
 
@@ -99,10 +98,6 @@ public class App {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLSingletonModel<StopLightRoles> model = app.getModelFactory().createSingletonModel("model",
 				StopLightRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
-		final JQMLButtonModel button = app.getModelFactory().createButtonModel("walkModel");
-		button.setText("Walk");
-		button.registerOnClicked(() -> System.out.println("Request Walk Signal"));
-		button.registerHoverChanged(b -> System.out.println(b ? "Hovered" : "Not Hovered"));
 
 		final TestInvokable invokable = new TestInvokable();
 		app.getInvokableDispatcher().registerInvokable("test_invokable", invokable);

@@ -79,16 +79,24 @@ Window {
                 bottomPadding: spaceForPadding / 4
                 spacing: spaceForPadding / 4
 
-                JButton {
-                    model: addPresetColor
+                Button {
+                    text: "Add"
                     width: 60
                     height: 50
+
+                    onClicked: {
+                        test_model.invoke("add")
+                    }
                 }
 
-                JButton {
-                    model: saveColors
+                Button {
+                    text: "Save"
                     width: 60
                     height: 50
+
+                    onClicked: {
+                        test_model.invoke("save")
+                    }
                 }
             }
         }

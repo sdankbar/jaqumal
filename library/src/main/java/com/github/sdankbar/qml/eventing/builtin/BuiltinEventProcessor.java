@@ -28,24 +28,6 @@ package com.github.sdankbar.qml.eventing.builtin;
 public interface BuiltinEventProcessor {
 
 	/**
-	 * Called when a ButtonActivateEvent is generated.
-	 *
-	 * @param e The BuiltinEvent to handle.
-	 */
-	default void handle(final ButtonActivateEvent e) {
-		// Empty Implementation
-	}
-
-	/**
-	 * Called when a ButtonClickEvent is generated.
-	 *
-	 * @param e The BuiltinEvent to handle.
-	 */
-	default void handle(final ButtonClickEvent e) {
-		// Empty Implementation
-	}
-
-	/**
 	 * Called when a ListSelectionChangedEvent is generated.
 	 *
 	 * @param e The BuiltinEvent to handle.
@@ -78,24 +60,6 @@ public interface BuiltinEventProcessor {
 	 * @param e The BuiltinEvent to handle.
 	 */
 	default void handle(final RenderEvent e) {
-		// Empty Implementation
-	}
-
-	/**
-	 * Called when a TextInputAcceptedEvent is generated.
-	 *
-	 * @param e The BuiltinEvent to handle.
-	 */
-	default void handle(final TextInputAcceptedEvent e) {
-		// Empty Implementation
-	}
-
-	/**
-	 * Called when a TextInputEditingFinishedEvent is generated.
-	 *
-	 * @param e The BuiltinEvent to handle.
-	 */
-	default void handle(final TextInputEditingFinishedEvent e) {
 		// Empty Implementation
 	}
 

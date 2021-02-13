@@ -24,10 +24,10 @@ package com.github.sdankbar.qml;
 
 import org.junit.Test;
 
-import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.PerformanceTest.EventProcessor;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.exceptions.QMLException;
+import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 
 /**
  * Tests the JQMLExceptionHandling class
@@ -44,7 +44,7 @@ public class JQMLExceptionHandlingTest {
 
 		JQMLApplication.delete();
 
-		app.getModelFactory().createButtonModel("Test");
+		app.getModelFactory().createSingletonModel("Test", PutMode.class, PutMode.RETURN_NULL);
 	}
 
 }

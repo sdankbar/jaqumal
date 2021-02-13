@@ -33,9 +33,7 @@ import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
-import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
-import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -46,18 +44,6 @@ import com.google.common.collect.ImmutableSet;
  *
  */
 public interface JQMLModelFactory {
-
-	/**
-	 * Creates a new JQMLButtonModel with the specified name.
-	 *
-	 * @param name Name of the model.
-	 * @return The new model
-	 * @throws QMLThreadingException Thrown if not called from the Qt Thread once
-	 *                               JQMLApplication.execute() is called.
-	 * @throws QMLException          Thrown if a model already exists with name.
-	 */
-	@QtThread()
-	JQMLButtonModel createButtonModel(final String name);
 
 	/**
 	 * Creates a new JQMLFlatTreeModel with Class&lt;K&gt; being its key.
@@ -171,18 +157,6 @@ public interface JQMLModelFactory {
 	 */
 	@QtThread
 	<K> JQMLSingletonModel<K> createSingletonModel(final String name, final Set<K> keys, final PutMode putMode);
-
-	/**
-	 * Creates a new JQMLTextInputModel.
-	 *
-	 * @param name Name of the model.
-	 * @return The new model
-	 * @throws QMLThreadingException Thrown if not called from the Qt Thread once
-	 *                               JQMLApplication.execute() is called.
-	 * @throws QMLException          Thrown if a model already exists with name.
-	 */
-	@QtThread
-	JQMLTextInputModel createTextInputModel(final String name);
 
 	/**
 	 * Creates a new JQMLXYSeriesModel which can be used for line/scatter graphs.

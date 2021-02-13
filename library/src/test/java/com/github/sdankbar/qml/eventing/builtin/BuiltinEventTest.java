@@ -49,18 +49,6 @@ public class BuiltinEventTest {
 		private final Map<Class<?>, Integer> callcounts = new HashMap<>();
 
 		@Override
-		public void handle(final ButtonActivateEvent e) {
-			callcounts.compute(e.getClass(),
-					(k, v) -> v == null ? Integer.valueOf(1) : Integer.valueOf(v.intValue() + 1));
-		}
-
-		@Override
-		public void handle(final ButtonClickEvent e) {
-			callcounts.compute(e.getClass(),
-					(k, v) -> v == null ? Integer.valueOf(1) : Integer.valueOf(v.intValue() + 1));
-		}
-
-		@Override
 		public void handle(final MouseClickEvent e) {
 			callcounts.compute(e.getClass(),
 					(k, v) -> v == null ? Integer.valueOf(1) : Integer.valueOf(v.intValue() + 1));
@@ -78,43 +66,6 @@ public class BuiltinEventTest {
 					(k, v) -> v == null ? Integer.valueOf(1) : Integer.valueOf(v.intValue() + 1));
 		}
 
-		@Override
-		public void handle(final TextInputAcceptedEvent e) {
-			callcounts.compute(e.getClass(),
-					(k, v) -> v == null ? Integer.valueOf(1) : Integer.valueOf(v.intValue() + 1));
-		}
-
-		@Override
-		public void handle(final TextInputEditingFinishedEvent e) {
-			callcounts.compute(e.getClass(),
-					(k, v) -> v == null ? Integer.valueOf(1) : Integer.valueOf(v.intValue() + 1));
-		}
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testButtonActivateEvent() {
-		final ButtonActivateEvent e = new ButtonActivateEvent("A");
-		assertEquals("A", e.getButtonName());
-
-		final Processor p = new Processor();
-		e.handle(p);
-		assertEquals(1, p.callcounts.get(ButtonActivateEvent.class).intValue());
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testButtonClickEvent() {
-		final ButtonClickEvent e = new ButtonClickEvent("A");
-		assertEquals("A", e.getButtonName());
-
-		final Processor p = new Processor();
-		e.handle(p);
-		assertEquals(1, p.callcounts.get(ButtonClickEvent.class).intValue());
 	}
 
 	/**
@@ -188,32 +139,6 @@ public class BuiltinEventTest {
 		final Processor p = new Processor();
 		e.handle(p);
 		assertEquals(1, p.callcounts.get(RenderEvent.class).intValue());
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testTextInputAcceptedEvent() {
-		final TextInputAcceptedEvent e = new TextInputAcceptedEvent("A");
-		assertEquals("A", e.getObjectName());
-
-		final Processor p = new Processor();
-		e.handle(p);
-		assertEquals(1, p.callcounts.get(TextInputAcceptedEvent.class).intValue());
-	}
-
-	/**
-	 *
-	 */
-	@Test
-	public void testTextInputEditingFinishedEvent() {
-		final TextInputEditingFinishedEvent e = new TextInputEditingFinishedEvent("A");
-		assertEquals("A", e.getObjectName());
-
-		final Processor p = new Processor();
-		e.handle(p);
-		assertEquals(1, p.callcounts.get(TextInputEditingFinishedEvent.class).intValue());
 	}
 
 }

@@ -43,11 +43,9 @@ import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.list.ListAccessor;
-import com.github.sdankbar.qml.models.singleton.JQMLButtonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModelImpl;
-import com.github.sdankbar.qml.models.singleton.JQMLTextInputModel;
 import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
 import com.github.sdankbar.qml.utility.JQMLUtilities;
 import com.google.common.collect.ImmutableMap;
@@ -94,14 +92,6 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		if (!modelName.add(Objects.requireNonNull(name, "name is null"))) {
 			throw new QMLException("Model with name [" + name + "] already exists");
 		}
-	}
-
-	@Override
-	@QtThread()
-	public JQMLButtonModel createButtonModel(final String name) {
-		JQMLUtilities.checkThread(eventLoopThread);
-
-		return new JQMLButtonModel(name, this, app.getEventDispatcher());
 	}
 
 	@Override
@@ -177,16 +167,6 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		checkModelName(name);
 
 		return new JQMLSingletonModelImpl<>(name, keys, eventLoopThread, new SingletonMapAccessor(), putMode);
-	}
-
-	@Override
-	@QtThread
-	public JQMLTextInputModel createTextInputModel(final String name) {
-		JQMLUtilities.checkThread(eventLoopThread);
-
-		final JQMLTextInputModel m = new JQMLTextInputModel(name, this, app.getEventDispatcher());
-
-		return m;
 	}
 
 	@Override
