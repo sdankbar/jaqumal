@@ -30,7 +30,7 @@
 	<parent>
 		<groupId>com.github.sdankbar.jaqumal</groupId>
 		<artifactId>examples</artifactId>
-		<version>0.5.1-${os.family}-SNAPSHOT</version>
+		<version>0.5.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>new_type</artifactId>
 	<packaging>jar</packaging>
@@ -42,6 +42,7 @@
 			<groupId>com.github.sdankbar.jaqumal</groupId>
 			<artifactId>library</artifactId>
 			<version>${project.parent.version}</version>
+			<classifier>${os.classifier}</classifier>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
