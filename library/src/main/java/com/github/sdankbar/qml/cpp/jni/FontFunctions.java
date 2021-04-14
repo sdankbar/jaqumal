@@ -57,4 +57,6 @@ public class FontFunctions {
 
 	public static native int scaleToFit(final int w, final int h, final String inputString, final int fontIndex,
 			final int minimumPointSize);
+
+	public static native int loadFont(String filePath);
 }

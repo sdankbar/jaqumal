@@ -33,6 +33,7 @@
 #include <QUuid>
 #include <QFont>
 #include <QFontInfo>
+#include <QFontDatabase>
 #include <QFontMetrics>
 #include <QScreen>
 #include <QApplication>
@@ -311,6 +312,12 @@ jint JNICALL scaleToFit(JNIEnv* env, jclass, jint w, jint h, jstring inputString
     return lastFittingIndex;
 }
 
+jint JNICALL loadFont(JNIEnv* env, jclass, jstring filePath)
+{
+   QString qStr = JNIUtilities::toQString(env, filePath);
+   return QFontDatabase::addApplicationFont(qStr);
+}
+
 
 jclass FontFunctions::rectangleClass;
 jmethodID FontFunctions::rectangleConstructor;
@@ -330,6 +337,7 @@ void FontFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("getTightBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getTightBoundingRect),
         JNIUtilities::createJNIMethod("inFont",    "(Ljava/lang/String;I)Z",    (void *)&inFont),
         JNIUtilities::createJNIMethod("scaleToFit",    "(IILjava/lang/String;II)I",    (void *)&scaleToFit),
+        JNIUtilities::createJNIMethod("loadFont",    "(Ljava/lang/String;)I",    (void *)&loadFont),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/FontFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(JNINativeMethod));

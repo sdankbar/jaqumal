@@ -22,6 +22,7 @@
  */
 package com.github.sdankbar.qml.fonts;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -496,6 +497,15 @@ public class JFont {
 		} else {
 			throw new IllegalArgumentException(str + " is not a valid font string");
 		}
+	}
+
+	/**
+	 * @param fontFilePath Path to font file to load.
+	 * @return True if font was loaded successfully.
+	 */
+	public static boolean loadFont(final File fontFilePath) {
+		Objects.requireNonNull(fontFilePath, "fontFilePath is null");
+		return FontFunctions.loadFont(fontFilePath.getAbsolutePath()) != -1;
 	}
 
 	private static final JFontCache cache = new JFontCache();
