@@ -93,6 +93,7 @@ public class JFontTest {
 	public void fromStringSuccess() {
 		assertNotNull(JFont.fromString("Arial,20,-1,5,81,0,0,0,0,0"));
 		assertNotNull(JFont.fromString(",20,-1,5,81,0,0,0,0,0"));
+		assertNotNull(JFont.fromString("Roboto Mono,20,-1,5,81,0,0,0,0,0"));
 	}
 
 	/**

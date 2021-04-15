@@ -492,7 +492,7 @@ public class JFont {
 	public static JFont fromString(final String str) {
 		Objects.requireNonNull(str, "str is null");
 
-		if (str.matches("\\w*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
+		if (str.matches("[^,]*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
 			return cache.getFont(str);
 		} else {
 			throw new IllegalArgumentException(str + " is not a valid font string");
