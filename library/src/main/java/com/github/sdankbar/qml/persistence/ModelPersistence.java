@@ -89,17 +89,25 @@ public class ModelPersistence {
 		if (!scheduledModels.contains(model.getModelName())) {
 			scheduledModels.add(model.getModelName());
 
-			qtExecutor.schedule(() -> {
-				scheduledModels.remove(model.getModelName());
-				final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				try {
-					model.serialize(stream);
-					saveModel(model.getModelName(), stream.toByteArray());
-				} catch (final IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
+			if (writeDelay.isZero()) {
+				qtThreadSaveModel(model);
+			} else {
+				qtExecutor.schedule(() -> {
+					qtThreadSaveModel(model);
+				}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
+			}
+		}
+	}
+
+	private void qtThreadSaveModel(final JQMLSingletonModel<?> model) {
+		scheduledModels.remove(model.getModelName());
+		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try {
+			model.serialize(stream);
+			saveModel(model.getModelName(), stream.toByteArray());
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -107,17 +115,25 @@ public class ModelPersistence {
 		if (!scheduledModels.contains(model.getModelName())) {
 			scheduledModels.add(model.getModelName());
 
-			qtExecutor.schedule(() -> {
-				scheduledModels.remove(model.getModelName());
-				final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				try {
-					model.serialize(stream);
-					saveModel(model.getModelName(), stream.toByteArray());
-				} catch (final IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
+			if (writeDelay.isZero()) {
+				qtThreadSaveModel(model);
+			} else {
+				qtExecutor.schedule(() -> {
+					qtThreadSaveModel(model);
+				}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
+			}
+		}
+	}
+
+	private void qtThreadSaveModel(final JQMLListModel<?> model) {
+		scheduledModels.remove(model.getModelName());
+		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try {
+			model.serialize(stream);
+			saveModel(model.getModelName(), stream.toByteArray());
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
