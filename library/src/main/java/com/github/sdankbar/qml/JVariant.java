@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1204,6 +1205,124 @@ public class JVariant {
 	@Override
 	public String toString() {
 		return "JVariant [type=" + type + ", obj=" + obj + "]";
+	}
+
+	public JSONObject toJSON() {
+		final JSONObject json = new JSONObject();
+		json.put("type", type.name());
+		switch (type) {
+		case BOOL: {
+			json.put("value", obj);
+			break;
+		}
+		case BYTE_ARRAY: {
+			// TODO json.put("value", obj);
+			break;
+		}
+		case COLOR: {
+			json.put("value", ((Color) obj).getRGB());
+			break;
+		}
+		case DATE_TIME: {
+			final Instant i = (Instant) obj;
+			// TODO?
+			json.put("value", i.toEpochMilli());
+			break;
+		}
+		case DOUBLE: {
+			json.put("value", obj);
+			break;
+		}
+		case FLOAT: {
+			json.put("value", ((Float) obj).doubleValue());
+			break;
+		}
+		case IMAGE: {
+			final BufferedImage image = (BufferedImage) obj;
+			final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+			final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
+			b.order(ByteOrder.nativeOrder());
+			for (final int p : pixels) {
+				b.putInt(p);
+			}
+			final byte[] array = b.array();
+			// TODO json.put("value", array);
+			break;
+		}
+		case INT: {
+			json.put("value", obj);
+			break;
+		}
+		case LINE: {
+			final Line2D l = (Line2D) obj;
+			// QMLDataTransfer.setLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(),
+			// (int) l.getY2(), role);
+			break;
+		}
+		case LONG: {
+			json.put("value", obj);
+			break;
+		}
+		case POINT: {
+			final Point2D p = (Point2D) obj;
+			// QMLDataTransfer.setPoint((int) p.getX(), (int) p.getY(), role);
+			break;
+		}
+		case RECTANGLE: {
+			final Rectangle2D r = (Rectangle2D) obj;
+			// QMLDataTransfer.setRectangle((int) r.getX(), (int) r.getY(), (int)
+			// r.getWidth(), (int) r.getHeight(), role);
+			break;
+		}
+		case REGULAR_EXPRESSION: {
+			final Pattern s = (Pattern) obj;
+			json.put("value", s.pattern());
+			break;
+		}
+		case SIZE: {
+			final Dimension s = (Dimension) obj;
+			// QMLDataTransfer.setSize(s.width, s.height, role);
+			break;
+		}
+		case STRING: {
+			json.put("value", obj);
+			break;
+		}
+		case URL: {
+			json.put("value", ((URL) obj).toExternalForm());
+			break;
+		}
+		case UUID: {
+			json.put("value", ((UUID) obj).toString());
+			break;
+		}
+		case FONT: {
+			final JFont f = (JFont) obj;
+			// QMLDataTransfer.setFont(f.getFontIndex(), role);
+			break;
+		}
+		case POLYLINE: {
+			@SuppressWarnings("unchecked")
+			final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
+			final double[] array = new double[2 * list.size()];
+			int i = 0;
+			for (final Point2D p : list) {
+				array[i++] = p.getX();
+				array[i++] = p.getY();
+			}
+			// QMLDataTransfer.setPolyline(list.size(), array, role);
+			break;
+		}
+		case CUSTOM: {
+			// ((Storable) obj).store(role);
+			break;
+		}
+		default: {
+			logger.error("Unkonwn type {}", type);
+			throw new IllegalStateException("Unkonwn type " + type);
+		}
+		}// end switch
+		return json;
 	}
 
 }

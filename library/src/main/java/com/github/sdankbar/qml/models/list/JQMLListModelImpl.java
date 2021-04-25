@@ -22,6 +22,9 @@
  */
 package com.github.sdankbar.qml.models.list;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +39,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
@@ -736,6 +742,29 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 			assign(source, destinationMap);
 			assign(destination, sourceMap);
 		}
+	}
+
+	@Override
+	public void serialize(final OutputStream stream) throws IOException {
+		final JSONObject root = new JSONObject();
+
+		final JSONArray array = new JSONArray();
+		for (final Map<K, JVariant> map : this) {
+			final JSONObject itemObj = new JSONObject();
+			for (final Map.Entry<K, JVariant> entry : map.entrySet()) {
+				itemObj.put(entry.getKey().toString(), entry.getValue().toJSON());
+			}
+			array.put(itemObj);
+		}
+		root.put("list", array);
+
+		final String s = root.toString(1);
+		stream.write(s.getBytes());
+	}
+
+	@Override
+	public void deserialize(final InputStream stream) throws IOException {
+		// TODO
 	}
 
 }

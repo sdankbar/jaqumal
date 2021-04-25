@@ -22,11 +22,17 @@
  */
 package com.github.sdankbar.qml.models.singleton;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.json.JSONObject;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.interfaces.MapChangeCallback;
@@ -122,6 +128,23 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 	@Override
 	public String getModelName() {
 		return modelName;
+	}
+
+	@Override
+	public void serialize(final OutputStream stream) throws IOException {
+		final JSONObject root = new JSONObject();
+
+		for (final Map.Entry<K, JVariant> entry : entrySet()) {
+			root.put(entry.getKey().toString(), entry.getValue().toJSON());
+		}
+
+		final String s = root.toString(1);
+		stream.write(s.getBytes());
+	}
+
+	@Override
+	public void deserialize(final InputStream stream) throws IOException {
+		// TODO
 	}
 
 }

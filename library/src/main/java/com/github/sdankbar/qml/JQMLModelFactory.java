@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml;
 
+import java.io.File;
+import java.time.Duration;
 import java.util.Set;
 
 import com.github.sdankbar.qml.exceptions.QMLException;
@@ -191,4 +193,9 @@ public interface JQMLModelFactory {
 	<K> JQMLListViewModel<K> createListViewModel(final String modelName, final ImmutableSet<K> keySet,
 			final SelectionMode mode, final PutMode putMode);
 
+	void enablePersistence(final Duration writeDelay, final File persistenceDirectory);
+
+	void enablePersistenceForModel(final JQMLSingletonModel<?> model);
+
+	void enablePersistenceForModel(final JQMLListModel<?> model);
 }

@@ -22,6 +22,9 @@
  */
 package com.github.sdankbar.qml.models.list;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -218,4 +221,8 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	<L> ImmutableList<L> asMappedList(K key, Class<L> t, L defaultValue);
 
 	void swap(int source, int destination);
+
+	void serialize(OutputStream stream) throws IOException;
+
+	void deserialize(InputStream stream) throws IOException;
 }

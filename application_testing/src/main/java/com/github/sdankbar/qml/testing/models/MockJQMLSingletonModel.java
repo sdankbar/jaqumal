@@ -22,6 +22,9 @@
  */
 package com.github.sdankbar.qml.testing.models;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -115,6 +118,16 @@ public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 	public void assign(final Map<K, JVariant> map) {
 		delegate.clear();
 		delegate.putAll(map);
+	}
+
+	@Override
+	public void serialize(final OutputStream stream) throws IOException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void deserialize(final InputStream stream) throws IOException {
+		// TODO Auto-generated method stub
 	}
 
 }

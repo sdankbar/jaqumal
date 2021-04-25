@@ -22,6 +22,9 @@
  */
 package com.github.sdankbar.qml.models.singleton;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
 import com.github.sdankbar.qml.JVariant;
@@ -55,4 +58,7 @@ public interface JQMLSingletonModel<K> extends Map<K, JVariant> {
 	 */
 	void assign(final Map<K, JVariant> map);
 
+	void serialize(OutputStream stream) throws IOException;
+
+	void deserialize(InputStream stream) throws IOException;
 }

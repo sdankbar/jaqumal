@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml.testing.models;
 
+import java.io.File;
+import java.time.Duration;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -167,6 +169,21 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		final JQMLListViewModel<K> model = new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
 		listViewModels.put(modelName, model);
 		return model;
+	}
+
+	@Override
+	public void enablePersistence(final Duration writeDelay, final File persistenceDirectory) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void enablePersistenceForModel(final JQMLSingletonModel<?> model) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void enablePersistenceForModel(final JQMLListModel<?> model) {
+		// TODO Auto-generated method stub
 	}
 
 }

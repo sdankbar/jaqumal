@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml.models;
 
+import java.io.File;
+import java.time.Duration;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Objects;
@@ -47,7 +49,9 @@ import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModelImpl;
 import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
+import com.github.sdankbar.qml.persistence.ModelPersistence;
 import com.github.sdankbar.qml.utility.JQMLUtilities;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -71,6 +75,8 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	private final JQMLApplication<?> app;
 	private final AtomicReference<Thread> eventLoopThread;
 	private final JQMLPerformanceModel perfModel;
+
+	private ModelPersistence persistence = null;
 
 	private final Set<String> modelName = new HashSet<>();
 
@@ -192,6 +198,23 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 			final SelectionMode mode, final PutMode putMode) {
 		checkForIsSelectedInKeySet(keySet);
 		return new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
+	}
+
+	@Override
+	@QtThread
+	public void enablePersistence(final Duration writeDelay, final File persistenceDirectory) {
+		Preconditions.checkArgument(persistence == null, "Persistence has already been enabled");
+		persistence = new ModelPersistence(app.getQMLThreadExecutor(), writeDelay, persistenceDirectory);
+	}
+
+	public void enablePersistenceForModel(final JQMLSingletonModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.addModel(model);
+	}
+
+	public void enablePersistenceForModel(final JQMLListModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.addModel(model);
 	}
 
 }

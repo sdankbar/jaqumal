@@ -22,6 +22,9 @@
  */
 package com.github.sdankbar.qml.testing.models;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -300,6 +303,16 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	@Override
 	public void swap(final int source, final int destination) {
 		Collections.swap(this, source, destination);
+	}
+
+	@Override
+	public void serialize(final OutputStream stream) throws IOException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void deserialize(final InputStream stream) throws IOException {
+		// TODO Auto-generated method stub
 	}
 
 }
