@@ -40,8 +40,10 @@ import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
+import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Tests the DelayedMap class.
@@ -75,7 +77,7 @@ public class ModelPersistenceTest {
 	 *
 	 */
 	@Test
-	public void test_writeData() throws InterruptedException, IOException {
+	public void test_writeData_singleton() throws InterruptedException, IOException {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
@@ -85,6 +87,8 @@ public class ModelPersistenceTest {
 
 		model.put(Roles.R1, new JVariant(1));
 		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
+
+		Thread.sleep(50);
 
 		assertTrue(new File("persistenceTest/other.json").exists());
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other.json"));
@@ -96,6 +100,44 @@ public class ModelPersistenceTest {
 		assertEquals(lines.get(4), "  \"value\": 1");
 		assertEquals(lines.get(5), " }");
 		assertEquals(lines.get(6), "}");
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
+	public void test_writeData_list() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other2", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
+		app.getModelFactory().enablePersistenceForModel(model);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+		Thread.sleep(50);
+
+		assertTrue(new File("persistenceTest/other2.json").exists());
+		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other2.json"));
+
+		assertEquals(lines.size(), 22);
 	}
 
 }

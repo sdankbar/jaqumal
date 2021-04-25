@@ -141,7 +141,9 @@ public class ModelPersistence {
 		ioExecutor.execute(() -> {
 			persistenceDirectory.mkdirs();
 			try {
-				Files.write(data, new File(persistenceDirectory, modelName + ".json"));
+				final File f = new File(persistenceDirectory, modelName + ".json");
+				f.delete();
+				Files.write(data, f);
 			} catch (final IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
