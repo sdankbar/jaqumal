@@ -86,6 +86,28 @@ public class ModelPersistence {
 		});
 	}
 
+	public void persistModel(final JQMLSingletonModel<?> model) {
+		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try {
+			model.serialize(stream);
+			saveModel(model.getModelName(), stream.toByteArray());
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void persistModel(final JQMLListModel<?> model) {
+		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try {
+			model.serialize(stream);
+			saveModel(model.getModelName(), stream.toByteArray());
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public void restoreModel(final JQMLSingletonModel<?> model) {
 		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
 			model.deserialize(s);
@@ -123,7 +145,7 @@ public class ModelPersistence {
 		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
 			model.serialize(stream);
-			saveModel(model.getModelName(), stream.toByteArray());
+			saveModelThreaded(model.getModelName(), stream.toByteArray());
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -149,24 +171,26 @@ public class ModelPersistence {
 		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
 			model.serialize(stream);
-			saveModel(model.getModelName(), stream.toByteArray());
+			saveModelThreaded(model.getModelName(), stream.toByteArray());
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private void saveModel(final String modelName, final byte[] data) {
+	private void saveModelThreaded(final String modelName, final byte[] data) {
 		ioExecutor.execute(() -> {
-			persistenceDirectory.mkdirs();
-			try {
-				final File f = new File(persistenceDirectory, modelName + ".json");
-				f.delete();
-				Files.write(data, f);
-			} catch (final IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			saveModel(modelName, data);
 		});
+	}
+
+	private void saveModel(final String modelName, final byte[] data) {
+		try {
+			persistenceDirectory.mkdirs();
+			Files.write(data, new File(persistenceDirectory, modelName + ".json"));
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

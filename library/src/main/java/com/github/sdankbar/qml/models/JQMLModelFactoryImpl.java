@@ -220,6 +220,18 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	}
 
 	@Override
+	public void persistModel(final JQMLSingletonModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.persistModel(model);
+	}
+
+	@Override
+	public void persistModel(final JQMLListModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.persistModel(model);
+	}
+
+	@Override
 	public void restoreModel(final JQMLSingletonModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
 		persistence.restoreModel(model);

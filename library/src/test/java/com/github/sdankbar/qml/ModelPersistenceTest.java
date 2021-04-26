@@ -32,7 +32,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -50,6 +52,8 @@ import com.google.common.collect.ImmutableMap;
  */
 public class ModelPersistenceTest {
 
+	private static final int SLEEP = 100;
+
 	/**
 	 *
 	 */
@@ -62,13 +66,16 @@ public class ModelPersistenceTest {
 	}
 
 	/**
-	 * @throws IOException Error deleting files.
+	 * @throws IOException          Error deleting files.
+	 * @throws InterruptedException
 	 *
 	 */
 	@After
-	public void cleanup() throws IOException {
+	public void cleanup() throws IOException, InterruptedException {
+		Thread.sleep(100);
 		JQMLApplication.delete();
 		FileUtils.deleteDirectory(new File("persistenceTest"));
+		Thread.sleep(100);
 	}
 
 	/**
@@ -88,7 +95,7 @@ public class ModelPersistenceTest {
 		model.put(Roles.R1, new JVariant(1));
 		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
 
-		Thread.sleep(50);
+		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/other.json").exists());
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other.json"));
@@ -103,6 +110,37 @@ public class ModelPersistenceTest {
 		app.getModelFactory().restoreModel(model);
 
 		assertEquals(model.get(Roles.R1), new JVariant(1));
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
+	public void test_readData_singleton() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
+				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
+
+		model.put(Roles.R1, new JVariant(1));
+		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
+
+		final Map<Roles, JVariant> copy = new HashMap<>(model);
+
+		app.getModelFactory().persistModel(model);
+
+		assertTrue(new File("persistenceTest/other.json").exists());
+
+		model.clear();
+		assertEquals(model.size(), 0);
+
+		app.getModelFactory().restoreModel(model);
+
+		assertEquals(model.size(), 2);
+		assertEquals(model, copy);
 	}
 
 	/**
@@ -135,7 +173,7 @@ public class ModelPersistenceTest {
 
 			model.add(data.build());
 		}
-		Thread.sleep(50);
+		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/other2.json").exists());
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other2.json"));
@@ -145,6 +183,52 @@ public class ModelPersistenceTest {
 		app.getModelFactory().restoreModel(model);
 
 		assertEquals(model.get(0).get(Roles.R5), new JVariant(5));
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
+	public void test_readData_list() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other2", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+		final ImmutableList<HashMap<Roles, JVariant>> copy = model.stream().map(HashMap::new)
+				.collect(ImmutableList.toImmutableList());
+
+		app.getModelFactory().persistModel(model);
+
+		assertTrue(new File("persistenceTest/other2.json").exists());
+
+		model.clear();
+		assertEquals(model.size(), 0);
+
+		app.getModelFactory().restoreModel(model);
+
+		assertEquals(model.size(), 2);
+		assertEquals(model.get(0), copy.get(0));
+		assertEquals(model.get(1), copy.get(1));
 	}
 
 }

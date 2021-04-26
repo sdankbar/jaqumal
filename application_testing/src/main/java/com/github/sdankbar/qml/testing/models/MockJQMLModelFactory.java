@@ -196,4 +196,16 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public void persistModel(final JQMLSingletonModel<?> model) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void persistModel(final JQMLListModel<?> model) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
