@@ -29,16 +29,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.interfaces.MapChangeCallback;
 import com.github.sdankbar.qml.cpp.jni.singleton.SingletonModelFunctions;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * A model that is available to QML. Represents a single Map from the key type
@@ -144,7 +147,26 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 
 	@Override
 	public void deserialize(final InputStream stream) throws IOException {
-		// TODO
+		final JSONTokener tokener = new JSONTokener(stream);
+		final JSONObject object = new JSONObject(tokener);
+
+		final ImmutableMap.Builder<K, JVariant> b = ImmutableMap.builder();
+		for (final String k : object.keySet()) {
+			K kObj = null;
+			for (final K temp : keys) {
+				if (temp.toString().equals(k)) {
+					kObj = temp;
+					break;
+				}
+			}
+
+			final Optional<JVariant> opt = JVariant.fromJSON(object.getJSONObject(k));
+			if (kObj != null && opt.isPresent()) {
+				b.put(kObj, opt.get());
+			}
+		}
+
+		assign(b.build());
 	}
 
 }

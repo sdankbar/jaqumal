@@ -207,14 +207,28 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		persistence = new ModelPersistence(app.getQMLThreadExecutor(), writeDelay, persistenceDirectory);
 	}
 
-	public void enablePersistenceForModel(final JQMLSingletonModel<?> model) {
+	@Override
+	public void enableAutoPersistenceForModel(final JQMLSingletonModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		persistence.addModel(model);
+		persistence.autoPersistModel(model);
 	}
 
-	public void enablePersistenceForModel(final JQMLListModel<?> model) {
+	@Override
+	public void enableAutoPersistenceForModel(final JQMLListModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		persistence.addModel(model);
+		persistence.autoPersistModel(model);
+	}
+
+	@Override
+	public void restoreModel(final JQMLSingletonModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.restoreModel(model);
+	}
+
+	@Override
+	public void restoreModel(final JQMLListModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.restoreModel(model);
 	}
 
 }

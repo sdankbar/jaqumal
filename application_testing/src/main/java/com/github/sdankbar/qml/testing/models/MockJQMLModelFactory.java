@@ -177,12 +177,22 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	}
 
 	@Override
-	public void enablePersistenceForModel(final JQMLSingletonModel<?> model) {
+	public void enableAutoPersistenceForModel(final JQMLSingletonModel<?> model) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void enablePersistenceForModel(final JQMLListModel<?> model) {
+	public void enableAutoPersistenceForModel(final JQMLListModel<?> model) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void restoreModel(final JQMLSingletonModel<?> model) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void restoreModel(final JQMLListModel<?> model) {
 		// TODO Auto-generated method stub
 	}
 

@@ -83,7 +83,7 @@ public class ModelPersistenceTest {
 		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
 				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
-		app.getModelFactory().enablePersistenceForModel(model);
+		app.getModelFactory().enableAutoPersistenceForModel(model);
 
 		model.put(Roles.R1, new JVariant(1));
 		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
@@ -99,6 +99,10 @@ public class ModelPersistenceTest {
 		assertEquals(lines.get(16), "  \"value\": 1");
 		assertEquals(lines.get(17), " }");
 		assertEquals(lines.get(18), "}");
+
+		app.getModelFactory().restoreModel(model);
+
+		assertEquals(model.get(Roles.R1), new JVariant(1));
 	}
 
 	/**
@@ -114,7 +118,7 @@ public class ModelPersistenceTest {
 				PutMode.RETURN_PREVIOUS_VALUE);
 
 		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
-		app.getModelFactory().enablePersistenceForModel(model);
+		app.getModelFactory().enableAutoPersistenceForModel(model);
 
 		{
 			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
@@ -137,6 +141,10 @@ public class ModelPersistenceTest {
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other2.json"));
 
 		assertEquals(lines.size(), 22);
+
+		app.getModelFactory().restoreModel(model);
+
+		assertEquals(model.get(0).get(Roles.R5), new JVariant(5));
 	}
 
 }

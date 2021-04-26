@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
@@ -298,13 +299,11 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean contains(final Object o) {
 		return indexOf(o) != -1;
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean containsAll(final Collection<?> c) {
 		for (final Object o : c) {
@@ -491,7 +490,6 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean remove(final Object o) {
 		final int index = indexOf(o);
@@ -503,7 +501,6 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean removeAll(final Collection<?> c) {
 		boolean modified = false;
@@ -764,7 +761,32 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 	@Override
 	public void deserialize(final InputStream stream) throws IOException {
-		// TODO
+		final JSONTokener tokener = new JSONTokener(stream);
+		final JSONObject object = new JSONObject(tokener);
+		final JSONArray array = object.getJSONArray("list");
+
+		final ImmutableList.Builder<Map<K, JVariant>> list = ImmutableList.builder();
+		for (int i = 0; i < array.length(); ++i) {
+			final JSONObject sub = array.getJSONObject(i);
+			final ImmutableMap.Builder<K, JVariant> b = ImmutableMap.builder();
+			for (final String k : sub.keySet()) {
+				K kObj = null;
+				for (final K temp : keySet) {
+					if (temp.toString().equals(k)) {
+						kObj = temp;
+						break;
+					}
+				}
+
+				final Optional<JVariant> opt = JVariant.fromJSON(sub.getJSONObject(k));
+				if (kObj != null && opt.isPresent()) {
+					b.put(kObj, opt.get());
+				}
+			}
+			list.add(b.build());
+		}
+
+		assign(list.build());
 	}
 
 }

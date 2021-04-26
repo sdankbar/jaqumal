@@ -24,6 +24,7 @@ package com.github.sdankbar.qml.persistence;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashSet;
@@ -60,7 +61,7 @@ public class ModelPersistence {
 		this.persistenceDirectory = Objects.requireNonNull(persistenceDirectory, "persistenceDirectory is null");
 	}
 
-	public <K> void addModel(final JQMLSingletonModel<K> model) {
+	public <K> void autoPersistModel(final JQMLSingletonModel<K> model) {
 		model.registerChangeListener(new ChangeListener() {
 
 			@Override
@@ -70,7 +71,7 @@ public class ModelPersistence {
 		});
 	}
 
-	public <K> void addModel(final JQMLListModel<K> model) {
+	public <K> void autoPersistModel(final JQMLListModel<K> model) {
 		model.registerListener(new ListListener<K>() {
 
 			@Override
@@ -83,6 +84,24 @@ public class ModelPersistence {
 				scheduleSave(model);
 			}
 		});
+	}
+
+	public void restoreModel(final JQMLSingletonModel<?> model) {
+		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
+			model.deserialize(s);
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void restoreModel(final JQMLListModel<?> model) {
+		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
+			model.deserialize(s);
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void scheduleSave(final JQMLSingletonModel<?> model) {

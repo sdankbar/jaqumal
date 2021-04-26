@@ -195,7 +195,11 @@ public interface JQMLModelFactory {
 
 	void enablePersistence(final Duration writeDelay, final File persistenceDirectory);
 
-	void enablePersistenceForModel(final JQMLSingletonModel<?> model);
+	void enableAutoPersistenceForModel(final JQMLSingletonModel<?> model);
 
-	void enablePersistenceForModel(final JQMLListModel<?> model);
+	void enableAutoPersistenceForModel(final JQMLListModel<?> model);
+
+	void restoreModel(final JQMLSingletonModel<?> model);
+
+	void restoreModel(final JQMLListModel<?> model);
 }
