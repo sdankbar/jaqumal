@@ -28,6 +28,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -38,6 +41,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +71,17 @@ import com.google.common.collect.ImmutableList;
  */
 public class JVariant {
 
+	/**
+	 * Interface that custom types must implement to be stored inside JVariant.
+	 */
 	public interface Storable {
+		/**
+		 * Used to store this Java object in C++. See TestStorable.java for an example
+		 * of the Java side of an implementation of this function and see
+		 * registerNewType.cpp:setTestStorable for a C++ side example.
+		 *
+		 * @param role Model user role to store under.
+		 */
 		void store(int role);
 	}
 
@@ -226,6 +242,8 @@ public class JVariant {
 	 */
 	public static final JVariant FALSE = new JVariant(false);
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromBufferedImage(final int w, final int h, final int[] array) {
 		final BufferedImage v = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		int i = 0;
@@ -238,14 +256,20 @@ public class JVariant {
 		return null;
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromColor(final int rgba) {
 		return new JVariant(new Color(rgba, true));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromDimension(final int w, final int h) {
 		return new JVariant(new Dimension(w, h));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromPolygon(final double[] x, final double[] y) {
 		Preconditions.checkArgument(x.length == y.length, "Lengths not equal");
 		final ImmutableList.Builder<Point2D> polygon = ImmutableList.builder();
@@ -255,30 +279,44 @@ public class JVariant {
 		return new JVariant(polygon.build());
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromInstant(final long epoch, final int nano) {
 		return new JVariant(Instant.ofEpochSecond(epoch, nano));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromJFont(final String str) {
 		return new JVariant(JFont.fromString(str));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromLine(final int x1, final int y1, final int x2, final int y2) {
 		return new JVariant(new Line2D.Double(x1, y1, x2, y2));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromPattern(final String patternStr) {
 		return new JVariant(Pattern.compile(patternStr));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromPoint(final int x, final int y) {
 		return new JVariant(new Point2D.Double(x, y));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromRectangle(final int x, final int y, final int w, final int h) {
 		return new JVariant(new Rectangle2D.Double(x, y, w, h));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromURL(final String str) {
 		try {
 			return new JVariant(new URL(str));
@@ -287,10 +325,14 @@ public class JVariant {
 		}
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromUUID(final String str) {
 		return new JVariant(UUID.fromString(str));
 	}
 
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromStorable(final Storable obj) {
 		return new JVariant(obj);
 	}
@@ -308,6 +350,132 @@ public class JVariant {
 		} else {
 			return FALSE;
 		}
+	}
+
+	/**
+	 * @param json JSONObject to parse.
+	 * @return The JVariant converted from the JSONObject or empty if parsing fails.
+	 */
+	public static Optional<JVariant> fromJSON(final JSONObject json) {
+		Objects.requireNonNull(json, "json is null");
+
+		final Type t = Type.valueOf(json.getString("type"));
+		switch (t) {
+		case BOOL: {
+			return Optional.of(JVariant.valueOf(Boolean.valueOf(json.getBoolean("value"))));
+		}
+		case BYTE_ARRAY: {
+			final JSONArray array = json.getJSONArray("value");
+			final byte[] byteArray = new byte[array.length()];
+			for (int i = 0; i < byteArray.length; ++i) {
+				byteArray[i] = (byte) array.getInt(i);
+			}
+			return Optional.of(new JVariant(byteArray));
+		}
+		case COLOR: {
+			final int rgb = json.getInt("value");
+			return Optional.of(new JVariant(new Color(rgb, true)));
+		}
+		case DATE_TIME: {
+			final JSONObject sub = json.getJSONObject("valule");
+			final long seconds = sub.getBigInteger("seconds").longValue();
+			final int nano = sub.getInt("nano");
+			return Optional.of(new JVariant(Instant.ofEpochSecond(seconds, nano)));
+		}
+		case DOUBLE: {
+			final double v = json.getDouble("value");
+			return Optional.of(new JVariant(v));
+		}
+		case FLOAT: {
+			final float v = json.getFloat("value");
+			return Optional.of(new JVariant(v));
+		}
+		case IMAGE: {
+			final JSONArray array = json.getJSONArray("value");
+			final byte[] byteArray = new byte[array.length()];
+			for (int i = 0; i < byteArray.length; ++i) {
+				byteArray[i] = (byte) array.getInt(i);
+			}
+			final ByteArrayInputStream stream = new ByteArrayInputStream(byteArray);
+			try {
+				return Optional.of(new JVariant(ImageIO.read(stream)));
+			} catch (final IOException e) {
+				return Optional.empty();
+			}
+		}
+		case INT: {
+			final int v = json.getInt("value");
+			return Optional.of(new JVariant(v));
+		}
+		case LINE: {
+			final JSONObject sub = json.getJSONObject("valule");
+			final int x1 = sub.getInt("x1");
+			final int y1 = sub.getInt("y1");
+			final int x2 = sub.getInt("x2");
+			final int y2 = sub.getInt("y2");
+			return Optional.of(new JVariant(new Line2D.Double(x1, y1, x2, y2)));
+		}
+		case LONG: {
+			final long v = json.getLong("value");
+			return Optional.of(new JVariant(v));
+		}
+		case POINT: {
+			final JSONObject sub = json.getJSONObject("valule");
+			final int x = sub.getInt("x");
+			final int y = sub.getInt("y");
+			return Optional.of(new JVariant(new Point2D.Double(x, y)));
+		}
+		case RECTANGLE: {
+			final JSONObject sub = json.getJSONObject("valule");
+			final int x = sub.getInt("x");
+			final int y = sub.getInt("y");
+			final int w = sub.getInt("w");
+			final int h = sub.getInt("h");
+			return Optional.of(new JVariant(new Rectangle2D.Double(x, y, w, h)));
+		}
+		case REGULAR_EXPRESSION: {
+			final String v = json.getString("value");
+			return Optional.of(new JVariant(Pattern.compile(v)));
+		}
+		case SIZE: {
+			final JSONObject sub = json.getJSONObject("valule");
+			final int w = sub.getInt("w");
+			final int h = sub.getInt("h");
+			return Optional.of(new JVariant(new Dimension(w, h)));
+		}
+		case STRING: {
+			final String v = json.getString("value");
+			return Optional.of(new JVariant(v));
+		}
+		case URL: {
+			final String v = json.getString("value");
+			try {
+				return Optional.of(new JVariant(new URL(v)));
+			} catch (final MalformedURLException e) {
+				return Optional.empty();
+			}
+		}
+		case UUID: {
+			final String v = json.getString("value");
+			return Optional.of(new JVariant(UUID.fromString(v)));
+		}
+		case FONT: {
+			final String v = json.getString("value");
+			return Optional.of(new JVariant(JFont.fromString(v)));
+		}
+		case POLYLINE: {
+			final ImmutableList.Builder<Point2D> b = ImmutableList.builder();
+			final JSONArray array = json.getJSONArray("value");
+			for (int i = 0; i < array.length(); ++i) {
+				final JSONObject sub = array.getJSONObject(i);
+				b.add(new Point2D.Double(sub.getDouble("x"), sub.getDouble("y")));
+			}
+			return Optional.of(new JVariant(b.build()));
+		}
+		case CUSTOM:
+		default:
+			return Optional.empty();
+		}// end switch
 	}
 
 	private final Type type;
@@ -556,6 +724,11 @@ public class JVariant {
 		obj = Objects.requireNonNull(v, "v is null");
 	}
 
+	/**
+	 * Constructs a new JVariant from a user defined type that extends Storable.
+	 *
+	 * @param v The variant's value.
+	 */
 	public JVariant(final Storable v) {
 		type = Type.CUSTOM;
 		obj = Objects.requireNonNull(v, "v is null");
@@ -942,11 +1115,20 @@ public class JVariant {
 		}
 	}
 
+	/**
+	 * @return The JVariant's value as a Storable.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not CUSTOM
+	 */
 	public Storable asStorable() {
 		Preconditions.checkArgument(type == Type.CUSTOM, "Wrong type, type is {}", type);
 		return (Storable) obj;
 	}
 
+	/**
+	 * @param defaultValue Value to return if JVariant is not a CUSTOM
+	 * @return The JVariant's value as a Storable or the defaultValue if not the
+	 *         correct type.
+	 */
 	public Storable asStorable(final Storable defaultValue) {
 		if (type == Type.CUSTOM) {
 			return (Storable) obj;
@@ -1087,6 +1269,12 @@ public class JVariant {
 		return t == type;
 	}
 
+	/**
+	 * Internal method for use by Java models to send data to C++ and ultimately
+	 * QML. NOTE FOR USE OUTSIDE OF THIS LIBRARY.
+	 *
+	 * @param role Model role index to store at.
+	 */
 	public void sendToQML(final int role) {
 		switch (type) {
 		case BOOL: {
@@ -1116,13 +1304,7 @@ public class JVariant {
 		}
 		case IMAGE: {
 			final BufferedImage image = (BufferedImage) obj;
-			final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-			final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
-			b.order(ByteOrder.nativeOrder());
-			for (final int p : pixels) {
-				b.putInt(p);
-			}
-			final byte[] array = b.array();
+			final byte[] array = bufferedImageToArray(image);
 			QMLDataTransfer.setImage(image.getWidth(), image.getHeight(), array, role);
 			break;
 		}
@@ -1199,6 +1381,17 @@ public class JVariant {
 		}// end switch
 	}
 
+	private byte[] bufferedImageToArray(final BufferedImage image) {
+		final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+		final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
+		b.order(ByteOrder.nativeOrder());
+		for (final int p : pixels) {
+			b.putInt(p);
+		}
+		final byte[] array = b.array();
+		return array;
+	}
+
 	/**
 	 * @see java.lang.Object#toString()
 	 */
@@ -1207,6 +1400,9 @@ public class JVariant {
 		return "JVariant [type=" + type + ", obj=" + obj + "]";
 	}
 
+	/**
+	 * @return The JSONObject representation of this JVariant.
+	 */
 	public JSONObject toJSON() {
 		final JSONObject json = new JSONObject();
 		json.put("type", type.name());
@@ -1216,7 +1412,9 @@ public class JVariant {
 			break;
 		}
 		case BYTE_ARRAY: {
-			// TODO json.put("value", obj);
+			final byte[] byteArray = (byte[]) obj;
+			final JSONArray array = byteArrayToJSONArray(byteArray);
+			json.put("value", array);
 			break;
 		}
 		case COLOR: {
@@ -1225,8 +1423,10 @@ public class JVariant {
 		}
 		case DATE_TIME: {
 			final Instant i = (Instant) obj;
-			// TODO?
-			json.put("value", i.toEpochMilli());
+			final JSONObject sub = new JSONObject();
+			sub.put("seconds", i.getEpochSecond());
+			sub.put("nano", i.getNano());
+			json.put("value", sub);
 			break;
 		}
 		case DOUBLE: {
@@ -1239,14 +1439,14 @@ public class JVariant {
 		}
 		case IMAGE: {
 			final BufferedImage image = (BufferedImage) obj;
-			final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-			final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
-			b.order(ByteOrder.nativeOrder());
-			for (final int p : pixels) {
-				b.putInt(p);
+			final ByteArrayOutputStream stream = new ByteArrayOutputStream(image.getHeight() * image.getWidth() * 4);
+			try {
+				ImageIO.write(image, "PNG", stream);
+				final JSONArray array = byteArrayToJSONArray(stream.toByteArray());
+				json.put("value", array);
+			} catch (final IOException e) {
+				json.put("value", JSONObject.NULL);
 			}
-			final byte[] array = b.array();
-			// TODO json.put("value", array);
 			break;
 		}
 		case INT: {
@@ -1255,8 +1455,12 @@ public class JVariant {
 		}
 		case LINE: {
 			final Line2D l = (Line2D) obj;
-			// QMLDataTransfer.setLine((int) l.getX1(), (int) l.getY1(), (int) l.getX2(),
-			// (int) l.getY2(), role);
+			final JSONObject sub = new JSONObject();
+			sub.put("x1", Integer.valueOf((int) l.getX1()));
+			sub.put("y1", Integer.valueOf((int) l.getY1()));
+			sub.put("x2", Integer.valueOf((int) l.getX2()));
+			sub.put("y2", Integer.valueOf((int) l.getY2()));
+			json.put("value", sub);
 			break;
 		}
 		case LONG: {
@@ -1265,13 +1469,20 @@ public class JVariant {
 		}
 		case POINT: {
 			final Point2D p = (Point2D) obj;
-			// QMLDataTransfer.setPoint((int) p.getX(), (int) p.getY(), role);
+			final JSONObject sub = new JSONObject();
+			sub.put("x", Integer.valueOf((int) p.getX()));
+			sub.put("y", Integer.valueOf((int) p.getY()));
+			json.put("value", sub);
 			break;
 		}
 		case RECTANGLE: {
 			final Rectangle2D r = (Rectangle2D) obj;
-			// QMLDataTransfer.setRectangle((int) r.getX(), (int) r.getY(), (int)
-			// r.getWidth(), (int) r.getHeight(), role);
+			final JSONObject sub = new JSONObject();
+			sub.put("x", Integer.valueOf((int) r.getX()));
+			sub.put("y", Integer.valueOf((int) r.getY()));
+			sub.put("w", Integer.valueOf((int) r.getWidth()));
+			sub.put("h", Integer.valueOf((int) r.getHeight()));
+			json.put("value", sub);
 			break;
 		}
 		case REGULAR_EXPRESSION: {
@@ -1281,7 +1492,10 @@ public class JVariant {
 		}
 		case SIZE: {
 			final Dimension s = (Dimension) obj;
-			// QMLDataTransfer.setSize(s.width, s.height, role);
+			final JSONObject sub = new JSONObject();
+			sub.put("w", Integer.valueOf(s.width));
+			sub.put("h", Integer.valueOf(s.height));
+			json.put("value", sub);
 			break;
 		}
 		case STRING: {
@@ -1298,23 +1512,25 @@ public class JVariant {
 		}
 		case FONT: {
 			final JFont f = (JFont) obj;
-			// QMLDataTransfer.setFont(f.getFontIndex(), role);
+			json.put("value", f.toString());
 			break;
 		}
 		case POLYLINE: {
 			@SuppressWarnings("unchecked")
 			final ImmutableList<Point2D> list = (ImmutableList<Point2D>) obj;
-			final double[] array = new double[2 * list.size()];
-			int i = 0;
+			final JSONArray array = new JSONArray();
 			for (final Point2D p : list) {
-				array[i++] = p.getX();
-				array[i++] = p.getY();
+				final JSONObject sub = new JSONObject();
+				sub.put("x", p.getX());
+				sub.put("y", p.getY());
+				array.put(sub);
 			}
-			// QMLDataTransfer.setPolyline(list.size(), array, role);
+			json.put("value", array);
 			break;
 		}
 		case CUSTOM: {
-			// ((Storable) obj).store(role);
+			// Persisting custom types is currently not supported
+			json.put("value", JSONObject.NULL);
 			break;
 		}
 		default: {
@@ -1323,6 +1539,14 @@ public class JVariant {
 		}
 		}// end switch
 		return json;
+	}
+
+	private JSONArray byteArrayToJSONArray(final byte[] byteArray) {
+		final JSONArray array = new JSONArray();
+		for (final byte b : byteArray) {
+			array.put(b);
+		}
+		return array;
 	}
 
 }

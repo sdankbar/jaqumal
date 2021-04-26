@@ -94,12 +94,11 @@ public class ModelPersistenceTest {
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other.json"));
 
 		assertEquals(lines.get(0), "{");
-		assertEquals(lines.get(1), " \"R3\": {\"type\": \"POLYLINE\"},");
-		assertEquals(lines.get(2), " \"R1\": {");
-		assertEquals(lines.get(3), "  \"type\": \"INT\",");
-		assertEquals(lines.get(4), "  \"value\": 1");
-		assertEquals(lines.get(5), " }");
-		assertEquals(lines.get(6), "}");
+		assertEquals(lines.get(14), " \"R1\": {");
+		assertEquals(lines.get(15), "  \"type\": \"INT\",");
+		assertEquals(lines.get(16), "  \"value\": 1");
+		assertEquals(lines.get(17), " }");
+		assertEquals(lines.get(18), "}");
 	}
 
 	/**
