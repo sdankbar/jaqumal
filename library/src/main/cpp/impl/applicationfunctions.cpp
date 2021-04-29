@@ -42,6 +42,7 @@
 #include <singletonmodelfunctions.h>
 #include <listmodelfunctions.h>
 #include <flattreemodelfunctions.h>
+#include <keyeventpreprocessor.h>
 
 #include "qmlimageprovider.h"
 #include <QQmlContext>
@@ -199,6 +200,7 @@ void ApplicationFunctions::create(int* argc, char** argv)
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
     qmlRegisterType<EventDispatcher>("com.github.sdankbar.jaqumal", 0, 4, "EventDispatcher");
     qmlRegisterType<InvokeTarget>("com.github.sdankbar.jaqumal", 0, 4, "InvokeTarget");
+    qmlRegisterType<KeyEventPreProcessor>("com.github.sdankbar.jaqumal", 0, 4, "KeyEventPreProcessor");
     qmlRegisterUncreatableType<GenericListModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericListModel", "Cannot create GenericListModel");
     qmlRegisterUncreatableType<GenericFlatTreeModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericFlatTreeModel", "Cannot create GenericFlatTreeModel");
     qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");

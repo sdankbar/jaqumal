@@ -60,7 +60,8 @@ SOURCES += \
     impl/jpolyline.cpp \
     impl/qmltest.cpp \
     impl/qmldatatransfer.cpp \
-    impl/jniutilities.cpp
+    impl/jniutilities.cpp \
+    impl/keyeventpreprocessor.cpp
 
 HEADERS += \
     include/applicationfunctions.h \
@@ -80,7 +81,8 @@ HEADERS += \
     include/userinputsimulator.h \
     include/qmlimageprovider.h \
     include/jpolyline.h \
-    include/qmltest.h
+    include/qmltest.h \
+    include/keyeventpreprocessor.h
 
 DISTFILES += \
     resources/qmldir \
