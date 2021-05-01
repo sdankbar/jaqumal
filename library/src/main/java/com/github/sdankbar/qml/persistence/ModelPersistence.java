@@ -131,20 +131,24 @@ public class ModelPersistence {
 	}
 
 	@QtThread
-	public void restoreModel(final JQMLSingletonModel<?> model) {
+	public boolean restoreModel(final JQMLSingletonModel<?> model) {
 		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
 			model.deserialize(s);
+			return true;
 		} catch (final IOException e) {
 			log.info("No data restored to " + model.getModelName(), e);
+			return false;
 		}
 	}
 
 	@QtThread
-	public void restoreModel(final JQMLListModel<?> model) {
+	public boolean restoreModel(final JQMLListModel<?> model) {
 		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
 			model.deserialize(s);
+			return true;
 		} catch (final IOException e) {
 			log.info("No data restored to " + model.getModelName(), e);
+			return false;
 		}
 	}
 
