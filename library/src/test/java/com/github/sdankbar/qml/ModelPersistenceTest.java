@@ -165,7 +165,6 @@ public class ModelPersistenceTest {
 
 			model.add(data.build());
 		}
-
 		{
 			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
 			data.put(Roles.R2, new JVariant(2));
@@ -173,6 +172,7 @@ public class ModelPersistenceTest {
 
 			model.add(data.build());
 		}
+
 		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/other2.json").exists());
@@ -191,10 +191,61 @@ public class ModelPersistenceTest {
 	 *
 	 */
 	@Test
+	public void test_writeData_list2() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other3", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
+		app.getModelFactory().enableAutoPersistenceForModel(model);
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.add(data.build());
+		}
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.add(data.build());
+		}
+
+		model.get(0).put(Roles.R1, new JVariant(42));
+		model.get(1).put(Roles.R5, new JVariant("ABC"));
+
+		Thread.sleep(SLEEP);
+
+		assertTrue(new File("persistenceTest/other3.json").exists());
+		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other3.json"));
+
+		assertEquals(lines.size(), 26);
+
+		app.getModelFactory().restoreModel(model);
+
+		assertEquals(model.get(0).get(Roles.R1), new JVariant(42));
+		assertEquals(model.get(0).get(Roles.R5), new JVariant(5));
+
+		assertEquals(model.get(1).get(Roles.R2), new JVariant(2));
+		assertEquals(model.get(1).get(Roles.R4), new JVariant(4));
+		assertEquals(model.get(1).get(Roles.R5), new JVariant("ABC"));
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
 	public void test_readData_list() throws InterruptedException, IOException {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other2", Roles.class,
+		final JQMLListModel<Roles> model = app.getModelFactory().createListModel("other4", Roles.class,
 				PutMode.RETURN_PREVIOUS_VALUE);
 
 		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
@@ -219,7 +270,7 @@ public class ModelPersistenceTest {
 
 		app.getModelFactory().persistModel(model);
 
-		assertTrue(new File("persistenceTest/other2.json").exists());
+		assertTrue(new File("persistenceTest/other4.json").exists());
 
 		model.clear();
 		assertEquals(model.size(), 0);

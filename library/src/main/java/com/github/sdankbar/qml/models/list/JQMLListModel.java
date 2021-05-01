@@ -225,4 +225,15 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	void serialize(OutputStream stream) throws IOException;
 
 	void deserialize(InputStream stream) throws IOException;
+
+	/**
+	 * Register to receive callbacks when any part of the model changes, ex. add,
+	 * remove, update, reorder, root data, etc.
+	 */
+	void registerModelChangedListener(Runnable r);
+
+	/**
+	 * Unregister to receive callbacks when any part of the model changes.
+	 */
+	void unregisterModelChangedListener(Runnable r);
 }

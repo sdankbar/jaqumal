@@ -252,6 +252,16 @@ void JNICALL unlockDataChangedSignal(JNIEnv* env, jclass, jlong pointer)
     }
 }
 
+void JNICALL registerModelChangedCallback(JNIEnv* env, jclass, jlong longPtr, jobject c)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        auto modelPtr = reinterpret_cast<GenericListModel*>(longPtr);
+        jobject globalC = env->NewGlobalRef(c);
+        modelPtr->registerModelChangedListener(globalC);
+    }
+}
+
 void ListModelFunctions::initialize(JNIEnv* env)
 {
     JNINativeMethod methods[] = {
@@ -272,6 +282,7 @@ void ListModelFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("assignGenericListModelData",    "(JI)V",    (void *)&assignGenericListModelData),
         JNIUtilities::createJNIMethod("lockDataChangedSignal",    "(J)V",    (void *)&lockDataChangedSignal),
         JNIUtilities::createJNIMethod("unlockDataChangedSignal",    "(J)V",    (void *)&unlockDataChangedSignal),
+        JNIUtilities::createJNIMethod("registerModelChangedCallback",    "(JLcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&registerModelChangedCallback),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/list/ListModelFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods)/sizeof(JNINativeMethod));
@@ -311,12 +322,14 @@ void GenericListModel::putRootValue(const QString& key, const QVariant& value)
 {
     m_root[key] = value;
     emit rootChanged();
+    callbackModelChangedListeners();
 }
 
 void GenericListModel::removeRootValue(const QString& key)
 {
     m_root.remove(key);
     emit rootChanged();
+    callbackModelChangedListeners();
 }
 
 const QVariant& GenericListModel::getRootValue(const QString& key)
@@ -368,6 +381,7 @@ bool GenericListModel::setData(const QModelIndex &i, const QVariant &value, int 
         if (!m_dataChangedLocked) {
             emit dataChanged(index(i.row(), 0), index(i.row(), 0));
         }
+        callbackModelChangedListeners();
         return true;
     }
     else
@@ -458,6 +472,8 @@ void GenericListModel::setRowData(qint32 row, std::vector<QVariant>& data, const
             emit dataChanged(index(row, 0), index(row, 0), roleIndex);
         }
     }
+
+    callbackModelChangedListeners();
 }
 
 void GenericListModel::assignRowData(qint32 row, std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
@@ -500,6 +516,8 @@ void GenericListModel::assignRowData(qint32 row, std::vector<QVariant>& data, co
             emit dataChanged(index(row, 0), index(row, 0));
         }
     }
+
+    callbackModelChangedListeners();
 }
 
 int32_t GenericListModel::appendRowData(std::vector<QVariant>& data, const QVector<int32_t>& roleIndex)
@@ -523,6 +541,8 @@ void GenericListModel::insertRowData(qint32 row, std::vector<QVariant>& data, QV
 
     endInsertRows();
     emit sizeChanged();
+
+    callbackModelChangedListeners();
 }
 
 void GenericListModel::erase(qint32 row)
@@ -531,6 +551,8 @@ void GenericListModel::erase(qint32 row)
     m_rowData.removeAt(row);
     endRemoveRows();
     emit sizeChanged();
+
+    callbackModelChangedListeners();
 }
 
 QHash<int, QByteArray> GenericListModel::roleNames() const
@@ -546,6 +568,8 @@ void GenericListModel::clear(qint32 row, int32_t roleIndex)
         if (!m_dataChangedLocked) {
             emit dataChanged(index(row, 0), index(row, 0));
         }
+
+        callbackModelChangedListeners();
     }
 }
 void GenericListModel::clear(qint32 row)
@@ -559,6 +583,8 @@ void GenericListModel::clear(qint32 row)
             if (!m_dataChangedLocked) {
                 emit dataChanged(index(row, 0), index(row, 0));
             }
+
+            callbackModelChangedListeners();
         }
     }
 }
@@ -578,12 +604,18 @@ bool GenericListModel::containsRole(qint32 row, int32_t roleIndex)
 
 void GenericListModel::reorder(const std::vector<int32_t>& ordering)
 {
+    beginResetModel();
+
     QVector<QVector<QVariant> > swapArea;
     for (int32_t i = 0; i < m_rowData.size(); ++i)
     {
         swapArea.append(m_rowData[ordering[i]]);
     }
     m_rowData.swap(swapArea);
+
+    endResetModel();
+
+    callbackModelChangedListeners();
 }
 
 qint32 GenericListModel::size() const
@@ -603,3 +635,15 @@ void GenericListModel::unlockDataChangedSignal()
     endResetModel();
 }
 
+void GenericListModel::registerModelChangedListener(jobject c)
+{
+    callbacks.push_back(c);
+}
+
+void GenericListModel::callbackModelChangedListeners()
+{
+    for (const jobject& c: callbacks)
+    {
+        JNIUtilities::invokeCallback(ApplicationFunctions::mainEnv, c);
+    }
+}

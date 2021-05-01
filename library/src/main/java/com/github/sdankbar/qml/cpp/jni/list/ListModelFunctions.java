@@ -23,6 +23,7 @@
 package com.github.sdankbar.qml.cpp.jni.list;
 
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
 
 public final class ListModelFunctions {
 
@@ -72,4 +73,6 @@ public final class ListModelFunctions {
 	public static native void lockDataChangedSignal(long modelPointer);
 
 	public static native void unlockDataChangedSignal(long modelPointer);
+
+	public static native void registerModelChangedCallback(long modelPointer, InvokeCallback callback);
 }

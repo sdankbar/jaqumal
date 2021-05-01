@@ -45,6 +45,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
 import com.github.sdankbar.qml.cpp.jni.list.ListModelFunctions;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.AbstractJQMLModel;
@@ -60,6 +61,55 @@ import com.google.common.collect.ImmutableMap;
  */
 public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListModel<K> {
 
+	private static class ModelChangeListener implements InvokeCallback {
+
+		private final List<Runnable> listeners = new ArrayList<>();
+		private boolean locked = false;
+		private boolean pendingCallback = false;
+
+		public void addListener(final Runnable l) {
+			listeners.add(l);
+		}
+
+		public void removeListener(final Runnable l) {
+			listeners.remove(l);
+		}
+
+		public boolean hasListeners() {
+			return !listeners.isEmpty();
+		}
+
+		@Override
+		public void invoke() {
+			if (!locked) {
+				for (final Runnable l : listeners) {
+					l.run();
+				}
+			} else {
+				pendingCallback = true;
+			}
+		}
+
+		public void lock() {
+			if (!locked) {
+				locked = true;
+			}
+		}
+
+		public void unlock() {
+			if (locked) {
+				locked = false;
+				if (pendingCallback) {
+					pendingCallback = false;
+					for (final Runnable l : listeners) {
+						l.run();
+					}
+				}
+			}
+		}
+
+	}
+
 	private final String modelName;
 	private final PutMode putMode;
 	private final long modelPointer;
@@ -73,6 +123,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	private final List<Map<K, JVariant>> mapRefs = new ArrayList<>();
 
 	private final List<ListListener<K>> listeners = new ArrayList<>();
+	private final ModelChangeListener changeCallback = new ModelChangeListener();
 
 	/**
 	 * Constructor.
@@ -131,15 +182,21 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		for (final Entry<K, JVariant> entry : map.entrySet()) {
 			entry.getValue().sendToQML(indexLookup.get(entry.getKey().toString()).intValue());
 		}
-		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
-		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(newIndex), indexLookup, putMode);
-		mapRefs.add(temp);
+		try {
+			changeCallback.lock();
+			final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
-		fireAddEvent(mapRefs.size() - 1, temp);
+			final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
+					accessor.copy(newIndex), indexLookup, putMode);
+			mapRefs.add(temp);
 
-		return temp;
+			fireAddEvent(mapRefs.size() - 1, temp);
+
+			return temp;
+		} finally {
+			changeCallback.unlock();
+		}
 	}
 
 	/**
@@ -161,17 +218,23 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		for (final Entry<K, JVariant> entry : map.entrySet()) {
 			entry.getValue().sendToQML(indexLookup.get(entry.getKey().toString()).intValue());
 		}
-		ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
-		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(index), indexLookup, putMode);
-		mapRefs.add(index, temp);
+		try {
+			changeCallback.lock();
+			ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
-		resetMapIndicies();
+			final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
+					accessor.copy(index), indexLookup, putMode);
+			mapRefs.add(index, temp);
 
-		fireAddEvent(index, temp);
+			resetMapIndicies();
 
-		return temp;
+			fireAddEvent(index, temp);
+
+			return temp;
+		} finally {
+			changeCallback.unlock();
+		}
 	}
 
 	/**
@@ -193,17 +256,22 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		verifyEventLoopThread();
 
 		data.sendToQML(indexLookup.get(role.toString()).intValue());
-		ListModelFunctions.insertGenericListModelData(modelPointer, index);
+		try {
+			changeCallback.lock();
+			ListModelFunctions.insertGenericListModelData(modelPointer, index);
 
-		final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(index), indexLookup, putMode);
-		mapRefs.add(index, temp);
+			final JQMLListModelMap<K> temp = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
+					accessor.copy(index), indexLookup, putMode);
+			mapRefs.add(index, temp);
 
-		resetMapIndicies();
+			resetMapIndicies();
 
-		fireAddEvent(index, temp);
+			fireAddEvent(index, temp);
 
-		return temp;
+			return temp;
+		} finally {
+			changeCallback.unlock();
+		}
 	}
 
 	@Deprecated
@@ -232,15 +300,20 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 
 		verifyEventLoopThread();
 		data.sendToQML(indexLookup.get(role.toString()).intValue());
-		final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
+		try {
+			changeCallback.lock();
+			final int newIndex = ListModelFunctions.appendGenericListModelData(modelPointer);
 
-		final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-				accessor.copy(newIndex), indexLookup, putMode);
-		mapRefs.add(map);
+			final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
+					accessor.copy(newIndex), indexLookup, putMode);
+			mapRefs.add(map);
 
-		fireAddEvent(mapRefs.size() - 1, map);
+			fireAddEvent(mapRefs.size() - 1, map);
 
-		return map;
+			return map;
+		} finally {
+			changeCallback.unlock();
+		}
 	}
 
 	@Override
@@ -464,15 +537,20 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		final Map<K, JVariant> copy = new HashMap<>(old);
 
 		verifyEventLoopThread();
-		ListModelFunctions.eraseGenericListModelData(modelPointer, index);
+		try {
+			changeCallback.lock();
+			ListModelFunctions.eraseGenericListModelData(modelPointer, index);
 
-		mapRefs.remove(index);
-		old.setIndex(-1);
-		resetMapIndicies();
+			mapRefs.remove(index);
+			old.setIndex(-1);
+			resetMapIndicies();
 
-		fireRemoveEvent(index, copy);
+			fireRemoveEvent(index, copy);
 
-		return copy;
+			return copy;
+		} finally {
+			changeCallback.unlock();
+		}
 	}
 
 	/**
@@ -576,18 +654,23 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		accessor.set(data, indexLookup.get(role.toString()).intValue());
 
 		boolean added = false;
-		while (mapRefs.size() <= index) {
-			final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
-					accessor.copy(mapRefs.size()), indexLookup, putMode);
-			mapRefs.add(map);
+		try {
+			changeCallback.lock();
+			while (mapRefs.size() <= index) {
+				final JQMLListModelMap<K> map = new JQMLListModelMap<>(modelName, keySet, eventLoopThread,
+						accessor.copy(mapRefs.size()), indexLookup, putMode);
+				mapRefs.add(map);
 
-			fireAddEvent(mapRefs.size() - 1, map);
+				fireAddEvent(mapRefs.size() - 1, map);
 
-			added = true;
-		}
+				added = true;
+			}
 
-		if (added) {
-			resetMapIndicies();
+			if (added) {
+				resetMapIndicies();
+			}
+		} finally {
+			changeCallback.unlock();
 		}
 	}
 
@@ -627,9 +710,14 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 			ordering[i] = map.getIndex();
 		}
 
-		ListModelFunctions.reorderGenericListModel(modelPointer, ordering);
+		try {
+			changeCallback.lock();
+			ListModelFunctions.reorderGenericListModel(modelPointer, ordering);
 
-		resetMapIndicies();
+			resetMapIndicies();
+		} finally {
+			changeCallback.unlock();
+		}
 	}
 
 	@Override
@@ -665,20 +753,25 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	public void assign(final List<Map<K, JVariant>> list) {
 		verifyEventLoopThread();
 
-		if (list.isEmpty()) {
-			clear();
-		} else {
-			final int reuseCount = Math.min(mapRefs.size(), list.size());
-			for (int i = 0; i < reuseCount; ++i) {
-				final JQMLListModelMap<K> ref = (JQMLListModelMap<K>) mapRefs.get(i);
-				ref.assign(list.get(i));
-			}
+		try {
+			changeCallback.lock();
+			if (list.isEmpty()) {
+				clear();
+			} else {
+				final int reuseCount = Math.min(mapRefs.size(), list.size());
+				for (int i = 0; i < reuseCount; ++i) {
+					final JQMLListModelMap<K> ref = (JQMLListModelMap<K>) mapRefs.get(i);
+					ref.assign(list.get(i));
+				}
 
-			addAll(list.subList(reuseCount, list.size()));
+				addAll(list.subList(reuseCount, list.size()));
 
-			while (mapRefs.size() > list.size()) {
-				remove(mapRefs.size() - 1);
+				while (mapRefs.size() > list.size()) {
+					remove(mapRefs.size() - 1);
+				}
 			}
+		} finally {
+			changeCallback.unlock();
 		}
 	}
 
@@ -787,6 +880,21 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 
 		assign(list.build());
+	}
+
+	@Override
+	public void registerModelChangedListener(final Runnable r) {
+		verifyEventLoopThread();
+		if (!changeCallback.hasListeners()) {
+			ListModelFunctions.registerModelChangedCallback(modelPointer, changeCallback);
+		}
+		changeCallback.addListener(Objects.requireNonNull(r, "r is null"));
+	}
+
+	@Override
+	public void unregisterModelChangedListener(final Runnable r) {
+		verifyEventLoopThread();
+		changeCallback.removeListener(Objects.requireNonNull(r, "r is null"));
 	}
 
 }

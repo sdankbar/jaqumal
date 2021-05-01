@@ -45,7 +45,6 @@ import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.QtThread;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
-import com.github.sdankbar.qml.models.list.ListListener;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
@@ -65,7 +64,7 @@ public class ModelPersistence {
 	private final Set<String> scheduledModels = new HashSet<>();
 
 	private final Map<JQMLSingletonModel<?>, ChangeListener> autoPersistedSingletonModels = new HashMap<>();
-	private final Map<JQMLListModel<?>, ListListener<?>> autoPersistedListModels = new HashMap<>();
+	private final Map<JQMLListModel<?>, Runnable> autoPersistedListModels = new HashMap<>();
 
 	public ModelPersistence(final ScheduledExecutorService qtExecutor, final Duration writeDelay,
 			final File persistenceDirectory) {
@@ -79,8 +78,8 @@ public class ModelPersistence {
 		for (final Entry<JQMLSingletonModel<?>, ChangeListener> m : autoPersistedSingletonModels.entrySet()) {
 			m.getKey().unregisterChangeListener(m.getValue());
 		}
-		for (final Entry<JQMLListModel<?>, ListListener<?>> m : autoPersistedListModels.entrySet()) {
-			m.getKey().unregisterListener(m.getValue());
+		for (final Entry<JQMLListModel<?>, Runnable> m : autoPersistedListModels.entrySet()) {
+			m.getKey().unregisterModelChangedListener(m.getValue());
 		}
 
 		pendingFuture.cancel(false);
@@ -104,20 +103,9 @@ public class ModelPersistence {
 
 	@QtThread
 	public <K> void autoPersistModel(final JQMLListModel<K> model) {
-		final ListListener<K> l = new ListListener<K>() {
-
-			@Override
-			public void added(final int index, final Map<K, JVariant> map) {
-				scheduleSave(model);
-			}
-
-			@Override
-			public void removed(final int index, final Map<K, JVariant> map) {
-				scheduleSave(model);
-			}
-		};
+		final Runnable l = () -> scheduleSave(model);
 		autoPersistedListModels.put(model, l);
-		model.registerListener(l);
+		model.registerModelChangedListener(l);
 	}
 
 	@QtThread

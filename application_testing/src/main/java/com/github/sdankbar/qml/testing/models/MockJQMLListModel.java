@@ -315,4 +315,14 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public void registerModelChangedListener(final Runnable r) {
+
+	}
+
+	@Override
+	public void unregisterModelChangedListener(final Runnable r) {
+
+	}
+
 }

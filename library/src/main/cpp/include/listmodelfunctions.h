@@ -80,6 +80,8 @@ public:
     void lockDataChangedSignal();
     void unlockDataChangedSignal();
 
+    void registerModelChangedListener(jobject c);
+
 signals:
     void sizeChanged();
     void rootChanged();
@@ -87,6 +89,7 @@ signals:
 private:
 
     void emitSignal(qint32 row);
+    void callbackModelChangedListeners();
 
     // Member variables
     QString m_modelName;
@@ -97,6 +100,8 @@ private:
     QHash<int, QByteArray> m_roleNames;
 
     bool m_dataChangedLocked;
+
+    std::vector<jobject> callbacks;
 };
 
 
