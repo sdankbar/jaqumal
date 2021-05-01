@@ -110,6 +110,11 @@ public class MockJQMLSingletonModel<K> implements JQMLSingletonModel<K> {
 	}
 
 	@Override
+	public void unregisterChangeListener(final ChangeListener l) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
 	public String getModelName() {
 		return modelName;
 	}

@@ -203,7 +203,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	@Override
 	@QtThread
 	public void enablePersistence(final Duration writeDelay, final File persistenceDirectory) {
-		Preconditions.checkArgument(persistence == null, "Persistence has already been enabled");
+		if (persistence != null) {
+			persistence.shutdown();
+		}
+
 		persistence = new ModelPersistence(app.getQMLThreadExecutor(), writeDelay, persistenceDirectory);
 	}
 

@@ -46,6 +46,13 @@ public interface JQMLSingletonModel<K> extends Map<K, JVariant> {
 	void registerChangeListener(final ChangeListener l);
 
 	/**
+	 * Unregisters a ChangeListener from this model.
+	 *
+	 * @param l The change listener.
+	 */
+	void unregisterChangeListener(final ChangeListener l);
+
+	/**
 	 * @return The name of the QML model this map is a part of.
 	 */
 	String getModelName();

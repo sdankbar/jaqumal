@@ -186,7 +186,7 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 	/**
 	 * @param l ListListener to unregister.
 	 */
-	void unregisterListener(final ListListener<K> l);
+	void unregisterListener(final ListListener<?> l);
 
 	/**
 	 * Assigns the list to this list. Equivalent to clear and addAll.

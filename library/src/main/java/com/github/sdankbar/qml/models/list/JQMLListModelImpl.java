@@ -656,7 +656,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	 * @param l ListListener to unregister.
 	 */
 	@Override
-	public void unregisterListener(final ListListener<K> l) {
+	public void unregisterListener(final ListListener<?> l) {
 		verifyEventLoopThread();
 		listeners.remove(l);
 	}

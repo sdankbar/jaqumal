@@ -258,7 +258,7 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	}
 
 	@Override
-	public void unregisterListener(final ListListener<K> l) {
+	public void unregisterListener(final ListListener<?> l) {
 		// TODO Auto-generated method stub
 	}
 

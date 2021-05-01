@@ -59,6 +59,10 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 			listeners.add(l);
 		}
 
+		public void removeListener(final ChangeListener l) {
+			listeners.remove(l);
+		}
+
 		public boolean hasListeners() {
 			return !listeners.isEmpty();
 		}
@@ -123,6 +127,12 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 			SingletonModelFunctions.registerValueChangedCallback(modelPointer, changeCallback);
 		}
 		changeCallback.addListener(Objects.requireNonNull(l, "l is null"));
+	}
+
+	@Override
+	public void unregisterChangeListener(final ChangeListener l) {
+		verifyEventLoopThread();
+		changeCallback.removeListener(Objects.requireNonNull(l, "l is null"));
 	}
 
 	/**
