@@ -137,7 +137,7 @@ public class ModelPersistenceTest {
 		model.clear();
 		assertEquals(model.size(), 0);
 
-		app.getModelFactory().restoreModel(model);
+		assertTrue(app.getModelFactory().restoreModel(model));
 
 		assertEquals(model.size(), 2);
 		assertEquals(model, copy);
@@ -275,7 +275,7 @@ public class ModelPersistenceTest {
 		model.clear();
 		assertEquals(model.size(), 0);
 
-		app.getModelFactory().restoreModel(model);
+		assertTrue(app.getModelFactory().restoreModel(model));
 
 		assertEquals(model.size(), 2);
 		assertEquals(model.get(0), copy.get(0));

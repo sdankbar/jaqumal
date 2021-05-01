@@ -187,13 +187,13 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	}
 
 	@Override
-	public void restoreModel(final JQMLSingletonModel<?> model) {
-		// TODO Auto-generated method stub
+	public boolean restoreModel(final JQMLSingletonModel<?> model) {
+		return false;
 	}
 
 	@Override
-	public void restoreModel(final JQMLListModel<?> model) {
-		// TODO Auto-generated method stub
+	public boolean restoreModel(final JQMLListModel<?> model) {
+		return false;
 	}
 
 	@Override

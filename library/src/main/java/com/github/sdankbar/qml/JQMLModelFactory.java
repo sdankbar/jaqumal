@@ -203,7 +203,7 @@ public interface JQMLModelFactory {
 
 	void persistModel(final JQMLListModel<?> model);
 
-	void restoreModel(final JQMLSingletonModel<?> model);
+	boolean restoreModel(final JQMLSingletonModel<?> model);
 
-	void restoreModel(final JQMLListModel<?> model);
+	boolean restoreModel(final JQMLListModel<?> model);
 }
