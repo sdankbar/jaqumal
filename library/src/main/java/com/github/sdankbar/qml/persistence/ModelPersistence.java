@@ -82,7 +82,9 @@ public class ModelPersistence {
 			m.getKey().unregisterModelChangedListener(m.getValue());
 		}
 
-		pendingFuture.cancel(false);
+		if (pendingFuture != null) {
+			pendingFuture.cancel(false);
+		}
 		ioExecutor.shutdown();
 		scheduledModels.clear();
 		// Do not shutdown qtExecutor
