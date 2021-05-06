@@ -23,7 +23,9 @@
 package com.github.sdankbar.qml.fonts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -74,47 +76,44 @@ public final class JFontCache {
 	}
 
 	private void storeAllSizes(final JFont.Builder start) {
+		final Map<JFont.Builder, JFont> tempBuilderMap = new HashMap<>(builderCache);
+		final Map<String, JFont> tempStringMap = new HashMap<>(stringCache);
+
 		for (int size = JFont.MAX_FONT_SIZE; size > 0; --size) {
 			final JFont.Builder b = start.setPointSize(size);
 			final int fontIndex = index++;
 			final String fontStr = b.getQFontString(fontIndex);
 			final JFont f = new JFont(fontStr, fontIndex);
-			storeFont(f, b, fontStr);
+			storeFont(f, b, fontStr, tempBuilderMap, tempStringMap);
 		}
 		for (int size = JFont.MAX_FONT_SIZE; size > 0; --size) {
 			final JFont.Builder b = start.setPixelSize(size);
 			final int fontIndex = index++;
 			final String fontStr = b.getQFontString(fontIndex);
 			final JFont f = new JFont(fontStr, fontIndex);
-			storeFont(f, b, fontStr);
+			storeFont(f, b, fontStr, tempBuilderMap, tempStringMap);
 		}
 
 		final JFont.Builder b = start.setDefaultSize();
 		final int fontIndex = index++;
 		final String fontStr = b.getQFontString(fontIndex);
 		final JFont f = new JFont(fontStr, fontIndex);
-		storeFont(f, b, fontStr);
+		storeFont(f, b, fontStr, tempBuilderMap, tempStringMap);
+
+		builderCache = ImmutableMap.copyOf(tempBuilderMap);
+		stringCache = ImmutableMap.copyOf(tempStringMap);
 	}
 
-	private void storeFont(final JFont f, final JFont.Builder builder, final String fontStr) {
-		{
-			final ImmutableMap.Builder<JFont.Builder, JFont> mapBuilder = ImmutableMap.builder();
-			mapBuilder.putAll(builderCache);
-			if (builder != null) {
-				mapBuilder.put(new JFont.Builder(builder), f);
-			} else {
-				mapBuilder.put(f.toBuilder(), f);
-			}
-			builderCache = mapBuilder.build();
-			indexLookup.add(f);
+	private void storeFont(final JFont f, final JFont.Builder builder, final String fontStr,
+			final Map<JFont.Builder, JFont> tempBuilderMap, final Map<String, JFont> tempStringMap) {
+		if (builder != null) {
+			tempBuilderMap.put(new JFont.Builder(builder), f);
+		} else {
+			tempBuilderMap.put(f.toBuilder(), f);
 		}
+		indexLookup.add(f);
 
-		if (!stringCache.containsKey(fontStr)) {
-			final ImmutableMap.Builder<String, JFont> mapBuilder = ImmutableMap.builder();
-			mapBuilder.putAll(stringCache);
-			mapBuilder.put(fontStr, f);
-			stringCache = mapBuilder.build();
-		}
+		tempStringMap.putIfAbsent(fontStr, f);
 	}
 
 }
