@@ -25,17 +25,14 @@ package com.github.sdankbar.qml.fonts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Provides methods for fast access to JFonts.
  */
 public final class JFontCache {
 
-	private ImmutableMap<JFont.Builder, JFont> builderCache = ImmutableMap.of();
-	private ImmutableMap<String, JFont> stringCache = ImmutableMap.of();
+	private final HashMap<JFont.Builder, JFont> builderCache = new HashMap<>();
+	private final HashMap<String, JFont> stringCache = new HashMap<>();
 	private final List<JFont> indexLookup = new ArrayList<>();
 	private int index = 0;
 
@@ -76,44 +73,29 @@ public final class JFontCache {
 	}
 
 	private void storeAllSizes(final JFont.Builder start) {
-		final Map<JFont.Builder, JFont> tempBuilderMap = new HashMap<>(builderCache);
-		final Map<String, JFont> tempStringMap = new HashMap<>(stringCache);
-
 		for (int size = JFont.MAX_FONT_SIZE; size > 0; --size) {
-			final JFont.Builder b = start.setPointSize(size);
-			final int fontIndex = index++;
-			final String fontStr = b.getQFontString(fontIndex);
-			final JFont f = new JFont(fontStr, fontIndex);
-			storeFont(f, b, fontStr, tempBuilderMap, tempStringMap);
+			start.setPointSize(size);
+			storeFont(start);
 		}
 		for (int size = JFont.MAX_FONT_SIZE; size > 0; --size) {
-			final JFont.Builder b = start.setPixelSize(size);
-			final int fontIndex = index++;
-			final String fontStr = b.getQFontString(fontIndex);
-			final JFont f = new JFont(fontStr, fontIndex);
-			storeFont(f, b, fontStr, tempBuilderMap, tempStringMap);
+			start.setPixelSize(size);
+			storeFont(start);
 		}
 
-		final JFont.Builder b = start.setDefaultSize();
-		final int fontIndex = index++;
-		final String fontStr = b.getQFontString(fontIndex);
-		final JFont f = new JFont(fontStr, fontIndex);
-		storeFont(f, b, fontStr, tempBuilderMap, tempStringMap);
-
-		builderCache = ImmutableMap.copyOf(tempBuilderMap);
-		stringCache = ImmutableMap.copyOf(tempStringMap);
+		{
+			start.setDefaultSize();
+			storeFont(start);
+		}
 	}
 
-	private void storeFont(final JFont f, final JFont.Builder builder, final String fontStr,
-			final Map<JFont.Builder, JFont> tempBuilderMap, final Map<String, JFont> tempStringMap) {
-		if (builder != null) {
-			tempBuilderMap.put(new JFont.Builder(builder), f);
-		} else {
-			tempBuilderMap.put(f.toBuilder(), f);
-		}
-		indexLookup.add(f);
+	private void storeFont(final JFont.Builder builder) {
+		final int fontIndex = index++;
+		final String fontStr = builder.getQFontString(fontIndex);
+		final JFont f = new JFont(fontStr, fontIndex);
 
-		tempStringMap.putIfAbsent(fontStr, f);
+		indexLookup.add(f);
+		builderCache.putIfAbsent(new JFont.Builder(builder), f);
+		stringCache.putIfAbsent(fontStr, f);
 	}
 
 }
