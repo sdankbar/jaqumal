@@ -39,7 +39,7 @@ void staticQtMessages(QtMsgType type, const QMessageLogContext &context, const Q
 
         if (msg == "QObject::~QObject: Timers cannot be stopped from another thread")
         {
-            // Know error that can be safely ignored.  May one day determine how to unload libraries,
+            // Known error that can be safely ignored.  May one day determine how to unload libraries,
             // allowing static de-initialization to occur in the correct thread.
             return;
         }

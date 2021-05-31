@@ -43,6 +43,7 @@ win32 {
 }
 
 SOURCES += \
+    impl/eventlogger.cpp \
     impl/applicationfunctions.cpp \
     impl/eventfunctions.cpp \
     impl/flattreemodelfunctions.cpp \
@@ -64,6 +65,7 @@ SOURCES += \
     impl/keyeventpreprocessor.cpp
 
 HEADERS += \
+    include/eventlogger.h \
     include/applicationfunctions.h \
     include/eventfunctions.h \
     include/flattreemodelfunctions.h \

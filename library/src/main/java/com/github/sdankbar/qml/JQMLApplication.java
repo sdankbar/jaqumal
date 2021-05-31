@@ -377,6 +377,11 @@ public class JQMLApplication<EType> {
 		return ImmutableList.copyOf(ApplicationFunctions.getScreens());
 	}
 
+	@QtThread
+	public void enableEventLogging() {
+		ApplicationFunctions.enableEventLogging();
+	}
+
 	private void verifyEventLoopThread() {
 		JQMLUtilities.checkThread(eventLoopThread);
 	}

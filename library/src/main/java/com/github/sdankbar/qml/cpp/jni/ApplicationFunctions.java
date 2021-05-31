@@ -50,6 +50,8 @@ public final class ApplicationFunctions {
 	 */
 	public static native void deleteQApplication();
 
+	public static native void enableEventLogging();
+
 	/**
 	 * Calls QApplication::exec()
 	 */

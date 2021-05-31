@@ -98,7 +98,7 @@ public class ModelPersistenceTest {
 		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/other.json").exists());
-		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other.json"));
+		final List<String> lines = Files.readAllLines(new File("persistenceTest", "other.json").toPath());
 
 		assertEquals(lines.get(0), "{");
 		assertEquals(lines.get(14), " \"R1\": {");

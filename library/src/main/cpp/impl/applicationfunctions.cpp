@@ -26,6 +26,7 @@
 
 #include <eventbuilder.h>
 #include <eventdispatcher.h>
+#include <eventlogger.h>
 #include <invoketarget.h>
 #include <jpolyline.h>
 #include <QQmlContext>
@@ -195,6 +196,14 @@ JNICALL void invoke(JNIEnv* env, jclass, jobject callback)
     }
 }
 
+JNICALL void enableEventLogging(JNIEnv* env, jclass)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->createEventLogger();
+    }
+}
+
 void ApplicationFunctions::create(int* argc, char** argv)
 {
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
@@ -290,7 +299,8 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("runQMLTests",    "(Ljava/lang/String;[Ljava/lang/String;)I",    (void *)&runQMLTests),
         JNIUtilities::createJNIMethod("addImageProvider",    "(Ljava/lang/String;Lcom/github/sdankbar/qml/cpp/jni/interfaces/ImageProviderCallback;)V",    (void *)&addImageProvider),
         JNIUtilities::createJNIMethod("getScreens",    "()[Lcom/github/sdankbar/qml/JScreen;",    (void *)&getScreens),
-        JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke)
+        JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
+        JNIUtilities::createJNIMethod("enableEventLogging", "()V", (void *)&enableEventLogging)
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
@@ -319,7 +329,8 @@ ApplicationFunctions::ApplicationFunctions(int32_t& argc, char** argv) :
     m_qapp(new QApplication(argc, argv)),
     m_qmlEngine(new QQmlApplicationEngine(m_qapp)),
     m_uiSim(),
-    m_logging()
+    m_logging(),
+    m_eventLogger(nullptr)
 {
     m_qmlEngine->rootContext()->setContextProperty("log", QVariant::fromValue(&m_logging));
     m_qmlEngine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));
@@ -399,6 +410,15 @@ void ApplicationFunctions::reloadQML(const QString& filePath)
 void ApplicationFunctions::setLoggingObject(jobject callbackObject)
 {
     m_logging.setCallback(callbackObject);
+}
+
+void ApplicationFunctions::createEventLogger()
+{
+    if (m_eventLogger == nullptr)
+    {
+        m_eventLogger = new EventLogger(m_logging, m_qapp);
+        m_qapp->installEventFilter(m_eventLogger);
+    }
 }
 
 void ApplicationFunctions::addImageProviderObject(const QString& id, jobject javaImageProviderCallback)

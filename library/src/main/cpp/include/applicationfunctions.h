@@ -29,6 +29,8 @@
 #include <userinputsimulator.h>
 //#include <QQmlContext>
 
+class EventLogger;
+
 class ApplicationFunctions : public QObject
 {
     Q_OBJECT
@@ -50,6 +52,7 @@ public:
     void unloadQML();
     void reloadQML(const QString& filePath);
     void setLoggingObject(jobject callbackObject);
+    void createEventLogger();
     void addImageProviderObject(const QString& id, jobject javaImageProviderCallback);
     QList<QScreen*> getScreensList();
     jobjectArray createJScreenArray(JNIEnv* env, int32_t length);
@@ -91,6 +94,7 @@ private:
     QQmlApplicationEngine* m_qmlEngine;
     UserInputSimulator m_uiSim;
     QMLLogging m_logging;
+    EventLogger* m_eventLogger;
 };
 
 
