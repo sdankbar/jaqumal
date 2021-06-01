@@ -34,14 +34,14 @@ INCLUDEPATH += include
 win32 {
     INCLUDEPATH += "$$getenv(JAVA_HOME)\include" \
                    "$$getenv(JAVA_HOME)\include\win32"
+
+    # TODO figure out a better way to access the .a on Windows
+    LIBS += "../../../../../library/src/main/cpp/libs/libJaqumal.a"
 } else {
     INCLUDEPATH += "$$getenv(JAVA_HOME)/include" \
                    "$$getenv(JAVA_HOME)/include/unix" \
                    "$$getenv(JAVA_HOME)/include/linux"
 }
-
-# TODO figure out a better way to access the .a on Windows
-LIBS += "../../../../../library/src/main/cpp/libs/libJaqumal.a"
 
 SOURCES += \
     impl/registerNewType.cpp
