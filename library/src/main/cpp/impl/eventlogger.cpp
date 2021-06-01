@@ -29,7 +29,7 @@ EventLogger::EventLogger(QMLLogging& log, QObject* parent) :
     QObject(parent),
     m_log(log)
 {
-    // Empty Implementation
+    m_log.info(QStringLiteral("Enabled QEvent logging"));
 }
 
 bool EventLogger::eventFilter(QObject* obj, QEvent* event)
