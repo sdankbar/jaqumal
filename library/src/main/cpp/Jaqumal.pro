@@ -38,8 +38,9 @@ win32 {
     INCLUDEPATH += "$$getenv(JAVA_HOME)\include" \
                    "$$getenv(JAVA_HOME)\include\win32"
 } else {
-        INCLUDEPATH += "$$getenv(JAVA_HOME)/include" \
-                   "$$getenv(JAVA_HOME)/include/unix"
+    INCLUDEPATH += "$$getenv(JAVA_HOME)/include" \
+                   "$$getenv(JAVA_HOME)/include/unix" \
+                   "$$getenv(JAVA_HOME)/include/linux"
 }
 
 SOURCES += \
