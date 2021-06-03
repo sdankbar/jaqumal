@@ -24,12 +24,10 @@ package com.github.sdankbar.qml.utility;
 
 import java.util.Objects;
 import java.util.Queue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +36,22 @@ public class OrderedThreadPool<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(OrderedThreadPool.class);
 
+	private enum State {
+		RUNNING, COMPLETE, ERROR;
+	}
+
 	private static final class Job<T> {
-		private final CompletableFuture<T> future;
+		private volatile State jobState = State.RUNNING;
+		private volatile T result;
 		private final Consumer<T> consumer;
 
 		public Job(final Consumer<T> consumer) {
-			this.future = new CompletableFuture<>();
 			this.consumer = consumer;
 		}
 
+		public boolean isFinished() {
+			return jobState == State.COMPLETE || jobState == State.ERROR;
+		}
 	}
 
 	private final ExecutorService parallelExecutor;
@@ -59,34 +64,45 @@ public class OrderedThreadPool<T> {
 		this.sequentialExecutor = Objects.requireNonNull(sequentialExecutor, "sequentialExecutor is null");
 	}
 
-	public void submit(final Callable<T> parallelProcessing, final Consumer<T> sequentialProcessing) {
+	public void submit(final Supplier<T> parallelProcessing, final Consumer<T> sequentialProcessing) {
 		final Job<T> j = new Job<>(sequentialProcessing);
 		futureQueue.add(j);
 
-		parallelExecutor.submit(() -> {
-			final T obj = parallelProcessing.call();
-			j.future.complete(obj);
+		parallelExecutor.execute(() -> {
+			try {
+				j.result = parallelProcessing.get();
+				j.jobState = State.COMPLETE;
+			} catch (final Exception e) {
+				logger.warn("Exception processing job", e);
+				j.jobState = State.ERROR;
+			}
+
 			sequentialExecutor.submit(() -> checkQueue());
-			return obj;
 		});
 	}
 
 	private void checkQueue() {
 		final Job<T> front = futureQueue.peek();
-		if (front != null && front.future.isDone()) {
-			try {
-				front.consumer.accept(front.future.get());
-			} catch (InterruptedException | ExecutionException e) {
-				logger.warn("Exception processing job", e);
+		if (front != null) {
+			if (front.jobState == State.COMPLETE) {
+				futureQueue.poll();
+				front.consumer.accept(front.result);
+				checkIfAdditionalScheduleNeeded();
+			} else if (front.jobState == State.ERROR) {
+				futureQueue.poll();
+				checkIfAdditionalScheduleNeeded();
+			} else {
+				// Head job not complete yet.
 			}
-			futureQueue.poll();
+		}
+	}
 
-			// Check if the next item on the queue is already complete and if it is,
-			// schedule to work it.
-			final Job<T> front2 = futureQueue.peek();
-			if (front2 != null && front2.future.isDone()) {
-				sequentialExecutor.submit(() -> checkQueue());
-			}
+	private void checkIfAdditionalScheduleNeeded() {
+		// Check if the next item on the queue is already finished and if it is,
+		// schedule to work it.
+		final Job<T> front2 = futureQueue.peek();
+		if (front2 != null && front2.isFinished()) {
+			sequentialExecutor.submit(() -> checkQueue());
 		}
 	}
 
