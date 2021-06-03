@@ -57,7 +57,7 @@ public class OrderedThreadPool<T> {
 	private final ExecutorService parallelExecutor;
 	private final ExecutorService sequentialExecutor;
 
-	private final Queue<Job<T>> futureQueue = new ConcurrentLinkedQueue<>();
+	private final Queue<Job<T>> jobQueue = new ConcurrentLinkedQueue<>();
 
 	public OrderedThreadPool(final ExecutorService parallelExecutor, final ExecutorService sequentialExecutor) {
 		this.parallelExecutor = Objects.requireNonNull(parallelExecutor, "parallelExecutor is null");
@@ -66,30 +66,36 @@ public class OrderedThreadPool<T> {
 
 	public void submit(final Supplier<T> parallelProcessing, final Consumer<T> sequentialProcessing) {
 		final Job<T> j = new Job<>(sequentialProcessing);
-		futureQueue.add(j);
+		jobQueue.add(j);
 
 		parallelExecutor.execute(() -> {
 			try {
 				j.result = parallelProcessing.get();
 				j.jobState = State.COMPLETE;
 			} catch (final Exception e) {
-				logger.warn("Exception processing job", e);
+				logger.warn("Exception processing parallel job", e);
 				j.jobState = State.ERROR;
 			}
 
-			sequentialExecutor.submit(() -> checkQueue());
+			if (j == jobQueue.peek()) {
+				sequentialExecutor.submit(() -> checkQueue());
+			}
 		});
 	}
 
 	private void checkQueue() {
-		final Job<T> front = futureQueue.peek();
+		final Job<T> front = jobQueue.peek();
 		if (front != null) {
 			if (front.jobState == State.COMPLETE) {
-				futureQueue.poll();
-				front.consumer.accept(front.result);
+				jobQueue.poll();
+				try {
+					front.consumer.accept(front.result);
+				} catch (final Exception e) {
+					logger.warn("Exception processing sequential job", e);
+				}
 				checkIfAdditionalScheduleNeeded();
 			} else if (front.jobState == State.ERROR) {
-				futureQueue.poll();
+				jobQueue.poll();
 				checkIfAdditionalScheduleNeeded();
 			} else {
 				// Head job not complete yet.
@@ -100,7 +106,7 @@ public class OrderedThreadPool<T> {
 	private void checkIfAdditionalScheduleNeeded() {
 		// Check if the next item on the queue is already finished and if it is,
 		// schedule to work it.
-		final Job<T> front2 = futureQueue.peek();
+		final Job<T> front2 = jobQueue.peek();
 		if (front2 != null && front2.isFinished()) {
 			sequentialExecutor.submit(() -> checkQueue());
 		}
