@@ -41,7 +41,7 @@ public class OrderedThreadPoolTest {
 	 */
 	@Test
 	public void test_submit() throws InterruptedException {
-		final OrderedThreadPool<Integer> ordered = new OrderedThreadPool<>(Executors.newFixedThreadPool(4),
+		final OrderedThreadPool<Integer> ordered = new OrderedThreadPool<>(Executors.newFixedThreadPool(16),
 				Executors.newSingleThreadExecutor());
 
 		final int length = 1_000_000;
@@ -51,13 +51,22 @@ public class OrderedThreadPoolTest {
 		final List<Integer> list = new ArrayList<>(length);
 		for (int i = 0; i < length; ++i) {
 			final int temp = i;
-			ordered.submit(() -> temp, j -> {
+			ordered.submit(() -> {
+				if (temp % 803 == 0) {
+					try {
+						Thread.sleep(0, 1);
+					} catch (final InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
+				return temp;
+			}, j -> {
 				list.add(j);
 			});
 		}
 
 		while (list.size() < length) {
-			Thread.sleep(1000);
+			Thread.sleep(100);
 		}
 
 		for (int i = 0; i < length; ++i) {
