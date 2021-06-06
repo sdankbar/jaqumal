@@ -24,6 +24,7 @@ package com.github.sdankbar.qml.utility;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -40,6 +41,24 @@ public class IndexedMap<K, V> {
 			this.index = index;
 			this.key = key;
 			this.value = value;
+		}
+
+		public V getValue() {
+			return value;
+		}
+
+		public V setValue(final V value) {
+			final V old = value;
+			this.value = value;
+			return old;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+
+		public K getKey() {
+			return key;
 		}
 	}
 
@@ -69,35 +88,48 @@ public class IndexedMap<K, V> {
 	}
 
 	public ImmutableList<V> values() {
-		return keyMap.values().stream().map(e -> e.value).collect(ImmutableList.toImmutableList());
+		return keyMap.values().stream().map(Entry::getValue).collect(ImmutableList.toImmutableList());
 	}
 
 	public V get(final K key) {
+		Objects.requireNonNull(key, "key is null");
 		final Entry<K, V> item = keyMap.get(key);
 		if (item != null) {
-			return item.value;
+			return item.getValue();
 		} else {
 			return null;
 		}
 	}
 
 	public V atIndex(final int index) {
+		Preconditions.checkArgument(0 <= index && index < table.length, "Index is outside value range %s", index);
 		final Entry<K, V> item = table[index];
 		if (item != null) {
-			return item.value;
+			return item.getValue();
 		} else {
 			return null;
 		}
 	}
 
+	public int getIndexForKey(final K key) {
+		Objects.requireNonNull(key, "key is null");
+		final Entry<K, V> item = keyMap.get(key);
+		if (item != null) {
+			return item.index;
+		} else {
+			return -1;
+		}
+	}
+
 	public V put(final int index, final K key, final V value) {
+		Preconditions.checkArgument(0 <= index && index < table.length, "Index is outside value range %s", index);
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(value, "value is null");
+
 		final Entry<K, V> existingItem = table[index];
 		if (existingItem != null) {
-			Preconditions.checkArgument(existingItem.key.equals(key), "Mapping between index and key changed (%s, %s)",
-					index, key);
-			final V oldValue = existingItem.value;
-			existingItem.value = value;
-			return oldValue;
+			Preconditions.checkArgument(key.equals(existingItem.key), "Existing key/index does not match new mapping");
+			return existingItem.setValue(value);
 		} else {
 			final Entry<K, V> newItem = new Entry<>(index, key, value);
 			table[index] = newItem;
@@ -109,9 +141,21 @@ public class IndexedMap<K, V> {
 	public V remove(final K key) {
 		final Entry<K, V> item = keyMap.remove(key);
 		if (item != null) {
-			final V oldValue = item.value;
+			final V oldValue = item.getValue();
 			table[item.index] = null;
 			return oldValue;
+		} else {
+			return null;
+		}
+	}
+
+	public V removeIndex(final int index) {
+		Preconditions.checkArgument(0 <= index && index < table.length, "Index is outside value range %s", index);
+		final Entry<K, V> item = table[index];
+		table[index] = null;
+		if (item != null) {
+			keyMap.remove(item.key);
+			return item.getValue();
 		} else {
 			return null;
 		}
