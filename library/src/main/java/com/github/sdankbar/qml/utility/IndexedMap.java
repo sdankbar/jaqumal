@@ -80,11 +80,21 @@ public class IndexedMap<K, V> {
 	}
 
 	public boolean containsKey(final K key) {
+		Objects.requireNonNull(key, "key is null");
 		return keyMap.containsKey(key);
+	}
+
+	public boolean containsIndex(final int index) {
+		Preconditions.checkArgument(0 <= index && index < table.length, "Index is outside value range %s", index);
+		return table[index] != null;
 	}
 
 	public ImmutableSet<K> keySet() {
 		return ImmutableSet.copyOf(keyMap.keySet());
+	}
+
+	public int[] indexSet() {
+		return keyMap.values().stream().mapToInt(Entry::getIndex).sorted().toArray();
 	}
 
 	public ImmutableList<V> values() {
@@ -115,7 +125,7 @@ public class IndexedMap<K, V> {
 		Objects.requireNonNull(key, "key is null");
 		final Entry<K, V> item = keyMap.get(key);
 		if (item != null) {
-			return item.index;
+			return item.getIndex();
 		} else {
 			return -1;
 		}
@@ -128,7 +138,8 @@ public class IndexedMap<K, V> {
 
 		final Entry<K, V> existingItem = table[index];
 		if (existingItem != null) {
-			Preconditions.checkArgument(key.equals(existingItem.key), "Existing key/index does not match new mapping");
+			Preconditions.checkArgument(key.equals(existingItem.getKey()),
+					"Existing key/index does not match new mapping");
 			return existingItem.setValue(value);
 		} else {
 			final Entry<K, V> newItem = new Entry<>(index, key, value);
@@ -139,10 +150,11 @@ public class IndexedMap<K, V> {
 	}
 
 	public V remove(final K key) {
+		Objects.requireNonNull(key, "key is null");
 		final Entry<K, V> item = keyMap.remove(key);
 		if (item != null) {
 			final V oldValue = item.getValue();
-			table[item.index] = null;
+			table[item.getIndex()] = null;
 			return oldValue;
 		} else {
 			return null;
@@ -154,7 +166,7 @@ public class IndexedMap<K, V> {
 		final Entry<K, V> item = table[index];
 		table[index] = null;
 		if (item != null) {
-			keyMap.remove(item.key);
+			keyMap.remove(item.getKey());
 			return item.getValue();
 		} else {
 			return null;
