@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml.utility;
 
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -48,8 +50,12 @@ public class IndexedMapJMHTest {
 	@State(Scope.Thread)
 	public static class BenchmarkState {
 
-		IndexedMap<Integer, String> map;
+		IndexedMap<String, String> map;
+		HashMap<String, String> map2 = new HashMap<>(14000);
 		int index = 0;
+
+		String[] keyLookup = new String[14000];
+		String firstKey;
 
 		/**
 		 * Sets up shared state.
@@ -58,6 +64,11 @@ public class IndexedMapJMHTest {
 		public void setup() {
 			map = new IndexedMap<>(14000);
 			index = 0;
+
+			for (int i = 0; i < keyLookup.length; ++i) {
+				keyLookup[i] = UUID.randomUUID().toString();
+			}
+			firstKey = keyLookup[0];
 		}
 
 	}
@@ -68,7 +79,16 @@ public class IndexedMapJMHTest {
 	@Benchmark
 	public void benchmark_put(final BenchmarkState state) {
 		final int index = (state.index++ % 14000);
-		state.map.put(index, index, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+		state.map.put(index, state.keyLookup[index], "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	}
+
+	/**
+	 * @param state
+	 */
+	@Benchmark
+	public void benchmark_put2(final BenchmarkState state) {
+		final int index = (state.index++ % 14000);
+		state.map2.put(state.keyLookup[index], "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	}
 
 	/**
@@ -76,8 +96,8 @@ public class IndexedMapJMHTest {
 	 * @return
 	 */
 	@Benchmark
-	public String benchmark_get(final BenchmarkState state) {
-		return state.map.get(0);
+	public void benchmark_get(final BenchmarkState state) {
+		state.map.get(state.firstKey);
 	}
 
 	/**
@@ -87,6 +107,24 @@ public class IndexedMapJMHTest {
 	@Benchmark
 	public String benchmark_atIndex(final BenchmarkState state) {
 		return state.map.atIndex(0);
+	}
+
+	/**
+	 * @param state
+	 * @return
+	 */
+	@Benchmark
+	public void benchmark_atIndex2(final BenchmarkState state) {
+		state.map.atIndex(0);
+	}
+
+	/**
+	 * @param state
+	 * @return
+	 */
+	@Benchmark
+	public int benchmark_overhead() {
+		return 0;
 	}
 
 	/**
