@@ -23,6 +23,7 @@
 package com.github.sdankbar.qml.utility;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -31,8 +32,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ThreadPool that allows submitted tasks to be preempted to the front
- * of the workqueue.
+ * ThreadPool that allows submitted tasks to be preempted to the front of the
+ * workqueue.
  */
 public class PreemptingThreadPool {
 
@@ -52,9 +53,9 @@ public class PreemptingThreadPool {
 	}
 
 	/**
-	 * If the task behind the Future has not been started yet,
-	 * moves it to the front of the task queue.
-	 * 
+	 * If the task behind the Future has not been started yet, moves it to the front
+	 * of the task queue.
+	 *
 	 * @param f Future of the work to move to the front of the queue.
 	 */
 	public void preempt(final Future<?> f) {
