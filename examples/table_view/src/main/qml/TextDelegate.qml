@@ -27,10 +27,13 @@ import QtQuick.Dialogs 1.3
 import com.github.sdankbar.jaqumal 0.4
 
 Rectangle {
+    property alias text: textObj.text
+
     width: 50
     height: 20
     border.color: "black"
     Text {
+        id: textObj
         anchors.fill: parent
         text: model.text
     }

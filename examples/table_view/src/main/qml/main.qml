@@ -21,6 +21,7 @@
  * THE SOFTWARE.
  */
 import QtQuick 2.11
+import QtQuick.Layouts 1.3
 import QtQuick.Window 2.10
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.3
@@ -35,14 +36,38 @@ Window {
     title: qsTr("TableView")
     id: mainWindow
 
-    JTableView {
-        id: tableView
-		anchors.fill: parent
-        model: table_model
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
+        Row {
+            Layout.fillWidth: true
 
-        delegate: Loader {
-            id: loaderObj
-            source: model.delegate
+            TextDelegate {
+                text: "C1"
+                color: "light gray"
+            }
+            TextDelegate {
+                text: "C2"
+                color: "light gray"
+            }
+            TextDelegate {
+                text: "C3"
+                color: "light gray"
+            }
         }
-	}
+
+        JTableView {
+            id: tableView
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+
+            model: table_model
+
+            delegate: Loader {
+                id: loaderObj
+                source: model.delegate
+            }
+        }
+    }
 }
