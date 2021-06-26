@@ -4,5 +4,6 @@
         <file>PerformanceMonitor.qml</file>
         <file>JLineSeries.qml</file>
         <file>JListView.qml</file>
+        <file>JTableView.qml</file>
     </qresource>
 </RCC>

@@ -242,5 +242,8 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 				map.putAll(ImmutableMap.of(rowKey, new JVariant(row), columnKey, new JVariant(column)));
 			}
 		}
+
+		putRootValue("row_count", new JVariant(rowCount));
+		putRootValue("column_count", new JVariant(columnCount));
 	}
 }

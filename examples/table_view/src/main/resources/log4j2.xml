@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     The MIT License
@@ -22,27 +23,16 @@
     THE SOFTWARE.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
-	<parent>
-		<groupId>com.github.sdankbar.jaqumal</groupId>
-		<artifactId>parent</artifactId>
-		<version>0.5.1-SNAPSHOT</version>
-	</parent>
-	<artifactId>examples</artifactId>
-	<packaging>pom</packaging>
-
-	<modules>
-	    <module>color_editor</module>
-		<module>stoplight</module>
-		<module>line_chart</module>
-		<module>image_provider</module>
-		<module>list_view</module>
-		<module>table_view</module>
-		<module>throughput</module>
-		<module>new_type</module>
-	</modules>
-</project>
+<Configuration status="WARN">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+	</Appenders>
+	<Loggers>
+		<Root level="all">
+			<AppenderRef ref="Console" />
+		</Root>
+	</Loggers>
+</Configuration>
