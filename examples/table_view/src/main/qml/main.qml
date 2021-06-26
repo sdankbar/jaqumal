@@ -40,21 +40,51 @@ Window {
     }
 
     JTableView {
-		id: listView
+        id: tableView
 		anchors.fill: parent
 		spacing: 1
         model: table_model
 
-        delegate: Rectangle {
-        	width: 50
-        	height: 20
-        	border.color: "black"
-        	Text {
-        		anchors.fill: parent
-                text: model.row + " " + model.column
-    	    }
-    	}
+        delegate: Loader {
+            id: loaderObj
+            property int row: model.row
+            property int column: model.column
+            sourceComponent: {
+                if (model.column === 2) {
+                    return checkboxDelegate
+                } else {
+                    return textDelegate
+                }
+            }
+        }
 	}
 
+
+    Component {
+        id: textDelegate
+
+        Rectangle {
+            width: 50
+            height: 20
+            border.color: "black"
+            Text {
+                anchors.fill: parent
+                text: row + " " + column
+            }
+        }
+    }
+
+    Component {
+        id: checkboxDelegate
+
+        Rectangle {
+            width: 50
+            height: 20
+            border.color: "black"
+            CheckBox {
+                checked: row === 1
+            }
+        }
+    }
 
 }
