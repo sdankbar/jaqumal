@@ -37,7 +37,15 @@ import com.google.common.collect.ImmutableMap;
 public class App {
 
 	public enum TableRole {
-		text, is_checked, row, column
+		text, is_checked, delegate, row, column
+	}
+
+	private static JVariant getDelegate(final int column) {
+		if (column == 1) {
+			return new JVariant("CheckboxDelegate.qml");
+		} else {
+			return new JVariant("TextDelegate.qml");
+		}
 	}
 
 	/**
@@ -59,7 +67,7 @@ public class App {
 		for (int r = 0; r < model.getRowCount(); ++r) {
 			for (int c = 0; c < model.getColumnCount(); ++c) {
 				model.setData(r, c, ImmutableMap.of(TableRole.text, new JVariant(r + "," + c), TableRole.is_checked,
-						JVariant.valueOf(r == 1 && c == 2)));
+						JVariant.valueOf(r == 1 && c == 2), TableRole.delegate, getDelegate(c)));
 			}
 		}
 

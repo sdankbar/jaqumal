@@ -35,25 +35,14 @@ Window {
     title: qsTr("TableView")
     id: mainWindow
 
-    EventBuilder {
-        id: eventing
-    }
-
     JTableView {
         id: tableView
 		anchors.fill: parent
-		spacing: 1
         model: table_model
 
         delegate: Loader {
             id: loaderObj
-            source: {
-                if (model.column === 2) {
-                    return "CheckboxDelegate.qml"
-                } else {
-                    return "TextDelegate.qml"
-                }
-            }
+            source: model.delegate
         }
 	}
 }
