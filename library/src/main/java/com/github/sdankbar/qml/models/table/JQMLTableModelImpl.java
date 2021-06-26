@@ -174,11 +174,13 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 
 	@Override
 	public void serialize(final OutputStream stream) throws IOException {
+		// TODO serialize row/column count
 		listModel.serialize(stream);
 	}
 
 	@Override
 	public void deserialize(final InputStream stream) throws IOException {
+		// TODO deserialize row/column count
 		listModel.deserialize(stream);
 	}
 

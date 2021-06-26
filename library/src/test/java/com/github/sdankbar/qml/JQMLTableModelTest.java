@@ -119,6 +119,9 @@ public class JQMLTableModelTest {
 
 		model.addRow(1);
 
+		assertEquals(4, model.getColumnCount());
+		assertEquals(4, model.getRowCount());
+
 		assertEquals(0, model.get(0, 0).get(Roles.R1).asInteger());
 		assertEquals(0, model.get(0, 1).get(Roles.R1).asInteger());
 		assertEquals(null, model.get(0, 2).get(Roles.R1));
@@ -140,6 +143,42 @@ public class JQMLTableModelTest {
 		assertEquals(2, model.get(3, 3).get(Roles.R1).asInteger());
 
 		model.removeRow(1);
+
+		assertEquals(4, model.getColumnCount());
+		assertEquals(3, model.getRowCount());
+
+		assertEquals(0, model.get(0, 0).get(Roles.R1).asInteger());
+		assertEquals(0, model.get(0, 1).get(Roles.R1).asInteger());
+		assertEquals(null, model.get(0, 2).get(Roles.R1));
+		assertEquals(0, model.get(0, 3).get(Roles.R1).asInteger());
+
+		assertEquals(1, model.get(1, 0).get(Roles.R1).asInteger());
+		assertEquals(1, model.get(1, 1).get(Roles.R1).asInteger());
+		assertEquals(null, model.get(1, 2).get(Roles.R1));
+		assertEquals(1, model.get(1, 3).get(Roles.R1).asInteger());
+
+		assertEquals(2, model.get(2, 0).get(Roles.R1).asInteger());
+		assertEquals(2, model.get(2, 1).get(Roles.R1).asInteger());
+		assertEquals(null, model.get(2, 2).get(Roles.R1));
+		assertEquals(2, model.get(2, 3).get(Roles.R1).asInteger());
+
+		model.removeColumn(2);
+
+		assertEquals(3, model.getColumnCount());
+		assertEquals(3, model.getRowCount());
+
+		assertEquals(0, model.get(0, 0).get(Roles.R1).asInteger());
+		assertEquals(0, model.get(0, 1).get(Roles.R1).asInteger());
+		assertEquals(0, model.get(0, 2).get(Roles.R1).asInteger());
+
+		assertEquals(1, model.get(1, 0).get(Roles.R1).asInteger());
+		assertEquals(1, model.get(1, 1).get(Roles.R1).asInteger());
+		assertEquals(1, model.get(1, 2).get(Roles.R1).asInteger());
+
+		assertEquals(2, model.get(2, 0).get(Roles.R1).asInteger());
+		assertEquals(2, model.get(2, 1).get(Roles.R1).asInteger());
+		assertEquals(2, model.get(2, 2).get(Roles.R1).asInteger());
+
 	}
 
 }
