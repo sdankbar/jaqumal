@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.json.JSONObject;
+
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.ListListener;
@@ -306,13 +308,14 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	}
 
 	@Override
-	public void serialize(final OutputStream stream) throws IOException {
+	public void serialize(final OutputStream stream, final JSONObject obj) throws IOException {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void deserialize(final InputStream stream) throws IOException {
+	public JSONObject deserialize(final InputStream stream) throws IOException {
 		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

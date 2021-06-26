@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.json.JSONObject;
+
 import com.github.sdankbar.qml.JVariant;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -222,9 +224,9 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 
 	void swap(int source, int destination);
 
-	void serialize(OutputStream stream) throws IOException;
+	void serialize(OutputStream stream, JSONObject additionalJSON) throws IOException;
 
-	void deserialize(InputStream stream) throws IOException;
+	JSONObject deserialize(InputStream stream) throws IOException;
 
 	/**
 	 * Register to receive callbacks when any part of the model changes, ex. add,

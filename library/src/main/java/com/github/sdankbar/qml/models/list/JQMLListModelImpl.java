@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -835,7 +836,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	}
 
 	@Override
-	public void serialize(final OutputStream stream) throws IOException {
+	public void serialize(final OutputStream stream, final JSONObject additionalJSON) throws IOException {
 		final JSONObject root = new JSONObject();
 
 		final JSONArray array = new JSONArray();
@@ -847,13 +848,16 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 			array.put(itemObj);
 		}
 		root.put("list", array);
+		if (additionalJSON != null) {
+			root.put("additional", additionalJSON);
+		}
 
 		final String s = root.toString(1);
 		stream.write(s.getBytes());
 	}
 
 	@Override
-	public void deserialize(final InputStream stream) throws IOException {
+	public JSONObject deserialize(final InputStream stream) throws IOException {
 		final JSONTokener tokener = new JSONTokener(stream);
 		final JSONObject object = new JSONObject(tokener);
 		final JSONArray array = object.getJSONArray("list");
@@ -880,6 +884,12 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 
 		assign(list.build());
+
+		if (Arrays.asList(JSONObject.getNames(object)).contains("additional")) {
+			return object.getJSONObject("additional");
+		} else {
+			return null;
+		}
 	}
 
 	@Override

@@ -226,4 +226,22 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		return model;
 	}
 
+	@Override
+	public void enableAutoPersistenceForModel(final JQMLTableModel<?> model) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void persistModel(final JQMLTableModel<?> model) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean restoreModel(final JQMLTableModel<?> model) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

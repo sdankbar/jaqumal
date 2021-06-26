@@ -44,6 +44,7 @@ import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -280,6 +281,111 @@ public class ModelPersistenceTest {
 		assertEquals(model.size(), 2);
 		assertEquals(model.get(0), copy.get(0));
 		assertEquals(model.get(1), copy.get(1));
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
+	public void test_writeData_table() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLTableModel<Roles> model = app.getModelFactory().createTableModel("table1", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
+		app.getModelFactory().enableAutoPersistenceForModel(model);
+
+		model.addRow();
+		model.addRow();
+		model.addRow();
+
+		model.addColumn();
+		model.addColumn();
+		model.addColumn();
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.setData(0, 0, data.build());
+		}
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.setData(2, 2, data.build());
+		}
+
+		Thread.sleep(SLEEP);
+
+		assertTrue(new File("persistenceTest/table1.json").exists());
+		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "table1.json"));
+
+		assertEquals(lines.size(), 38);
+
+		app.getModelFactory().restoreModel(model);
+
+		assertEquals(model.get(2, 2).get(Roles.R4), new JVariant(4));
+		assertEquals(3, model.getRowCount());
+		assertEquals(4, model.getColumnCount());
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
+	public void test_readData_table() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLTableModel<Roles> model = app.getModelFactory().createTableModel("table2", Roles.class,
+				PutMode.RETURN_PREVIOUS_VALUE);
+
+		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
+
+		model.addRow();
+		model.addRow();
+		model.addRow();
+
+		model.addColumn();
+		model.addColumn();
+		model.addColumn();
+
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R1, new JVariant(1));
+			data.put(Roles.R5, new JVariant(5));
+
+			model.setData(0, 0, data.build());
+		}
+		{
+			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
+			data.put(Roles.R2, new JVariant(2));
+			data.put(Roles.R4, new JVariant(4));
+
+			model.setData(2, 2, data.build());
+		}
+
+		app.getModelFactory().persistModel(model);
+
+		assertTrue(new File("persistenceTest/table2.json").exists());
+
+		model.clear(0, 0);
+		model.clear(2, 2);
+
+		assertTrue(app.getModelFactory().restoreModel(model));
+
+		assertEquals(model.getRowCount(), 3);
+		assertEquals(model.getColumnCount(), 4);
+		assertEquals(model.get(2, 2).get(Roles.R4), new JVariant(4));
+		assertEquals(model.get(2, 2).get(Roles.R2), new JVariant(2));
+		assertEquals(model.get(1, 1).get(Roles.R4), null);
 	}
 
 }

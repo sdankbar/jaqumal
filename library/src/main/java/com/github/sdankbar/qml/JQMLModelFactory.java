@@ -209,11 +209,17 @@ public interface JQMLModelFactory {
 
 	void enableAutoPersistenceForModel(final JQMLListModel<?> model);
 
+	void enableAutoPersistenceForModel(final JQMLTableModel<?> model);
+
 	void persistModel(final JQMLSingletonModel<?> model);
 
 	void persistModel(final JQMLListModel<?> model);
 
+	void persistModel(final JQMLTableModel<?> model);
+
 	boolean restoreModel(final JQMLSingletonModel<?> model);
 
 	boolean restoreModel(final JQMLListModel<?> model);
+
+	boolean restoreModel(final JQMLTableModel<?> model);
 }

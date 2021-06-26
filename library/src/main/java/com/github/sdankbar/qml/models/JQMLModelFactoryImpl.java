@@ -240,6 +240,12 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	}
 
 	@Override
+	public void enableAutoPersistenceForModel(final JQMLTableModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.autoPersistModel(model);
+	}
+
+	@Override
 	public void persistModel(final JQMLSingletonModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
 		persistence.persistModel(model);
@@ -252,6 +258,12 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	}
 
 	@Override
+	public void persistModel(final JQMLTableModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.persistModel(model);
+	}
+
+	@Override
 	public boolean restoreModel(final JQMLSingletonModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
 		return persistence.restoreModel(model);
@@ -259,6 +271,12 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 
 	@Override
 	public boolean restoreModel(final JQMLListModel<?> model) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		return persistence.restoreModel(model);
+	}
+
+	@Override
+	public boolean restoreModel(final JQMLTableModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
 		return persistence.restoreModel(model);
 	}

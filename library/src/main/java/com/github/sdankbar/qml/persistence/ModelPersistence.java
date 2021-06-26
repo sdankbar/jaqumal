@@ -46,6 +46,7 @@ import com.github.sdankbar.qml.QtThread;
 import com.github.sdankbar.qml.models.interfaces.ChangeListener;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 
@@ -65,6 +66,7 @@ public class ModelPersistence {
 
 	private final Map<JQMLSingletonModel<?>, ChangeListener> autoPersistedSingletonModels = new HashMap<>();
 	private final Map<JQMLListModel<?>, Runnable> autoPersistedListModels = new HashMap<>();
+	private final Map<JQMLTableModel<?>, Runnable> autoPersistedTableModels = new HashMap<>();
 
 	public ModelPersistence(final ScheduledExecutorService qtExecutor, final Duration writeDelay,
 			final File persistenceDirectory) {
@@ -92,13 +94,7 @@ public class ModelPersistence {
 
 	@QtThread
 	public <K> void autoPersistModel(final JQMLSingletonModel<K> model) {
-		final ChangeListener l = new ChangeListener() {
-
-			@Override
-			public void valueChanged(final String key, final JVariant newValue) {
-				scheduleSave(model);
-			}
-		};
+		final ChangeListener l = (final String key, final JVariant newValue) -> scheduleSave(model);
 		autoPersistedSingletonModels.put(model, l);
 		model.registerChangeListener(l);
 	}
@@ -107,6 +103,13 @@ public class ModelPersistence {
 	public <K> void autoPersistModel(final JQMLListModel<K> model) {
 		final Runnable l = () -> scheduleSave(model);
 		autoPersistedListModels.put(model, l);
+		model.registerModelChangedListener(l);
+	}
+
+	@QtThread
+	public <K> void autoPersistModel(final JQMLTableModel<K> model) {
+		final Runnable l = () -> scheduleSave(model);
+		autoPersistedTableModels.put(model, l);
 		model.registerModelChangedListener(l);
 	}
 
@@ -123,6 +126,17 @@ public class ModelPersistence {
 
 	@QtThread
 	public void persistModel(final JQMLListModel<?> model) {
+		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try {
+			model.serialize(stream, null);
+			saveModel(model.getModelName(), stream.toByteArray());
+		} catch (final IOException e) {
+			log.warn("Failed to persist " + model.getModelName(), e);
+		}
+	}
+
+	@QtThread
+	public void persistModel(final JQMLTableModel<?> model) {
 		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
 			model.serialize(stream);
@@ -145,6 +159,17 @@ public class ModelPersistence {
 
 	@QtThread
 	public boolean restoreModel(final JQMLListModel<?> model) {
+		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
+			model.deserialize(s);
+			return true;
+		} catch (final IOException e) {
+			log.info("No data restored to " + model.getModelName(), e);
+			return false;
+		}
+	}
+
+	@QtThread
+	public boolean restoreModel(final JQMLTableModel<?> model) {
 		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
 			model.deserialize(s);
 			return true;
@@ -195,7 +220,33 @@ public class ModelPersistence {
 		}
 	}
 
+	private void scheduleSave(final JQMLTableModel<?> model) {
+		if (!scheduledModels.contains(model.getModelName())) {
+			scheduledModels.add(model.getModelName());
+
+			if (writeDelay.isZero()) {
+				qtThreadSaveModel(model);
+			} else {
+				pendingFuture = qtExecutor.schedule(() -> {
+					pendingFuture = null;
+					qtThreadSaveModel(model);
+				}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
+			}
+		}
+	}
+
 	private void qtThreadSaveModel(final JQMLListModel<?> model) {
+		scheduledModels.remove(model.getModelName());
+		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		try {
+			model.serialize(stream, null);
+			saveModelThreaded(model.getModelName(), stream.toByteArray());
+		} catch (final IOException e) {
+			log.warn("Failed to persist " + model.getModelName(), e);
+		}
+	}
+
+	private void qtThreadSaveModel(final JQMLTableModel<?> model) {
 		scheduledModels.remove(model.getModelName());
 		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {

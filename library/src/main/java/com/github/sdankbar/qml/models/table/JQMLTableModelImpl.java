@@ -26,7 +26,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import org.json.JSONObject;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
@@ -174,14 +177,19 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 
 	@Override
 	public void serialize(final OutputStream stream) throws IOException {
-		// TODO serialize row/column count
-		listModel.serialize(stream);
+		final JSONObject additional = new JSONObject();
+		additional.put("rows", rowCount);
+		additional.put("columns", columnCount);
+		listModel.serialize(stream, additional);
 	}
 
 	@Override
 	public void deserialize(final InputStream stream) throws IOException {
-		// TODO deserialize row/column count
-		listModel.deserialize(stream);
+
+		final JSONObject obj = listModel.deserialize(stream);
+		Objects.requireNonNull(obj, "Invalid data");
+		rowCount = obj.getInt("rows");
+		columnCount = obj.getInt("columns");
 	}
 
 	/**
