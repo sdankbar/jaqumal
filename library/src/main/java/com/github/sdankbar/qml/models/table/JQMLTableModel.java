@@ -48,8 +48,6 @@ public interface JQMLTableModel<K> {
 
 	void removeRow(int row);
 
-	void clear(final int row, int column);
-
 	Map<K, JVariant> get(final int row, int column);
 
 	/**

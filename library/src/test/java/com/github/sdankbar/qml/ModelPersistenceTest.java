@@ -63,7 +63,7 @@ public class ModelPersistenceTest {
 	}
 
 	private enum Roles {
-		R1, R2, R3, R4, R5;
+		R1, R2, R3, R4, R5, row, column;
 	}
 
 	/**
@@ -326,7 +326,7 @@ public class ModelPersistenceTest {
 		assertTrue(new File("persistenceTest/table1.json").exists());
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "table1.json"));
 
-		assertEquals(lines.size(), 38);
+		assertEquals(lines.size(), 144);
 
 		app.getModelFactory().restoreModel(model);
 
@@ -376,8 +376,8 @@ public class ModelPersistenceTest {
 
 		assertTrue(new File("persistenceTest/table2.json").exists());
 
-		model.clear(0, 0);
-		model.clear(2, 2);
+		model.setData(0, 0, ImmutableMap.of());
+		model.setData(2, 2, ImmutableMap.of());
 
 		assertTrue(app.getModelFactory().restoreModel(model));
 

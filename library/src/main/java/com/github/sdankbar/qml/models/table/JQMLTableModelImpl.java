@@ -41,12 +41,26 @@ import com.google.common.collect.ImmutableSet;
 
 public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 
+	private static <K> K getKey(final ImmutableSet<K> keys, final String keyName) {
+		for (final K v : keys) {
+			if (v.toString().equals(keyName)) {
+				return v;
+			}
+		}
+		throw new IllegalArgumentException("Failed to find key: " + keyName);
+	}
+
 	private final JQMLListModel<K> listModel;
 	private int rowCount = 0;
 	private int columnCount = 1;
 
+	private final K rowKey;
+	private final K columnKey;
+
 	public JQMLTableModelImpl(final String modelName, final ImmutableSet<K> keys, final JQMLApplication<?> app,
 			final PutMode putMode) {
+		rowKey = getKey(keys, "row");
+		columnKey = getKey(keys, "column");
 		listModel = app.getModelFactory().createListModel(modelName, keys, putMode);
 	}
 
@@ -73,6 +87,7 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 			listModel.add(index, ImmutableMap.of());
 		}
 		++columnCount;
+		updateIndices();
 	}
 
 	@Override
@@ -88,6 +103,7 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 			listModel.remove(index);
 		}
 		--columnCount;
+		updateIndices();
 	}
 
 	@Override
@@ -103,6 +119,7 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 			listModel.add(index, ImmutableMap.of());
 		}
 		++rowCount;
+		updateIndices();
 	}
 
 	@Override
@@ -118,11 +135,7 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 			listModel.remove(index);
 		}
 		--rowCount;
-	}
-
-	@Override
-	public void clear(final int row, final int column) {
-		listModel.clear(index(row, column));
+		updateIndices();
 	}
 
 	@Override
@@ -173,6 +186,8 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 	@Override
 	public void setData(final int row, final int column, final Map<K, JVariant> data) {
 		listModel.setData(index(row, column), data);
+		final Map<K, JVariant> map = get(row, column);
+		map.putAll(ImmutableMap.of(rowKey, new JVariant(row), columnKey, new JVariant(column)));
 	}
 
 	@Override
@@ -185,11 +200,12 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 
 	@Override
 	public void deserialize(final InputStream stream) throws IOException {
-
 		final JSONObject obj = listModel.deserialize(stream);
 		Objects.requireNonNull(obj, "Invalid data");
 		rowCount = obj.getInt("rows");
 		columnCount = obj.getInt("columns");
+
+		updateIndices();
 	}
 
 	/**
@@ -217,5 +233,14 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 	@Override
 	public int getColumnCount() {
 		return columnCount;
+	}
+
+	private void updateIndices() {
+		for (int row = 0; row < rowCount; ++row) {
+			for (int column = 0; column < columnCount; ++column) {
+				final Map<K, JVariant> map = get(row, column);
+				map.putAll(ImmutableMap.of(rowKey, new JVariant(row), columnKey, new JVariant(column)));
+			}
+		}
 	}
 }

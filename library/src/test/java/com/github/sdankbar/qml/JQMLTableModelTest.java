@@ -45,7 +45,7 @@ public class JQMLTableModelTest {
 	}
 
 	private enum Roles {
-		R1, R2, R3, R4, R5;
+		R1, R2, R3, R4, R5, row, column;
 	}
 
 	@After
@@ -79,6 +79,7 @@ public class JQMLTableModelTest {
 		assertEquals(0, model.get(1, 0).get(Roles.R1).asInteger());
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void addColumn() {
 		final String[] args = new String[0];
@@ -170,6 +171,8 @@ public class JQMLTableModelTest {
 		assertEquals(0, model.get(0, 0).get(Roles.R1).asInteger());
 		assertEquals(0, model.get(0, 1).get(Roles.R1).asInteger());
 		assertEquals(0, model.get(0, 2).get(Roles.R1).asInteger());
+		assertEquals(0, model.get(0, 2).get(Roles.row).asInteger());
+		assertEquals(2, model.get(0, 2).get(Roles.column).asInteger());
 
 		assertEquals(1, model.get(1, 0).get(Roles.R1).asInteger());
 		assertEquals(1, model.get(1, 1).get(Roles.R1).asInteger());
