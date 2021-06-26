@@ -47,44 +47,13 @@ Window {
 
         delegate: Loader {
             id: loaderObj
-            property int row: model.row
-            property int column: model.column
-            sourceComponent: {
+            source: {
                 if (model.column === 2) {
-                    return checkboxDelegate
+                    return "CheckboxDelegate.qml"
                 } else {
-                    return textDelegate
+                    return "TextDelegate.qml"
                 }
             }
         }
 	}
-
-
-    Component {
-        id: textDelegate
-
-        Rectangle {
-            width: 50
-            height: 20
-            border.color: "black"
-            Text {
-                anchors.fill: parent
-                text: row + " " + column
-            }
-        }
-    }
-
-    Component {
-        id: checkboxDelegate
-
-        Rectangle {
-            width: 50
-            height: 20
-            border.color: "black"
-            CheckBox {
-                checked: row === 1
-            }
-        }
-    }
-
 }

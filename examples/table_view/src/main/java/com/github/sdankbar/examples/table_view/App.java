@@ -23,10 +23,12 @@
 package com.github.sdankbar.examples.table_view;
 
 import com.github.sdankbar.qml.JQMLApplication;
+import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Example application that allow for editing a set of colors.
@@ -35,7 +37,7 @@ import com.github.sdankbar.qml.models.table.JQMLTableModel;
 public class App {
 
 	public enum TableRole {
-		text, row, column
+		text, is_checked, row, column
 	}
 
 	/**
@@ -53,6 +55,13 @@ public class App {
 
 		model.addColumn();
 		model.addColumn();
+
+		for (int r = 0; r < model.getRowCount(); ++r) {
+			for (int c = 0; c < model.getColumnCount(); ++c) {
+				model.setData(r, c, ImmutableMap.of(TableRole.text, new JVariant(r + "," + c), TableRole.is_checked,
+						JVariant.valueOf(r == 1 && c == 2)));
+			}
+		}
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 
