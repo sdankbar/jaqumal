@@ -44,6 +44,8 @@ import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.github.sdankbar.qml.models.table.JQMLTableModel;
+import com.github.sdankbar.qml.models.table.JQMLTableModelImpl;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -52,7 +54,8 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	private final Map<String, JQMLSingletonModel<?>> singletonModels = new HashMap<>();
 	private final Map<String, JQMLListModel<?>> listModels = new HashMap<>();
 	private final Map<String, JQMLListViewModel<?>> listViewModels = new HashMap<>();
-	private final Set<String> modelName = new HashSet<>();
+	private final Map<String, JQMLTableModel<?>> tableModels = new HashMap<>();
+	private final Set<String> modelNames = new HashSet<>();
 
 	private final JQMLApplication<?> app;
 
@@ -61,7 +64,7 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	}
 
 	private void checkModelName(final String name) {
-		if (!modelName.add(Objects.requireNonNull(name, "name is null"))) {
+		if (!modelNames.add(Objects.requireNonNull(name, "name is null"))) {
 			throw new QMLException("Model with name [" + name + "] already exists");
 		}
 	}
@@ -149,7 +152,7 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		singletonModels.clear();
 		listModels.clear();
 		listViewModels.clear();
-		modelName.clear();
+		modelNames.clear();
 	}
 
 	@Override
@@ -199,13 +202,28 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	@Override
 	public void persistModel(final JQMLSingletonModel<?> model) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void persistModel(final JQMLListModel<?> model) {
 		// TODO Auto-generated method stub
+	}
 
+	@Override
+	public <K extends Enum<K>> JQMLTableModel<K> createTableModel(final String name, final Class<K> enumClass,
+			final PutMode putMode) {
+		final ImmutableSet<K> userKeys = ImmutableSet.copyOf(EnumSet.allOf(enumClass));
+		final JQMLTableModelImpl<K> model = new JQMLTableModelImpl<>(name, userKeys, app, putMode);
+		tableModels.put(name, model);
+		return model;
+	}
+
+	@Override
+	public <K> JQMLTableModel<K> createTableModel(final String modelName, final ImmutableSet<K> keySet,
+			final SelectionMode mode, final PutMode putMode) {
+		final JQMLTableModelImpl<K> model = new JQMLTableModelImpl<>(modelName, keySet, app, putMode);
+		tableModels.put(modelName, model);
+		return model;
 	}
 
 }

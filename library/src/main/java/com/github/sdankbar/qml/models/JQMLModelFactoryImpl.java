@@ -49,6 +49,8 @@ import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModelImpl;
 import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
+import com.github.sdankbar.qml.models.table.JQMLTableModel;
+import com.github.sdankbar.qml.models.table.JQMLTableModelImpl;
 import com.github.sdankbar.qml.persistence.ModelPersistence;
 import com.github.sdankbar.qml.utility.JQMLUtilities;
 import com.google.common.base.Preconditions;
@@ -198,6 +200,21 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 			final SelectionMode mode, final PutMode putMode) {
 		checkForIsSelectedInKeySet(keySet);
 		return new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
+	}
+
+	@Override
+	@QtThread()
+	public <K extends Enum<K>> JQMLTableModel<K> createTableModel(final String modelName, final Class<K> keyClass,
+			final PutMode putMode) {
+		final ImmutableSet<K> userKeys = ImmutableSet.copyOf(EnumSet.allOf(keyClass));
+		return new JQMLTableModelImpl<>(modelName, userKeys, app, putMode);
+	}
+
+	@Override
+	@QtThread()
+	public <K> JQMLTableModel<K> createTableModel(final String modelName, final ImmutableSet<K> keySet,
+			final SelectionMode mode, final PutMode putMode) {
+		return new JQMLTableModelImpl<>(modelName, keySet, app, putMode);
 	}
 
 	@Override

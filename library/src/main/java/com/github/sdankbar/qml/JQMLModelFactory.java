@@ -36,6 +36,7 @@ import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -190,7 +191,16 @@ public interface JQMLModelFactory {
 	 * @param putMode   Specifies how put operations behave.
 	 * @return The new model.
 	 */
+	@QtThread
 	<K> JQMLListViewModel<K> createListViewModel(final String modelName, final ImmutableSet<K> keySet,
+			final SelectionMode mode, final PutMode putMode);
+
+	@QtThread
+	<K extends Enum<K>> JQMLTableModel<K> createTableModel(final String name, final Class<K> enumClass,
+			final PutMode putMode);
+
+	@QtThread
+	<K> JQMLTableModel<K> createTableModel(final String modelName, final ImmutableSet<K> keySet,
 			final SelectionMode mode, final PutMode putMode);
 
 	void enablePersistence(final Duration writeDelay, final File persistenceDirectory);
