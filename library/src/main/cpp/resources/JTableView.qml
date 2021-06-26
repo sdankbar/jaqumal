@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 import QtQuick 2.11
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.11
 import com.github.sdankbar.jaqumal 0.4
 
 ScrollView {
@@ -29,10 +29,6 @@ ScrollView {
 
     property alias model: tableRepeater.model
     property alias delegate: tableRepeater.delegate
-
-	QtObject {
-		id: internal
-	}
 
     Grid {
         anchors.fill: parent
