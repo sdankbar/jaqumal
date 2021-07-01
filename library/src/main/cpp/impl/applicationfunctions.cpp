@@ -334,6 +334,7 @@ ApplicationFunctions::ApplicationFunctions(int32_t& argc, char** argv) :
 {
     m_qmlEngine->rootContext()->setContextProperty("log", QVariant::fromValue(&m_logging));
     m_qmlEngine->rootContext()->setContextProperty("userInputSim", QVariant::fromValue(&m_uiSim));
+    m_qmlEngine->rootContext()->setContextProperty("Jaqumal", QVariant::fromValue(this));
 
     // Install SIGTERM signal handler so application can shutdown cleanly
     std::signal(SIGTERM, signal_handler);
@@ -511,5 +512,11 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
 
 void ApplicationFunctions::addToContext(const QString& name, const QVariant& value)
 {
+    m_objectLookupMap.insert(name, value);
     m_qmlEngine->rootContext()->setContextProperty(name, value);
+}
+
+QVariant ApplicationFunctions::lookup(const QString& objectName) const
+{
+    return m_objectLookupMap.value(objectName);
 }

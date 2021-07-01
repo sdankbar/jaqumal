@@ -66,6 +66,8 @@ public:
     {
         addToContext(name, QVariant::fromValue(ptr));
     }
+
+    Q_INVOKABLE QVariant lookup(const QString& objectName) const;
 public slots:
     void invokeCallback(JNIEnv* env, jobject c);
 
@@ -95,6 +97,7 @@ private:
     UserInputSimulator m_uiSim;
     QMLLogging m_logging;
     EventLogger* m_eventLogger;
+    QVariantHash m_objectLookupMap;
 };
 
 
