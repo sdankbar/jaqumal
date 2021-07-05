@@ -35,7 +35,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -57,12 +56,13 @@ public class ModelPersistence {
 	private final ScheduledExecutorService ioExecutor = Executors.newSingleThreadScheduledExecutor();
 
 	private final ScheduledExecutorService qtExecutor;
-	private ScheduledFuture<?> pendingFuture = null;
 
 	private final Duration writeDelay;
 	private final File persistenceDirectory;
 
-	private final Set<String> scheduledModels = new HashSet<>();
+	private final Set<String> scheduledSingletonModels = new HashSet<>();
+	private final Set<String> scheduledListModels = new HashSet<>();
+	private final Set<String> scheduledTableModels = new HashSet<>();
 
 	private final Map<JQMLSingletonModel<?>, ChangeListener> autoPersistedSingletonModels = new HashMap<>();
 	private final Map<JQMLListModel<?>, Runnable> autoPersistedListModels = new HashMap<>();
@@ -83,13 +83,63 @@ public class ModelPersistence {
 		for (final Entry<JQMLListModel<?>, Runnable> m : autoPersistedListModels.entrySet()) {
 			m.getKey().unregisterModelChangedListener(m.getValue());
 		}
-
-		if (pendingFuture != null) {
-			pendingFuture.cancel(false);
+		for (final Entry<JQMLTableModel<?>, Runnable> m : autoPersistedTableModels.entrySet()) {
+			m.getKey().unregisterModelChangedListener(m.getValue());
 		}
-		ioExecutor.shutdown();
-		scheduledModels.clear();
+
+		for (final String name : scheduledSingletonModels) {
+			final JQMLSingletonModel<?> model = autoPersistedSingletonModels.keySet().stream()
+					.filter(m -> m.getModelName().equals(name)).findAny().get();
+			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			try {
+				model.serialize(stream);
+				ioExecutor.execute(() -> {
+					saveModel(model.getModelName(), stream.toByteArray());
+				});
+			} catch (final IOException e) {
+				log.warn("Failed to persist " + model.getModelName(), e);
+			}
+		}
+
+		for (final String name : scheduledListModels) {
+			final JQMLListModel<?> model = autoPersistedListModels.keySet().stream()
+					.filter(m -> m.getModelName().equals(name)).findAny().get();
+			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			try {
+				model.serialize(stream, null);
+				ioExecutor.execute(() -> {
+					saveModel(model.getModelName(), stream.toByteArray());
+				});
+			} catch (final IOException e) {
+				log.warn("Failed to persist " + model.getModelName(), e);
+			}
+		}
+
+		for (final String name : scheduledTableModels) {
+			final JQMLTableModel<?> model = autoPersistedTableModels.keySet().stream()
+					.filter(m -> m.getModelName().equals(name)).findAny().get();
+			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			try {
+				model.serialize(stream);
+				ioExecutor.execute(() -> {
+					saveModel(model.getModelName(), stream.toByteArray());
+				});
+			} catch (final IOException e) {
+				log.warn("Failed to persist " + model.getModelName(), e);
+			}
+		}
+
 		// Do not shutdown qtExecutor
+		ioExecutor.shutdown();
+		try {
+			ioExecutor.awaitTermination(1, TimeUnit.SECONDS);
+		} catch (final InterruptedException e) {
+			log.warn("Failed to finish all IO operations in 1 sec. Not all models may have been written to disk.", e);
+		}
+	}
+
+	public boolean isShutdown() {
+		return ioExecutor.isShutdown();
 	}
 
 	@QtThread
@@ -180,14 +230,14 @@ public class ModelPersistence {
 	}
 
 	private void scheduleSave(final JQMLSingletonModel<?> model) {
-		if (!scheduledModels.contains(model.getModelName())) {
-			scheduledModels.add(model.getModelName());
+		final String name = model.getModelName();
+		if (!scheduledSingletonModels.contains(name)) {
+			scheduledSingletonModels.add(name);
 
 			if (writeDelay.isZero()) {
 				qtThreadSaveModel(model);
 			} else {
-				pendingFuture = qtExecutor.schedule(() -> {
-					pendingFuture = null;
+				qtExecutor.schedule(() -> {
 					qtThreadSaveModel(model);
 				}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
 			}
@@ -195,25 +245,29 @@ public class ModelPersistence {
 	}
 
 	private void qtThreadSaveModel(final JQMLSingletonModel<?> model) {
-		scheduledModels.remove(model.getModelName());
-		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		try {
-			model.serialize(stream);
-			saveModelThreaded(model.getModelName(), stream.toByteArray());
-		} catch (final IOException e) {
-			log.warn("Failed to persist " + model.getModelName(), e);
+		if (!isShutdown()) {
+			scheduledSingletonModels.remove(model.getModelName());
+			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			try {
+				model.serialize(stream);
+				ioExecutor.execute(() -> {
+					saveModel(model.getModelName(), stream.toByteArray());
+				});
+			} catch (final IOException e) {
+				log.warn("Failed to persist " + model.getModelName(), e);
+			}
 		}
 	}
 
 	private void scheduleSave(final JQMLListModel<?> model) {
-		if (!scheduledModels.contains(model.getModelName())) {
-			scheduledModels.add(model.getModelName());
+		final String name = model.getModelName();
+		if (!scheduledListModels.contains(name)) {
+			scheduledListModels.add(name);
 
 			if (writeDelay.isZero()) {
 				qtThreadSaveModel(model);
 			} else {
-				pendingFuture = qtExecutor.schedule(() -> {
-					pendingFuture = null;
+				qtExecutor.schedule(() -> {
 					qtThreadSaveModel(model);
 				}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
 			}
@@ -221,14 +275,14 @@ public class ModelPersistence {
 	}
 
 	private void scheduleSave(final JQMLTableModel<?> model) {
-		if (!scheduledModels.contains(model.getModelName())) {
-			scheduledModels.add(model.getModelName());
+		final String name = model.getModelName();
+		if (!scheduledTableModels.contains(name)) {
+			scheduledTableModels.add(name);
 
 			if (writeDelay.isZero()) {
 				qtThreadSaveModel(model);
 			} else {
-				pendingFuture = qtExecutor.schedule(() -> {
-					pendingFuture = null;
+				qtExecutor.schedule(() -> {
 					qtThreadSaveModel(model);
 				}, writeDelay.toMillis(), TimeUnit.MILLISECONDS);
 			}
@@ -236,31 +290,33 @@ public class ModelPersistence {
 	}
 
 	private void qtThreadSaveModel(final JQMLListModel<?> model) {
-		scheduledModels.remove(model.getModelName());
-		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		try {
-			model.serialize(stream, null);
-			saveModelThreaded(model.getModelName(), stream.toByteArray());
-		} catch (final IOException e) {
-			log.warn("Failed to persist " + model.getModelName(), e);
+		if (!isShutdown()) {
+			scheduledListModels.remove(model.getModelName());
+			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			try {
+				model.serialize(stream, null);
+				ioExecutor.execute(() -> {
+					saveModel(model.getModelName(), stream.toByteArray());
+				});
+			} catch (final IOException e) {
+				log.warn("Failed to persist " + model.getModelName(), e);
+			}
 		}
 	}
 
 	private void qtThreadSaveModel(final JQMLTableModel<?> model) {
-		scheduledModels.remove(model.getModelName());
-		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		try {
-			model.serialize(stream);
-			saveModelThreaded(model.getModelName(), stream.toByteArray());
-		} catch (final IOException e) {
-			log.warn("Failed to persist " + model.getModelName(), e);
+		if (!isShutdown()) {
+			scheduledTableModels.remove(model.getModelName());
+			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			try {
+				model.serialize(stream);
+				ioExecutor.execute(() -> {
+					saveModel(model.getModelName(), stream.toByteArray());
+				});
+			} catch (final IOException e) {
+				log.warn("Failed to persist " + model.getModelName(), e);
+			}
 		}
-	}
-
-	private void saveModelThreaded(final String modelName, final byte[] data) {
-		ioExecutor.execute(() -> {
-			saveModel(modelName, data);
-		});
 	}
 
 	private void saveModel(final String modelName, final byte[] data) {

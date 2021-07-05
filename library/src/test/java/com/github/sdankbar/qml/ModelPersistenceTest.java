@@ -23,6 +23,7 @@
 package com.github.sdankbar.qml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.awt.geom.Point2D;
@@ -77,6 +78,30 @@ public class ModelPersistenceTest {
 		JQMLApplication.delete();
 		FileUtils.deleteDirectory(new File("persistenceTest"));
 		Thread.sleep(100);
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
+	public void test_shutdown() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
+				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		app.getModelFactory().enablePersistence(Duration.ofSeconds(3), new File("persistenceTest"));
+		app.getModelFactory().enableAutoPersistenceForModel(model);
+
+		model.put(Roles.R1, new JVariant(1));
+		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
+
+		Thread.sleep(SLEEP);
+
+		assertFalse(new File("persistenceTest/other.json").exists());
+		app.getModelFactory().enablePersistence(Duration.ofSeconds(3), new File("persistenceTest2"));
+		assertTrue(new File("persistenceTest/other.json").exists());
 	}
 
 	/**
