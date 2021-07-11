@@ -38,7 +38,7 @@ DashedRectangle::~DashedRectangle()
 void DashedRectangle::paint(QPainter* painter)
 {
     painter->setPen(m_stroke);
-    painter->drawRect(x(), y(), width(), height());
+    painter->drawRect(0, 0, width(), height());
 }
 
 QColor DashedRectangle::strokeColor() const
