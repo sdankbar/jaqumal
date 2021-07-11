@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 
 import org.slf4j.Logger;
@@ -92,14 +91,7 @@ public class QMLThreadPersistanceTask implements Runnable {
 	}
 
 	public void finishImmediately() {
-		if (isRunning) {
-			// Already started so wait for it to finish
-			try {
-				qtThreadFuture.get();
-			} catch (InterruptedException | ExecutionException e) {
-				log.warn("Exception waiting for reseult", e);
-			}
-		} else {
+		if (!isRunning) {
 			// Not run yet so cancel and run synchronously
 			qtThreadFuture.cancel(false);
 			run();

@@ -68,6 +68,7 @@ public class ModelPersistence {
 		this.persistenceDirectory = Objects.requireNonNull(persistenceDirectory, "persistenceDirectory is null");
 	}
 
+	@QtThread
 	public void shutdown() {
 		for (final Entry<JQMLSingletonModel<?>, ChangeListener> m : autoPersistedSingletonModels.entrySet()) {
 			m.getKey().unregisterChangeListener(m.getValue());
@@ -82,6 +83,7 @@ public class ModelPersistence {
 		flush();
 	}
 
+	@QtThread
 	public void flush() {
 		for (final Entry<String, QMLThreadPersistanceTask> entry : taskMap.entrySet()) {
 			entry.getValue().finishImmediately();
