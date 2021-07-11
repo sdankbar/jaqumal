@@ -222,4 +222,6 @@ public interface JQMLModelFactory {
 	boolean restoreModel(final JQMLListModel<?> model);
 
 	boolean restoreModel(final JQMLTableModel<?> model);
+
+	void flushPersistence();
 }

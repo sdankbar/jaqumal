@@ -244,4 +244,9 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		return false;
 	}
 
+	@Override
+	public void flushPersistence() {
+		// TODO Auto-generated method stub
+	}
+
 }

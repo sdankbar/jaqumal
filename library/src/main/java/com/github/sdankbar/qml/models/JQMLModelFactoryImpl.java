@@ -281,4 +281,9 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		return persistence.restoreModel(model);
 	}
 
+	@Override
+	public void flushPersistence() {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.flush();
+	}
 }
