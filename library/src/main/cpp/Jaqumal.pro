@@ -44,6 +44,7 @@ win32 {
 }
 
 SOURCES += \
+    impl/dashedrectangle.cpp \
     impl/eventlogger.cpp \
     impl/applicationfunctions.cpp \
     impl/eventfunctions.cpp \
@@ -66,6 +67,7 @@ SOURCES += \
     impl/keyeventpreprocessor.cpp
 
 HEADERS += \
+    include/dashedrectangle.h \
     include/eventlogger.h \
     include/applicationfunctions.h \
     include/eventfunctions.h \
