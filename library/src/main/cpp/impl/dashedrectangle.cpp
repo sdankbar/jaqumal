@@ -27,7 +27,7 @@ DashedRectangle::DashedRectangle(QQuickItem* parent) :
     QQuickPaintedItem(parent),
     m_stroke(QColor(), 1, Qt::SolidLine, Qt::SquareCap)
 {
-   // Empty Implementation
+   m_stroke.setJoinStyle(Qt::MiterJoin);
 }
 
 DashedRectangle::~DashedRectangle()
@@ -38,7 +38,17 @@ DashedRectangle::~DashedRectangle()
 void DashedRectangle::paint(QPainter* painter)
 {
     painter->setPen(m_stroke);
-    painter->drawRect(0, 0, width(), height());
+    // width = 1, offset = 0
+    // width = 2, offset = 1
+    // width = 3, offset = 1
+    // width = 4, offset = 2
+    const qint32 topLeftOffset = m_stroke.width() / 2;
+    // width = 1, offset = 1
+    // width = 2, offset = 2
+    // width = 3, offset = 3
+    // width = 4, offset = 4
+    const qint32 bottomRightOffset = m_stroke.width();
+    painter->drawRect(topLeftOffset, topLeftOffset, width() - bottomRightOffset, height() - bottomRightOffset);
 }
 
 QColor DashedRectangle::strokeColor() const
