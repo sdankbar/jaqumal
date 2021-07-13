@@ -110,6 +110,38 @@ public class ModelPersistenceTest {
 	 *
 	 */
 	@Test
+	public void test_flush() throws InterruptedException, IOException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLSingletonModel<Roles> model1 = app.getModelFactory().createSingletonModel("other",
+				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model2 = app.getModelFactory().createSingletonModel("other_2",
+				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		app.getModelFactory().enablePersistence(Duration.ofSeconds(3), new File("persistenceTest"));
+		app.getModelFactory().enableAutoPersistenceForModel(model1);
+		app.getModelFactory().enableAutoPersistenceForModel(model2);
+
+		model1.put(Roles.R1, new JVariant(1));
+		model1.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
+
+		model2.put(Roles.R1, new JVariant(2));
+		model2.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
+
+		Thread.sleep(SLEEP);
+
+		assertFalse(new File("persistenceTest/other.json").exists());
+		assertFalse(new File("persistenceTest/other_2.json").exists());
+		app.getModelFactory().flushPersistence();
+		assertTrue(new File("persistenceTest/other.json").exists());
+		assertTrue(new File("persistenceTest/other_2.json").exists());
+	}
+
+	/**
+	 * @throws InterruptedException
+	 * @throws IOException
+	 *
+	 */
+	@Test
 	public void test_writeData_singleton() throws InterruptedException, IOException {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());

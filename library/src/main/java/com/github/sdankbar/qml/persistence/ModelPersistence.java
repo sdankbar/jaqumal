@@ -44,6 +44,7 @@ import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 public class ModelPersistence {
 
@@ -85,8 +86,8 @@ public class ModelPersistence {
 
 	@QtThread
 	public void flush() {
-		for (final Entry<String, QMLThreadPersistanceTask> entry : taskMap.entrySet()) {
-			entry.getValue().finishImmediately();
+		for (final QMLThreadPersistanceTask task : ImmutableList.copyOf(taskMap.values())) {
+			task.finishImmediately();
 		}
 		taskMap.clear();
 	}
