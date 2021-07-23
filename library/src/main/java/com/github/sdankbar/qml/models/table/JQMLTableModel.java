@@ -25,6 +25,7 @@ package com.github.sdankbar.qml.models.table;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -98,4 +99,6 @@ public interface JQMLTableModel<K> {
 	int getRowCount();
 
 	int getColumnCount();
+
+	void assign(int rows, int columns, List<Map<K, JVariant>> list);
 }

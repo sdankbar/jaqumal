@@ -25,6 +25,7 @@ package com.github.sdankbar.qml.models.table;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -245,5 +246,16 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 
 		putRootValue("row_count", new JVariant(rowCount));
 		putRootValue("column_count", new JVariant(columnCount));
+	}
+
+	@Override
+	public void assign(final int rows, final int columns, final List<Map<K, JVariant>> list) {
+		Objects.requireNonNull(list, "list is null");
+		Preconditions.checkArgument(rows * columns == list.size(), "list length does not equal rows * columns");
+
+		listModel.assign(list);
+		rowCount = rows;
+		columnCount = columns;
+		updateIndices();
 	}
 }
