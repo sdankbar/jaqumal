@@ -22,6 +22,10 @@
  */
 package com.github.sdankbar.examples.table_view;
 
+import java.io.File;
+
+import javax.imageio.ImageIO;
+
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -70,6 +74,8 @@ public class App {
 						JVariant.valueOf(r == 1 && c == 2), TableRole.delegate, getDelegate(c)));
 			}
 		}
+
+		app.setWindowIcon(ImageIO.read(new File("./icon.png")));
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 

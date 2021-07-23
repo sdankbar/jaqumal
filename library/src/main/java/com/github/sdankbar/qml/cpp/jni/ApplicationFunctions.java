@@ -22,6 +22,8 @@
  */
 package com.github.sdankbar.qml.cpp.jni;
 
+import java.awt.image.BufferedImage;
+
 import com.github.sdankbar.qml.JScreen;
 import com.github.sdankbar.qml.cpp.jni.interfaces.ImageProviderCallback;
 import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
@@ -127,5 +129,7 @@ public final class ApplicationFunctions {
 	 *                 InvokeCallback object is not garbage collected.
 	 */
 	public static native void invoke(final InvokeCallback callback);
+
+	public static native void setWindowsIcon(BufferedImage icon);
 
 }

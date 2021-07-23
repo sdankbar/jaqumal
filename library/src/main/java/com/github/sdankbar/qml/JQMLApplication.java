@@ -22,6 +22,7 @@
  */
 package com.github.sdankbar.qml;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
@@ -353,6 +354,7 @@ public class JQMLApplication<EType> {
 	 */
 	@QtThread
 	public void registerImageProvider(final JQMLImageProvider provider, final String providerID) {
+		verifyEventLoopThread();
 		imageProviders.add(new JQMLImageProviderWrapper(providerID, provider));
 	}
 
@@ -374,16 +376,25 @@ public class JQMLApplication<EType> {
 	 */
 	@QtThread
 	public ImmutableList<JScreen> screens() {
+		verifyEventLoopThread();
 		return ImmutableList.copyOf(ApplicationFunctions.getScreens());
 	}
 
 	@QtThread
 	public void enableEventLogging() {
+		verifyEventLoopThread();
 		ApplicationFunctions.enableEventLogging();
 	}
 
 	private void verifyEventLoopThread() {
 		JQMLUtilities.checkThread(eventLoopThread);
+	}
+
+	@QtThread
+	public void setWindowIcon(final BufferedImage i) {
+		verifyEventLoopThread();
+		Objects.requireNonNull(i, "i is null");
+		ApplicationFunctions.setWindowsIcon(i);
 	}
 
 }

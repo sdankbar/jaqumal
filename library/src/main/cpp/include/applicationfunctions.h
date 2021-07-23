@@ -54,6 +54,7 @@ public:
     void setLoggingObject(jobject callbackObject);
     void createEventLogger();
     void addImageProviderObject(const QString& id, jobject javaImageProviderCallback);
+    void setWindowIcon(const QIcon& icon);
     QList<QScreen*> getScreensList();
     jobjectArray createJScreenArray(JNIEnv* env, int32_t length);
     jobject createJScreen(JNIEnv* env, int32_t x, int32_t y, int32_t w, int32_t h, double dpi);
@@ -68,14 +69,14 @@ public:
     }
 
     Q_INVOKABLE QVariant lookup(const QString& objectName) const;
+
+    QImage toQImage(JNIEnv* env, jobject bufferedImage);
 public slots:
     void invokeCallback(JNIEnv* env, jobject c);
 
 private:
     ApplicationFunctions(int32_t& argc, char** argv);
     ~ApplicationFunctions();
-
-    QImage toQImage(JNIEnv* env, jobject bufferedImage);
 
     static ApplicationFunctions* SINGLETON;
     static jclass loggingCallback;

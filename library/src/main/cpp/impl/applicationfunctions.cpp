@@ -205,6 +205,15 @@ JNICALL void enableEventLogging(JNIEnv* env, jclass)
     }
 }
 
+JNICALL void setWindowsIcon(JNIEnv* env, jclass, jobject jImage)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        QImage i = ApplicationFunctions::get()->toQImage(env, jImage);
+        ApplicationFunctions::get()->setWindowIcon(QIcon(QPixmap::fromImage(i)));
+    }
+}
+
 void ApplicationFunctions::create(int* argc, char** argv)
 {
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
@@ -302,7 +311,8 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("addImageProvider",    "(Ljava/lang/String;Lcom/github/sdankbar/qml/cpp/jni/interfaces/ImageProviderCallback;)V",    (void *)&addImageProvider),
         JNIUtilities::createJNIMethod("getScreens",    "()[Lcom/github/sdankbar/qml/JScreen;",    (void *)&getScreens),
         JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
-        JNIUtilities::createJNIMethod("enableEventLogging", "()V", (void *)&enableEventLogging)
+        JNIUtilities::createJNIMethod("enableEventLogging", "()V", (void *)&enableEventLogging),
+        JNIUtilities::createJNIMethod("setWindowsIcon", "(Ljava/awt/image/BufferedImage;)V", (void *)&setWindowsIcon),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
@@ -428,6 +438,11 @@ void ApplicationFunctions::addImageProviderObject(const QString& id, jobject jav
 {
     m_qmlEngine->addImageProvider(
                 id, new QMLImageProvider(createImageProviderFunctionCallback(mainEnv, javaImageProviderCallback)));
+}
+
+void ApplicationFunctions::setWindowIcon(const QIcon& icon)
+{
+    m_qapp->setWindowIcon(icon);
 }
 
 QList<QScreen*> ApplicationFunctions::getScreensList()
