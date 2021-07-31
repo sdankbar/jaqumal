@@ -249,4 +249,42 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public void enableAutoPersistenceForModel(final JQMLListModel<?> model,
+			final ImmutableSet<String> rootKeysToPersist) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void enableAutoPersistenceForModel(final JQMLTableModel<?> model,
+			final ImmutableSet<String> rootKeysToPersist) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void persistModel(final JQMLListModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void persistModel(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean restoreModel(final JQMLListModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean restoreModel(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

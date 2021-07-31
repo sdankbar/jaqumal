@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 
 public class QMLThreadPersistanceTask implements Runnable {
@@ -49,6 +50,8 @@ public class QMLThreadPersistanceTask implements Runnable {
 	private final JQMLListModel<?> listModel;
 	private final JQMLTableModel<?> tableModel;
 
+	private final ImmutableSet<String> rootKeysToPersist;
+
 	private ScheduledFuture<?> qtThreadFuture = null;
 
 	private boolean isRunning = false;
@@ -58,6 +61,7 @@ public class QMLThreadPersistanceTask implements Runnable {
 		this.persistenceDirectory = Objects.requireNonNull(persistenceDirectory, "persistenceDirectory is null");
 		this.scheduled = Objects.requireNonNull(scheduled, "scheduled is null");
 		this.singletonModel = Objects.requireNonNull(singletonModel, "singletonModel is null");
+		rootKeysToPersist = ImmutableSet.of();
 		listModel = null;
 		tableModel = null;
 
@@ -65,23 +69,25 @@ public class QMLThreadPersistanceTask implements Runnable {
 	}
 
 	public QMLThreadPersistanceTask(final File persistenceDirectory, final JQMLListModel<?> listModel,
-			final Map<String, QMLThreadPersistanceTask> scheduled) {
+			final Map<String, QMLThreadPersistanceTask> scheduled, final ImmutableSet<String> rootKeysToPersist) {
 		this.persistenceDirectory = Objects.requireNonNull(persistenceDirectory, "persistenceDirectory is null");
 		this.scheduled = Objects.requireNonNull(scheduled, "scheduled is null");
 		singletonModel = null;
 		this.listModel = Objects.requireNonNull(listModel, "listModel is null");
 		tableModel = null;
+		this.rootKeysToPersist = Objects.requireNonNull(rootKeysToPersist, "rootKeysToPersist is null");
 
 		scheduled.put(listModel.getModelName(), this);
 	}
 
 	public QMLThreadPersistanceTask(final File persistenceDirectory, final JQMLTableModel<?> tableModel,
-			final Map<String, QMLThreadPersistanceTask> scheduled) {
+			final Map<String, QMLThreadPersistanceTask> scheduled, final ImmutableSet<String> rootKeysToPersist) {
 		this.persistenceDirectory = Objects.requireNonNull(persistenceDirectory, "persistenceDirectory is null");
 		this.scheduled = Objects.requireNonNull(scheduled, "scheduled is null");
 		singletonModel = null;
 		listModel = null;
 		this.tableModel = Objects.requireNonNull(tableModel, "listModel is null");
+		this.rootKeysToPersist = Objects.requireNonNull(rootKeysToPersist, "rootKeysToPersist is null");
 
 		scheduled.put(tableModel.getModelName(), this);
 	}
@@ -125,7 +131,7 @@ public class QMLThreadPersistanceTask implements Runnable {
 		scheduled.remove(model.getModelName());
 		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
-			model.serialize(stream, null);
+			model.serialize(stream, null, rootKeysToPersist);
 			saveModel(model.getModelName(), stream.toByteArray());
 		} catch (final IOException e) {
 			log.warn("Failed to persist " + model.getModelName(), e);
@@ -136,7 +142,7 @@ public class QMLThreadPersistanceTask implements Runnable {
 		scheduled.remove(model.getModelName());
 		final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		try {
-			model.serialize(stream);
+			model.serialize(stream, rootKeysToPersist);
 			saveModel(model.getModelName(), stream.toByteArray());
 		} catch (final IOException e) {
 			log.warn("Failed to persist " + model.getModelName(), e);

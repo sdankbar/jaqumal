@@ -192,16 +192,16 @@ public class JQMLTableModelImpl<K> implements JQMLTableModel<K> {
 	}
 
 	@Override
-	public void serialize(final OutputStream stream) throws IOException {
+	public void serialize(final OutputStream stream, final ImmutableSet<String> rootKeysToPersist) throws IOException {
 		final JSONObject additional = new JSONObject();
 		additional.put("rows", rowCount);
 		additional.put("columns", columnCount);
-		listModel.serialize(stream, additional);
+		listModel.serialize(stream, additional, rootKeysToPersist);
 	}
 
 	@Override
-	public void deserialize(final InputStream stream) throws IOException {
-		final JSONObject obj = listModel.deserialize(stream);
+	public void deserialize(final InputStream stream, final ImmutableSet<String> rootKeysToPersist) throws IOException {
+		final JSONObject obj = listModel.deserialize(stream, rootKeysToPersist);
 		Objects.requireNonNull(obj, "Invalid data");
 		rowCount = obj.getInt("rows");
 		columnCount = obj.getInt("columns");

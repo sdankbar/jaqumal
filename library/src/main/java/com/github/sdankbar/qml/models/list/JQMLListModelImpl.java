@@ -53,6 +53,7 @@ import com.github.sdankbar.qml.models.AbstractJQMLModel;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A model that is available to QML. Represents a list of Maps from the key type
@@ -836,8 +837,18 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	}
 
 	@Override
-	public void serialize(final OutputStream stream, final JSONObject additionalJSON) throws IOException {
+	public void serialize(final OutputStream stream, final JSONObject additionalJSON,
+			final ImmutableSet<String> rootKeysToPersist) throws IOException {
 		final JSONObject root = new JSONObject();
+
+		final JSONObject rootValues = new JSONObject();
+		for (final String s : rootKeysToPersist) {
+			final Optional<JVariant> var = getRootValue(s);
+			if (var.isPresent()) {
+				rootValues.put(s, var.get().toJSON());
+			}
+		}
+		root.put("root", rootValues);
 
 		final JSONArray array = new JSONArray();
 		for (final Map<K, JVariant> map : this) {
@@ -857,10 +868,32 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 	}
 
 	@Override
-	public JSONObject deserialize(final InputStream stream) throws IOException {
+	public JSONObject deserialize(final InputStream stream, final ImmutableSet<String> rootKeysToPersist)
+			throws IOException {
 		final JSONTokener tokener = new JSONTokener(stream);
 		final JSONObject object = new JSONObject(tokener);
 		final JSONArray array = object.getJSONArray("list");
+
+		final JSONObject rootValues = object.optJSONObject("root");
+		if (rootValues != null) {
+			for (final String s : rootKeysToPersist) {
+				final JSONObject nullableObj = rootValues.optJSONObject(s);
+				if (nullableObj != null) {
+					final Optional<JVariant> opt = JVariant.fromJSON(nullableObj);
+					if (opt.isPresent()) {
+						putRootValue(s, opt.get());
+					} else {
+						removeRootValue(s);
+					}
+				} else {
+					removeRootValue(s);
+				}
+			}
+		} else {
+			for (final String s : rootKeysToPersist) {
+				removeRootValue(s);
+			}
+		}
 
 		final ImmutableList.Builder<Map<K, JVariant>> list = ImmutableList.builder();
 		for (int i = 0; i < array.length(); ++i) {

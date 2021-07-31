@@ -44,6 +44,7 @@ import com.github.sdankbar.qml.models.list.ListListener;
 import com.github.sdankbar.qml.models.list.SignalLock;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public class MockJQMLListModel<K> implements JQMLListModel<K> {
 
@@ -308,12 +309,14 @@ public class MockJQMLListModel<K> implements JQMLListModel<K> {
 	}
 
 	@Override
-	public void serialize(final OutputStream stream, final JSONObject obj) throws IOException {
+	public void serialize(final OutputStream stream, final JSONObject obj, final ImmutableSet<String> rootKeysToPersist)
+			throws IOException {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public JSONObject deserialize(final InputStream stream) throws IOException {
+	public JSONObject deserialize(final InputStream stream, final ImmutableSet<String> rootKeysToPersist)
+			throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}

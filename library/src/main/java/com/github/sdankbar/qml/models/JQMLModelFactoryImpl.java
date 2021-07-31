@@ -236,13 +236,27 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	@Override
 	public void enableAutoPersistenceForModel(final JQMLListModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		persistence.autoPersistModel(model);
+		persistence.autoPersistModel(model, ImmutableSet.of());
+	}
+
+	@Override
+	public void enableAutoPersistenceForModel(final JQMLListModel<?> model,
+			final ImmutableSet<String> rootKeysToPersist) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.autoPersistModel(model, rootKeysToPersist);
 	}
 
 	@Override
 	public void enableAutoPersistenceForModel(final JQMLTableModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		persistence.autoPersistModel(model);
+		persistence.autoPersistModel(model, ImmutableSet.of());
+	}
+
+	@Override
+	public void enableAutoPersistenceForModel(final JQMLTableModel<?> model,
+			final ImmutableSet<String> rootKeysToPersist) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.autoPersistModel(model, rootKeysToPersist);
 	}
 
 	@Override
@@ -254,13 +268,25 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	@Override
 	public void persistModel(final JQMLListModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		persistence.persistModel(model);
+		persistence.persistModel(model, ImmutableSet.of());
 	}
 
 	@Override
 	public void persistModel(final JQMLTableModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		persistence.persistModel(model);
+		persistence.persistModel(model, ImmutableSet.of());
+	}
+
+	@Override
+	public void persistModel(final JQMLListModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.persistModel(model, rootKeysToPersist);
+	}
+
+	@Override
+	public void persistModel(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		persistence.persistModel(model, rootKeysToPersist);
 	}
 
 	@Override
@@ -272,13 +298,25 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	@Override
 	public boolean restoreModel(final JQMLListModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		return persistence.restoreModel(model);
+		return persistence.restoreModel(model, ImmutableSet.of());
 	}
 
 	@Override
 	public boolean restoreModel(final JQMLTableModel<?> model) {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
-		return persistence.restoreModel(model);
+		return persistence.restoreModel(model, ImmutableSet.of());
+	}
+
+	@Override
+	public boolean restoreModel(final JQMLListModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		return persistence.restoreModel(model, rootKeysToPersist);
+	}
+
+	@Override
+	public boolean restoreModel(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
+		return persistence.restoreModel(model, rootKeysToPersist);
 	}
 
 	@Override

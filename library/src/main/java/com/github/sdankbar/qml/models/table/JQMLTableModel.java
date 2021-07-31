@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.github.sdankbar.qml.JVariant;
+import com.google.common.collect.ImmutableSet;
 
 public interface JQMLTableModel<K> {
 
@@ -81,9 +82,9 @@ public interface JQMLTableModel<K> {
 
 	void setData(final int row, int column, final Map<K, JVariant> data);
 
-	void serialize(OutputStream stream) throws IOException;
+	void serialize(OutputStream stream, ImmutableSet<String> rootKeysToPersist) throws IOException;
 
-	void deserialize(InputStream stream) throws IOException;
+	void deserialize(InputStream stream, ImmutableSet<String> rootKeysToPersist) throws IOException;
 
 	/**
 	 * Register to receive callbacks when any part of the model changes, ex. add,

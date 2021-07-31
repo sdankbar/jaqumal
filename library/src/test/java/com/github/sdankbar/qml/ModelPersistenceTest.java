@@ -48,6 +48,7 @@ import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Tests the DelayedMap class.
@@ -236,7 +237,7 @@ public class ModelPersistenceTest {
 		assertTrue(new File("persistenceTest/other2.json").exists());
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other2.json"));
 
-		assertEquals(lines.size(), 22);
+		assertEquals(lines.size(), 25);
 
 		app.getModelFactory().restoreModel(model);
 
@@ -256,7 +257,7 @@ public class ModelPersistenceTest {
 				PutMode.RETURN_PREVIOUS_VALUE);
 
 		app.getModelFactory().enablePersistence(Duration.ZERO, new File("persistenceTest"));
-		app.getModelFactory().enableAutoPersistenceForModel(model);
+		app.getModelFactory().enableAutoPersistenceForModel(model, ImmutableSet.of("rootTest"));
 
 		{
 			final ImmutableMap.Builder<Roles, JVariant> data = ImmutableMap.builder();
@@ -277,14 +278,16 @@ public class ModelPersistenceTest {
 		model.get(0).put(Roles.R1, new JVariant(42));
 		model.get(1).put(Roles.R5, new JVariant("ABC"));
 
+		model.putRootValue("rootTest", new JVariant("rootValue"));
+
 		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/other3.json").exists());
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other3.json"));
 
-		assertEquals(lines.size(), 26);
+		assertEquals(lines.size(), 32);
 
-		app.getModelFactory().restoreModel(model);
+		app.getModelFactory().restoreModel(model, ImmutableSet.of("rootTest"));
 
 		assertEquals(model.get(0).get(Roles.R1), new JVariant(42));
 		assertEquals(model.get(0).get(Roles.R5), new JVariant(5));
@@ -292,6 +295,8 @@ public class ModelPersistenceTest {
 		assertEquals(model.get(1).get(Roles.R2), new JVariant(2));
 		assertEquals(model.get(1).get(Roles.R4), new JVariant(4));
 		assertEquals(model.get(1).get(Roles.R5), new JVariant("ABC"));
+
+		assertEquals("rootValue", model.getRootValue("rootTest").get().asString());
 	}
 
 	/**
@@ -383,7 +388,7 @@ public class ModelPersistenceTest {
 		assertTrue(new File("persistenceTest/table1.json").exists());
 		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "table1.json"));
 
-		assertEquals(lines.size(), 144);
+		assertEquals(lines.size(), 145);
 
 		app.getModelFactory().restoreModel(model);
 

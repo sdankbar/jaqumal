@@ -211,17 +211,29 @@ public interface JQMLModelFactory {
 
 	void enableAutoPersistenceForModel(final JQMLTableModel<?> model);
 
+	void enableAutoPersistenceForModel(final JQMLListModel<?> model, ImmutableSet<String> rootKeysToPersist);
+
+	void enableAutoPersistenceForModel(final JQMLTableModel<?> model, ImmutableSet<String> rootKeysToPersist);
+
 	void persistModel(final JQMLSingletonModel<?> model);
 
 	void persistModel(final JQMLListModel<?> model);
 
 	void persistModel(final JQMLTableModel<?> model);
 
+	void persistModel(final JQMLListModel<?> model, ImmutableSet<String> rootKeysToPersist);
+
+	void persistModel(final JQMLTableModel<?> model, ImmutableSet<String> rootKeysToPersist);
+
 	boolean restoreModel(final JQMLSingletonModel<?> model);
 
 	boolean restoreModel(final JQMLListModel<?> model);
 
 	boolean restoreModel(final JQMLTableModel<?> model);
+
+	boolean restoreModel(final JQMLListModel<?> model, ImmutableSet<String> rootKeysToPersist);
+
+	boolean restoreModel(final JQMLTableModel<?> model, ImmutableSet<String> rootKeysToPersist);
 
 	void flushPersistence();
 }

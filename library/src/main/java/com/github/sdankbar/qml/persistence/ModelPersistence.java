@@ -45,6 +45,7 @@ import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 public class ModelPersistence {
 
@@ -100,15 +101,15 @@ public class ModelPersistence {
 	}
 
 	@QtThread
-	public <K> void autoPersistModel(final JQMLListModel<K> model) {
-		final Runnable l = () -> scheduleSave(model);
+	public <K> void autoPersistModel(final JQMLListModel<K> model, final ImmutableSet<String> rootKeysToPersist) {
+		final Runnable l = () -> scheduleSave(model, rootKeysToPersist);
 		autoPersistedListModels.put(model, l);
 		model.registerModelChangedListener(l);
 	}
 
 	@QtThread
-	public <K> void autoPersistModel(final JQMLTableModel<K> model) {
-		final Runnable l = () -> scheduleSave(model);
+	public <K> void autoPersistModel(final JQMLTableModel<K> model, final ImmutableSet<String> rootKeysToPersist) {
+		final Runnable l = () -> scheduleSave(model, rootKeysToPersist);
 		autoPersistedTableModels.put(model, l);
 		model.registerModelChangedListener(l);
 	}
@@ -120,14 +121,16 @@ public class ModelPersistence {
 	}
 
 	@QtThread
-	public void persistModel(final JQMLListModel<?> model) {
-		final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap);
+	public void persistModel(final JQMLListModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap,
+				rootKeysToPersist);
 		task.run();
 	}
 
 	@QtThread
-	public void persistModel(final JQMLTableModel<?> model) {
-		final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap);
+	public void persistModel(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
+		final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap,
+				rootKeysToPersist);
 		task.run();
 	}
 
@@ -143,9 +146,9 @@ public class ModelPersistence {
 	}
 
 	@QtThread
-	public boolean restoreModel(final JQMLListModel<?> model) {
+	public boolean restoreModel(final JQMLListModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
 		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
-			model.deserialize(s);
+			model.deserialize(s, rootKeysToPersist);
 			return true;
 		} catch (final IOException e) {
 			log.info("No data restored to " + model.getModelName(), e);
@@ -154,9 +157,9 @@ public class ModelPersistence {
 	}
 
 	@QtThread
-	public boolean restoreModel(final JQMLTableModel<?> model) {
+	public boolean restoreModel(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
 		try (FileInputStream s = new FileInputStream(new File(persistenceDirectory, model.getModelName() + ".json"))) {
-			model.deserialize(s);
+			model.deserialize(s, rootKeysToPersist);
 			return true;
 		} catch (final IOException e) {
 			log.info("No data restored to " + model.getModelName(), e);
@@ -178,10 +181,11 @@ public class ModelPersistence {
 		}
 	}
 
-	private void scheduleSave(final JQMLListModel<?> model) {
+	private void scheduleSave(final JQMLListModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
 		final String name = model.getModelName();
 		if (!taskMap.containsKey(name)) {
-			final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap);
+			final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap,
+					rootKeysToPersist);
 
 			if (writeDelay.isZero()) {
 				task.run();
@@ -192,10 +196,11 @@ public class ModelPersistence {
 		}
 	}
 
-	private void scheduleSave(final JQMLTableModel<?> model) {
+	private void scheduleSave(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
 		final String name = model.getModelName();
 		if (!taskMap.containsKey(name)) {
-			final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap);
+			final QMLThreadPersistanceTask task = new QMLThreadPersistanceTask(persistenceDirectory, model, taskMap,
+					rootKeysToPersist);
 
 			if (writeDelay.isZero()) {
 				task.run();

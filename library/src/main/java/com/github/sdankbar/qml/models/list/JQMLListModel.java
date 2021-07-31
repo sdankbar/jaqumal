@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import com.github.sdankbar.qml.JVariant;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A model that is available to QML. Represents a list of Maps from the key type
@@ -224,9 +225,10 @@ public interface JQMLListModel<K> extends List<Map<K, JVariant>> {
 
 	void swap(int source, int destination);
 
-	void serialize(OutputStream stream, JSONObject additionalJSON) throws IOException;
+	void serialize(OutputStream stream, JSONObject additionalJSON, ImmutableSet<String> rootKeysToPersist)
+			throws IOException;
 
-	JSONObject deserialize(InputStream stream) throws IOException;
+	JSONObject deserialize(InputStream stream, ImmutableSet<String> rootKeysToPersist) throws IOException;
 
 	/**
 	 * Register to receive callbacks when any part of the model changes, ex. add,
