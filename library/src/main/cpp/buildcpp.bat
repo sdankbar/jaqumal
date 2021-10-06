@@ -21,8 +21,8 @@ Rem OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 Rem THE SOFTWARE.
 Rem
 
-qmake -v
-qmake ./Jaqumal.pro -spec win32-g++
-mingw32-make qmake_all
-mingw32-make -j
-copy libs\Jaqumal.dll ..\resources\win32-x86-64
+qmake -v || exit 1
+qmake ./Jaqumal.pro -spec win32-g++ || exit 1
+mingw32-make qmake_all || exit 1
+mingw32-make -j || exit 1
+copy libs\Jaqumal.dll ..\resources\win32-x86-64 || exit 1
