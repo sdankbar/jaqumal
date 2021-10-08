@@ -34,6 +34,7 @@ class EventLogger;
 class ApplicationFunctions : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(const QVariantMap& modelMap READ modelMap NOTIFY modelMapChanged)
 public:
     static void initialize(JNIEnv* env);
     static void uninitialize(JNIEnv* env);
@@ -70,7 +71,13 @@ public:
 
     Q_INVOKABLE QVariant lookup(const QString& objectName) const;
 
+    const QVariantMap& modelMap() const;
+
     QImage toQImage(JNIEnv* env, jobject bufferedImage);
+
+signals:
+    void modelMapChanged();
+
 public slots:
     void invokeCallback(JNIEnv* env, jobject c);
 
@@ -98,7 +105,7 @@ private:
     UserInputSimulator m_uiSim;
     QMLLogging m_logging;
     EventLogger* m_eventLogger;
-    QVariantHash m_objectLookupMap;
+    QVariantMap m_objectLookupMap;
 };
 
 

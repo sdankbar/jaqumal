@@ -530,10 +530,16 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
 void ApplicationFunctions::addToContext(const QString& name, const QVariant& value)
 {
     m_objectLookupMap.insert(name, value);
+    emit modelMapChanged();
     m_qmlEngine->rootContext()->setContextProperty(name, value);
 }
 
 QVariant ApplicationFunctions::lookup(const QString& objectName) const
 {
     return m_objectLookupMap.value(objectName);
+}
+
+const QVariantMap& ApplicationFunctions::modelMap() const
+{
+    return m_objectLookupMap;
 }
