@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.cpp.jni.data_transfer.QMLDataTransfer;
 import com.github.sdankbar.qml.fonts.JFont;
+import com.github.sdankbar.qml.painting.PainterInstructions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -210,6 +211,10 @@ public class JVariant {
 		 */
 		POLYLINE,
 		/**
+		 *
+		 */
+		PAINTER_INSTRUCTIONS,
+		/**
 		 * User defined type.
 		 */
 		CUSTOM
@@ -329,6 +334,13 @@ public class JVariant {
 	@SuppressWarnings("unused")
 	private static JVariant fromUUID(final String str) {
 		return new JVariant(UUID.fromString(str));
+	}
+
+	// Used by JNI
+	@SuppressWarnings("unused")
+	private static JVariant fromPainterInstructions(final byte[] data) {
+		// TODO
+		return null;
 	}
 
 	// Used by JNI
@@ -471,6 +483,10 @@ public class JVariant {
 				b.add(new Point2D.Double(sub.getDouble("x"), sub.getDouble("y")));
 			}
 			return Optional.of(new JVariant(b.build()));
+		}
+		case PAINTER_INSTRUCTIONS: {
+			// TODO
+			return Optional.empty();
 		}
 		case CUSTOM:
 		default:
@@ -721,6 +737,16 @@ public class JVariant {
 	 */
 	public JVariant(final UUID v) {
 		type = Type.UUID;
+		obj = Objects.requireNonNull(v, "v is null");
+	}
+
+	/**
+	 * Constructs a new JVariant from a PainterInstructions.
+	 *
+	 * @param v The variant's value.
+	 */
+	public JVariant(final PainterInstructions v) {
+		type = Type.PAINTER_INSTRUCTIONS;
 		obj = Objects.requireNonNull(v, "v is null");
 	}
 
@@ -1116,6 +1142,29 @@ public class JVariant {
 	}
 
 	/**
+	 * @return The JVariant's value as a PainterInstructions.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not
+	 *                                  PAINTER_INSTRUCTIONS
+	 */
+	public PainterInstructions asPainterInstructions() {
+		Preconditions.checkArgument(type == Type.PAINTER_INSTRUCTIONS, "Wrong type, type is {}", type);
+		return (PainterInstructions) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a STRING
+	 * @return The JVariant's value as a String or the defaultValue if not the
+	 *         correct type.
+	 */
+	public PainterInstructions asPainterInstructions(final PainterInstructions defaultValue) {
+		if (type == Type.PAINTER_INSTRUCTIONS) {
+			return (PainterInstructions) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * @return The JVariant's value as a Storable.
 	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not CUSTOM
 	 */
@@ -1370,6 +1419,10 @@ public class JVariant {
 			QMLDataTransfer.setPolyline(list.size(), array, role);
 			break;
 		}
+		case PAINTER_INSTRUCTIONS: {
+			// TODO
+			break;
+		}
 		case CUSTOM: {
 			((Storable) obj).store(role);
 			break;
@@ -1526,6 +1579,10 @@ public class JVariant {
 				array.put(sub);
 			}
 			json.put("value", array);
+			break;
+		}
+		case PAINTER_INSTRUCTIONS: {
+			// TODO
 			break;
 		}
 		case CUSTOM: {
