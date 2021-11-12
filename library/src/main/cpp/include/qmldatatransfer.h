@@ -99,6 +99,7 @@ private:
     static jmethodID fromRectangleMethod;
     static jmethodID fromURLMethod;
     static jmethodID fromUUIDMethod;
+    static jmethodID fromPainterInstructions;
     static jmethodID fromStorableMethod;
 
     static jmethodID booleanConstructor;

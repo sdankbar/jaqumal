@@ -34,12 +34,15 @@
 #include <QFont>
 
 #include "jniutilities.h"
+#include "painterinstructions.h"
 #include <iostream>
 
 namespace
 {
 const std::size_t MAX_SIZE = 1024;
 }
+
+Q_DECLARE_METATYPE(PainterInstructions);
 
 void QMLDataTransfer_Store(const QVariant& var, int32_t role)
 {
@@ -179,6 +182,18 @@ JNICALL void setPolyline(JNIEnv* env, jclass, jint length, jdoubleArray data, ji
     env->ReleaseDoubleArrayElements(data, array, JNI_ABORT);
 }
 
+JNICALL void setPainterInstructions(JNIEnv* env, jclass, jint length, jbyteArray data, jint roleIndex)
+{
+    jbyte* array = env->GetByteArrayElements(data, NULL);
+
+    unsigned char* copy = new unsigned char[length];
+    memcpy(copy, array, length);
+    PainterInstructions instr(length, copy);
+    QMLDataTransfer::storeRef(instr, roleIndex);
+
+    env->ReleaseByteArrayElements(data, array, JNI_ABORT);
+}
+
 std::function<jobject(JNIEnv*, jclass, jmethodID, const QVariant&)> QMLDataTransfer::toJVariantFunc;
 std::vector<QVariant> QMLDataTransfer::variants;
 QVector<int32_t> QMLDataTransfer::roleStack;
@@ -197,6 +212,7 @@ jmethodID QMLDataTransfer::fromPointMethod;
 jmethodID QMLDataTransfer::fromRectangleMethod;
 jmethodID QMLDataTransfer::fromURLMethod;
 jmethodID QMLDataTransfer::fromUUIDMethod;
+jmethodID QMLDataTransfer::fromPainterInstructions;
 jmethodID QMLDataTransfer::fromStorableMethod;
 
 jmethodID QMLDataTransfer::booleanConstructor;
@@ -226,6 +242,7 @@ void QMLDataTransfer::initialize(JNIEnv* env)
     fromRectangleMethod = env->GetStaticMethodID(jvariantClass, "fromRectangle", "(IIII)Lcom/github/sdankbar/qml/JVariant;");
     fromURLMethod = env->GetStaticMethodID(jvariantClass, "fromURL", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
     fromUUIDMethod = env->GetStaticMethodID(jvariantClass, "fromUUID", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
+    fromPainterInstructions = env->GetStaticMethodID(jvariantClass, "fromPainterInstructions", "([B)Lcom/github/sdankbar/qml/JVariant;");
     fromStorableMethod = env->GetStaticMethodID(jvariantClass, "fromStorable",
                                                 "(Lcom/github/sdankbar/qml/JVariant$Storable;)Lcom/github/sdankbar/qml/JVariant;");
 
@@ -257,6 +274,7 @@ void QMLDataTransfer::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("setImage",    "(II[BI)V",    (void *)&setImage),
         JNIUtilities::createJNIMethod("setFont",    "(II)V",    (void *)&setFont),
         JNIUtilities::createJNIMethod("setPolyline",    "(I[DI)V",    (void *)&setPolyline),
+        JNIUtilities::createJNIMethod("setPainterInstructions",    "(I[BI)V",    (void *)&setPainterInstructions),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/data_transfer/QMLDataTransfer");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
@@ -367,7 +385,13 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
         return env->CallStaticObjectMethod(jvariantClass, fromJFontMethod, jStr);
     }
     default:
-        if (value.canConvert<QPolygonF>())
+        if (value.canConvert<PainterInstructions>())
+        {
+            const PainterInstructions p = value.value<PainterInstructions>();
+            jbyteArray data = p.cloneIntoJavaArray(env);
+            return env->CallStaticObjectMethod(jvariantClass, fromPainterInstructions, data);
+        }
+        else if (value.canConvert<QPolygonF>())
         {
             const QPolygonF p = value.value<QPolygonF>();
             jdoubleArray xArrayObj = env->NewDoubleArray(p.size());

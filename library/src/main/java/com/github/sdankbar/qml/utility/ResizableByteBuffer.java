@@ -34,18 +34,17 @@ public class ResizableByteBuffer {
 	private ByteBuffer b;
 
 	public ResizableByteBuffer() {
-		b = ByteBuffer.allocateDirect(1024).order(ByteOrder.nativeOrder());
+		b = ByteBuffer.allocate(1024).order(ByteOrder.nativeOrder());
 	}
 
 	public ResizableByteBuffer(final int initialSize) {
-		b = ByteBuffer.allocateDirect(initialSize).order(ByteOrder.nativeOrder());
+		b = ByteBuffer.allocate(initialSize).order(ByteOrder.nativeOrder());
 	}
 
 	private void checkSize(final int increment) {
 		// 0 + 4 > 4
-		if (b.position() + increment > b.capacity()) {
-			b.capacity();
-			final ByteBuffer temp = ByteBuffer.allocateDirect(2 * b.capacity()).order(ByteOrder.nativeOrder());
+		if ((b.position() + increment) > b.capacity()) {
+			final ByteBuffer temp = ByteBuffer.allocate(2 * b.capacity()).order(ByteOrder.nativeOrder());
 			System.arraycopy(b.array(), 0, temp.array(), 0, b.capacity());
 			b = temp;
 		}

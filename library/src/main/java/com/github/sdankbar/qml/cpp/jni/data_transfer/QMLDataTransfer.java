@@ -64,4 +64,6 @@ public class QMLDataTransfer {
 	public static native void setFont(int fontIndex, int roleIndex);
 
 	public static native void setPolyline(int length, double[] data, int roleIndex);
+
+	public static native void setPainterInstructions(int length, byte[] data, int roleIndex);
 }

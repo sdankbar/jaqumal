@@ -54,6 +54,7 @@ SOURCES += \
     impl/invokebuilder.cpp \
     impl/invoketarget.cpp \
     impl/listmodelfunctions.cpp \
+    impl/painterinstructions.cpp \
     impl/qmllogging.cpp \
     impl/eventdispatcher.cpp \
     impl/requestbuilder.cpp \
@@ -77,6 +78,7 @@ HEADERS += \
     include/invoketarget.h \
     include/jniutilities.h \
     include/listmodelfunctions.h \
+    include/painterinstructions.h \
     include/qmldatatransfer.h \
     include/eventbuilder.h \
     include/qmllogging.h \

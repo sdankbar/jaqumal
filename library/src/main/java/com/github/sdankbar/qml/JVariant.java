@@ -339,8 +339,7 @@ public class JVariant {
 	// Used by JNI
 	@SuppressWarnings("unused")
 	private static JVariant fromPainterInstructions(final byte[] data) {
-		// TODO
-		return null;
+		return new JVariant(new PainterInstructions(data));
 	}
 
 	// Used by JNI
@@ -485,8 +484,12 @@ public class JVariant {
 			return Optional.of(new JVariant(b.build()));
 		}
 		case PAINTER_INSTRUCTIONS: {
-			// TODO
-			return Optional.empty();
+			final JSONArray array = json.getJSONArray("value");
+			final byte[] byteArray = new byte[array.length()];
+			for (int i = 0; i < byteArray.length; ++i) {
+				byteArray[i] = (byte) array.getInt(i);
+			}
+			return Optional.of(new JVariant(new PainterInstructions(byteArray)));
 		}
 		case CUSTOM:
 		default:
@@ -1420,7 +1423,8 @@ public class JVariant {
 			break;
 		}
 		case PAINTER_INSTRUCTIONS: {
-			// TODO
+			final byte[] array = ((PainterInstructions) obj).getArray();
+			QMLDataTransfer.setPainterInstructions(array.length, array, role);
 			break;
 		}
 		case CUSTOM: {
@@ -1582,7 +1586,9 @@ public class JVariant {
 			break;
 		}
 		case PAINTER_INSTRUCTIONS: {
-			// TODO
+			final PainterInstructions p = (PainterInstructions) obj;
+			final JSONArray array = byteArrayToJSONArray(p.getArray());
+			json.put("value", array);
 			break;
 		}
 		case CUSTOM: {

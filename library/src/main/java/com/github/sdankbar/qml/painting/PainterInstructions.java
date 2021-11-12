@@ -76,4 +76,8 @@ public class PainterInstructions {
 	public PainterInstructions(final byte[] data) {
 		this.data = Objects.requireNonNull(data, "data is null");
 	}
+
+	public byte[] getArray() {
+		return data;
+	}
 }
