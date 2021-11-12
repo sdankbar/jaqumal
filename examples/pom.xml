@@ -44,5 +44,6 @@
 		<module>table_view</module>
 		<module>throughput</module>
 		<module>new_type</module>
+		<module>painter</module>
 	</modules>
 </project>

@@ -59,7 +59,7 @@ public class App {
 
 		model.put(Roles.drawable, new JVariant(b.build()));
 
-		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
+		app.loadQMLFile("./src/main/qml/main.qml");
 
 		app.execute();
 	}

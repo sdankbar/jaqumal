@@ -40,5 +40,6 @@ Window {
    
     Painter {
        anchors.fill: parent
+       instructions: drawModel.drawable
     }
 }

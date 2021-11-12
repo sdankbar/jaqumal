@@ -269,7 +269,7 @@ PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsig
 {
     if (index + sizeof(jint) <= m_length) {
         unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        PainterFunctions func = *(PainterFunctions*)(ptr + index);
+        PainterFunctions func = *(PainterFunctions*)ptr;
         index += sizeof(jint);
         return func;
     } else {
@@ -280,7 +280,7 @@ unsigned char PainterInstructions::getByte(unsigned int& index)
 {
     if (index + sizeof(jbyte) <= m_length) {
         unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        unsigned char v = *(ptr + index);
+        unsigned char v = *ptr;
         index += sizeof(jbyte);
         return v;
     } else {
@@ -291,7 +291,7 @@ int32_t PainterInstructions::getInteger(unsigned int& index)
 {
     if (index + sizeof(jint) <= m_length) {
         unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        int32_t v = *(int32_t*)(ptr + index);
+        int32_t v = *(int32_t*)ptr;
         index += sizeof(jint);
         return v;
     } else {
@@ -302,7 +302,7 @@ double PainterInstructions::getDouble(unsigned int& index)
 {
     if (index + sizeof(jdouble) <= m_length) {
         unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        int32_t v = *(double*)(ptr + index);
+        int32_t v = *(double*)ptr;
         index += sizeof(jdouble);
         return v;
     } else {
@@ -315,7 +315,7 @@ QString PainterInstructions::getString(unsigned int& index)
     if (index + sizeof(jint) <= m_length) {
         int32_t length = getInteger(index);
         unsigned char* ptrTemp = static_cast<unsigned char*>(m_instructions.get());
-        char* ptr = (char*)(ptrTemp + index);
+        char* ptr = (char*)ptrTemp;
         QString str = QString::fromUtf8(ptr, length);
         index += length;
         return str;
