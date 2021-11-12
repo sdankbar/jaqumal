@@ -26,6 +26,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 
 import com.github.sdankbar.qml.fonts.JFont;
@@ -40,7 +42,18 @@ public class PainterInstructionsBuilder {
 
 	private final ResizableByteBuffer buffer = new ResizableByteBuffer();
 
-	void drawArc(final int x, final int y, final int width, final int height, final int startAngle,
+	private byte[] bufferedImageToArray(final BufferedImage image) {
+		final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+		final ByteBuffer b = ByteBuffer.allocate(4 * pixels.length);
+		b.order(ByteOrder.nativeOrder());
+		for (final int p : pixels) {
+			b.putInt(p);
+		}
+		final byte[] array = b.array();
+		return array;
+	}
+
+	public void drawArc(final int x, final int y, final int width, final int height, final int startAngle,
 			final int spanAngle) {
 		buffer.putInt(PainterFunction.drawArcInteger.ordinal());
 		buffer.putInt(x);
@@ -50,7 +63,7 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(spanAngle);
 	}
 
-	void drawChord(final int x, final int y, final int width, final int height, final int startAngle,
+	public void drawChord(final int x, final int y, final int width, final int height, final int startAngle,
 			final int spanAngle) {
 		buffer.putInt(PainterFunction.drawChordInteger.ordinal());
 		buffer.putInt(x);
@@ -61,7 +74,7 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(spanAngle);
 	}
 
-	void drawConvexPolygon(final List<Point> points) {
+	public void drawConvexPolygon(final List<Point> points) {
 		buffer.putInt(PainterFunction.drawConvexPolygonInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -70,7 +83,7 @@ public class PainterInstructionsBuilder {
 		}
 	}
 
-	void drawEllipse(final int x, final int y, final int width, final int height) {
+	public void drawEllipse(final int x, final int y, final int width, final int height) {
 		buffer.putInt(PainterFunction.drawEllipseInteger.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -78,11 +91,23 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(height);
 	}
 
-	void drawImage(final Rectangle target, final Rectangle source, final BufferedImage image) {
+	public void drawImage(final Rectangle target, final Rectangle source, final BufferedImage image) {
 		buffer.putInt(PainterFunction.drawImageInteger.ordinal());
+		buffer.putInt(target.x);
+		buffer.putInt(target.y);
+		buffer.putInt(target.width);
+		buffer.putInt(target.height);
+		buffer.putInt(source.x);
+		buffer.putInt(source.y);
+		buffer.putInt(source.width);
+		buffer.putInt(source.height);
+		final byte[] data = bufferedImageToArray(image);
+		buffer.putInt(image.getWidth());
+		buffer.putInt(image.getHeight());
+		buffer.putBytes(data);
 	}
 
-	void drawLine(final int x1, final int y1, final int x2, final int y2) {
+	public void drawLine(final int x1, final int y1, final int x2, final int y2) {
 		buffer.putInt(PainterFunction.drawLineInteger.ordinal());
 		buffer.putInt(x1);
 		buffer.putInt(y1);
@@ -90,7 +115,7 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(y2);
 	}
 
-	void drawLines(final List<Point> points) {
+	public void drawLines(final List<Point> points) {
 		buffer.putInt(PainterFunction.drawLinesInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -99,7 +124,7 @@ public class PainterInstructionsBuilder {
 		}
 	}
 
-	void drawPie(final int x, final int y, final int width, final int height, final int startAngle,
+	public void drawPie(final int x, final int y, final int width, final int height, final int startAngle,
 			final int spanAngle) {
 		buffer.putInt(PainterFunction.drawPieInteger.ordinal());
 		buffer.putInt(x);
@@ -110,13 +135,13 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(spanAngle);
 	}
 
-	void drawPoint(final int x, final int y) {
+	public void drawPoint(final int x, final int y) {
 		buffer.putInt(PainterFunction.drawPointInteger.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
 	}
 
-	void drawPoints(final List<Point> points) {
+	public void drawPoints(final List<Point> points) {
 		buffer.putInt(PainterFunction.drawPointsInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -125,7 +150,7 @@ public class PainterInstructionsBuilder {
 		}
 	}
 
-	void drawPolygon(final List<Point> points, final FillMode mode) {
+	public void drawPolygon(final List<Point> points, final FillMode mode) {
 		buffer.putInt(PainterFunction.drawPolygonInteger.ordinal());
 		buffer.putInt(mode.ordinal());
 		buffer.putInt(points.size());
@@ -135,7 +160,7 @@ public class PainterInstructionsBuilder {
 		}
 	}
 
-	void drawPolyline(final List<Point> points) {
+	public void drawPolyline(final List<Point> points) {
 		buffer.putInt(PainterFunction.drawPolylineInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -144,7 +169,7 @@ public class PainterInstructionsBuilder {
 		}
 	}
 
-	void drawRect(final int x, final int y, final int width, final int height) {
+	public void drawRect(final int x, final int y, final int width, final int height) {
 		buffer.putInt(PainterFunction.drawRectInteger.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -152,7 +177,7 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(height);
 	}
 
-	void drawRoundedRect(final int x, final int y, final int w, final int h, final double xRadius,
+	public void drawRoundedRect(final int x, final int y, final int w, final int h, final double xRadius,
 			final double yRadius) {
 		buffer.putInt(PainterFunction.drawRoundedRectInteger.ordinal());
 		buffer.putInt(x);
@@ -163,21 +188,22 @@ public class PainterInstructionsBuilder {
 		buffer.putDouble(yRadius);
 	}
 
-	void drawStaticText(final int left, final int top, final String staticText) {
+	public void drawStaticText(final int left, final int top, final String staticText) {
 		buffer.putInt(PainterFunction.drawStaticText.ordinal());
 		buffer.putInt(left);
 		buffer.putInt(top);
 		buffer.putString(staticText);
 	}
 
-	void drawText(final int x, final int y, final String text) {
+	public void drawText(final int x, final int y, final String text) {
 		buffer.putInt(PainterFunction.drawTextSimple.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
 		buffer.putString(text);
 	}
 
-	void drawText(final int x, final int y, final int width, final int height, final int flags, final String text) {
+	public void drawText(final int x, final int y, final int width, final int height, final int flags,
+			final String text) {
 		buffer.putInt(PainterFunction.drawTextComplex.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -187,7 +213,7 @@ public class PainterInstructionsBuilder {
 		buffer.putString(text);
 	}
 
-	void eraseRect(final int x, final int y, final int width, final int height) {
+	public void eraseRect(final int x, final int y, final int width, final int height) {
 		buffer.putInt(PainterFunction.eraseRect.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -195,7 +221,7 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(height);
 	}
 
-	void fillRect(final int x, final int y, final int width, final int height, final Color color) {
+	public void fillRect(final int x, final int y, final int width, final int height, final Color color) {
 		buffer.putInt(PainterFunction.fillRectInteger.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -204,24 +230,24 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(color.getRGB());
 	}
 
-	void resetTransform() {
+	public void resetTransform() {
 		buffer.putInt(PainterFunction.resetTransform.ordinal());
 	}
 
-	void restore() {
+	public void restore() {
 		buffer.putInt(PainterFunction.restore.ordinal());
 	}
 
-	void rotate(final double angle) {
+	public void rotate(final double angle) {
 		buffer.putInt(PainterFunction.rotate.ordinal());
 		buffer.putDouble(angle);
 	}
 
-	void save() {
+	public void save() {
 		buffer.putInt(PainterFunction.save.ordinal());
 	}
 
-	void scale(final double sx, final double sy) {
+	public void scale(final double sx, final double sy) {
 		buffer.putInt(PainterFunction.scale.ordinal());
 		buffer.putDouble(sx);
 		buffer.putDouble(sy);
@@ -229,7 +255,8 @@ public class PainterInstructionsBuilder {
 
 	// void setBrush(const QBrush &brush)
 
-	void setClipRect(final int x, final int y, final int width, final int height, final ClipOperation operation) {
+	public void setClipRect(final int x, final int y, final int width, final int height,
+			final ClipOperation operation) {
 		buffer.putInt(PainterFunction.setClipRectInteger.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -238,46 +265,46 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(operation.ordinal());
 	}
 
-	void setClipping(final boolean enable) {
+	public void setClipping(final boolean enable) {
 		buffer.putInt(PainterFunction.setClipping.ordinal());
 		buffer.putBoolean(enable);
 	}
 
-	void setCompositionMode(final CompositionMode mode) {
+	public void setCompositionMode(final CompositionMode mode) {
 		buffer.putInt(PainterFunction.setCompositionMode.ordinal());
 		buffer.putInt(mode.ordinal());
 	}
 
-	void setFont(final JFont font) {
+	public void setFont(final JFont font) {
 		buffer.putInt(PainterFunction.setFont.ordinal());
 		buffer.putInt(font.getFontIndex());
 	}
 
-	void setOpacity(final double opacity) {
+	public void setOpacity(final double opacity) {
 		buffer.putInt(PainterFunction.setOpacity.ordinal());
 		buffer.putDouble(opacity);
 	}
 
 	// void setPen(const QPen &pen)
 
-	void setPen(final Color color) {
+	public void setPen(final Color color) {
 		buffer.putInt(PainterFunction.setPen.ordinal());
 		buffer.putInt(color.getRGB());
 	}
 
-	void setRenderHint(final RenderHint hint, final boolean on) {
+	public void setRenderHint(final RenderHint hint, final boolean on) {
 		buffer.putInt(PainterFunction.setRenderHint.ordinal());
 		buffer.putInt(hint.getMask());
 		buffer.putBoolean(on);
 	}
 
-	void shear(final double sh, final double sv) {
+	public void shear(final double sh, final double sv) {
 		buffer.putInt(PainterFunction.shear.ordinal());
 		buffer.putDouble(sh);
 		buffer.putDouble(sv);
 	}
 
-	void translate(final double dx, final double dy) {
+	public void translate(final double dx, final double dy) {
 		buffer.putInt(PainterFunction.translate.ordinal());
 		buffer.putDouble(dx);
 		buffer.putDouble(dy);

@@ -60,6 +60,11 @@ public class ResizableByteBuffer {
 		b.put(v);
 	}
 
+	public void putBytes(final byte[] array) {
+		checkSize(array.length);
+		b.put(array);
+	}
+
 	public void putInt(final int i) {
 		checkSize(Integer.BYTES);
 		b.putInt(i);
@@ -72,7 +77,8 @@ public class ResizableByteBuffer {
 
 	public void putString(final String s) {
 		final byte[] array = s.getBytes(StandardCharsets.UTF_8);
-		checkSize(array.length);
+		checkSize(array.length + Integer.BYTES);
+		b.putInt(array.length);
 		b.put(array);
 	}
 

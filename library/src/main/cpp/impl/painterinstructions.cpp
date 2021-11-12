@@ -21,7 +21,17 @@
  * THE SOFTWARE.
  */
 #include "painterinstructions.h"
+#include "jniutilities.h"
 #include <QPainter>
+#include <QStaticText>
+
+namespace
+{
+void cleanupMemory(void* ptr)
+{
+    delete static_cast<unsigned char*>(ptr);
+}
+}
 
 PainterInstructions::PainterInstructions() :
     m_length(0),
@@ -67,36 +77,99 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
                   getInteger(index),
                   getInteger(index));
         break;
-    case drawConvexPolygonInteger:
+    case drawConvexPolygonInteger: {
+        int32_t length = getInteger(index);
+        QPoint* ptr = new QPoint[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            ptr[i] = QPoint(getInteger(index), getInteger(index));
+        }
+        p.drawConvexPolygon(ptr, length);
         break;
+    }
     case drawEllipseInteger:
         p.drawEllipse(getInteger(index),
                       getInteger(index),
                       getInteger(index),
                       getInteger(index));
         break;
-    case drawImageInteger:
+    case drawImageInteger: {
+        QRect target(getInteger(index),
+                     getInteger(index),
+                     getInteger(index),
+                     getInteger(index));
+        QRect source(getInteger(index),
+                     getInteger(index),
+                     getInteger(index),
+                     getInteger(index));
+        int32_t w = getInteger(index);
+        int32_t h = getInteger(index);
+        const int32_t copyLength = 4 * w * h;
+        unsigned char* copy = new unsigned char[copyLength];
+        memcpy(copy, m_instructions.get() + index, copyLength);
+        QImage image(copy, w, h, QImage::Format_ARGB32, &cleanupMemory);
+        p.drawImage(target, image, source);
         break;
+    }
     case drawLineInteger:
         p.drawLine(getInteger(index),
                    getInteger(index),
                    getInteger(index),
                    getInteger(index));
         break;
-    case drawLinesInteger:
+    case drawLinesInteger: {
+        int32_t length = getInteger(index);
+        QPoint* ptr = new QPoint[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            ptr[i] = QPoint(getInteger(index), getInteger(index));
+        }
+        p.drawLines(ptr, length);
         break;
+    }
     case drawPieInteger:
+        p.drawPie(getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index));
         break;
     case drawPointInteger:
         p.drawPoint(getInteger(index),
                     getInteger(index));
         break;
-    case drawPointsInteger:
+    case drawPointsInteger: {
+        int32_t length = getInteger(index);
+        QPoint* ptr = new QPoint[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            ptr[i] = QPoint(getInteger(index), getInteger(index));
+        }
+        p.drawPoints(ptr, length);
         break;
-    case drawPolygonInteger:
+    }
+    case drawPolygonInteger: {
+        Qt::FillRule rule = static_cast<Qt::FillRule>(getInteger(index));
+        int32_t length = getInteger(index);
+        QPoint* ptr = new QPoint[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            ptr[i] = QPoint(getInteger(index), getInteger(index));
+        }
+        p.drawPolygon(ptr, length, rule);
         break;
-    case drawPolylineInteger:
+    }
+    case drawPolylineInteger: {
+        int32_t length = getInteger(index);
+        QPolygon poly;
+        for (int32_t i = 0; i < length; ++i)
+        {
+            poly << QPoint(getInteger(index), getInteger(index));
+        }
+        p.drawPolyline(poly);
         break;
+    }
     case drawRectInteger:
         p.drawRect(getInteger(index),
                    getInteger(index),
@@ -112,10 +185,14 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
                           getInteger(index));
         break;
     case drawStaticText:
+        p.drawStaticText(getInteger(index), getInteger(index), QStaticText(getString(index)));
         break;
     case drawTextSimple:
+        p.drawText(getInteger(index), getInteger(index), getString(index));
         break;
     case drawTextComplex:
+        p.drawText(getInteger(index), getInteger(index), getInteger(index),
+                   getInteger(index),getInteger(index), getString(index));
         break;
     case eraseRect:
         p.eraseRect(getInteger(index),
@@ -147,20 +224,35 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
                 getDouble(index));
         break;
     case setClipRectInteger:
+        p.setClipRect(getInteger(index),
+                      getInteger(index),
+                      getInteger(index),
+                      getInteger(index));
         break;
     case setClipping:
+        p.setClipping(getByte(index));
         break;
-    case setCompositionMode:
+    case setCompositionMode: {
+        QPainter::CompositionMode mode = static_cast<QPainter::CompositionMode>(getInteger(index));
+        p.setCompositionMode(mode);
         break;
-    case setFont:
+    }
+    case setFont: {
+        int32_t fontIndex = getInteger(index);
+        p.setFont(JNIUtilities::getFont(fontIndex));
         break;
+    }
     case setOpacity:
         p.setOpacity(getDouble(index));
         break;
     case setPen:
+        p.setPen(QColor::fromRgba(getInteger(index)));
         break;
-    case setRenderHint:
+    case setRenderHint: {
+        QPainter::RenderHint hint = static_cast<QPainter::RenderHint>(getInteger(index));
+        p.setRenderHint(hint, getByte(index));
         break;
+    }
     case shear:
         p.shear(getDouble(index), getDouble(index));
         break;
@@ -168,6 +260,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
          p.translate(getDouble(index), getDouble(index));
         break;
     case none:
+        // Do nothing
         break;
     }
 }
@@ -181,6 +274,17 @@ PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsig
         return func;
     } else {
         return none;
+    }
+}
+unsigned char PainterInstructions::getByte(unsigned int& index)
+{
+    if (index + sizeof(jbyte) <= m_length) {
+        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
+        unsigned char v = *(ptr + index);
+        index += sizeof(jbyte);
+        return v;
+    } else {
+        return 0;
     }
 }
 int32_t PainterInstructions::getInteger(unsigned int& index)
@@ -206,11 +310,25 @@ double PainterInstructions::getDouble(unsigned int& index)
     }
 }
 
+QString PainterInstructions::getString(unsigned int& index)
+{
+    if (index + sizeof(jint) <= m_length) {
+        int32_t length = getInteger(index);
+        unsigned char* ptrTemp = static_cast<unsigned char*>(m_instructions.get());
+        char* ptr = (char*)(ptrTemp + index);
+        QString str = QString::fromUtf8(ptr, length);
+        index += length;
+        return str;
+    } else {
+        return QString();
+    }
+}
+
 jbyteArray PainterInstructions::cloneIntoJavaArray(JNIEnv* env) const
 {
     jbyteArray javaObject = env->NewByteArray(m_length);
     jbyte* mem = env->GetByteArrayElements(javaObject, nullptr);
     memcpy(mem, m_instructions.get(), m_length);
-    env->ReleaseByteArrayElements(javaObject, mem, 0);// Commit and release
+    env->ReleaseByteArrayElements(javaObject, mem, 0);
     return javaObject;
 }

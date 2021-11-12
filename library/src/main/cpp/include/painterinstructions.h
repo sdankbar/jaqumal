@@ -25,6 +25,8 @@
 #include <memory>
 #include <jni.h>
 
+#include <QString>
+
 class QPainter;
 
 class PainterInstructions
@@ -49,8 +51,10 @@ private:
     };
 
     PainterFunctions getNextFunction(unsigned int& index);
+    unsigned char getByte(unsigned int& index);
     int32_t getInteger(unsigned int& index);
     double getDouble(unsigned int& index);
+    QString getString(unsigned int& index);
 
     void paint(QPainter& p, PainterFunctions func, unsigned int& index);
 

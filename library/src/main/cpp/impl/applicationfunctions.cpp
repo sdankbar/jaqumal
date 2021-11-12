@@ -30,6 +30,7 @@
 #include <invoketarget.h>
 #include <jpolyline.h>
 #include <dashedrectangle.h>
+#include <painter.h>
 #include <QQmlContext>
 #include <QTimer>
 #include <QDateTime>
@@ -225,6 +226,7 @@ void ApplicationFunctions::create(int* argc, char** argv)
     qmlRegisterUncreatableType<GenericObjectModel>("com.github.sdankbar.jaqumal", 0, 4, "GenericObjectModel", "Cannot create GenericObjectModel");
     qmlRegisterType<JPolyline>("com.github.sdankbar.jaqumal", 0, 4, "JPolyline");
     qmlRegisterType<DashedRectangle>("com.github.sdankbar.jaqumal", 0, 4, "DashedRectangle");
+    qmlRegisterType<Painter>("com.github.sdankbar.jaqumal", 0, 4, "Painter");
 
     SINGLETON = new ApplicationFunctions(*argc, argv);
 }
