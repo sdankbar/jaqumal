@@ -39,7 +39,171 @@ PainterInstructions::PainterInstructions(unsigned int length, unsigned char* ins
 
 void PainterInstructions::paint(QPainter& p)
 {
-    // TODO
+    unsigned int index = 0;
+    PainterFunctions nextFunc = getNextFunction(index);
+    while (nextFunc != none)
+    {
+        paint(p, nextFunc, index);
+        nextFunc = getNextFunction(index);
+    }
+}
+
+void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int& index)
+{
+    switch (func) {
+    case drawArcInteger:
+        p.drawArc(getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index));
+        break;
+    case drawChordInteger:
+        p.drawChord(getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index),
+                  getInteger(index));
+        break;
+    case drawConvexPolygonInteger:
+        break;
+    case drawEllipseInteger:
+        p.drawEllipse(getInteger(index),
+                      getInteger(index),
+                      getInteger(index),
+                      getInteger(index));
+        break;
+    case drawImageInteger:
+        break;
+    case drawLineInteger:
+        p.drawLine(getInteger(index),
+                   getInteger(index),
+                   getInteger(index),
+                   getInteger(index));
+        break;
+    case drawLinesInteger:
+        break;
+    case drawPieInteger:
+        break;
+    case drawPointInteger:
+        p.drawPoint(getInteger(index),
+                    getInteger(index));
+        break;
+    case drawPointsInteger:
+        break;
+    case drawPolygonInteger:
+        break;
+    case drawPolylineInteger:
+        break;
+    case drawRectInteger:
+        p.drawRect(getInteger(index),
+                   getInteger(index),
+                   getInteger(index),
+                   getInteger(index));
+        break;
+    case drawRoundedRectInteger:
+        p.drawRoundedRect(getInteger(index),
+                          getInteger(index),
+                          getInteger(index),
+                          getInteger(index),
+                          getInteger(index),
+                          getInteger(index));
+        break;
+    case drawStaticText:
+        break;
+    case drawTextSimple:
+        break;
+    case drawTextComplex:
+        break;
+    case eraseRect:
+        p.eraseRect(getInteger(index),
+                    getInteger(index),
+                    getInteger(index),
+                    getInteger(index));
+        break;
+    case fillRectInteger:
+        p.fillRect(getInteger(index),
+                   getInteger(index),
+                   getInteger(index),
+                   getInteger(index),
+                   getInteger(index));
+        break;
+    case resetTransform:
+        p.resetTransform();
+        break;
+    case restore:
+        p.restore();
+        break;
+    case rotate:
+        p.rotate(getDouble(index));
+        break;
+    case save:
+        p.save();
+        break;
+    case scale:
+        p.scale(getDouble(index),
+                getDouble(index));
+        break;
+    case setClipRectInteger:
+        break;
+    case setClipping:
+        break;
+    case setCompositionMode:
+        break;
+    case setFont:
+        break;
+    case setOpacity:
+        p.setOpacity(getDouble(index));
+        break;
+    case setPen:
+        break;
+    case setRenderHint:
+        break;
+    case shear:
+        p.shear(getDouble(index), getDouble(index));
+        break;
+    case translate:
+         p.translate(getDouble(index), getDouble(index));
+        break;
+    case none:
+        break;
+    }
+}
+
+PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsigned int& index)
+{
+    if (index + sizeof(jint) <= m_length) {
+        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
+        PainterFunctions func = *(PainterFunctions*)(ptr + index);
+        index += sizeof(jint);
+        return func;
+    } else {
+        return none;
+    }
+}
+int32_t PainterInstructions::getInteger(unsigned int& index)
+{
+    if (index + sizeof(jint) <= m_length) {
+        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
+        int32_t v = *(int32_t*)(ptr + index);
+        index += sizeof(jint);
+        return v;
+    } else {
+        return 0;
+    }
+}
+double PainterInstructions::getDouble(unsigned int& index)
+{
+    if (index + sizeof(jdouble) <= m_length) {
+        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
+        int32_t v = *(double*)(ptr + index);
+        index += sizeof(jdouble);
+        return v;
+    } else {
+        return 0;
+    }
 }
 
 jbyteArray PainterInstructions::cloneIntoJavaArray(JNIEnv* env) const

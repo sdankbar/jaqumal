@@ -40,6 +40,20 @@ public:
 
 private:
 
+    enum PainterFunctions {
+        drawArcInteger, drawChordInteger, drawConvexPolygonInteger, drawEllipseInteger, drawImageInteger,
+        drawLineInteger, drawLinesInteger, drawPieInteger, drawPointInteger, drawPointsInteger, drawPolygonInteger,
+        drawPolylineInteger, drawRectInteger, drawRoundedRectInteger, drawStaticText, drawTextSimple, drawTextComplex,
+        eraseRect, fillRectInteger, resetTransform, restore, rotate, save, scale, setClipRectInteger, setClipping,
+        setCompositionMode, setFont, setOpacity, setPen, setRenderHint, shear, translate, none = 999
+    };
+
+    PainterFunctions getNextFunction(unsigned int& index);
+    int32_t getInteger(unsigned int& index);
+    double getDouble(unsigned int& index);
+
+    void paint(QPainter& p, PainterFunctions func, unsigned int& index);
+
     unsigned int m_length;
     std::shared_ptr<unsigned char> m_instructions;
 };
