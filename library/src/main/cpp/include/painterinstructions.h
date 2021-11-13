@@ -50,15 +50,16 @@ private:
         setCompositionMode, setFont, setOpacity, setPen, setRenderHint, shear, translate, none = 999
     };
 
-    PainterFunctions getNextFunction(unsigned int& index);
-    unsigned char getByte(unsigned int& index);
-    int32_t getInteger(unsigned int& index);
-    double getDouble(unsigned int& index);
-    QString getString(unsigned int& index);
+    PainterFunctions getNextFunction(unsigned char*& ptr);
+    unsigned char getByte(unsigned char*& ptr);
+    int32_t getInteger(unsigned char*& ptr);
+    double getDouble(unsigned char*& ptr);
+    QString getString(unsigned char*& ptr);
 
-    void paint(QPainter& p, PainterFunctions func, unsigned int& index);
+    void paint(QPainter& p, PainterFunctions func, unsigned char*& ptr);
 
     unsigned int m_length;
     std::shared_ptr<unsigned char> m_instructions;
+    unsigned char* m_end;
 };
 

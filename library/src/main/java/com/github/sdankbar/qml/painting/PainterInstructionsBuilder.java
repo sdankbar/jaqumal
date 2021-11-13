@@ -101,10 +101,9 @@ public class PainterInstructionsBuilder {
 		buffer.putInt(source.y);
 		buffer.putInt(source.width);
 		buffer.putInt(source.height);
-		final byte[] data = bufferedImageToArray(image);
 		buffer.putInt(image.getWidth());
 		buffer.putInt(image.getHeight());
-		buffer.putBytes(data);
+		buffer.putBytes(bufferedImageToArray(image));
 	}
 
 	public void drawLine(final int x1, final int y1, final int x2, final int y2) {
