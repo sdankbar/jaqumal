@@ -30,7 +30,6 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -235,7 +234,7 @@ public class ModelPersistenceTest {
 		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/other2.json").exists());
-		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other2.json"));
+		final List<String> lines = Files.readAllLines(new File("persistenceTest", "other2.json").toPath());
 
 		assertEquals(lines.size(), 25);
 
@@ -283,7 +282,7 @@ public class ModelPersistenceTest {
 		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/other3.json").exists());
-		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "other3.json"));
+		final List<String> lines = Files.readAllLines(new File("persistenceTest", "other3.json").toPath());
 
 		assertEquals(lines.size(), 32);
 
@@ -386,7 +385,7 @@ public class ModelPersistenceTest {
 		Thread.sleep(SLEEP);
 
 		assertTrue(new File("persistenceTest/table1.json").exists());
-		final List<String> lines = Files.readAllLines(Path.of("persistenceTest", "table1.json"));
+		final List<String> lines = Files.readAllLines(new File("persistenceTest", "table1.json").toPath());
 
 		assertEquals(lines.size(), 145);
 

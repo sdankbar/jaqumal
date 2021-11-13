@@ -85,6 +85,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
             ptr[i] = QPoint(getInteger(index), getInteger(index));
         }
         p.drawConvexPolygon(ptr, length);
+        delete [] ptr;
         break;
     }
     case drawEllipseInteger:
@@ -125,6 +126,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
             ptr[i] = QPoint(getInteger(index), getInteger(index));
         }
         p.drawLines(ptr, length);
+        delete [] ptr;
         break;
     }
     case drawPieInteger:
@@ -147,6 +149,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
             ptr[i] = QPoint(getInteger(index), getInteger(index));
         }
         p.drawPoints(ptr, length);
+        delete [] ptr;
         break;
     }
     case drawPolygonInteger: {
@@ -158,6 +161,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
             ptr[i] = QPoint(getInteger(index), getInteger(index));
         }
         p.drawPolygon(ptr, length, rule);
+        delete [] ptr;
         break;
     }
     case drawPolylineInteger: {
@@ -205,7 +209,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
                    getInteger(index),
                    getInteger(index),
                    getInteger(index),
-                   getInteger(index));
+                   QColor::fromRgba(getInteger(index)));
         break;
     case resetTransform:
         p.resetTransform();
@@ -268,8 +272,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
 PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsigned int& index)
 {
     if (index + sizeof(jint) <= m_length) {
-        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        PainterFunctions func = *(PainterFunctions*)ptr;
+        PainterFunctions func = *(PainterFunctions*)(m_instructions.get() + index);
         index += sizeof(jint);
         return func;
     } else {
@@ -279,8 +282,7 @@ PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsig
 unsigned char PainterInstructions::getByte(unsigned int& index)
 {
     if (index + sizeof(jbyte) <= m_length) {
-        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        unsigned char v = *ptr;
+        unsigned char v = *(m_instructions.get() + index);
         index += sizeof(jbyte);
         return v;
     } else {
@@ -290,8 +292,7 @@ unsigned char PainterInstructions::getByte(unsigned int& index)
 int32_t PainterInstructions::getInteger(unsigned int& index)
 {
     if (index + sizeof(jint) <= m_length) {
-        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        int32_t v = *(int32_t*)ptr;
+        int32_t v = *(int32_t*)(m_instructions.get() + index);
         index += sizeof(jint);
         return v;
     } else {
@@ -301,8 +302,7 @@ int32_t PainterInstructions::getInteger(unsigned int& index)
 double PainterInstructions::getDouble(unsigned int& index)
 {
     if (index + sizeof(jdouble) <= m_length) {
-        unsigned char* ptr = static_cast<unsigned char*>(m_instructions.get());
-        int32_t v = *(double*)ptr;
+        int32_t v = *(double*)(m_instructions.get() + index);
         index += sizeof(jdouble);
         return v;
     } else {
@@ -314,8 +314,7 @@ QString PainterInstructions::getString(unsigned int& index)
 {
     if (index + sizeof(jint) <= m_length) {
         int32_t length = getInteger(index);
-        unsigned char* ptrTemp = static_cast<unsigned char*>(m_instructions.get());
-        char* ptr = (char*)ptrTemp;
+        char* ptr = (char*)(m_instructions.get() + index);
         QString str = QString::fromUtf8(ptr, length);
         index += length;
         return str;

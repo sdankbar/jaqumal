@@ -83,8 +83,11 @@ public class ResizableByteBuffer {
 	}
 
 	public byte[] toArray() {
-		final byte[] dst = new byte[b.position()];
+		final int oldPosition = b.position();
+		final byte[] dst = new byte[oldPosition];
+		b.position(0);
 		b.get(dst);
+		b.position(oldPosition);
 		return dst;
 	}
 }
