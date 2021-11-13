@@ -272,7 +272,8 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned int
 PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsigned int& index)
 {
     if (index + sizeof(jint) <= m_length) {
-        PainterFunctions func = *(PainterFunctions*)(m_instructions.get() + index);
+        PainterFunctions func;
+        memcpy(&func, (m_instructions.get() + index), sizeof(PainterFunctions));
         index += sizeof(jint);
         return func;
     } else {
@@ -292,7 +293,8 @@ unsigned char PainterInstructions::getByte(unsigned int& index)
 int32_t PainterInstructions::getInteger(unsigned int& index)
 {
     if (index + sizeof(jint) <= m_length) {
-        int32_t v = *(int32_t*)(m_instructions.get() + index);
+        int32_t v;
+        memcpy(&v, (m_instructions.get() + index), sizeof(jint));
         index += sizeof(jint);
         return v;
     } else {
@@ -302,7 +304,8 @@ int32_t PainterInstructions::getInteger(unsigned int& index)
 double PainterInstructions::getDouble(unsigned int& index)
 {
     if (index + sizeof(jdouble) <= m_length) {
-        int32_t v = *(double*)(m_instructions.get() + index);
+        double v;
+        memcpy(&v, (m_instructions.get() + index), sizeof(jdouble));
         index += sizeof(jdouble);
         return v;
     } else {
