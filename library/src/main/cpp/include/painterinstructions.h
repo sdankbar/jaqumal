@@ -24,7 +24,9 @@
 
 #include <memory>
 #include <jni.h>
+#include <unordered_map>
 
+#include <QImage>
 #include <QString>
 
 class QPainter;
@@ -61,5 +63,6 @@ private:
     unsigned int m_length;
     std::shared_ptr<unsigned char> m_instructions;
     unsigned char* m_end;
+    std::unordered_map<unsigned char*, QImage> m_cachedImages;
 };
 

@@ -108,10 +108,22 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         int32_t w = getInteger(ptr);
         int32_t h = getInteger(ptr);
         const int32_t copyLength = 4 * w * h;
-        unsigned char* copy = new unsigned char[copyLength];
-        memcpy(copy, ptr, copyLength);
-        QImage image(copy, w, h, QImage::Format_ARGB32, &cleanupMemory);
-        p.drawImage(target, image, source);
+        auto iter = m_cachedImages.find(ptr);
+        if (iter == m_cachedImages.end())
+        {
+
+            unsigned char* copy = new unsigned char[copyLength];
+            memcpy(copy, ptr, copyLength);
+            QImage image(copy, w, h, QImage::Format_ARGB32, &cleanupMemory);
+            m_cachedImages[ptr] = image;
+            ptr += copyLength;
+            p.drawImage(target, image, source);
+        }
+        else
+        {
+            ptr += copyLength;
+            p.drawImage(target, iter->second, source);
+        }
         break;
     }
     case drawLineInteger:
@@ -261,10 +273,11 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         p.setOpacity(getDouble(ptr));
         break;
     case setPen: {
-        QPen pen(QBrush(QColor::fromRgba(getInteger(ptr))), getDouble(ptr),
-               static_cast<Qt::PenStyle>(getInteger(ptr)),
-               static_cast<Qt::PenCapStyle>(getInteger(ptr)),
-               static_cast<Qt::PenJoinStyle>(getInteger(ptr)));
+        QPen pen(QBrush(QColor::fromRgba(getInteger(ptr))),
+                 getDouble(ptr),
+                 static_cast<Qt::PenStyle>(getInteger(ptr)),
+                 static_cast<Qt::PenCapStyle>(getInteger(ptr)),
+                 static_cast<Qt::PenJoinStyle>(getInteger(ptr)));
         p.setPen(pen);
         break;
     }
