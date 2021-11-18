@@ -49,8 +49,7 @@ public class PainterInstructionsBuilder {
 		for (final int p : pixels) {
 			b.putInt(p);
 		}
-		final byte[] array = b.array();
-		return array;
+		return b.array();
 	}
 
 	public void drawArc(final int x, final int y, final int width, final int height, final int startAngle,
@@ -252,8 +251,6 @@ public class PainterInstructionsBuilder {
 		buffer.putDouble(sy);
 	}
 
-	// void setBrush(const QBrush &brush)
-
 	public void setClipRect(final int x, final int y, final int width, final int height,
 			final ClipOperation operation) {
 		buffer.putInt(PainterFunction.setClipRectInteger.ordinal());
@@ -284,10 +281,13 @@ public class PainterInstructionsBuilder {
 		buffer.putDouble(opacity);
 	}
 
-	// void setPen(const QPen &pen)
+	void setPen(final JPen pen) {
+		buffer.putInt(PainterFunction.setPen.ordinal());
+		pen.serialize(buffer);
+	}
 
 	public void setPen(final Color color) {
-		buffer.putInt(PainterFunction.setPen.ordinal());
+		buffer.putInt(PainterFunction.setPenColor.ordinal());
 		buffer.putInt(color.getRGB());
 	}
 

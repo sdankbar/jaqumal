@@ -68,7 +68,7 @@ public class PainterInstructions {
 		drawLineInteger, drawLinesInteger, drawPieInteger, drawPointInteger, drawPointsInteger, drawPolygonInteger,
 		drawPolylineInteger, drawRectInteger, drawRoundedRectInteger, drawStaticText, drawTextSimple, drawTextComplex,
 		eraseRect, fillRectInteger, resetTransform, restore, rotate, save, scale, setClipRectInteger, setClipping,
-		setCompositionMode, setFont, setOpacity, setPen, setRenderHint, shear, translate;
+		setCompositionMode, setFont, setOpacity, setPen, setPenColor, setRenderHint, shear, translate;
 	}
 
 	private final byte[] data;

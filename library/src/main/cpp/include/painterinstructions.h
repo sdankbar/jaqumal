@@ -47,7 +47,7 @@ private:
         drawLineInteger, drawLinesInteger, drawPieInteger, drawPointInteger, drawPointsInteger, drawPolygonInteger,
         drawPolylineInteger, drawRectInteger, drawRoundedRectInteger, drawStaticText, drawTextSimple, drawTextComplex,
         eraseRect, fillRectInteger, resetTransform, restore, rotate, save, scale, setClipRectInteger, setClipping,
-        setCompositionMode, setFont, setOpacity, setPen, setRenderHint, shear, translate, none = 999
+        setCompositionMode, setFont, setOpacity, setPen, setPenColor, setRenderHint, shear, translate, none = 9999
     };
 
     PainterFunctions getNextFunction(unsigned char*& ptr);

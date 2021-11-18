@@ -260,7 +260,15 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
     case setOpacity:
         p.setOpacity(getDouble(ptr));
         break;
-    case setPen:
+    case setPen: {
+        QPen pen(QBrush(QColor::fromRgba(getInteger(ptr))), getDouble(ptr),
+               static_cast<Qt::PenStyle>(getInteger(ptr)),
+               static_cast<Qt::PenCapStyle>(getInteger(ptr)),
+               static_cast<Qt::PenJoinStyle>(getInteger(ptr)));
+        p.setPen(pen);
+        break;
+    }
+    case setPenColor:
         p.setPen(QColor::fromRgba(getInteger(ptr)));
         break;
     case setRenderHint: {
