@@ -307,7 +307,8 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         const int32_t y = getInteger(ptr);
         const int32_t w = getInteger(ptr);
         const int32_t h = getInteger(ptr);
-        p.setClipRect(x, y, w, h);
+        Qt::ClipOperation op = static_cast<Qt::ClipOperation>(getInteger(ptr));
+        p.setClipRect(x, y, w, h, op);
         break;
     }
     case setClipping: {
@@ -366,6 +367,226 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         double tx = getDouble(ptr);
         double ty = getDouble(ptr);
          p.translate(tx, ty);
+        break;
+    }
+    case drawArcDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        const int32_t a = getInteger(ptr);
+        const int32_t alen = getInteger(ptr);
+        p.drawArc(QRectF(x, y, w, h), a, alen);
+        break;
+    }
+    case drawChordDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        const int32_t a = getInteger(ptr);
+        const int32_t alen = getInteger(ptr);
+        p.drawChord(QRectF(x, y, w, h), a, alen);
+        break;
+    }
+    case drawConvexPolygonDouble: {
+        const int32_t length = getInteger(ptr);
+        QPointF* points = new QPointF[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            const double x = getDouble(ptr);
+            const double y = getDouble(ptr);
+            points[i] = QPointF(x, y);
+        }
+        p.drawConvexPolygon(points, length);
+        delete[] points;
+        break;
+    }
+    case drawEllipseDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        p.drawEllipse(QRectF(x, y, w, h));
+        break;
+    }
+    case drawImageDouble: {
+        const double xTarget = getDouble(ptr);
+        const double yTarget = getDouble(ptr);
+        const double wTarget = getDouble(ptr);
+        const double hTarget = getDouble(ptr);
+        const QRectF target(xTarget, yTarget, wTarget, hTarget);
+        const double xSource = getDouble(ptr);
+        const double ySource = getDouble(ptr);
+        const double wSource = getDouble(ptr);
+        const double hSource = getDouble(ptr);
+        const QRectF source(xSource, ySource, wSource, hSource);
+        const int32_t w = getInteger(ptr);
+        const int32_t h = getInteger(ptr);
+        const int32_t copyLength = 4 * w * h;
+        auto iter = m_cachedImages.find(ptr);
+        if (iter != m_cachedImages.end())
+        {
+            ptr += copyLength;
+            p.drawImage(target, iter->second, source);
+        }
+        else
+        {
+            unsigned char* copy = new unsigned char[copyLength];
+            memcpy(copy, ptr, copyLength);
+            const QImage image(copy, w, h, QImage::Format_ARGB32, &cleanupMemory);
+            m_cachedImages[ptr] = image;
+            ptr += copyLength;
+            p.drawImage(target, image, source);
+        }
+        break;
+    }
+    case drawLineDouble: {
+        const double x1 = getDouble(ptr);
+        const double y1 = getDouble(ptr);
+        const double x2 = getDouble(ptr);
+        const int32_t y2 = getDouble(ptr);
+        p.drawLine(QLineF(x1, y1, x2, y2));
+        break;
+    }
+    case drawLinesDouble: {
+        const int32_t length = getInteger(ptr);
+        QPointF* points = new QPointF[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            const double x = getDouble(ptr);
+            const double y = getDouble(ptr);
+            points[i] = QPointF(x, y);
+        }
+        p.drawLines(points, length);
+        delete[] points;
+        break;
+    }
+    case drawPieDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        const int32_t a = getInteger(ptr);
+        const int32_t alen = getInteger(ptr);
+        p.drawPie(QRectF(x, y, w, h), a, alen);
+        break;
+    }
+    case drawPointDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        p.drawPoint(QPointF(x, y));
+        break;
+    }
+    case drawPointsDouble: {
+        const int32_t length = getInteger(ptr);
+        QPointF* points = new QPointF[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            const double x = getDouble(ptr);
+            const double y = getDouble(ptr);
+            points[i] = QPointF(x, y);
+        }
+        p.drawPoints(points, length);
+        delete[] points;
+        break;
+    }
+    case drawPolygonDouble: {
+        const Qt::FillRule rule = static_cast<Qt::FillRule>(getInteger(ptr));
+        const int32_t length = getInteger(ptr);
+        QPointF* points = new QPointF[length];
+        for (int32_t i = 0; i < length; ++i)
+        {
+            const double x = getDouble(ptr);
+            const double y = getDouble(ptr);
+            points[i] = QPointF(x, y);
+        }
+        p.drawPolygon(points, length, rule);
+        delete[] points;
+        break;
+    }
+    case drawPolylineDouble: {
+        const int32_t length = getInteger(ptr);
+        QPolygonF poly;
+        for (int32_t i = 0; i < length; ++i)
+        {
+            const double x = getDouble(ptr);
+            const double y = getDouble(ptr);
+            poly << QPointF(x, y);
+        }
+        p.drawPolyline(poly);
+        break;
+    }
+    case drawRectDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        p.drawRect(x, y, w, h);
+        break;
+    }
+    case drawRoundedRectDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        const double xRadius = getDouble(ptr);
+        const double yRadius = getDouble(ptr);
+        p.drawRoundedRect(QRectF(x, y, w, h), xRadius, yRadius);
+        break;
+    }
+    case drawStaticTextDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const auto iter = m_cachedStaticText.find(ptr);
+        if (iter != m_cachedStaticText.end())
+        {
+            const int32_t length = getInteger(ptr);
+            ptr += length;
+            p.drawStaticText(QPointF(x, y), iter->second);
+        }
+        else
+        {
+            unsigned char* tempPtr = ptr;
+            QStaticText temp(getString(ptr));
+            p.drawStaticText(QPointF(x, y), temp);
+            m_cachedStaticText[tempPtr] = temp;
+        }
+        break;
+    }
+    case drawTextSimpleDouble: {
+        double x = getDouble(ptr);
+        double y = getDouble(ptr);
+        QString text = getString(ptr);
+        p.drawText(QPointF(x, y), text);
+        break;
+    }
+    case drawTextComplexDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        const int32_t flags = getInteger(ptr);
+        QString text = getString(ptr);
+        p.drawText(QRectF(x, y, w, h), flags, text);
+        break;
+    }
+    case fillRectDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        const QColor c = QColor::fromRgba(getInteger(ptr));
+        p.fillRect(QRectF(x, y, w, h), c);
+        break;
+    }
+    case setClipRectDouble: {
+        const double x = getDouble(ptr);
+        const double y = getDouble(ptr);
+        const double w = getDouble(ptr);
+        const double h = getDouble(ptr);
+        Qt::ClipOperation op = static_cast<Qt::ClipOperation>(getInteger(ptr));
+        p.setClipRect(QRectF(x, y, w, h), op);
         break;
     }
     case none:

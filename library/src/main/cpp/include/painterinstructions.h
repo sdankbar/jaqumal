@@ -50,7 +50,12 @@ private:
         drawLineInteger, drawLinesInteger, drawPieInteger, drawPointInteger, drawPointsInteger, drawPolygonInteger,
         drawPolylineInteger, drawRectInteger, drawRoundedRectInteger, drawStaticText, drawTextSimple, drawTextComplex,
         eraseRect, fillRectInteger, resetTransform, restore, rotate, save, scale, setClipRectInteger, setClipping,
-        setCompositionMode, setFont, setOpacity, setPen, setPenColor, setRenderHint, shear, translate, none = 9999
+        setCompositionMode, setFont, setOpacity, setPen, setPenColor, setRenderHint, shear, translate,
+        drawArcDouble, drawChordDouble, drawConvexPolygonDouble, drawEllipseDouble, drawImageDouble, drawLineDouble,
+        drawLinesDouble, drawPieDouble, drawPointDouble, drawPointsDouble, drawPolygonDouble, drawPolylineDouble,
+        drawRectDouble, drawRoundedRectDouble, drawStaticTextDouble, drawTextSimpleDouble, drawTextComplexDouble,
+        fillRectDouble, setClipRectDouble,
+        none = 9999
     };
 
     inline PainterFunctions getNextFunction(unsigned char*& ptr) const;
