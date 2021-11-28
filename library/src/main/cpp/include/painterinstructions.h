@@ -53,11 +53,11 @@ private:
         setCompositionMode, setFont, setOpacity, setPen, setPenColor, setRenderHint, shear, translate, none = 9999
     };
 
-    PainterFunctions getNextFunction(unsigned char*& ptr);
-    unsigned char getByte(unsigned char*& ptr);
-    int32_t getInteger(unsigned char*& ptr);
-    double getDouble(unsigned char*& ptr);
-    QString getString(unsigned char*& ptr);
+    inline PainterFunctions getNextFunction(unsigned char*& ptr) const;
+    inline unsigned char getByte(unsigned char*& ptr) const;
+    inline int32_t getInteger(unsigned char*& ptr) const;
+    inline double getDouble(unsigned char*& ptr) const;
+    inline QString getString(unsigned char*& ptr) const;
 
     void paint(QPainter& p, PainterFunctions func, unsigned char*& ptr);
 
