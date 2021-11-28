@@ -320,10 +320,11 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
 
 PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsigned char*& ptr)
 {
-    if (ptr < m_end) {
+    unsigned char* next = ptr + sizeof(jint);
+    if (next <= m_end) {
         PainterFunctions func;
         memcpy(&func, ptr, sizeof(PainterFunctions));
-        ptr += sizeof(jint);
+        ptr = next;
         return func;
     } else {
         return none;
@@ -331,9 +332,10 @@ PainterInstructions::PainterFunctions PainterInstructions::getNextFunction(unsig
 }
 unsigned char PainterInstructions::getByte(unsigned char*& ptr)
 {
-    if (ptr < m_end) {
+    unsigned char* next = ptr + sizeof(jbyte);
+    if (next <= m_end) {
         unsigned char v = *ptr;
-        ptr += sizeof(jbyte);
+        ptr = next;
         return v;
     } else {
         return 0;
@@ -341,10 +343,11 @@ unsigned char PainterInstructions::getByte(unsigned char*& ptr)
 }
 int32_t PainterInstructions::getInteger(unsigned char*& ptr)
 {
-    if (ptr < m_end) {
+    unsigned char* next = ptr + sizeof(jint);
+    if (next <= m_end) {
         int32_t v;
         memcpy(&v, ptr, sizeof(jint));
-        ptr += sizeof(jint);
+        ptr = next;
         return v;
     } else {
         return 0;
@@ -352,10 +355,11 @@ int32_t PainterInstructions::getInteger(unsigned char*& ptr)
 }
 double PainterInstructions::getDouble(unsigned char*& ptr)
 {
-    if (ptr < m_end) {
+    unsigned char* next = ptr + sizeof(jdouble);
+    if (next <= m_end) {
         double v;
         memcpy(&v, ptr, sizeof(jdouble));
-        ptr += sizeof(jdouble);
+        ptr = next;
         return v;
     } else {
         return 0;
@@ -364,8 +368,8 @@ double PainterInstructions::getDouble(unsigned char*& ptr)
 
 QString PainterInstructions::getString(unsigned char*& ptr)
 {
-    if (ptr < m_end) {
-        int32_t length = getInteger(ptr);
+    int32_t length = getInteger(ptr);
+    if (length > 0) {
         QString str = QString::fromUtf8((char*)ptr, length);
         ptr += length;
         return str;

@@ -281,7 +281,7 @@ public class PainterInstructionsBuilder {
 		buffer.putDouble(opacity);
 	}
 
-	void setPen(final JPen pen) {
+	public void setPen(final JPen pen) {
 		buffer.putInt(PainterFunction.setPen.ordinal());
 		pen.serialize(buffer);
 	}
