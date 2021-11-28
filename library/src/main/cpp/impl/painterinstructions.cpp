@@ -80,7 +80,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
                     getInteger(ptr));
         break;
     case drawConvexPolygonInteger: {
-        int32_t length = getInteger(ptr);
+        const int32_t length = getInteger(ptr);
         QPoint* points = new QPoint[length];
         for (int32_t i = 0; i < length; ++i)
         {
@@ -97,16 +97,16 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
                       getInteger(ptr));
         break;
     case drawImageInteger: {
-        QRect target(getInteger(ptr),
+        const QRect target(getInteger(ptr),
                      getInteger(ptr),
                      getInteger(ptr),
                      getInteger(ptr));
-        QRect source(getInteger(ptr),
+        const QRect source(getInteger(ptr),
                      getInteger(ptr),
                      getInteger(ptr),
                      getInteger(ptr));
-        int32_t w = getInteger(ptr);
-        int32_t h = getInteger(ptr);
+        const int32_t w = getInteger(ptr);
+        const int32_t h = getInteger(ptr);
         const int32_t copyLength = 4 * w * h;
         auto iter = m_cachedImages.find(ptr);
         if (iter == m_cachedImages.end())
@@ -133,7 +133,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
                    getInteger(ptr));
         break;
     case drawLinesInteger: {
-        int32_t length = getInteger(ptr);
+        const int32_t length = getInteger(ptr);
         QPoint* points = new QPoint[length];
         for (int32_t i = 0; i < length; ++i)
         {
@@ -156,7 +156,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
                     getInteger(ptr));
         break;
     case drawPointsInteger: {
-        int32_t length = getInteger(ptr);
+        const int32_t length = getInteger(ptr);
         QPoint* points = new QPoint[length];
         for (int32_t i = 0; i < length; ++i)
         {
@@ -167,8 +167,8 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         break;
     }
     case drawPolygonInteger: {
-        Qt::FillRule rule = static_cast<Qt::FillRule>(getInteger(ptr));
-        int32_t length = getInteger(ptr);
+        const Qt::FillRule rule = static_cast<Qt::FillRule>(getInteger(ptr));
+        const int32_t length = getInteger(ptr);
         QPoint* points = new QPoint[length];
         for (int32_t i = 0; i < length; ++i)
         {
@@ -179,7 +179,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         break;
     }
     case drawPolylineInteger: {
-        int32_t length = getInteger(ptr);
+        const int32_t length = getInteger(ptr);
         QPolygon poly;
         for (int32_t i = 0; i < length; ++i)
         {
@@ -202,11 +202,25 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
                           getInteger(ptr),
                           getInteger(ptr));
         break;
-    case drawStaticText:
-        p.drawStaticText(getInteger(ptr),
-                         getInteger(ptr),
-                         QStaticText(getString(ptr)));
+    case drawStaticText: {
+        const int32_t x = getInteger(ptr);
+        const int32_t y = getInteger(ptr);
+        const auto iter = m_cachedStaticText.find(ptr);
+        if (iter != m_cachedStaticText.end())
+        {
+            ptr += getInteger(ptr);
+            p.drawStaticText(x,
+                             y,
+                             iter->second);
+        }
+        else
+        {
+            p.drawStaticText(x,
+                             y,
+                             QStaticText(getString(ptr)));
+        }
         break;
+    }
     case drawTextSimple:
         p.drawText(getInteger(ptr),
                    getInteger(ptr),
@@ -259,13 +273,13 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         p.setClipping(getByte(ptr));
         break;
     case setCompositionMode: {
-        QPainter::CompositionMode mode =
+        const QPainter::CompositionMode mode =
             static_cast<QPainter::CompositionMode>(getInteger(ptr));
         p.setCompositionMode(mode);
         break;
     }
     case setFont: {
-        int32_t fontptr = getInteger(ptr);
+        const int32_t fontptr = getInteger(ptr);
         p.setFont(JNIUtilities::getFont(fontptr));
         break;
     }
@@ -273,7 +287,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         p.setOpacity(getDouble(ptr));
         break;
     case setPen: {
-        QPen pen(QBrush(QColor::fromRgba(getInteger(ptr))),
+        const QPen pen(QBrush(QColor::fromRgba(getInteger(ptr))),
                  getDouble(ptr),
                  static_cast<Qt::PenStyle>(getInteger(ptr)),
                  static_cast<Qt::PenCapStyle>(getInteger(ptr)),
@@ -285,7 +299,7 @@ void PainterInstructions::paint(QPainter& p, PainterFunctions func, unsigned cha
         p.setPen(QColor::fromRgba(getInteger(ptr)));
         break;
     case setRenderHint: {
-        QPainter::RenderHint hint = 
+        const QPainter::RenderHint hint =
             static_cast<QPainter::RenderHint>(getInteger(ptr));
         p.setRenderHint(hint, getByte(ptr));
         break;

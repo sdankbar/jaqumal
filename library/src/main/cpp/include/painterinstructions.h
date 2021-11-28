@@ -28,6 +28,7 @@
 
 #include <QImage>
 #include <QString>
+#include <QStaticText>
 
 class QPainter;
 
@@ -64,5 +65,6 @@ private:
     std::shared_ptr<unsigned char> m_instructions;
     unsigned char* m_end;
     std::unordered_map<unsigned char*, QImage> m_cachedImages;
+    std::unordered_map<unsigned char*, QStaticText> m_cachedStaticText;
 };
 
