@@ -22,6 +22,7 @@
  */
 package com.github.sdankbar.qml.painting;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class PainterInstructions {
@@ -72,6 +73,7 @@ public class PainterInstructions {
 	}
 
 	private final byte[] data;
+	private int hash = 0;
 
 	public PainterInstructions(final byte[] data) {
 		this.data = Objects.requireNonNull(data, "data is null");
@@ -80,4 +82,30 @@ public class PainterInstructions {
 	public byte[] getArray() {
 		return data;
 	}
+
+	@Override
+	public int hashCode() {
+		int h = hash;
+		if (h == 0) {
+			h = Arrays.hashCode(data);
+			hash = h;
+		}
+		return h;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final PainterInstructions other = (PainterInstructions) obj;
+		return Arrays.equals(data, other.data);
+	}
+
 }

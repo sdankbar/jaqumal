@@ -74,7 +74,7 @@ public class JPen {
 
 	public JPen(final Color c) {
 		this.c = Objects.requireNonNull(c, "c is null");
-		width = 1;
+		width = 1.0;
 		style = PenStyle.SolidLine;
 		capStyle = PenCapStyle.SquareCap;
 		joinStyle = PenJoinStyle.BevelJoin;
