@@ -96,8 +96,8 @@
 						<version>1.7</version>
 						<executions>
 							<execution>
-								<id>compile</id>
-								<phase>compile</phase>
+								<id>rcc</id>
+								<phase>initialize</phase>
 								<configuration>
 									<target>
 										<exec dir="${project.basedir}/src/main/cpp"
@@ -131,8 +131,8 @@
 						<version>1.7</version>
 						<executions>
 							<execution>
-								<id>compile</id>
-								<phase>compile</phase>
+								<id>rcc</id>
+								<phase>initialize</phase>
 								<configuration>
 									<target>
 										<exec dir="${project.basedir}"

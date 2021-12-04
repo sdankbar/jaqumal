@@ -139,5 +139,4 @@ Provides an example of defining new Event types and sending and receiving those 
 
 # Future Work
 
-* Dynamic resource loading (rcc) from class path
 * Java enums available in QML
