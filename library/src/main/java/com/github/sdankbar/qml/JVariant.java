@@ -211,7 +211,9 @@ public class JVariant {
 		 */
 		POLYLINE,
 		/**
+		 * PainterInstructions
 		 *
+		 * 4 native endian bytes for array length and byte array of instructions
 		 */
 		PAINTER_INSTRUCTIONS,
 		/**
@@ -388,7 +390,7 @@ public class JVariant {
 			return Optional.of(new JVariant(new Color(rgb, true)));
 		}
 		case DATE_TIME: {
-			final JSONObject sub = json.getJSONObject("valule");
+			final JSONObject sub = json.getJSONObject("value");
 			final long seconds = sub.getBigInteger("seconds").longValue();
 			final int nano = sub.getInt("nano");
 			return Optional.of(new JVariant(Instant.ofEpochSecond(seconds, nano)));
@@ -419,7 +421,7 @@ public class JVariant {
 			return Optional.of(new JVariant(v));
 		}
 		case LINE: {
-			final JSONObject sub = json.getJSONObject("valule");
+			final JSONObject sub = json.getJSONObject("value");
 			final int x1 = sub.getInt("x1");
 			final int y1 = sub.getInt("y1");
 			final int x2 = sub.getInt("x2");
@@ -431,13 +433,13 @@ public class JVariant {
 			return Optional.of(new JVariant(v));
 		}
 		case POINT: {
-			final JSONObject sub = json.getJSONObject("valule");
+			final JSONObject sub = json.getJSONObject("value");
 			final int x = sub.getInt("x");
 			final int y = sub.getInt("y");
 			return Optional.of(new JVariant(new Point2D.Double(x, y)));
 		}
 		case RECTANGLE: {
-			final JSONObject sub = json.getJSONObject("valule");
+			final JSONObject sub = json.getJSONObject("value");
 			final int x = sub.getInt("x");
 			final int y = sub.getInt("y");
 			final int w = sub.getInt("w");
@@ -449,7 +451,7 @@ public class JVariant {
 			return Optional.of(new JVariant(Pattern.compile(v)));
 		}
 		case SIZE: {
-			final JSONObject sub = json.getJSONObject("valule");
+			final JSONObject sub = json.getJSONObject("value");
 			final int w = sub.getInt("w");
 			final int h = sub.getInt("h");
 			return Optional.of(new JVariant(new Dimension(w, h)));

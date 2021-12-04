@@ -139,5 +139,5 @@ Provides an example of defining new Event types and sending and receiving those 
 
 # Future Work
 
-* Create additional specialized models for each QtQuick type.
-* Decrease boilerplate for sending data from QML to C++.
+* Dynamic resource loading (rcc) from class path
+* Java enums available in QML
