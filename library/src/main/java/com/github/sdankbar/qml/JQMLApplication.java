@@ -120,18 +120,41 @@ public class JQMLApplication<EType> {
 		SINGLETON_EXISTS.set(false);
 	}
 
+	/**
+	 * Reads the binary RCC data from the file and registers it in the Qt Resource
+	 * System.
+	 *
+	 * @param rccFile
+	 * @param mapRoot
+	 * @return
+	 */
 	@QtThread
 	public static boolean registerResource(final File rccFile, final String mapRoot) {
 		return ApplicationFunctions.registerResource(rccFile.getAbsolutePath(), mapRoot);
 	}
 
+	/**
+	 * Registers the data in the Qt Resource System. Assumed to be rcc binary
+	 * format.
+	 *
+	 * @param rccData
+	 * @param mapRoot
+	 * @return
+	 */
 	@QtThread
 	public static boolean registerResource(final byte[] rccData, final String mapRoot) {
 		return ApplicationFunctions.registerResource(rccData.length, rccData, mapRoot);
 	}
 
+	/**
+	 * Reads data from the system resource given by resourceFileName.
+	 *
+	 * @param resourceFileName
+	 * @param mapRoot
+	 * @return
+	 */
 	@QtThread
-	public static boolean registerResourceFromResouseStream(final String resourceFileName, final String mapRoot) {
+	public static boolean registerResourceFromSystemResource(final String resourceFileName, final String mapRoot) {
 		try (BufferedInputStream stream = new BufferedInputStream(
 				ClassLoader.getSystemResourceAsStream(resourceFileName))) {
 			final byte[] array = stream.readAllBytes();
