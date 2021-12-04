@@ -49,6 +49,7 @@
 
 #include "qmlimageprovider.h"
 #include <QQmlContext>
+#include <QResource>
 #include <QQuickWindow>
 #include <csignal>
 #include <qmltest.h>
@@ -215,6 +216,21 @@ JNICALL void setWindowsIcon(JNIEnv* env, jclass, jobject jImage)
     }
 }
 
+JNICALL jboolean registerResourceFile(JNIEnv* env, jclass, jstring rccFile, jstring mapRoot)
+{
+    return QResource::registerResource(
+                JNIUtilities::toQString(env, rccFile),
+                JNIUtilities::toQString(env, mapRoot));
+}
+
+JNICALL jboolean registerResourceData(JNIEnv* env, jclass, jint length, jbyteArray rccData, jstring mapRoot)
+{
+    jbyte* array = env->GetByteArrayElements(rccData, NULL);
+    uchar* copy = new uchar[length];
+    memcpy(copy, array, length);
+    return QResource::registerResource(copy, JNIUtilities::toQString(env, mapRoot));
+}
+
 void ApplicationFunctions::create(int* argc, char** argv)
 {
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
@@ -315,6 +331,8 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
         JNIUtilities::createJNIMethod("enableEventLogging", "()V", (void *)&enableEventLogging),
         JNIUtilities::createJNIMethod("setWindowsIcon", "(Ljava/awt/image/BufferedImage;)V", (void *)&setWindowsIcon),
+        JNIUtilities::createJNIMethod("registerResource", "(Ljava/lang/String;Ljava/lang/String;)Z", (void *)&registerResourceFile),
+        JNIUtilities::createJNIMethod("registerResource", "(I[BLjava/lang/String;)Z", (void *)&registerResourceData),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));

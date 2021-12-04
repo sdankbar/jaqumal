@@ -23,7 +23,9 @@
 package com.github.sdankbar.qml;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -116,6 +118,28 @@ public class JQMLApplication<EType> {
 	public static void delete() {
 		ApplicationFunctions.deleteQApplication();
 		SINGLETON_EXISTS.set(false);
+	}
+
+	@QtThread
+	public static boolean registerResource(final File rccFile, final String mapRoot) {
+		return ApplicationFunctions.registerResource(rccFile.getAbsolutePath(), mapRoot);
+	}
+
+	@QtThread
+	public static boolean registerResource(final byte[] rccData, final String mapRoot) {
+		return ApplicationFunctions.registerResource(rccData.length, rccData, mapRoot);
+	}
+
+	@QtThread
+	public static boolean registerResourceFromResouseStream(final String resourceFileName, final String mapRoot) {
+		try (BufferedInputStream stream = new BufferedInputStream(
+				ClassLoader.getSystemResourceAsStream(resourceFileName))) {
+			final byte[] array = stream.readAllBytes();
+			return ApplicationFunctions.registerResource(array.length, array, mapRoot);
+		} catch (final IOException e) {
+			log.warn("Failed to load resouse {}", resourceFileName);
+			return false;
+		}
 	}
 
 	private final ApplicationEventListener listener = new ApplicationEventListener();

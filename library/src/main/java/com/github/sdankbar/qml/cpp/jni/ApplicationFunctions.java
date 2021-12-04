@@ -132,4 +132,19 @@ public final class ApplicationFunctions {
 
 	public static native void setWindowsIcon(BufferedImage icon);
 
+	/**
+	 * @param rccFile Path to the rcc file to load and register.
+	 * @param mapRoot Resource in the location tree to register.
+	 * @return True if successfully registered, false on error.
+	 */
+	public static native boolean registerResource(String rccFile, String mapRoot);
+
+	/**
+	 * @param length  Length of rccData.
+	 * @param rccData Binary rcc data to register..
+	 * @param mapRoot Resource in the location tree to register.
+	 * @return True if successfully registered, false on error.
+	 */
+	public static native boolean registerResource(int length, byte[] rccData, String mapRoot);
+
 }
