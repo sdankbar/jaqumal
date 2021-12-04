@@ -23,6 +23,7 @@
 package com.github.sdankbar.examples.painter;
 
 import java.awt.Color;
+import java.io.File;
 
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
@@ -59,8 +60,11 @@ public class App {
 
 		model.put(Roles.drawable, new JVariant(b.build()));
 
+		System.out.println(
+				"Register=" + JQMLApplication.registerResource(new File("src/main/resources/painter.rcc"), ""));
+
 		System.out.print("Loading...");
-		app.loadQMLFile("./src/main/qml/main.qml");
+		app.loadQMLFile(":/painter.qml");
 		System.out.println("Done");
 		app.execute();
 	}
