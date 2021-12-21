@@ -27,7 +27,6 @@
 #include <qmllogging.h>
 #include <QQmlApplicationEngine>
 #include <userinputsimulator.h>
-//#include <QQmlContext>
 
 class EventLogger;
 

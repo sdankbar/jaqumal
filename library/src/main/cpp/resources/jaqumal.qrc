@@ -5,5 +5,6 @@
         <file>JLineSeries.qml</file>
         <file>JListView.qml</file>
         <file>JTableView.qml</file>
+        <file>JDevToolsGUI.qml</file>
     </qresource>
 </RCC>

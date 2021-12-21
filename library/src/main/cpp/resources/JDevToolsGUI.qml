@@ -21,46 +21,54 @@
  * THE SOFTWARE.
  */
 import QtQuick 2.0
-import QtQuick.Controls 1.4
+import QtCharts 2.3
 import com.github.sdankbar.jaqumal 0.4
 
-Item {
-    id: root
-    visible: false
+JDevTools {
+    id: toolsObj
+    title: "Development Tools"
+    x: 100
+    y: 100
+    width: 500
+    height: 300
 
-    property var window
+    property var mainWindow
 
-    Rectangle {
-        border.color: "black"
+    Column {
         anchors.fill: parent
+        spacing: 10
+
+        PerformanceMonitor {
+            window: mainWindow
+            width: parent.width
+            height: 20
+            visible: true
+        }
+
+        Row {
+            spacing: 15
+
+            Text {
+                text: "Recording"
+            }
+
+            Rectangle {
+                height: 20
+                width: height
+                radius: width / 2
+
+                color: toolsObj.isRecording ? "red" : "green"
+            }
+        }
 
         Text {
-            text: Math.round(1000.0 / PerfModel.AVERAGE_TOTAL_TIME_MILLI) + " Average Sync/Render/Swap Time"
+            text: "F12 Show/hide this window"
+        }
+        Text {
+            text: "F11 Start/stop recording user inputs"
+        }
+        Text {
+            text: "F10 Take screenshot while recording"
         }
     }
-
-    EventBuilder {
-        id: eventing
-    }
-
-    Connections {
-        target: window
-
-        onBeforeSynchronizing: {
-            eventing.perfEvent(EventBuilder.BEFORE_SYNC)
-        }
-
-        onBeforeRendering: {
-            eventing.perfEvent(EventBuilder.BEFORE_RENDER)
-        }
-
-        onAfterRendering: {
-            eventing.perfEvent(EventBuilder.AFTER_RENDER)
-        }
-
-        onFrameSwapped: {
-            eventing.perfEvent(EventBuilder.FRAME_SWAP)
-        }
-    }
-
 }

@@ -46,6 +46,7 @@
 #include <listmodelfunctions.h>
 #include <flattreemodelfunctions.h>
 #include <keyeventpreprocessor.h>
+#include <jdevelopmenttools.h>
 
 #include "qmlimageprovider.h"
 #include <QQmlContext>
@@ -243,6 +244,7 @@ void ApplicationFunctions::create(int* argc, char** argv)
     qmlRegisterType<JPolyline>("com.github.sdankbar.jaqumal", 0, 4, "JPolyline");
     qmlRegisterType<DashedRectangle>("com.github.sdankbar.jaqumal", 0, 4, "DashedRectangle");
     qmlRegisterType<Painter>("com.github.sdankbar.jaqumal", 0, 4, "Painter");
+    qmlRegisterType<JDevelopmentTools>("com.github.sdankbar.jaqumal", 0, 4, "JDevTools");
 
     SINGLETON = new ApplicationFunctions(*argc, argv);
 }
@@ -568,6 +570,7 @@ void ApplicationFunctions::installEventFilterToApplication(QObject* obj)
 {
     m_qapp->installEventFilter(obj);
 }
+
 void ApplicationFunctions::removeEventFilterFromApplication(QObject* obj)
 {
     m_qapp->removeEventFilter(obj);

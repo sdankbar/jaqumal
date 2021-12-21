@@ -1,15 +1,31 @@
 #include "jdevelopmenttools.h"
+#include "applicationfunctions.h"
 
 int32_t JDevelopmentTools::INSTANCE_COUNT = 0;
 
-JDevelopmentTools::JDevelopmentTools(QQuickItem* parent) :
-    QQuickItem(parent)
+JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
+    QQuickWindow(parent),
+    m_isRecording(false)
 {
     ++INSTANCE_COUNT;
-    if (INSTANCE_COUNT > 1)
+    if (INSTANCE_COUNT == 1)
+    {
+        ApplicationFunctions::get()->installEventFilterToApplication(this);
+    }
+    else
     {
         // TODO log warning
     }
+}
+
+JDevelopmentTools::~JDevelopmentTools()
+{
+    ApplicationFunctions::get()->removeEventFilterFromApplication(this);
+}
+
+bool JDevelopmentTools::isRecording() const
+{
+    return m_isRecording;
 }
 
 bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
@@ -25,11 +41,19 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         QKeyEvent* key = static_cast<QKeyEvent*>(event);
         if (key->key() == Qt::Key_F12)
         {
-            // TODO open dev tools
+            setVisible(!isVisible());
+            return true;
         }
         else if (key->key() == Qt::Key_F11)
         {
-            // TODO toggle recording
+            if (m_isRecording) {
+                // TODO
+            } else {
+                // TODO
+            }
+            m_isRecording = !m_isRecording;
+            emit isRecordingChanged();
+            return true;
         }
         break;
     }

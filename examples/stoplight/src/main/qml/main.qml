@@ -29,6 +29,7 @@ import QtQuick.Controls 1.4
 import com.github.sdankbar.jaqumal 0.4
 
 Window {
+    id: root
     visible: true
     width: 110
     height: 440
@@ -57,6 +58,10 @@ Window {
             returnValue = args.data + 9
         }
 
+    }
+
+    JDevToolsGUI {
+        mainWindow: root
     }
 
     Item {

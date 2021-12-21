@@ -2,4 +2,5 @@ module com.github.sdankbar.jaqumal
 JLineSeries 0.4 JLineSeries.qml
 JListView 0.4 JListView.qml
 JTableView 0.4 JTableView.qml
+JDevToolsGUI 0.4 JDevToolsGUI.qml
 PerformanceMonitor 0.4 PerformanceMonitor.qml
