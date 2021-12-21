@@ -77,6 +77,8 @@ public:
     void installEventFilterToApplication(QObject* obj);
     void removeEventFilterFromApplication(QObject* obj);
 
+    QImage takeFocusedWindowScreenShot() const;
+
 signals:
     void modelMapChanged();
 

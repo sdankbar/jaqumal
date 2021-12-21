@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QQuickWindow>
+#include <QDateTime>
 
 class JDevelopmentTools : public QQuickWindow
 {
@@ -22,10 +23,23 @@ signals:
     void isRecordingChanged();
 private:
 
+    struct RecordedEvent {
+        QEvent* m_event;
+        QDateTime m_eventTime;
+        QString m_screenshotFile;
+    };
+
     static int32_t INSTANCE_COUNT;
+
+    void saveRecording();
 
     // Properties
     bool m_isRecording;
+
+    // Recording variables
+    QDateTime m_startTime;
+    std::vector<RecordedEvent> m_recordedEvents;
+    std::string m_recordingDirectory;
 };
 
 #endif // JDEVELOPMENTTOOLS_H

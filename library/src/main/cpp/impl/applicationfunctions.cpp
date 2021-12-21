@@ -575,3 +575,17 @@ void ApplicationFunctions::removeEventFilterFromApplication(QObject* obj)
 {
     m_qapp->removeEventFilter(obj);
 }
+
+QImage ApplicationFunctions::takeFocusedWindowScreenShot() const
+{
+   QWindow* w = QApplication::focusWindow();
+   QQuickWindow* quickWindow = dynamic_cast<QQuickWindow*>(w);
+   if (quickWindow != nullptr)
+   {
+       quickWindow->grabWindow();
+   }
+   else
+   {
+       return QImage();
+   }
+}
