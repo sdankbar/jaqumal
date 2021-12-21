@@ -2,12 +2,14 @@
 #include "applicationfunctions.h"
 
 #include <QDir>
+#include <QTextStream>
 
 int32_t JDevelopmentTools::INSTANCE_COUNT = 0;
 
 JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
     QQuickWindow(parent),
-    m_isRecording(false)
+    m_isRecording(false),
+    m_lastReceivedEvent(nullptr)
 {
     ++INSTANCE_COUNT;
     if (INSTANCE_COUNT == 1)
@@ -49,7 +51,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         {
             // Ignore
         }
-        else
+        else if (event != m_lastReceivedEvent)
         {
             RecordedEvent rec;
             rec.m_event = new QKeyEvent(*key);
@@ -101,7 +103,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             }
             return true;
         }
-        else
+        else if (event != m_lastReceivedEvent)
         {
             RecordedEvent rec;
             rec.m_event = new QKeyEvent(*key);
@@ -112,37 +114,47 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
     }
     case QEvent::MouseButtonPress:
     {
-        QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        RecordedEvent rec;
-        rec.m_event = new QMouseEvent(*mouse);
-        rec.m_eventTime = QDateTime::currentDateTimeUtc();
-        m_recordedEvents.push_back(rec);
+        if (event != m_lastReceivedEvent)
+        {
+            QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
+            RecordedEvent rec;
+            rec.m_event = new QMouseEvent(*mouse);
+            rec.m_eventTime = QDateTime::currentDateTimeUtc();
+            m_recordedEvents.push_back(rec);
+        }
         break;
     }
-    case QEvent::MouseButtonDblClick:
-    {
-        QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        RecordedEvent rec;
-        rec.m_event = new QMouseEvent(*mouse);
-        rec.m_eventTime = QDateTime::currentDateTimeUtc();
-        m_recordedEvents.push_back(rec);
-        break;
-    }
+        //case QEvent::MouseButtonDblClick:
+        //{
+        //    QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
+        //    RecordedEvent rec;
+        //    rec.m_event = new QMouseEvent(*mouse);
+        //    rec.m_eventTime = QDateTime::currentDateTimeUtc();
+        //    m_recordedEvents.push_back(rec);
+        //    break;
+        //}
     case QEvent::MouseButtonRelease:
     {
-        QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        RecordedEvent rec;
-        rec.m_event = new QMouseEvent(*mouse);
-        rec.m_eventTime = QDateTime::currentDateTimeUtc();
-        m_recordedEvents.push_back(rec);
+        if (event != m_lastReceivedEvent)
+        {
+            QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
+            RecordedEvent rec;
+            rec.m_event = new QMouseEvent(*mouse);
+            rec.m_eventTime = QDateTime::currentDateTimeUtc();
+            m_recordedEvents.push_back(rec);
+        }
         break;
     }
-    case QEvent::MouseMove: {
-        QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        RecordedEvent rec;
-        rec.m_event = new QMouseEvent(*mouse);
-        rec.m_eventTime = QDateTime::currentDateTimeUtc();
-        m_recordedEvents.push_back(rec);
+    case QEvent::MouseMove:
+    {
+        if (event != m_lastReceivedEvent)
+        {
+            QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
+            RecordedEvent rec;
+            rec.m_event = new QMouseEvent(*mouse);
+            rec.m_eventTime = QDateTime::currentDateTimeUtc();
+            m_recordedEvents.push_back(rec);
+        }
         break;
     }
     default:
@@ -150,10 +162,100 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         break;
     }
 
+    m_lastReceivedEvent = event;
     return QObject::eventFilter(watched, event);
 }
 
 void JDevelopmentTools::saveRecording()
 {
-    // TODO
+    QFile javaTestFile(QString::fromStdString(m_recordingDirectory) + "/IntegrationTest.java");
+    if (javaTestFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&javaTestFile);
+
+        out << "import com.github.sdankbar.qml.JQMLApplication\n";
+        out << "import com.github.sdankbar.qml.JQMLDevelopmentTools\n";
+
+        out << "class IntegrationTest {\n";
+        out << "\n";
+        out << "\t@Test\n";
+        out << "\tpublic void test_run() {\n";
+        out << "\t\t// TODO run test setup\n";
+        out << "\t\tString screenshotDir = \"TODO\";\n";
+        out << "\t\tJQMLDevelopmentTools tools = app.getDevelopmentTools();\n";
+
+        QDateTime workingTime = m_startTime;
+        for (const RecordedEvent& e: m_recordedEvents)
+        {
+            if (e.m_event != nullptr)
+            {
+                switch (e.m_event->type()) {
+                case QEvent::KeyPress:
+                {
+                    QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\ttools.pressKey(" << key->text() << ", "
+                        << "Duration.ofMillis(" << milli << "))\n";
+                    break;
+                }
+                case QEvent::KeyRelease:
+                {
+                    QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\ttools.pressKey(" << key->text() << ", "
+                        << "Duration.ofMillis(" << milli << "))\n";
+                    break;
+                }
+                case QEvent::MouseButtonPress:
+                {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\ttools.mousePress(" << mouse->x() << ", "
+                        << mouse->y() << ", "
+                        << "Duration.ofMillis(" << milli << "))\n";
+                    break;
+                }
+                    //case QEvent::MouseButtonDblClick:
+                    //{
+                    //    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    //
+                    //    break;
+                    //}
+                case QEvent::MouseButtonRelease:
+                {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\ttools.mouseRelease(" << mouse->x() << ", "
+                        << mouse->y() << ", "
+                        << "Duration.ofMillis(" << milli << "))\n";
+                    break;
+                }
+                case QEvent::MouseMove: {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\ttools.mouseMove(" << mouse->x() << ", "
+                        << mouse->y() << ", "
+                        << "Duration.ofMillis(" << milli << "))\n";
+                    break;
+                }
+                default:
+                    // Ignore
+                    break;
+                }
+
+                workingTime = e.m_eventTime;
+            }
+            else
+            {
+                int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                out << "\t\ttools.compareWindowToImage(new File(screenshotDir, \""
+                    << e.m_screenshotFile << "\"), Duration.ofMillis(" << milli << "));\n";
+                workingTime = e.m_eventTime;
+            }
+        }
+
+        out << "\t}\n";
+        out << "\n";
+        out << "}\n";
+        out.flush();
+    }
 }
