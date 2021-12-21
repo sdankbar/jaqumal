@@ -24,6 +24,7 @@ package com.github.sdankbar.qml;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.Set;
 
 import com.github.sdankbar.qml.exceptions.QMLException;
@@ -236,4 +237,15 @@ public interface JQMLModelFactory {
 	boolean restoreModel(final JQMLTableModel<?> model, ImmutableSet<String> rootKeysToPersist);
 
 	void flushPersistence();
+
+	<K> Optional<JQMLListModel<K>> getListModel(final String name);
+
+	<K> Optional<JQMLSingletonModel<K>> getSingletonModel(final String name);
+
+	<K> Optional<JQMLListViewModel<K>> getListViewModel(final String name);
+
+	<K> Optional<JQMLFlatTreeModel<K>> getFlatTreeModel(final String name);
+
+	<K> Optional<JQMLTableModel<K>> getTableModel(final String name);
+
 }

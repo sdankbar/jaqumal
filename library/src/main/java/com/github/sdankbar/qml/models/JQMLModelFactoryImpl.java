@@ -25,8 +25,11 @@ package com.github.sdankbar.qml.models;
 import java.io.File;
 import java.time.Duration;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -82,6 +85,12 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 
 	private final Set<String> modelName = new HashSet<>();
 
+	private final Map<String, JQMLSingletonModel<?>> singletonModels = new HashMap<>();
+	private final Map<String, JQMLListModel<?>> listModels = new HashMap<>();
+	private final Map<String, JQMLListViewModel<?>> listViewModels = new HashMap<>();
+	private final Map<String, JQMLFlatTreeModel<?>> flatTreeModels = new HashMap<>();
+	private final Map<String, JQMLTableModel<?>> tableModels = new HashMap<>();
+
 	/**
 	 * Constructs a new factory.
 	 *
@@ -109,8 +118,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLFlatTreeModel<>(name, EnumSet.allOf(enumClass), eventLoopThread, new FlatTreeAccessor(),
-				putMode);
+		final JQMLFlatTreeModel<K> m = new JQMLFlatTreeModel<>(name, EnumSet.allOf(enumClass), eventLoopThread,
+				new FlatTreeAccessor(), putMode);
+		flatTreeModels.put(name, m);
+		return m;
 	}
 
 	@Override
@@ -119,7 +130,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLFlatTreeModel<>(name, keys, eventLoopThread, new FlatTreeAccessor(), putMode);
+		final JQMLFlatTreeModel<K> m = new JQMLFlatTreeModel<>(name, keys, eventLoopThread, new FlatTreeAccessor(),
+				putMode);
+		flatTreeModels.put(name, m);
+		return m;
 	}
 
 	@QtThread
@@ -129,7 +143,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread, new ListAccessor(), putMode);
+		final JQMLListModelImpl<K> m = new JQMLListModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread,
+				new ListAccessor(), putMode);
+		listModels.put(name, m);
+		return m;
 	}
 
 	@QtThread
@@ -138,7 +155,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLListModelImpl<>(name, keys, eventLoopThread, new ListAccessor(), putMode);
+		final JQMLListModelImpl<K> m = new JQMLListModelImpl<>(name, keys, eventLoopThread, new ListAccessor(),
+				putMode);
+		listModels.put(name, m);
+		return m;
 	}
 
 	@QtThread
@@ -164,8 +184,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLSingletonModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread, new SingletonMapAccessor(),
-				putMode);
+		final JQMLSingletonModel<K> m = new JQMLSingletonModelImpl<>(name, EnumSet.allOf(enumClass), eventLoopThread,
+				new SingletonMapAccessor(), putMode);
+		singletonModels.put(name, m);
+		return m;
 	}
 
 	@QtThread
@@ -174,7 +196,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		JQMLUtilities.checkThread(eventLoopThread);
 		checkModelName(name);
 
-		return new JQMLSingletonModelImpl<>(name, keys, eventLoopThread, new SingletonMapAccessor(), putMode);
+		final JQMLSingletonModel<K> m = new JQMLSingletonModelImpl<>(name, keys, eventLoopThread,
+				new SingletonMapAccessor(), putMode);
+		singletonModels.put(name, m);
+		return m;
 	}
 
 	@Override
@@ -191,7 +216,9 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 			final SelectionMode mode, final PutMode putMode) {
 		final ImmutableSet<K> userKeys = ImmutableSet.copyOf(EnumSet.allOf(keyClass));
 		checkForIsSelectedInKeySet(userKeys);
-		return new JQMLListViewModel<>(modelName, userKeys, app, mode, putMode);
+		final JQMLListViewModel<K> m = new JQMLListViewModel<>(modelName, userKeys, app, mode, putMode);
+		listViewModels.put(modelName, m);
+		return m;
 	}
 
 	@Override
@@ -199,7 +226,9 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	public <K> JQMLListViewModel<K> createListViewModel(final String modelName, final ImmutableSet<K> keySet,
 			final SelectionMode mode, final PutMode putMode) {
 		checkForIsSelectedInKeySet(keySet);
-		return new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
+		final JQMLListViewModel<K> m = new JQMLListViewModel<>(modelName, keySet, app, mode, putMode);
+		listViewModels.put(modelName, m);
+		return m;
 	}
 
 	@Override
@@ -207,14 +236,18 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	public <K extends Enum<K>> JQMLTableModel<K> createTableModel(final String modelName, final Class<K> keyClass,
 			final PutMode putMode) {
 		final ImmutableSet<K> userKeys = ImmutableSet.copyOf(EnumSet.allOf(keyClass));
-		return new JQMLTableModelImpl<>(modelName, userKeys, app, putMode);
+		final JQMLTableModelImpl<K> m = new JQMLTableModelImpl<>(modelName, userKeys, app, putMode);
+		tableModels.put(modelName, m);
+		return m;
 	}
 
 	@Override
 	@QtThread()
 	public <K> JQMLTableModel<K> createTableModel(final String modelName, final ImmutableSet<K> keySet,
 			final SelectionMode mode, final PutMode putMode) {
-		return new JQMLTableModelImpl<>(modelName, keySet, app, putMode);
+		final JQMLTableModelImpl<K> m = new JQMLTableModelImpl<>(modelName, keySet, app, putMode);
+		tableModels.put(modelName, m);
+		return m;
 	}
 
 	@Override
@@ -323,5 +356,55 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	public void flushPersistence() {
 		Preconditions.checkArgument(persistence != null, "Persistence has not been enabled");
 		persistence.flush();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLListModel<K>> getListModel(final String name) {
+		try {
+			return Optional.ofNullable((JQMLListModel<K>) listModels.get(name));
+		} catch (final ClassCastException e) {
+			return Optional.empty();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLSingletonModel<K>> getSingletonModel(final String name) {
+		try {
+			return Optional.ofNullable((JQMLSingletonModel<K>) singletonModels.get(name));
+		} catch (final ClassCastException e) {
+			return Optional.empty();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLListViewModel<K>> getListViewModel(final String name) {
+		try {
+			return Optional.ofNullable((JQMLListViewModel<K>) listViewModels.get(name));
+		} catch (final ClassCastException e) {
+			return Optional.empty();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLFlatTreeModel<K>> getFlatTreeModel(final String name) {
+		try {
+			return Optional.ofNullable((JQMLFlatTreeModel<K>) flatTreeModels.get(name));
+		} catch (final ClassCastException e) {
+			return Optional.empty();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLTableModel<K>> getTableModel(final String name) {
+		try {
+			return Optional.ofNullable((JQMLTableModel<K>) tableModels.get(name));
+		} catch (final ClassCastException e) {
+			return Optional.empty();
+		}
 	}
 }

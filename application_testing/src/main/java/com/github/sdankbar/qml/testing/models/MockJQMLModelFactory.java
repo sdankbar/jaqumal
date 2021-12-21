@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import com.github.sdankbar.qml.JQMLApplication;
@@ -136,16 +137,22 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		return null;
 	}
 
-	public <K> JQMLListModel<K> getListModel(final String name) {
-		return (JQMLListModel<K>) listModels.get(name);
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLListModel<K>> getListModel(final String name) {
+		return Optional.ofNullable((JQMLListModel<K>) listModels.get(name));
 	}
 
-	public <K> JQMLSingletonModel<K> getSingletonModel(final String name) {
-		return (JQMLSingletonModel<K>) singletonModels.get(name);
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLSingletonModel<K>> getSingletonModel(final String name) {
+		return Optional.ofNullable((JQMLSingletonModel<K>) singletonModels.get(name));
 	}
 
-	public <K> JQMLListViewModel<K> getListViewModel(final String name) {
-		return (JQMLListViewModel<K>) listViewModels.get(name);
+	@Override
+	@SuppressWarnings("unchecked")
+	public <K> Optional<JQMLListViewModel<K>> getListViewModel(final String name) {
+		return Optional.ofNullable((JQMLListViewModel<K>) listViewModels.get(name));
 	}
 
 	void reset() {
@@ -285,6 +292,18 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	public boolean restoreModel(final JQMLTableModel<?> model, final ImmutableSet<String> rootKeysToPersist) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public <K> Optional<JQMLFlatTreeModel<K>> getFlatTreeModel(final String name) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K> Optional<JQMLTableModel<K>> getTableModel(final String name) {
+		return Optional.ofNullable((JQMLTableModel<K>) tableModels.get(name));
 	}
 
 }
