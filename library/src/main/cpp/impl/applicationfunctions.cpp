@@ -563,3 +563,12 @@ const QVariantMap& ApplicationFunctions::modelMap() const
 {
     return m_objectLookupMap;
 }
+
+void ApplicationFunctions::installEventFilterToApplication(QObject* obj)
+{
+    m_qapp->installEventFilter(obj);
+}
+void ApplicationFunctions::removeEventFilterFromApplication(QObject* obj)
+{
+    m_qapp->removeEventFilter(obj);
+}

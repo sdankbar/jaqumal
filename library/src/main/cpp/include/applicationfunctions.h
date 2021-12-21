@@ -75,6 +75,9 @@ public:
 
     QImage toQImage(JNIEnv* env, jobject bufferedImage);
 
+    void installEventFilterToApplication(QObject* obj);
+    void removeEventFilterFromApplication(QObject* obj);
+
 signals:
     void modelMapChanged();
 

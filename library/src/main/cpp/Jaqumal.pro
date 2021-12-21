@@ -66,7 +66,8 @@ SOURCES += \
     impl/qmltest.cpp \
     impl/qmldatatransfer.cpp \
     impl/jniutilities.cpp \
-    impl/keyeventpreprocessor.cpp
+    impl/keyeventpreprocessor.cpp \
+    impl/jdevelopmenttools.cpp
 
 HEADERS += \
     include/dashedrectangle.h \
@@ -91,7 +92,8 @@ HEADERS += \
     include/qmlimageprovider.h \
     include/jpolyline.h \
     include/qmltest.h \
-    include/keyeventpreprocessor.h
+    include/keyeventpreprocessor.h \
+    include/jdevelopmenttools.h
 
 DISTFILES += \
     resources/qmldir \
