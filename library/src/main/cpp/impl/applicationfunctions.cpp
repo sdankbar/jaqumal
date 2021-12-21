@@ -582,7 +582,7 @@ QImage ApplicationFunctions::takeFocusedWindowScreenShot() const
    QQuickWindow* quickWindow = dynamic_cast<QQuickWindow*>(w);
    if (quickWindow != nullptr)
    {
-       quickWindow->grabWindow();
+       return quickWindow->grabWindow();
    }
    else
    {

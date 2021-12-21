@@ -75,7 +75,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
                 m_recordedEvents.clear();
 
                 m_recordingDirectory =
-                        "recording_" + m_startTime.toString("hh:mm:ss.zzz").toStdString();
+                        "recording_" + m_startTime.toString("hh_mm_ss_zzz").toStdString();
                 QDir currentDirectory;
                 currentDirectory.mkdir(QString::fromStdString(m_recordingDirectory));
             }
@@ -89,7 +89,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             QImage windowImage = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
             if (!windowImage.isNull())
             {
-                QString now = QDateTime::currentDateTimeUtc().toString("hh:mm:ss.zzz");
+                QString now = QDateTime::currentDateTimeUtc().toString("hh_mm_ss_zzz");
                 QString fileName = QString::fromStdString(m_recordingDirectory) + "/screenshot_" + now + ".png";
                 windowImage.save(fileName, "png");
 

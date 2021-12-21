@@ -34,6 +34,10 @@ JDevTools {
 
     property var mainWindow
 
+    onIsRecordingChanged: {
+        mainWindow.requestActivate()
+    }
+
     Column {
         anchors.fill: parent
         spacing: 10
