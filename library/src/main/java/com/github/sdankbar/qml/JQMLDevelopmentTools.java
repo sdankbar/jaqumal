@@ -22,9 +22,13 @@
  */
 package com.github.sdankbar.qml;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
+
+import javax.imageio.ImageIO;
 
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 
@@ -74,7 +78,15 @@ public class JQMLDevelopmentTools {
 
 	public void compareWindowToImage(final File path, final Duration delay) {
 		pollEventQueue(delay);
-		// TODO
+
+		try {
+			final BufferedImage i = ImageIO.read(path);
+			if (!ApplicationFunctions.compareImageToActiveWindow(i)) {
+				throw new AssertionError("Active window does not match " + path);
+			}
+		} catch (final IOException e) {
+			throw new AssertionError("Unable to load comparison image", e);
+		}
 	}
 
 	public void pollEventQueue(final Duration delay) {

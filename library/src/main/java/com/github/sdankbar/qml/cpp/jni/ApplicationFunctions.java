@@ -154,4 +154,6 @@ public final class ApplicationFunctions {
 	public static native void injectMouseReleaseIntoApplication(int x, int y, int button, int buttons, int modifiers);
 
 	public static native void injectMouseMoveIntoApplication(int x, int y, int button, int buttons, int modifiers);
+
+	public static native boolean compareImageToActiveWindow(BufferedImage i);
 }

@@ -270,6 +270,20 @@ JNICALL jboolean registerResourceData(JNIEnv* env, jclass, jint length, jbyteArr
     return QResource::registerResource(copy, JNIUtilities::toQString(env, mapRoot));
 }
 
+JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        QImage target = ApplicationFunctions::get()->toQImage(env, jImage);
+        QImage source = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
+        return target == source;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void ApplicationFunctions::create(int* argc, char** argv)
 {
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
@@ -372,6 +386,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
         JNIUtilities::createJNIMethod("enableEventLogging", "()V", (void *)&enableEventLogging),
         JNIUtilities::createJNIMethod("setWindowsIcon", "(Ljava/awt/image/BufferedImage;)V", (void *)&setWindowsIcon),
+        JNIUtilities::createJNIMethod("compareImageToActiveWindow", "(Ljava/awt/image/BufferedImage;)Z", (void *)&compareImageToActiveWindow),
         JNIUtilities::createJNIMethod("registerResource", "(Ljava/lang/String;Ljava/lang/String;)Z", (void *)&registerResourceFile),
         JNIUtilities::createJNIMethod("registerResource", "(I[BLjava/lang/String;)Z", (void *)&registerResourceData),
         JNIUtilities::createJNIMethod("injectMousePressIntoApplication", "(IIIII)V", (void *)&injectMousePressIntoApplication),

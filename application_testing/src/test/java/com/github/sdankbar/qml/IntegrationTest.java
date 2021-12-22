@@ -22,8 +22,10 @@
  */
 package com.github.sdankbar.qml;
 
+import java.io.File;
 import java.time.Duration;
 
+import org.junit.After;
 import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -31,47 +33,50 @@ import com.github.sdankbar.qml.eventing.NullEventProcessor;
 
 public class IntegrationTest {
 
+	private JQMLApplication<NullEventProcessor> app;
+
+	@After
+	public void finish() {
+		app.endIntegrationTest();
+	}
+
 	@Test
 	public void testRun() {
 		final String[] args = new String[0];
-		final JQMLApplication<NullEventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		app = JQMLApplication.create(args, new NullEventFactory<>());
 		app.loadQMLFile("src/test/java/com/github/sdankbar/qml/IntegrationTest.qml");
 
-		final String screenshotDir = "TODO";
+		final String screenshotDir = "src/test/resources/";
 		final JQMLDevelopmentTools tools = app.getDevelopmentTools();
 		tools.startIntegrationTest();
-		tools.mousePress(362, 91, 1, 1, 0, Duration.ofMillis(555));
-		tools.mouseRelease(362, 91, 1, 0, 0, Duration.ofMillis(229));
-		tools.mouseMove(362, 90, 0, 0, 0, Duration.ofMillis(234));
-		tools.mouseMove(359, 69, 0, 0, 0, Duration.ofMillis(281));
-		tools.mousePress(360, 67, 1, 1, 0, Duration.ofMillis(135));
-		tools.mouseRelease(360, 67, 1, 0, 0, Duration.ofMillis(81));
-		tools.mouseMove(358, 67, 0, 0, 0, Duration.ofMillis(283));
-		tools.mouseMove(326, 86, 0, 0, 0, Duration.ofMillis(267));
-		tools.mousePress(322, 87, 1, 1, 0, Duration.ofMillis(170));
-		tools.mouseRelease(322, 87, 1, 0, 0, Duration.ofMillis(74));
-		tools.mouseMove(322, 86, 0, 0, 0, Duration.ofMillis(238));
-		tools.mouseMove(322, 67, 0, 0, 0, Duration.ofMillis(252));
-		tools.mouseMove(320, 62, 0, 0, 0, Duration.ofMillis(260));
-		tools.mousePress(320, 63, 1, 1, 0, Duration.ofMillis(30));
-		tools.mouseRelease(320, 63, 1, 0, 0, Duration.ofMillis(67));
-		tools.mouseMove(309, 61, 0, 0, 0, Duration.ofMillis(283));
-		tools.mouseMove(20, 1, 0, 0, 0, Duration.ofMillis(771));
-		tools.mousePress(17, 5, 1, 1, 0, Duration.ofMillis(165));
-		tools.mouseRelease(17, 5, 1, 0, 0, Duration.ofMillis(67));
-		tools.mouseMove(17, 7, 0, 0, 0, Duration.ofMillis(204));
-		tools.mouseMove(17, 27, 0, 0, 0, Duration.ofMillis(268));
-		tools.mousePress(17, 28, 1, 1, 0, Duration.ofMillis(108));
-		tools.mouseRelease(17, 28, 1, 0, 0, Duration.ofMillis(76));
-		tools.mouseMove(19, 29, 0, 0, 0, Duration.ofMillis(226));
-		tools.mousePress(45, 40, 1, 1, 0, Duration.ofMillis(319));
-		tools.mouseRelease(45, 40, 1, 0, 0, Duration.ofMillis(60));
-		tools.mouseMove(45, 39, 0, 0, 0, Duration.ofMillis(211));
-		tools.mouseMove(50, 14, 0, 0, 0, Duration.ofMillis(258));
-		tools.mousePress(50, 9, 1, 1, 0, Duration.ofMillis(166));
-		tools.mouseRelease(50, 9, 1, 0, 0, Duration.ofMillis(67));
-		tools.pollEventQueue(Duration.ofMillis(972));
-		tools.endIntegrationTest();
+		tools.mouseMove(206, 134, 0, 0, 0, Duration.ofMillis(429));
+		tools.mouseMove(190, 31, 0, 0, 0, Duration.ofMillis(357));
+		tools.mouseMove(71, 2, 0, 0, 0, Duration.ofMillis(253));
+		tools.mousePress(52, 7, 1, 1, 0, Duration.ofMillis(491));
+		tools.mouseRelease(52, 7, 1, 0, 0, Duration.ofMillis(86));
+		tools.compareWindowToImage(new File(screenshotDir, "integrationTestScreenshots/screenshot_22_59_38_399.png"),
+				Duration.ofMillis(1006));
+		tools.mouseMove(52, 9, 0, 0, 0, Duration.ofMillis(398));
+		tools.mouseMove(47, 24, 0, 0, 0, Duration.ofMillis(260));
+		tools.mousePress(49, 34, 1, 1, 0, Duration.ofMillis(327));
+		tools.mouseRelease(49, 34, 1, 0, 0, Duration.ofMillis(88));
+		tools.compareWindowToImage(new File(screenshotDir, "integrationTestScreenshots/screenshot_22_59_40_469.png"),
+				Duration.ofMillis(842));
+		tools.mouseMove(55, 36, 0, 0, 0, Duration.ofMillis(478));
+		tools.mouseMove(201, 60, 0, 0, 0, Duration.ofMillis(259));
+		tools.mouseMove(273, 61, 0, 0, 0, Duration.ofMillis(253));
+		tools.mouseMove(277, 61, 0, 0, 0, Duration.ofMillis(259));
+		tools.mousePress(282, 61, 1, 1, 0, Duration.ofMillis(174));
+		tools.mouseRelease(282, 61, 1, 0, 0, Duration.ofMillis(59));
+		tools.compareWindowToImage(new File(screenshotDir, "integrationTestScreenshots/screenshot_22_59_42_793.png"),
+				Duration.ofMillis(842));
+		tools.mouseMove(282, 62, 0, 0, 0, Duration.ofMillis(597));
+		tools.mouseMove(282, 92, 0, 0, 0, Duration.ofMillis(274));
+		tools.mousePress(282, 93, 1, 1, 0, Duration.ofMillis(118));
+		tools.mouseRelease(282, 93, 1, 0, 0, Duration.ofMillis(73));
+		tools.compareWindowToImage(new File(screenshotDir, "integrationTestScreenshots/screenshot_22_59_44_755.png"),
+				Duration.ofMillis(900));
+		tools.pollEventQueue(Duration.ofMillis(1282));
 	}
 
 }

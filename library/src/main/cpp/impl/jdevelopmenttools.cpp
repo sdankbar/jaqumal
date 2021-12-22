@@ -185,11 +185,12 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
     if (javaTestFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&javaTestFile);
 
+        out << "import java.io.File;\n";
         out << "import java.time.Duration;\n";
         out << "import org.junit.Test;\n";
         out << "import com.github.sdankbar.qml.JQMLApplication\n";
         out << "import com.github.sdankbar.qml.JQMLDevelopmentTools\n";
-
+        out << "\n";
         out << "class IntegrationTest {\n";
         out << "\n";
         out << "\t@Test\n";
