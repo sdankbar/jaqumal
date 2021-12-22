@@ -48,7 +48,6 @@ import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jni.EventFunctions;
 import com.github.sdankbar.qml.cpp.jni.InvocationFunctions;
 import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
-import com.github.sdankbar.qml.dev_tools.JQMLDevelopmentTools;
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.EventFactory;
@@ -179,7 +178,7 @@ public class JQMLApplication<EType> {
 
 	private final ScheduledExecutorService executor = new JQMLScheduledExecutorService();
 	private final JQMLModelFactory modelFactory;
-	private final JQMLDevelopmentTools devTools = new JQMLDevelopmentTools();
+	private final JQMLDevelopmentTools devTools = new JQMLDevelopmentTools(this);
 
 	private final List<JQMLImageProviderWrapper> imageProviders = new ArrayList<>();
 
@@ -204,16 +203,25 @@ public class JQMLApplication<EType> {
 				ApplicationFunctions.getRuntimeQtVersion());
 	}
 
-	/**
-	 * Blocks the current thread, processing Qt Events until the EventLoop exits.
-	 *
-	 * See QApplication::exec()
-	 */
-	public void execute() {
+	void startIntegrationTest() {
 		eventLoopThread.set(Thread.currentThread());
 
-		final AtomicBoolean shutdownRunning = new AtomicBoolean(false);
-		final Thread shutdownThread = new Thread() {
+		Runtime.getRuntime().addShutdownHook(getShutdownThread(new AtomicBoolean(false)));
+	}
+
+	void endIntegrationTest() {
+		eventLoopThread.set(null);
+
+		shutdownFileMonitors();
+		shutdownExecutor();
+
+		delete();
+		
+		Runtime.getRuntime().removeShutdownHook(shutdownThread);
+	}
+
+	private Thread getShutdownThread(final AtomicBoolean shutdownRunning) {
+		return new Thread() {
 
 			@Override
 			public void run() {
@@ -228,26 +236,26 @@ public class JQMLApplication<EType> {
 				}
 			}
 		};
+	}
+
+	/**
+	 * Blocks the current thread, processing Qt Events until the EventLoop exits.
+	 *
+	 * See QApplication::exec()
+	 */
+	public void execute() {
+		eventLoopThread.set(Thread.currentThread());
+
+		final AtomicBoolean shutdownRunning = new AtomicBoolean(false);
+		final Thread shutdownThread = getShutdownThread(shutdownRunning);
 		Runtime.getRuntime().addShutdownHook(shutdownThread);
 
 		ApplicationFunctions.execQApplication();
 		eventLoopThread.set(null);
 
-		for (final FileAlterationMonitor m : fileMonitors) {
-			try {
-				m.stop();
-			} catch (final Exception e) {
-				log.error("Failed to stop FileMonitor", e);
-			}
-		}
-		fileMonitors.clear();
+		shutdownFileMonitors();
 
-		executor.shutdownNow();
-		try {
-			executor.awaitTermination(1, TimeUnit.SECONDS);
-		} catch (final InterruptedException e) {
-			log.error("Interrupted while attempting to shutdown executor", e);
-		}
+		shutdownExecutor();
 
 		delete();
 
@@ -256,6 +264,26 @@ public class JQMLApplication<EType> {
 		}
 
 		log.info("JQMLApplication.execute() complete");
+	}
+
+	private void shutdownExecutor() {
+		executor.shutdownNow();
+		try {
+			executor.awaitTermination(1, TimeUnit.SECONDS);
+		} catch (final InterruptedException e) {
+			log.error("Interrupted while attempting to shutdown executor", e);
+		}
+	}
+
+	private void shutdownFileMonitors() {
+		for (final FileAlterationMonitor m : fileMonitors) {
+			try {
+				m.stop();
+			} catch (final Exception e) {
+				log.error("Failed to stop FileMonitor", e);
+			}
+		}
+		fileMonitors.clear();
 	}
 
 	/**

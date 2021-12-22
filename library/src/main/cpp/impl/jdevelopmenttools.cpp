@@ -71,7 +71,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         else if (key->key() == Qt::Key_F11)
         {
             if (m_isRecording) {
-                saveRecording();
+                saveRecording(QDateTime::currentDateTimeUtc());
             } else {
                 m_startTime = QDateTime::currentDateTimeUtc();
                 m_recordedEvents.clear();
@@ -166,7 +166,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
     return QObject::eventFilter(watched, event);
 }
 
-void JDevelopmentTools::saveRecording()
+void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
 {
     QFile javaTestFile(QString::fromStdString(m_recordingDirectory) + "/IntegrationTest.java");
     if (javaTestFile.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -182,6 +182,7 @@ void JDevelopmentTools::saveRecording()
         out << "\t\t// TODO run test setup\n";
         out << "\t\tString screenshotDir = \"TODO\";\n";
         out << "\t\tJQMLDevelopmentTools tools = app.getDevelopmentTools();\n";
+        out << "\t\ttools.startIntegrationTest();\n";
 
         QDateTime workingTime = m_startTime;
         for (const RecordedEvent& e: m_recordedEvents)
@@ -262,6 +263,10 @@ void JDevelopmentTools::saveRecording()
             }
         }
 
+        int64_t milli = workingTime.msecsTo(recordingEndTime);
+        out << "\t\ttools.pollEventQueue(Duration.ofMillis(" << milli << "))\n";
+
+        out << "\t\ttools.endIntegrationTest();\n";
         out << "\t}\n";
         out << "\n";
         out << "}\n";

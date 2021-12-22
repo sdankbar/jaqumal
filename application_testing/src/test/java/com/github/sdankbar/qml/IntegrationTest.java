@@ -26,7 +26,6 @@ import java.time.Duration;
 
 import org.junit.Test;
 
-import com.github.sdankbar.qml.dev_tools.JQMLDevelopmentTools;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.eventing.NullEventProcessor;
 
@@ -40,6 +39,8 @@ public class IntegrationTest {
 
 		final String screenshotDir = "TODO";
 		final JQMLDevelopmentTools tools = app.getDevolopmentTools();
+		tools.startIntegrationTest();
+
 		tools.mouseMove(140, 5, 0, 0, 0, Duration.ofMillis(790));
 		tools.mouseMove(138, 8, 0, 0, 0, Duration.ofMillis(7));
 		tools.mouseMove(136, 12, 0, 0, 0, Duration.ofMillis(7));
@@ -218,6 +219,8 @@ public class IntegrationTest {
 		tools.mouseMove(126, 91, 0, 0, 0, Duration.ofMillis(33));
 		tools.mousePress(126, 91, 1, 1, 0, Duration.ofMillis(396));
 		tools.mouseRelease(126, 91, 1, 0, 0, Duration.ofMillis(94));
+
+		tools.endIntegrationTest();
 	}
 
 }

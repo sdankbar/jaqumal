@@ -20,49 +20,64 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.github.sdankbar.qml.dev_tools;
+package com.github.sdankbar.qml;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Objects;
 
 import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 
 public class JQMLDevelopmentTools {
 
+	private final JQMLApplication<?> app;
+
+	JQMLDevelopmentTools(final JQMLApplication<?> app) {
+		this.app = Objects.requireNonNull(app, "app is null");
+	}
+
+	public void startIntegrationTest() {
+		app.startIntegrationTest();
+	}
+
+	public void endIntegrationTest() {
+		app.endIntegrationTest();
+	}
+
 	public void pressKey(final String k, final Duration delay) {
-		wait(delay);
+		pollEventQueue(delay);
 		// TODO
 	}
 
 	public void releaseKey(final String k, final Duration delay) {
-		wait(delay);
+		pollEventQueue(delay);
 		// TODO
 	}
 
 	public void mousePress(final int x, final int y, final int button, final int buttons, final int modifiers,
 			final Duration delay) {
-		wait(delay);
+		pollEventQueue(delay);
 		ApplicationFunctions.injectMousePressIntoApplication(x, y, button, buttons, modifiers);
 	}
 
 	public void mouseRelease(final int x, final int y, final int button, final int buttons, final int modifiers,
 			final Duration delay) {
-		wait(delay);
+		pollEventQueue(delay);
 		ApplicationFunctions.injectMouseReleaseIntoApplication(x, y, button, buttons, modifiers);
 	}
 
 	public void mouseMove(final int x, final int y, final int button, final int buttons, final int modifiers,
 			final Duration delay) {
-		wait(delay);
+		pollEventQueue(delay);
 		ApplicationFunctions.injectMouseMoveIntoApplication(x, y, button, buttons, modifiers);
 	}
 
 	public void compareWindowToImage(final File path, final Duration delay) {
-		wait(delay);
+		pollEventQueue(delay);
 		// TODO
 	}
 
-	private void wait(final Duration delay) {
+	public void pollEventQueue(final Duration delay) {
 		final long start = System.currentTimeMillis();
 		long now = start;
 		while ((now - start) < delay.toMillis()) {

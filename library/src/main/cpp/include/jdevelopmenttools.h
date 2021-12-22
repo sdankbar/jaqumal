@@ -31,7 +31,7 @@ private:
 
     static int32_t INSTANCE_COUNT;
 
-    void saveRecording();
+    void saveRecording(const QDateTime& recordingEndTime);
 
     // Properties
     bool m_isRecording;
