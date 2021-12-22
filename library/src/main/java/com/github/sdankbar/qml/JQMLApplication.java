@@ -470,7 +470,7 @@ public class JQMLApplication<EType> {
 		ApplicationFunctions.setWindowsIcon(i);
 	}
 
-	public JQMLDevelopmentTools getDevolopmentTools() {
+	public JQMLDevelopmentTools getDevelopmentTools() {
 		return devTools;
 	}
 

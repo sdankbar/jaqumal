@@ -38,6 +38,7 @@ private:
 
     // Recording variables
     QDateTime m_startTime;
+    QDateTime m_lastMouseMoveTime;
     QEvent* m_lastReceivedEvent;
     std::vector<RecordedEvent> m_recordedEvents;
     std::string m_recordingDirectory;

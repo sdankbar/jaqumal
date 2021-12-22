@@ -4,11 +4,17 @@
 #include <QDir>
 #include <QTextStream>
 
+namespace
+{
+int32_t MOVE_SAMPLE_RATE = 250;
+}
+
 int32_t JDevelopmentTools::INSTANCE_COUNT = 0;
 
 JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
     QQuickWindow(parent),
     m_isRecording(false),
+    m_lastMouseMoveTime(QDateTime::fromMSecsSinceEpoch(0)),
     m_lastReceivedEvent(nullptr)
 {
     ++INSTANCE_COUNT;
@@ -58,6 +64,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             rec.m_eventTime = QDateTime::currentDateTimeUtc();
             m_recordedEvents.push_back(rec);
         }
+        m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
         break;
     }
     case QEvent::KeyRelease:
@@ -110,6 +117,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             rec.m_eventTime = QDateTime::currentDateTimeUtc();
             m_recordedEvents.push_back(rec);
         }
+        m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
         break;
     }
     case QEvent::MouseButtonPress:
@@ -122,6 +130,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             rec.m_eventTime = QDateTime::currentDateTimeUtc();
             m_recordedEvents.push_back(rec);
         }
+        m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
         break;
     }
         //case QEvent::MouseButtonDblClick:
@@ -143,16 +152,20 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             rec.m_eventTime = QDateTime::currentDateTimeUtc();
             m_recordedEvents.push_back(rec);
         }
+        m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
         break;
     }
     case QEvent::MouseMove:
     {
-        if (event != m_lastReceivedEvent)
+        QDateTime now = QDateTime::currentDateTimeUtc();
+        int64_t milli = m_lastMouseMoveTime.msecsTo(now);
+        if (event != m_lastReceivedEvent && (milli > MOVE_SAMPLE_RATE))
         {
             QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
             RecordedEvent rec;
             rec.m_event = new QMouseEvent(*mouse);
-            rec.m_eventTime = QDateTime::currentDateTimeUtc();
+            rec.m_eventTime = now;
+            m_lastMouseMoveTime = now;
             m_recordedEvents.push_back(rec);
         }
         break;
@@ -172,6 +185,8 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
     if (javaTestFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&javaTestFile);
 
+        out << "import java.time.Duration;\n";
+        out << "import org.junit.Test;\n";
         out << "import com.github.sdankbar.qml.JQMLApplication\n";
         out << "import com.github.sdankbar.qml.JQMLDevelopmentTools\n";
 
@@ -264,7 +279,7 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
         }
 
         int64_t milli = workingTime.msecsTo(recordingEndTime);
-        out << "\t\ttools.pollEventQueue(Duration.ofMillis(" << milli << "))\n";
+        out << "\t\ttools.pollEventQueue(Duration.ofMillis(" << milli << "));\n";
 
         out << "\t\ttools.endIntegrationTest();\n";
         out << "\t}\n";
