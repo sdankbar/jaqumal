@@ -205,8 +205,6 @@ public class JQMLApplication<EType> {
 
 	void startIntegrationTest() {
 		eventLoopThread.set(Thread.currentThread());
-
-		Runtime.getRuntime().addShutdownHook(getShutdownThread(new AtomicBoolean(false)));
 	}
 
 	void endIntegrationTest() {
@@ -216,8 +214,6 @@ public class JQMLApplication<EType> {
 		shutdownExecutor();
 
 		delete();
-		
-		Runtime.getRuntime().removeShutdownHook(shutdownThread);
 	}
 
 	private Thread getShutdownThread(final AtomicBoolean shutdownRunning) {
