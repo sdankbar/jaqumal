@@ -48,6 +48,7 @@ import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 import com.github.sdankbar.qml.cpp.jni.EventFunctions;
 import com.github.sdankbar.qml.cpp.jni.InvocationFunctions;
 import com.github.sdankbar.qml.cpp.jni.interfaces.EventCallback;
+import com.github.sdankbar.qml.dev_tools.JQMLDevelopmentTools;
 import com.github.sdankbar.qml.eventing.Event;
 import com.github.sdankbar.qml.eventing.EventDispatcher;
 import com.github.sdankbar.qml.eventing.EventFactory;
@@ -178,6 +179,7 @@ public class JQMLApplication<EType> {
 
 	private final ScheduledExecutorService executor = new JQMLScheduledExecutorService();
 	private final JQMLModelFactory modelFactory;
+	private final JQMLDevelopmentTools devTools = new JQMLDevelopmentTools();
 
 	private final List<JQMLImageProviderWrapper> imageProviders = new ArrayList<>();
 
@@ -442,6 +444,10 @@ public class JQMLApplication<EType> {
 		verifyEventLoopThread();
 		Objects.requireNonNull(i, "i is null");
 		ApplicationFunctions.setWindowsIcon(i);
+	}
+
+	public JQMLDevelopmentTools getDevolopmentTools() {
+		return devTools;
 	}
 
 }

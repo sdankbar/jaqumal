@@ -25,19 +25,13 @@ package com.github.sdankbar.qml.dev_tools;
 import java.io.File;
 import java.time.Duration;
 
-public class JQMLDevelopmentTools {
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 
-	public void pressKey(final String k) {
-		pressKey(k, Duration.ZERO);
-	}
+public class JQMLDevelopmentTools {
 
 	public void pressKey(final String k, final Duration delay) {
 		wait(delay);
 		// TODO
-	}
-
-	public void releaseKey(final String k) {
-		releaseKey(k, Duration.ZERO);
 	}
 
 	public void releaseKey(final String k, final Duration delay) {
@@ -45,35 +39,22 @@ public class JQMLDevelopmentTools {
 		// TODO
 	}
 
-	public void mousePress(final int x, final int y) {
-		mousePress(x, y, Duration.ZERO);
-	}
-
-	public void mousePress(final int x, final int y, final Duration delay) {
+	public void mousePress(final int x, final int y, final int button, final int buttons, final int modifiers,
+			final Duration delay) {
 		wait(delay);
-		// TODO
+		ApplicationFunctions.injectMousePressIntoApplication(x, y, button, buttons, modifiers);
 	}
 
-	public void mouseRelease(final int x, final int y) {
-		mouseRelease(x, y, Duration.ZERO);
-	}
-
-	public void mouseRelease(final int x, final int y, final Duration delay) {
+	public void mouseRelease(final int x, final int y, final int button, final int buttons, final int modifiers,
+			final Duration delay) {
 		wait(delay);
-		// TODO
+		ApplicationFunctions.injectMouseReleaseIntoApplication(x, y, button, buttons, modifiers);
 	}
 
-	public void mouseMove(final int x, final int y) {
-		mouseMove(x, y, Duration.ZERO);
-	}
-
-	public void mouseMove(final int x, final int y, final Duration delay) {
+	public void mouseMove(final int x, final int y, final int button, final int buttons, final int modifiers,
+			final Duration delay) {
 		wait(delay);
-		// TODO
-	}
-
-	public void compareWindowToImage(final File path) {
-		compareWindowToImage(path, Duration.ZERO);
+		ApplicationFunctions.injectMouseMoveIntoApplication(x, y, button, buttons, modifiers);
 	}
 
 	public void compareWindowToImage(final File path, final Duration delay) {
@@ -82,6 +63,16 @@ public class JQMLDevelopmentTools {
 	}
 
 	private void wait(final Duration delay) {
-		// TODO
+		final long start = System.currentTimeMillis();
+		long now = start;
+		while ((now - start) < delay.toMillis()) {
+			ApplicationFunctions.pollQAplicationEvents();
+			try {
+				Thread.sleep(1);
+			} catch (final InterruptedException e) {
+				e.printStackTrace();
+			}
+			now = System.currentTimeMillis();
+		}
 	}
 }

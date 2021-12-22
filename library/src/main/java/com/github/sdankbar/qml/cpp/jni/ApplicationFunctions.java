@@ -59,6 +59,8 @@ public final class ApplicationFunctions {
 	 */
 	public static native void execQApplication();
 
+	public static native void pollQAplicationEvents();
+
 	/**
 	 * @return The version of Qt the Jaqumal was compiled with.
 	 */
@@ -147,4 +149,9 @@ public final class ApplicationFunctions {
 	 */
 	public static native boolean registerResource(int length, byte[] rccData, String mapRoot);
 
+	public static native void injectMousePressIntoApplication(int x, int y, int button, int buttons, int modifiers);
+
+	public static native void injectMouseReleaseIntoApplication(int x, int y, int button, int buttons, int modifiers);
+
+	public static native void injectMouseMoveIntoApplication(int x, int y, int button, int buttons, int modifiers);
 }

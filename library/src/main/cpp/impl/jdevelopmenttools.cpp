@@ -85,7 +85,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             emit isRecordingChanged();
             return true;
         }
-        else if (key->key() == Qt::Key_F10)
+        else if (key->key() == Qt::Key_F10 && m_isRecording)
         {
 
             QImage windowImage = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
@@ -194,7 +194,7 @@ void JDevelopmentTools::saveRecording()
                     QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\ttools.pressKey(" << key->text() << ", "
-                        << "Duration.ofMillis(" << milli << "))\n";
+                        << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                 case QEvent::KeyRelease:
@@ -202,7 +202,7 @@ void JDevelopmentTools::saveRecording()
                     QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\ttools.pressKey(" << key->text() << ", "
-                        << "Duration.ofMillis(" << milli << "))\n";
+                        << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                 case QEvent::MouseButtonPress:
@@ -211,7 +211,10 @@ void JDevelopmentTools::saveRecording()
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\ttools.mousePress(" << mouse->x() << ", "
                         << mouse->y() << ", "
-                        << "Duration.ofMillis(" << milli << "))\n";
+                        << mouse->button() << ", "
+                        << mouse->buttons() << ", "
+                        << mouse->modifiers() << ", "
+                        << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                     //case QEvent::MouseButtonDblClick:
@@ -226,7 +229,10 @@ void JDevelopmentTools::saveRecording()
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\ttools.mouseRelease(" << mouse->x() << ", "
                         << mouse->y() << ", "
-                        << "Duration.ofMillis(" << milli << "))\n";
+                        << mouse->button() << ", "
+                        << mouse->buttons() << ", "
+                        << mouse->modifiers() << ", "
+                        << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                 case QEvent::MouseMove: {
@@ -234,7 +240,10 @@ void JDevelopmentTools::saveRecording()
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\ttools.mouseMove(" << mouse->x() << ", "
                         << mouse->y() << ", "
-                        << "Duration.ofMillis(" << milli << "))\n";
+                        << mouse->button() << ", "
+                        << mouse->buttons() << ", "
+                        << mouse->modifiers() << ", "
+                        << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                 default:

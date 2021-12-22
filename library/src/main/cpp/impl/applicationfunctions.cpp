@@ -90,6 +90,44 @@ JNICALL void execQApplication(JNIEnv* env, jclass)
     }
 }
 
+JNICALL void pollQAplicationEvents(JNIEnv* env, jclass)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->pollEvents();
+    }
+}
+
+JNICALL void injectMousePressIntoApplication(JNIEnv* env, jclass, jint x, jint y,
+                                             jint button, jint buttons,
+                                             jint modifiers)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->injectMousePress(x, y, button, buttons, modifiers);
+    }
+}
+
+JNICALL void injectMouseReleaseIntoApplication(JNIEnv* env, jclass, jint x, jint y,
+                                               jint button, jint buttons,
+                                               jint modifiers)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->injectMouseRelease(x, y, button, buttons, modifiers);
+    }
+}
+
+JNICALL void injectMouseMoveIntoApplication(JNIEnv* env, jclass, jint x, jint y,
+                                            jint button, jint buttons,
+                                            jint modifiers)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->injectMouseMove(x, y, button, buttons, modifiers);
+    }
+}
+
 JNICALL jstring getCompileQtVersion(JNIEnv* env, jclass)
 {
     return env->NewStringUTF(QT_VERSION_STR);
@@ -320,6 +358,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("createQApplication",    "([Ljava/lang/String;)V",    (void *)&createQApplication),
         JNIUtilities::createJNIMethod("deleteQApplication",    "()V",    (void *)&deleteQApplication),
         JNIUtilities::createJNIMethod("execQApplication",    "()V",    (void *)&execQApplication),
+        JNIUtilities::createJNIMethod("pollQAplicationEvents", "()V",    (void *)&pollQAplicationEvents),
         JNIUtilities::createJNIMethod("getCompileQtVersion",    "()Ljava/lang/String;",    (void *)&getCompileQtVersion),
         JNIUtilities::createJNIMethod("getRuntimeQtVersion",    "()Ljava/lang/String;",    (void *)&getRuntimeQtVersion),
         JNIUtilities::createJNIMethod("loadQMLFile",    "(Ljava/lang/String;)V",    (void *)&loadQMLFile),
@@ -335,6 +374,9 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("setWindowsIcon", "(Ljava/awt/image/BufferedImage;)V", (void *)&setWindowsIcon),
         JNIUtilities::createJNIMethod("registerResource", "(Ljava/lang/String;Ljava/lang/String;)Z", (void *)&registerResourceFile),
         JNIUtilities::createJNIMethod("registerResource", "(I[BLjava/lang/String;)Z", (void *)&registerResourceData),
+        JNIUtilities::createJNIMethod("injectMousePressIntoApplication", "(IIIII)V", (void *)&injectMousePressIntoApplication),
+        JNIUtilities::createJNIMethod("injectMouseReleaseIntoApplication", "(IIIII)V", (void *)&injectMouseReleaseIntoApplication),
+        JNIUtilities::createJNIMethod("injectMouseMoveIntoApplication", "(IIIII)V", (void *)&injectMouseMoveIntoApplication),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
@@ -404,6 +446,12 @@ ApplicationFunctions::~ApplicationFunctions()
 void ApplicationFunctions::exec()
 {
    m_qapp->exec();
+}
+
+void ApplicationFunctions::pollEvents()
+{
+   m_qapp->processEvents();
+   m_qapp->sendPostedEvents();
 }
 
 void ApplicationFunctions::quitApplication()
@@ -588,4 +636,55 @@ QImage ApplicationFunctions::takeFocusedWindowScreenShot() const
    {
        return QImage();
    }
+}
+
+void ApplicationFunctions::injectMousePress(int32_t x, int32_t y,
+                                            int32_t button, int32_t buttons,
+                                            int32_t modifiers)
+{
+    QWindow* window = QGuiApplication::focusWindow();
+    QMouseEvent* event = new QMouseEvent(
+                QEvent::MouseButtonPress,
+                QPointF(x, y),
+                QPointF(x, y),
+                QPointF(x + window->x(), y + window->y()),
+                static_cast<Qt::MouseButton>(button),
+                static_cast<Qt::MouseButtons>(buttons),
+                static_cast<Qt::KeyboardModifiers>(modifiers),
+                Qt::MouseEventSynthesizedByApplication);
+    QCoreApplication::postEvent(window, event);
+}
+
+void ApplicationFunctions::injectMouseRelease(int32_t x, int32_t y,
+                                              int32_t button, int32_t buttons,
+                                              int32_t modifiers)
+{
+    QWindow* window = QGuiApplication::focusWindow();
+    QMouseEvent* event = new QMouseEvent(
+                QEvent::MouseButtonRelease,
+                QPointF(x, y),
+                QPointF(x, y),
+                QPointF(x + window->x(), y + window->y()),
+                static_cast<Qt::MouseButton>(button),
+                static_cast<Qt::MouseButtons>(buttons),
+                static_cast<Qt::KeyboardModifiers>(modifiers),
+                Qt::MouseEventSynthesizedByApplication);
+    QCoreApplication::postEvent(window, event);
+}
+
+void ApplicationFunctions::injectMouseMove(int32_t x, int32_t y,
+                                           int32_t button, int32_t buttons,
+                                           int32_t modifiers)
+{
+    QWindow* window = QGuiApplication::focusWindow();
+    QMouseEvent* event = new QMouseEvent(
+                QEvent::MouseMove,
+                QPointF(x, y),
+                QPointF(x, y),
+                QPointF(x + window->x(), y + window->y()),
+                static_cast<Qt::MouseButton>(button),
+                static_cast<Qt::MouseButtons>(buttons),
+                static_cast<Qt::KeyboardModifiers>(modifiers),
+                Qt::MouseEventSynthesizedByApplication);
+    QCoreApplication::postEvent(window, event);
 }
