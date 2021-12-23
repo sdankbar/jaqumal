@@ -78,6 +78,13 @@ public class JQMLDevelopmentTools {
 		ApplicationFunctions.injectMouseMoveIntoApplication(x, y, button, buttons, modifiers);
 	}
 
+	public void wheel(final int x, final int y, final int pixelX, final int pixelY, final int angleX, final int angleY,
+			final int buttons, final int modifiers, final int phase, final boolean inverted, final Duration delay) {
+		pollEventQueue(delay);
+		ApplicationFunctions.injectWheelIntoApplication(x, y, pixelX, pixelY, angleX, angleY, buttons, modifiers, phase,
+				inverted);
+	}
+
 	public void compareWindowToImage(final File path, final Duration delay) {
 		pollEventQueue(delay);
 

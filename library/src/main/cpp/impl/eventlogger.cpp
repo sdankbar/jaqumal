@@ -24,6 +24,8 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QTouchEvent>
+#include <sstream>
 
 EventLogger::EventLogger(QMLLogging& log, QObject* parent) :
     QObject(parent),
@@ -63,6 +65,54 @@ bool EventLogger::eventFilter(QObject* obj, QEvent* event)
     {
         QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
         m_log.info(QString("MouseButtonRelease btn=%1 x=%2 y=%3").arg(mouse->button()).arg(mouse->x()).arg(mouse->y()));
+        break;
+    }
+    case QEvent::Wheel:
+    {
+        QWheelEvent* mouse = static_cast<QWheelEvent*>(event);
+        m_log.info(QString("Wheel x=%1 y=%2 angleX=%3 angleY=%4").
+                   arg(mouse->x()).
+                   arg(mouse->y()).
+                   arg(mouse->angleDelta().x()).
+                   arg(mouse->angleDelta().y()));
+        break;
+    }
+    case QEvent::TouchBegin:
+    {
+        QTouchEvent* touch = static_cast<QTouchEvent*>(event);
+        std::stringstream str;
+        for (const QTouchEvent::TouchPoint& p : touch->touchPoints())
+        {
+            str << p.id() << "=(" << p.pos().x() << ", " << p.pos().y() << ") ";
+        }
+        m_log.info(QString("Touch begin points=%1").arg(QString::fromStdString(str.str())));
+        break;
+    }
+    case QEvent::TouchEnd:
+    {
+        QTouchEvent* touch = static_cast<QTouchEvent*>(event);
+        std::stringstream str;
+        for (const QTouchEvent::TouchPoint& p : touch->touchPoints())
+        {
+            str << p.id() << "=(" << p.pos().x() << ", " << p.pos().y() << ") ";
+        }
+        m_log.info(QString("Touch end points=%1").arg(QString::fromStdString(str.str())));
+        break;
+    }
+    case QEvent::TouchUpdate:
+    {
+        QTouchEvent* touch = static_cast<QTouchEvent*>(event);
+        std::stringstream str;
+        for (const QTouchEvent::TouchPoint& p : touch->touchPoints())
+        {
+            str << p.id() << "=(" << p.pos().x() << ", " << p.pos().y() << ") ";
+        }
+        m_log.info(QString("Touch update points=%1").arg(QString::fromStdString(str.str())));
+        break;
+    }
+    case QEvent::TouchCancel:
+    {
+        m_log.info(QString("Touch cancel"));
         break;
     }
     //case QEvent::MouseMove: {

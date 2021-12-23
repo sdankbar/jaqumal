@@ -273,12 +273,12 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
                         << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
-                    //case QEvent::MouseButtonDblClick:
-                    //{
-                    //    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
-                    //
-                    //    break;
-                    //}
+                //case QEvent::MouseButtonDblClick:
+                //{
+                //    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                //
+                //    break;
+                //}
                 case QEvent::MouseButtonRelease:
                 {
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
@@ -304,7 +304,19 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
                 }
                 case QEvent::Wheel:
                 {
-                    // TODO
+                    QWheelEvent* mouse = static_cast<QWheelEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\ttools.wheel(" << mouse->x() << ", "
+                        << mouse->y() << ", "
+                        << mouse->pixelDelta().x() << ", "
+                        << mouse->pixelDelta().y() << ", "
+                        << mouse->angleDelta().x() << ", "
+                        << mouse->angleDelta().y() << ", "
+                        << mouse->buttons() << ", "
+                        << mouse->modifiers() << ", "
+                        << mouse->phase() << ", "
+                        << (mouse->inverted() ? "true" : "false") << ", "
+                        << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                 case QEvent::TouchBegin:
