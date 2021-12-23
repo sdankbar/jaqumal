@@ -14,8 +14,7 @@ int32_t JDevelopmentTools::INSTANCE_COUNT = 0;
 JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
     QQuickWindow(parent),
     m_isRecording(false),
-    m_lastMouseMoveTime(QDateTime::fromMSecsSinceEpoch(0)),
-    m_lastReceivedEvent(nullptr)
+    m_lastMouseMoveTime(QDateTime::fromMSecsSinceEpoch(0))
 {
     ++INSTANCE_COUNT;
     if (INSTANCE_COUNT == 1)
@@ -58,7 +57,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         {
             // Ignore
         }
-        else if (event != m_lastReceivedEvent)
+        else if ((watched->parent() == nullptr) && m_isRecording)
         {
             RecordedEvent rec;
             rec.m_event = new QKeyEvent(*key);
@@ -74,7 +73,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         if (key->key() == Qt::Key_F12)
         {
             setVisible(!isVisible());
-            m_lastReceivedEvent = event;
+            m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
             return true;
         }
         else if (key->key() == Qt::Key_F11)
@@ -92,7 +91,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             }
             m_isRecording = !m_isRecording;
             emit isRecordingChanged();
-            m_lastReceivedEvent = event;
+            m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
             return true;
         }
         else if (key->key() == Qt::Key_F10 && m_isRecording)
@@ -102,8 +101,9 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             if (!windowImage.isNull())
             {
                 QString now = QDateTime::currentDateTimeUtc().toString("hh_mm_ss_zzz");
-                QString fileName = QString::fromStdString(m_recordingDirectory) + "/screenshot_" + now + ".png";
-                windowImage.save(fileName, "png");
+                QString fileName = "screenshot_" + now + ".png";
+                QString filePath = QString::fromStdString(m_recordingDirectory) + "/" + fileName;
+                windowImage.save(filePath, "png");
 
                 RecordedEvent rec;
                 rec.m_event = nullptr;
@@ -111,10 +111,10 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
                 rec.m_screenshotFile = fileName;
                 m_recordedEvents.push_back(rec);
             }
-            m_lastReceivedEvent = event;
+            m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
             return true;
         }
-        else if (event != m_lastReceivedEvent)
+        else if ((watched->parent() == nullptr) && m_isRecording)
         {
             RecordedEvent rec;
             rec.m_event = new QKeyEvent(*key);
@@ -126,11 +126,10 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
     }
     case QEvent::MouseButtonPress:
     {
-        if (event != m_lastReceivedEvent)
+        if ((watched->parent() == nullptr) && m_isRecording)
         {
-            QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
             RecordedEvent rec;
-            rec.m_event = new QMouseEvent(*mouse);
+            rec.m_event = new QMouseEvent(*static_cast<QMouseEvent*>(event));
             rec.m_eventTime = QDateTime::currentDateTimeUtc();
             m_recordedEvents.push_back(rec);
         }
@@ -148,11 +147,10 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         //}
     case QEvent::MouseButtonRelease:
     {
-        if (event != m_lastReceivedEvent)
+        if ((watched->parent() == nullptr) && m_isRecording)
         {
-            QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
             RecordedEvent rec;
-            rec.m_event = new QMouseEvent(*mouse);
+            rec.m_event = new QMouseEvent(*static_cast<QMouseEvent*>(event));
             rec.m_eventTime = QDateTime::currentDateTimeUtc();
             m_recordedEvents.push_back(rec);
         }
@@ -163,15 +161,31 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
     {
         QDateTime now = QDateTime::currentDateTimeUtc();
         int64_t milli = m_lastMouseMoveTime.msecsTo(now);
-        if (event != m_lastReceivedEvent && (milli > MOVE_SAMPLE_RATE))
+        if ((watched->parent() == nullptr) && (milli > MOVE_SAMPLE_RATE) && m_isRecording)
         {
-            QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
             RecordedEvent rec;
-            rec.m_event = new QMouseEvent(*mouse);
+            rec.m_event = new QMouseEvent(*static_cast<QMouseEvent*>(event));
             rec.m_eventTime = now;
             m_lastMouseMoveTime = now;
             m_recordedEvents.push_back(rec);
         }
+        break;
+    }
+    case QEvent::Wheel:
+    {
+        if ((watched->parent() == nullptr) && m_isRecording)
+        {
+            RecordedEvent rec;
+            rec.m_event = new QWheelEvent(*static_cast<QWheelEvent*>(event));
+            rec.m_eventTime = QDateTime::currentDateTimeUtc();
+            m_recordedEvents.push_back(rec);
+        }
+        m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
+        break;
+    }
+    case QEvent::TouchBegin:
+    {
+        // TODO
         break;
     }
     default:
@@ -179,7 +193,6 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         break;
     }
 
-    m_lastReceivedEvent = event;
     return QObject::eventFilter(watched, event);
 }
 
@@ -287,6 +300,16 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
                         << mouse->buttons() << ", "
                         << mouse->modifiers() << ", "
                         << "Duration.ofMillis(" << milli << "));\n";
+                    break;
+                }
+                case QEvent::Wheel:
+                {
+                    // TODO
+                    break;
+                }
+                case QEvent::TouchBegin:
+                {
+                    // TODO
                     break;
                 }
                 default:
