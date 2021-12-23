@@ -129,6 +129,20 @@ JNICALL void injectMouseMoveIntoApplication(JNIEnv* env, jclass, jint x, jint y,
     }
 }
 
+JNICALL void injectWheelIntoApplication(JNIEnv* env, jclass, jint x, jint y,
+                                        jint pixelX, jint pixelY,
+                                        jint angleX, jint angleY,
+                                        jint buttons, jint modifiers,
+                                        jint phase, jboolean inverted)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->injectWheel(x, y, pixelX, pixelY,
+                                                 angleX, angleY, buttons, modifiers,
+                                                 phase, inverted);
+    }
+}
+
 JNICALL void injectKeyPressIntoApplication(JNIEnv* env, jclass,
                                            jint key,
                                            jint modifiers,
@@ -803,5 +817,25 @@ void ApplicationFunctions::injectKeyRelease(int32_t key,
                                      text,
                                      autoRep,
                                      count);
+    QCoreApplication::postEvent(window, event);
+}
+
+void ApplicationFunctions::injectWheel(int32_t x, int32_t y,
+                                       int32_t pixelX, int32_t pixelY,
+                                       int32_t angleX, int32_t angleY,
+                                       int32_t buttons, int32_t modifiers,
+                                       int32_t phase, bool inverted)
+{
+    QWindow* window = QGuiApplication::focusWindow();
+    QWheelEvent* event = new QWheelEvent(
+                                     QPointF(x, y),
+                                     QPointF(x + window->x(), y + window->y()),
+                                     QPoint(pixelX, pixelY),
+                                     QPoint(angleX, angleY),
+                                     static_cast<Qt::MouseButtons>(buttons),
+                                     static_cast<Qt::KeyboardModifiers>(modifiers),
+                                     static_cast<Qt::ScrollPhase>(phase),
+                                     inverted,
+                                     Qt::MouseEventSynthesizedByApplication);
     QCoreApplication::postEvent(window, event);
 }
