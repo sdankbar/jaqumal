@@ -76,6 +76,7 @@ public class IntegrationTest {
 		tools.compareWindowToImage(new File(screenshotDir, "screenshot_01_50_39_095.png"), Duration.ofMillis(751));
 		tools.mouseMove(274, 66, 0, 0, 0, Duration.ofMillis(381));
 		tools.mouseMove(101, 183, 0, 0, 0, Duration.ofMillis(254));
+		tools.mousePress(60, 190, 1, 0, 0, Duration.ofMillis(50));
 		tools.mouseRelease(60, 190, 1, 0, 0, Duration.ofMillis(353));
 		tools.pressKey(49, 0, "1", false, 1, Duration.ofMillis(525));
 		tools.releaseKey(49, 0, "1", false, 1, Duration.ofMillis(69));

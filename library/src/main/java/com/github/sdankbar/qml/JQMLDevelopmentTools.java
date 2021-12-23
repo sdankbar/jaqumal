@@ -83,9 +83,14 @@ public class JQMLDevelopmentTools {
 
 		try {
 			final BufferedImage i = ImageIO.read(path);
-			if (!ApplicationFunctions.compareImageToActiveWindow(i)) {
-				throw new AssertionError("Active window does not match " + path);
+			for (int j = 0; j < 10; ++j) {
+				if (ApplicationFunctions.compareImageToActiveWindow(i)) {
+					return;
+				} else {
+					pollEventQueue(Duration.ofMillis(100));
+				}
 			}
+			throw new AssertionError("Active window does not match " + path);
 		} catch (final IOException e) {
 			throw new AssertionError("Unable to load comparison image", e);
 		}
