@@ -90,6 +90,9 @@ public class JQMLDevelopmentTools {
 	}
 
 	public void pollEventQueue(final Duration delay) {
+		// Poll at least once.
+		ApplicationFunctions.pollQAplicationEvents();
+
 		final long start = System.currentTimeMillis();
 		long now = start;
 		while ((now - start) < delay.toMillis()) {
