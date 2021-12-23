@@ -293,24 +293,25 @@ JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage)
         else
         {
             uint64_t sqSum = 0;
-            for (int i = 0; i < source.height(); ++i)
+            const int32_t pixelCount = source.width() * source.height();
+            const QRgb* sourcePixels = (const QRgb*)source.constBits();
+            const QRgb* targetPixels = (const QRgb*)target.constBits();
+            for (int i = 0; i < pixelCount; ++i)
             {
-                for (int j = 0; j < source.width(); ++j)
-                {
-                    QColor sColor = source.pixelColor(j, i);
-                    QColor tColor = target.pixelColor(j, i);
-                    int deltaR = sColor.red() - tColor.red();
-                    int deltaG = sColor.green() - tColor.green();
-                    int deltaB = sColor.blue() - tColor.blue();
-                    sqSum += (deltaR * deltaR)+
-                             (deltaG * deltaG) +
-                             (deltaB * deltaB);
-                }
+                const QRgb sColor = sourcePixels[i];
+                const QRgb tColor = targetPixels[i];
+                const int deltaR = qRed(sColor) - qRed(tColor);
+                const int deltaG = qGreen(sColor) - qGreen(tColor);
+                const int deltaB = qBlue(sColor)- qBlue(tColor);
+                sqSum += (deltaR * deltaR) +
+                         (deltaG * deltaG) +
+                         (deltaB * deltaB);
             }
 
-            double meanSquareError = sqSum / (3.0 * source.width() * source.height());
+            double meanSquareError = sqSum / (3.0 * pixelCount);
             if (meanSquareError == 0)
             {
+                // Avoid division by 0.
                 return true;
             }
             else
