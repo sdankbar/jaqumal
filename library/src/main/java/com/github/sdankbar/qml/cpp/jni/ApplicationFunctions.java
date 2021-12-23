@@ -155,5 +155,11 @@ public final class ApplicationFunctions {
 
 	public static native void injectMouseMoveIntoApplication(int x, int y, int button, int buttons, int modifiers);
 
+	public static native void injectKeyPressIntoApplication(int key, int modifiers, String text, boolean autoRep,
+			int count);
+
+	public static native void injectKeyReleaseIntoApplication(int key, int modifiers, String text, boolean autoRep,
+			int count);
+
 	public static native boolean compareImageToActiveWindow(BufferedImage i);
 }

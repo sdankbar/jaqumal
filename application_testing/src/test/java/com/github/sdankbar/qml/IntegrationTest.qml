@@ -55,4 +55,17 @@ Window {
             }
         }
     }
+
+    Rectangle {
+        anchors.bottom: parent.bottom
+
+        height: 20
+        width: 100
+        border.color: "black"
+
+        TextInput {
+            anchors.fill: parent
+            anchors.margins: 2
+        }
+    }
 }

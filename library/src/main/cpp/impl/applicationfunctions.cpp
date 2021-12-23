@@ -129,6 +129,32 @@ JNICALL void injectMouseMoveIntoApplication(JNIEnv* env, jclass, jint x, jint y,
     }
 }
 
+JNICALL void injectKeyPressIntoApplication(JNIEnv* env, jclass,
+                                           jint key,
+                                           jint modifiers,
+                                           jstring text,
+                                           jboolean autoRep,
+                                           jint count)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->injectKeyPress(key, modifiers, JNIUtilities::toQString(env, text), autoRep, count);
+    }
+}
+
+JNICALL void injectKeyReleaseIntoApplication(JNIEnv* env, jclass,
+                                           jint key,
+                                           jint modifiers,
+                                           jstring text,
+                                           jboolean autoRep,
+                                           jint count)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->injectKeyRelease(key, modifiers, JNIUtilities::toQString(env, text), autoRep, count);
+    }
+}
+
 JNICALL jstring getCompileQtVersion(JNIEnv* env, jclass)
 {
     return env->NewStringUTF(QT_VERSION_STR);
@@ -435,6 +461,8 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("injectMousePressIntoApplication", "(IIIII)V", (void *)&injectMousePressIntoApplication),
         JNIUtilities::createJNIMethod("injectMouseReleaseIntoApplication", "(IIIII)V", (void *)&injectMouseReleaseIntoApplication),
         JNIUtilities::createJNIMethod("injectMouseMoveIntoApplication", "(IIIII)V", (void *)&injectMouseMoveIntoApplication),
+        JNIUtilities::createJNIMethod("injectKeyPressIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyPressIntoApplication),
+        JNIUtilities::createJNIMethod("injectKeyReleaseIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyReleaseIntoApplication),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));
@@ -744,5 +772,36 @@ void ApplicationFunctions::injectMouseMove(int32_t x, int32_t y,
                 static_cast<Qt::MouseButtons>(buttons),
                 static_cast<Qt::KeyboardModifiers>(modifiers),
                 Qt::MouseEventSynthesizedByApplication);
+    QCoreApplication::postEvent(window, event);
+}
+
+void ApplicationFunctions::injectKeyPress(int32_t key,
+                                          int32_t modifiers,
+                                          const QString& text,
+                                          bool autoRep,
+                                          int32_t count)
+{
+    QWindow* window = QGuiApplication::focusWindow();
+    QKeyEvent* event = new QKeyEvent(QEvent::KeyPress,
+                                     key,
+                                     static_cast<Qt::KeyboardModifiers>(modifiers),
+                                     text,
+                                     autoRep,
+                                     count);
+    QCoreApplication::postEvent(window, event);
+}
+void ApplicationFunctions::injectKeyRelease(int32_t key,
+                                            int32_t modifiers,
+                                            const QString& text,
+                                            bool autoRep,
+                                            int32_t count)
+{
+    QWindow* window = QGuiApplication::focusWindow();
+    QKeyEvent* event = new QKeyEvent(QEvent::KeyRelease,
+                                     key,
+                                     static_cast<Qt::KeyboardModifiers>(modifiers),
+                                     text,
+                                     autoRep,
+                                     count);
     QCoreApplication::postEvent(window, event);
 }

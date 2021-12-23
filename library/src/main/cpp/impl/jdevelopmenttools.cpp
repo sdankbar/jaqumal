@@ -187,16 +187,28 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
 
         out << "import java.io.File;\n";
         out << "import java.time.Duration;\n";
+        out << "import org.junit.After;\n";
         out << "import org.junit.Test;\n";
-        out << "import com.github.sdankbar.qml.JQMLApplication\n";
-        out << "import com.github.sdankbar.qml.JQMLDevelopmentTools\n";
+        out << "import com.github.sdankbar.qml.JQMLApplication;\n";
+        out << "import com.github.sdankbar.qml.JQMLDevelopmentTools;\n";
         out << "\n";
-        out << "class IntegrationTest {\n";
+        out << "public class IntegrationTest {\n";
+        out << "\n";
+        out << "\tprivate JQMLApplication<?> app;\n";
+        out << "\tprivate final String screenshotDir = \"TODO\";\n";
+        out << "\n";
+        out << "\t@Before\n";
+        out << "\tpublic void setup() {\n";
+        out << "\t\t//TODO run test setup\n";
+        out << "\t}\n";
+        out << "\n";
+        out << "\t@After\n";
+        out << "\tpublic void finish() {\n";
+        out << "\t\tapp.getDevelopmentTools().endIntegrationTest();\n";
+        out << "\t}\n";
         out << "\n";
         out << "\t@Test\n";
         out << "\tpublic void test_run() {\n";
-        out << "\t\t// TODO run test setup\n";
-        out << "\t\tString screenshotDir = \"TODO\";\n";
         out << "\t\tJQMLDevelopmentTools tools = app.getDevelopmentTools();\n";
         out << "\t\ttools.startIntegrationTest();\n";
 
@@ -210,16 +222,26 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
                 {
                     QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                    out << "\t\ttools.pressKey(" << key->text() << ", "
-                        << "Duration.ofMillis(" << milli << "));\n";
+                    out << "\t\ttools.pressKey(" <<
+                           key->key() << ", " <<
+                           key->modifiers() << ", " <<
+                           "\"" << key->text() << "\", " <<
+                           (key->isAutoRepeat() ? "true" : "false") << ", " <<
+                           key->count() << ", " <<
+                           "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                 case QEvent::KeyRelease:
                 {
                     QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                    out << "\t\ttools.pressKey(" << key->text() << ", "
-                        << "Duration.ofMillis(" << milli << "));\n";
+                    out << "\t\ttools.releaseKey(" <<
+                           key->key() << ", " <<
+                           key->modifiers() << ", " <<
+                           "\"" << key->text() << "\", " <<
+                           (key->isAutoRepeat() ? "true" : "false") << ", " <<
+                           key->count() << ", " <<
+                           "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
                 case QEvent::MouseButtonPress:
@@ -282,7 +304,6 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
         int64_t milli = workingTime.msecsTo(recordingEndTime);
         out << "\t\ttools.pollEventQueue(Duration.ofMillis(" << milli << "));\n";
 
-        out << "\t\ttools.endIntegrationTest();\n";
         out << "\t}\n";
         out << "\n";
         out << "}\n";

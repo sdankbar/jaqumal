@@ -48,14 +48,16 @@ public class JQMLDevelopmentTools {
 		app.endIntegrationTest();
 	}
 
-	public void pressKey(final String k, final Duration delay) {
+	public void pressKey(final int key, final int modifiers, final String text, final boolean autoRep, final int count,
+			final Duration delay) {
 		pollEventQueue(delay);
-		// TODO
+		ApplicationFunctions.injectKeyPressIntoApplication(key, modifiers, text, autoRep, count);
 	}
 
-	public void releaseKey(final String k, final Duration delay) {
+	public void releaseKey(final int key, final int modifiers, final String text, final boolean autoRep,
+			final int count, final Duration delay) {
 		pollEventQueue(delay);
-		// TODO
+		ApplicationFunctions.injectKeyReleaseIntoApplication(key, modifiers, text, autoRep, count);
 	}
 
 	public void mousePress(final int x, final int y, final int button, final int buttons, final int modifiers,

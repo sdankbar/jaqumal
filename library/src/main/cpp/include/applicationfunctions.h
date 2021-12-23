@@ -85,6 +85,17 @@ public:
     void injectMouseRelease(int32_t x, int32_t y, int32_t button, int32_t buttons, int32_t modifiers);
     void injectMouseMove(int32_t x, int32_t y, int32_t button, int32_t buttons, int32_t modifiers);
 
+    void injectKeyPress(int32_t key,
+                        int32_t modifiers,
+                        const QString& text,
+                        bool autoRep,
+                        int32_t count);
+    void injectKeyRelease(int32_t key,
+                          int32_t modifiers,
+                          const QString& text,
+                          bool autoRep,
+                          int32_t count);
+
 signals:
     void modelMapChanged();
 
