@@ -40,7 +40,8 @@ bool JDevelopmentTools::isRecording() const
 
 bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
 {
-    switch (event->type()) {
+    switch (event->type())
+    {
     case QEvent::KeyPress:
     {
         QKeyEvent* key = static_cast<QKeyEvent*>(event);
@@ -73,6 +74,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         if (key->key() == Qt::Key_F12)
         {
             setVisible(!isVisible());
+            m_lastReceivedEvent = event;
             return true;
         }
         else if (key->key() == Qt::Key_F11)
@@ -90,6 +92,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
             }
             m_isRecording = !m_isRecording;
             emit isRecordingChanged();
+            m_lastReceivedEvent = event;
             return true;
         }
         else if (key->key() == Qt::Key_F10 && m_isRecording)
@@ -108,6 +111,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
                 rec.m_screenshotFile = fileName;
                 m_recordedEvents.push_back(rec);
             }
+            m_lastReceivedEvent = event;
             return true;
         }
         else if (event != m_lastReceivedEvent)
