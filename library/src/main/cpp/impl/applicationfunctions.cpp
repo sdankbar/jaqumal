@@ -54,6 +54,7 @@
 #include <QQuickWindow>
 #include <csignal>
 #include <qmltest.h>
+#include <math.h>
 
 JNICALL void createQApplication(JNIEnv* env, jclass, jobjectArray argv)
 {
@@ -276,7 +277,48 @@ JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage)
     {
         QImage target = ApplicationFunctions::get()->toQImage(env, jImage);
         QImage source = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
-        return target == source;
+
+        if (source.isNull() || target.isNull())
+        {
+            return false;
+        }
+        else if (source.width() != target.width())
+        {
+            return false;
+        }
+        else if (source.height() != target.height())
+        {
+            return false;
+        }
+        else
+        {
+            uint64_t sqSum = 0;
+            for (int i = 0; i < source.height(); ++i)
+            {
+                for (int j = 0; j < source.width(); ++j)
+                {
+                    QColor sColor = source.pixelColor(j, i);
+                    QColor tColor = target.pixelColor(j, i);
+                    int deltaR = sColor.red() - tColor.red();
+                    int deltaG = sColor.green() - tColor.green();
+                    int deltaB = sColor.blue() - tColor.blue();
+                    sqSum += (deltaR * deltaR)+
+                             (deltaG * deltaG) +
+                             (deltaB * deltaB);
+                }
+            }
+
+            double meanSquareError = sqSum / (3.0 * source.width() * source.height());
+            if (meanSquareError == 0)
+            {
+                return true;
+            }
+            else
+            {
+                double peakSignalToNoiseRatio = 10 * log10((255 * 255) / meanSquareError);
+                return (peakSignalToNoiseRatio > 60);
+            }
+        }
     }
     else
     {
@@ -410,10 +452,10 @@ ApplicationFunctions* ApplicationFunctions::SINGLETON = nullptr;
 
 void signal_handler(int)
 {
-  if (ApplicationFunctions::get())
-  {
-      ApplicationFunctions::get()->quitApplication();
-  }
+    if (ApplicationFunctions::get())
+    {
+        ApplicationFunctions::get()->quitApplication();
+    }
 }
 
 ApplicationFunctions::ApplicationFunctions(int32_t& argc, char** argv) :
@@ -460,18 +502,18 @@ ApplicationFunctions::~ApplicationFunctions()
 
 void ApplicationFunctions::exec()
 {
-   m_qapp->exec();
+    m_qapp->exec();
 }
 
 void ApplicationFunctions::pollEvents()
 {
-   m_qapp->processEvents();
-   m_qapp->sendPostedEvents();
+    m_qapp->processEvents();
+    m_qapp->sendPostedEvents();
 }
 
 void ApplicationFunctions::quitApplication()
 {
-   m_qapp->quit();
+    m_qapp->quit();
 }
 
 void ApplicationFunctions::invokeCallback(JNIEnv* env, jobject c)
@@ -641,16 +683,16 @@ void ApplicationFunctions::removeEventFilterFromApplication(QObject* obj)
 
 QImage ApplicationFunctions::takeFocusedWindowScreenShot() const
 {
-   QWindow* w = QApplication::focusWindow();
-   QQuickWindow* quickWindow = dynamic_cast<QQuickWindow*>(w);
-   if (quickWindow != nullptr)
-   {
-       return quickWindow->grabWindow();
-   }
-   else
-   {
-       return QImage();
-   }
+    QWindow* w = QApplication::focusWindow();
+    QQuickWindow* quickWindow = dynamic_cast<QQuickWindow*>(w);
+    if (quickWindow != nullptr)
+    {
+        return quickWindow->grabWindow();
+    }
+    else
+    {
+        return QImage();
+    }
 }
 
 void ApplicationFunctions::injectMousePress(int32_t x, int32_t y,
