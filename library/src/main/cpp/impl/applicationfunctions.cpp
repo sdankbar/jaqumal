@@ -157,11 +157,11 @@ JNICALL void injectKeyPressIntoApplication(JNIEnv* env, jclass,
 }
 
 JNICALL void injectKeyReleaseIntoApplication(JNIEnv* env, jclass,
-                                           jint key,
-                                           jint modifiers,
-                                           jstring text,
-                                           jboolean autoRep,
-                                           jint count)
+                                             jint key,
+                                             jint modifiers,
+                                             jstring text,
+                                             jboolean autoRep,
+                                             jint count)
 {
     if (ApplicationFunctions::check(env))
     {
@@ -237,7 +237,7 @@ JNICALL void addImageProvider(JNIEnv* env, jclass, jstring id, jobject c)
     if (ApplicationFunctions::check(env))
     {
         ApplicationFunctions::get()->addImageProviderObject(
-            JNIUtilities::toQString(env, id), env->NewGlobalRef(c));
+                    JNIUtilities::toQString(env, id), env->NewGlobalRef(c));
     }
 }
 
@@ -344,8 +344,8 @@ JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage)
                 const int deltaG = qGreen(sColor) - qGreen(tColor);
                 const int deltaB = qBlue(sColor)- qBlue(tColor);
                 sqSum += (deltaR * deltaR) +
-                         (deltaG * deltaG) +
-                         (deltaB * deltaB);
+                        (deltaG * deltaG) +
+                        (deltaB * deltaB);
             }
 
             double meanSquareError = sqSum / (3.0 * pixelCount);
@@ -735,9 +735,27 @@ void ApplicationFunctions::removeEventFilterFromApplication(QObject* obj)
     m_qapp->removeEventFilter(obj);
 }
 
-QImage ApplicationFunctions::takeFocusedWindowScreenShot() const
+QWindow* ApplicationFunctions::getEventInjectionWindow() const
 {
     QWindow* w = QApplication::focusWindow();
+    if (w != nullptr)
+    {
+        return w;
+    }
+    QWindowList topLevel = QApplication::topLevelWindows();
+    if (!topLevel.isEmpty())
+    {
+        return topLevel[0];
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+QImage ApplicationFunctions::takeFocusedWindowScreenShot() const
+{
+    QWindow* w = getEventInjectionWindow();
     QQuickWindow* quickWindow = dynamic_cast<QQuickWindow*>(w);
     if (quickWindow != nullptr)
     {
@@ -753,51 +771,60 @@ void ApplicationFunctions::injectMousePress(int32_t x, int32_t y,
                                             int32_t button, int32_t buttons,
                                             int32_t modifiers)
 {
-    QWindow* window = QGuiApplication::focusWindow();
-    QMouseEvent* event = new QMouseEvent(
-                QEvent::MouseButtonPress,
-                QPointF(x, y),
-                QPointF(x, y),
-                QPointF(x + window->x(), y + window->y()),
-                static_cast<Qt::MouseButton>(button),
-                static_cast<Qt::MouseButtons>(buttons),
-                static_cast<Qt::KeyboardModifiers>(modifiers),
-                Qt::MouseEventSynthesizedByApplication);
-    QCoreApplication::postEvent(window, event);
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QMouseEvent* event = new QMouseEvent(
+                    QEvent::MouseButtonPress,
+                    QPointF(x, y),
+                    QPointF(x, y),
+                    QPointF(x + window->x(), y + window->y()),
+                    static_cast<Qt::MouseButton>(button),
+                    static_cast<Qt::MouseButtons>(buttons),
+                    static_cast<Qt::KeyboardModifiers>(modifiers),
+                    Qt::MouseEventSynthesizedByApplication);
+        QCoreApplication::postEvent(window, event);
+    }
 }
 
 void ApplicationFunctions::injectMouseRelease(int32_t x, int32_t y,
                                               int32_t button, int32_t buttons,
                                               int32_t modifiers)
 {
-    QWindow* window = QGuiApplication::focusWindow();
-    QMouseEvent* event = new QMouseEvent(
-                QEvent::MouseButtonRelease,
-                QPointF(x, y),
-                QPointF(x, y),
-                QPointF(x + window->x(), y + window->y()),
-                static_cast<Qt::MouseButton>(button),
-                static_cast<Qt::MouseButtons>(buttons),
-                static_cast<Qt::KeyboardModifiers>(modifiers),
-                Qt::MouseEventSynthesizedByApplication);
-    QCoreApplication::postEvent(window, event);
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QMouseEvent* event = new QMouseEvent(
+                    QEvent::MouseButtonRelease,
+                    QPointF(x, y),
+                    QPointF(x, y),
+                    QPointF(x + window->x(), y + window->y()),
+                    static_cast<Qt::MouseButton>(button),
+                    static_cast<Qt::MouseButtons>(buttons),
+                    static_cast<Qt::KeyboardModifiers>(modifiers),
+                    Qt::MouseEventSynthesizedByApplication);
+        QCoreApplication::postEvent(window, event);
+    }
 }
 
 void ApplicationFunctions::injectMouseMove(int32_t x, int32_t y,
                                            int32_t button, int32_t buttons,
                                            int32_t modifiers)
 {
-    QWindow* window = QGuiApplication::focusWindow();
-    QMouseEvent* event = new QMouseEvent(
-                QEvent::MouseMove,
-                QPointF(x, y),
-                QPointF(x, y),
-                QPointF(x + window->x(), y + window->y()),
-                static_cast<Qt::MouseButton>(button),
-                static_cast<Qt::MouseButtons>(buttons),
-                static_cast<Qt::KeyboardModifiers>(modifiers),
-                Qt::MouseEventSynthesizedByApplication);
-    QCoreApplication::postEvent(window, event);
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QMouseEvent* event = new QMouseEvent(
+                    QEvent::MouseMove,
+                    QPointF(x, y),
+                    QPointF(x, y),
+                    QPointF(x + window->x(), y + window->y()),
+                    static_cast<Qt::MouseButton>(button),
+                    static_cast<Qt::MouseButtons>(buttons),
+                    static_cast<Qt::KeyboardModifiers>(modifiers),
+                    Qt::MouseEventSynthesizedByApplication);
+        QCoreApplication::postEvent(window, event);
+    }
 }
 
 void ApplicationFunctions::injectKeyPress(int32_t key,
@@ -806,14 +833,18 @@ void ApplicationFunctions::injectKeyPress(int32_t key,
                                           bool autoRep,
                                           int32_t count)
 {
-    QWindow* window = QGuiApplication::focusWindow();
-    QKeyEvent* event = new QKeyEvent(QEvent::KeyPress,
-                                     key,
-                                     static_cast<Qt::KeyboardModifiers>(modifiers),
-                                     text,
-                                     autoRep,
-                                     count);
-    QCoreApplication::postEvent(window, event);
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QWindow* window = QGuiApplication::focusWindow();
+        QKeyEvent* event = new QKeyEvent(QEvent::KeyPress,
+                                         key,
+                                         static_cast<Qt::KeyboardModifiers>(modifiers),
+                                         text,
+                                         autoRep,
+                                         count);
+        QCoreApplication::postEvent(window, event);
+    }
 }
 void ApplicationFunctions::injectKeyRelease(int32_t key,
                                             int32_t modifiers,
@@ -821,14 +852,18 @@ void ApplicationFunctions::injectKeyRelease(int32_t key,
                                             bool autoRep,
                                             int32_t count)
 {
-    QWindow* window = QGuiApplication::focusWindow();
-    QKeyEvent* event = new QKeyEvent(QEvent::KeyRelease,
-                                     key,
-                                     static_cast<Qt::KeyboardModifiers>(modifiers),
-                                     text,
-                                     autoRep,
-                                     count);
-    QCoreApplication::postEvent(window, event);
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QWindow* window = QGuiApplication::focusWindow();
+        QKeyEvent* event = new QKeyEvent(QEvent::KeyRelease,
+                                         key,
+                                         static_cast<Qt::KeyboardModifiers>(modifiers),
+                                         text,
+                                         autoRep,
+                                         count);
+        QCoreApplication::postEvent(window, event);
+    }
 }
 
 void ApplicationFunctions::injectWheel(int32_t x, int32_t y,
@@ -837,16 +872,20 @@ void ApplicationFunctions::injectWheel(int32_t x, int32_t y,
                                        int32_t buttons, int32_t modifiers,
                                        int32_t phase, bool inverted)
 {
-    QWindow* window = QGuiApplication::focusWindow();
-    QWheelEvent* event = new QWheelEvent(
-                                     QPointF(x, y),
-                                     QPointF(x + window->x(), y + window->y()),
-                                     QPoint(pixelX, pixelY),
-                                     QPoint(angleX, angleY),
-                                     static_cast<Qt::MouseButtons>(buttons),
-                                     static_cast<Qt::KeyboardModifiers>(modifiers),
-                                     static_cast<Qt::ScrollPhase>(phase),
-                                     inverted,
-                                     Qt::MouseEventSynthesizedByApplication);
-    QCoreApplication::postEvent(window, event);
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QWindow* window = QGuiApplication::focusWindow();
+        QWheelEvent* event = new QWheelEvent(
+                    QPointF(x, y),
+                    QPointF(x + window->x(), y + window->y()),
+                    QPoint(pixelX, pixelY),
+                    QPoint(angleX, angleY),
+                    static_cast<Qt::MouseButtons>(buttons),
+                    static_cast<Qt::KeyboardModifiers>(modifiers),
+                    static_cast<Qt::ScrollPhase>(phase),
+                    inverted,
+                    Qt::MouseEventSynthesizedByApplication);
+        QCoreApplication::postEvent(window, event);
+    }
 }

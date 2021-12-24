@@ -123,6 +123,8 @@ private:
     static jmethodID bufferedImageGetHeight;
     static jmethodID bufferedImageGetRGB;
 
+    QWindow* getEventInjectionWindow() const;
+
     QApplication* m_qapp;
     QQmlApplicationEngine* m_qmlEngine;
     UserInputSimulator m_uiSim;
