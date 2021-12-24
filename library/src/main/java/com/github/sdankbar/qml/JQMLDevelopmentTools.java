@@ -97,7 +97,12 @@ public class JQMLDevelopmentTools {
 					pollEventQueue(Duration.ofMillis(100));
 				}
 			}
-			throw new AssertionError("Active window does not match " + path);
+
+			if ("1".equals(System.getenv("RECAPTURE"))) {
+				ApplicationFunctions.saveScreenshot(path.getAbsolutePath());
+			} else {
+				throw new AssertionError("Active window does not match " + path);
+			}
 		} catch (final IOException e) {
 			throw new AssertionError("Unable to load comparison image", e);
 		}

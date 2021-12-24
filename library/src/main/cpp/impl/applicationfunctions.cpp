@@ -367,6 +367,16 @@ JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage)
     }
 }
 
+JNICALL void saveScreenshot(JNIEnv* env, jclass, jstring path)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        QString qpath = JNIUtilities::toQString(env, path);
+        QImage source = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
+        source.save(qpath);
+    }
+}
+
 void ApplicationFunctions::create(int* argc, char** argv)
 {
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
@@ -477,6 +487,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("injectMouseMoveIntoApplication", "(IIIII)V", (void *)&injectMouseMoveIntoApplication),
         JNIUtilities::createJNIMethod("injectKeyPressIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyPressIntoApplication),
         JNIUtilities::createJNIMethod("injectKeyReleaseIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyReleaseIntoApplication),
+        JNIUtilities::createJNIMethod("saveScreenshot", "(Ljava/lang/String;)V", (void *)&saveScreenshot),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));

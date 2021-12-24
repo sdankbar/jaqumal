@@ -165,4 +165,6 @@ public final class ApplicationFunctions {
 			int count);
 
 	public static native boolean compareImageToActiveWindow(BufferedImage i);
+
+	public static native void saveScreenshot(String path);
 }

@@ -51,7 +51,7 @@ Window {
             model: 40
 
             delegate: CheckBox {
-                text: model.index + 1
+                text: model.index
             }
         }
     }
