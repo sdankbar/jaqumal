@@ -23,9 +23,9 @@
 package com.github.sdankbar.qml;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
@@ -155,9 +156,8 @@ public class JQMLApplication<EType> {
 	 */
 	@QtThread
 	public static boolean registerResourceFromSystemResource(final String resourceFileName, final String mapRoot) {
-		try (BufferedInputStream stream = new BufferedInputStream(
-				ClassLoader.getSystemResourceAsStream(resourceFileName))) {
-			final byte[] array = stream.readAllBytes();
+		try (InputStream stream = ClassLoader.getSystemResourceAsStream(resourceFileName)) {
+			final byte[] array = IOUtils.toByteArray(stream);
 			return ApplicationFunctions.registerResource(array.length, array, mapRoot);
 		} catch (final IOException e) {
 			log.warn("Failed to load resouse {}", resourceFileName);
