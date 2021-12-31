@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
+import java.util.Objects;
 
 import com.github.sdankbar.qml.fonts.JFont;
 import com.github.sdankbar.qml.painting.PainterInstructions.ClipOperation;
@@ -43,6 +44,7 @@ import com.github.sdankbar.qml.utility.ResizableByteBuffer;
 public class PainterInstructionsBuilder {
 
 	private final ResizableByteBuffer buffer = new ResizableByteBuffer();
+	private JFont currentFont = JFont.builder().build();
 
 	private byte[] bufferedImageToArray(final BufferedImage image) {
 		final int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
@@ -52,6 +54,10 @@ public class PainterInstructionsBuilder {
 			b.putInt(p);
 		}
 		return b.array();
+	}
+
+	public JFont getFont() {
+		return currentFont;
 	}
 
 	public void drawArc(final int x, final int y, final int width, final int height, final int startAngle,
@@ -97,6 +103,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawConvexPolygon(final List<Point> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawConvexPolygonInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -106,6 +114,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawConvexPolygonFloat(final List<Point2D.Double> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawConvexPolygonDouble.ordinal());
 		buffer.putInt(points.size());
 		for (final Point2D.Double p : points) {
@@ -131,6 +141,10 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawImage(final Rectangle target, final Rectangle source, final BufferedImage image) {
+		Objects.requireNonNull(target, "target is null");
+		Objects.requireNonNull(source, "source is null");
+		Objects.requireNonNull(image, "image is null");
+
 		buffer.putInt(PainterFunction.drawImageInteger.ordinal());
 		buffer.putInt(target.x);
 		buffer.putInt(target.y);
@@ -146,6 +160,10 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawImage(final Rectangle2D.Double target, final Rectangle2D.Double source, final BufferedImage image) {
+		Objects.requireNonNull(target, "target is null");
+		Objects.requireNonNull(source, "source is null");
+		Objects.requireNonNull(image, "image is null");
+
 		buffer.putInt(PainterFunction.drawImageDouble.ordinal());
 		buffer.putDouble(target.getX());
 		buffer.putDouble(target.getY());
@@ -177,6 +195,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawLines(final List<Point> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawLinesInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -186,6 +206,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawLinesFloat(final List<Point2D.Double> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawLinesDouble.ordinal());
 		buffer.putInt(points.size());
 		for (final Point2D.Double p : points) {
@@ -229,6 +251,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawPoints(final List<Point> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawPointsInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -238,6 +262,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawPointsFloat(final List<Point2D.Double> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawPointsDouble.ordinal());
 		buffer.putInt(points.size());
 		for (final Point2D.Double p : points) {
@@ -247,6 +273,9 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawPolygon(final List<Point> points, final FillMode mode) {
+		Objects.requireNonNull(points, "points is null");
+		Objects.requireNonNull(mode, "mode is null");
+
 		buffer.putInt(PainterFunction.drawPolygonInteger.ordinal());
 		buffer.putInt(mode.ordinal());
 		buffer.putInt(points.size());
@@ -257,6 +286,9 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawPolygonFloat(final List<Point2D.Double> points, final FillMode mode) {
+		Objects.requireNonNull(points, "points is null");
+		Objects.requireNonNull(mode, "mode is null");
+
 		buffer.putInt(PainterFunction.drawPolygonDouble.ordinal());
 		buffer.putInt(mode.ordinal());
 		buffer.putInt(points.size());
@@ -267,6 +299,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawPolyline(final List<Point> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawPolylineInteger.ordinal());
 		buffer.putInt(points.size());
 		for (final Point p : points) {
@@ -276,6 +310,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawPolylineFloat(final List<Point2D.Double> points) {
+		Objects.requireNonNull(points, "points is null");
+
 		buffer.putInt(PainterFunction.drawPolylineDouble.ordinal());
 		buffer.putInt(points.size());
 		for (final Point2D.Double p : points) {
@@ -323,6 +359,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawStaticText(final int left, final int top, final String staticText) {
+		Objects.requireNonNull(staticText, "staticText is null");
+
 		buffer.putInt(PainterFunction.drawStaticText.ordinal());
 		buffer.putInt(left);
 		buffer.putInt(top);
@@ -330,6 +368,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawStaticText(final double left, final double top, final String staticText) {
+		Objects.requireNonNull(staticText, "staticText is null");
+
 		buffer.putInt(PainterFunction.drawStaticTextDouble.ordinal());
 		buffer.putDouble(left);
 		buffer.putDouble(top);
@@ -337,6 +377,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawText(final int x, final int y, final String text) {
+		Objects.requireNonNull(text, "text is null");
+
 		buffer.putInt(PainterFunction.drawTextSimple.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -344,6 +386,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void drawText(final double x, final double y, final String text) {
+		Objects.requireNonNull(text, "text is null");
+
 		buffer.putInt(PainterFunction.drawTextSimpleDouble.ordinal());
 		buffer.putDouble(x);
 		buffer.putDouble(y);
@@ -352,6 +396,8 @@ public class PainterInstructionsBuilder {
 
 	public void drawText(final int x, final int y, final int width, final int height, final int flags,
 			final String text) {
+		Objects.requireNonNull(text, "text is null");
+
 		buffer.putInt(PainterFunction.drawTextComplex.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -363,6 +409,8 @@ public class PainterInstructionsBuilder {
 
 	public void drawText(final double x, final double y, final double width, final double height, final int flags,
 			final String text) {
+		Objects.requireNonNull(text, "text is null");
+
 		buffer.putInt(PainterFunction.drawTextComplexDouble.ordinal());
 		buffer.putDouble(x);
 		buffer.putDouble(y);
@@ -381,6 +429,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void fillRect(final int x, final int y, final int width, final int height, final Color color) {
+		Objects.requireNonNull(color, "color is null");
+
 		buffer.putInt(PainterFunction.fillRectInteger.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -390,6 +440,8 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void fillRect(final double x, final int y, final int width, final int height, final Color color) {
+		Objects.requireNonNull(color, "color is null");
+
 		buffer.putInt(PainterFunction.fillRectDouble.ordinal());
 		buffer.putDouble(x);
 		buffer.putDouble(y);
@@ -423,6 +475,8 @@ public class PainterInstructionsBuilder {
 
 	public void setClipRect(final int x, final int y, final int width, final int height,
 			final ClipOperation operation) {
+		Objects.requireNonNull(operation, "operation is null");
+
 		buffer.putInt(PainterFunction.setClipRectInteger.ordinal());
 		buffer.putInt(x);
 		buffer.putInt(y);
@@ -433,6 +487,8 @@ public class PainterInstructionsBuilder {
 
 	public void setClipRect(final double x, final double y, final double width, final double height,
 			final ClipOperation operation) {
+		Objects.requireNonNull(operation, "operation is null");
+
 		buffer.putInt(PainterFunction.setClipRectDouble.ordinal());
 		buffer.putDouble(x);
 		buffer.putDouble(y);
@@ -447,13 +503,19 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void setCompositionMode(final CompositionMode mode) {
+		Objects.requireNonNull(mode, "mode is null");
+
 		buffer.putInt(PainterFunction.setCompositionMode.ordinal());
 		buffer.putInt(mode.ordinal());
 	}
 
 	public void setFont(final JFont font) {
+		Objects.requireNonNull(font, "font is null");
+
 		buffer.putInt(PainterFunction.setFont.ordinal());
 		buffer.putInt(font.getFontIndex());
+
+		currentFont = font;
 	}
 
 	public void setOpacity(final double opacity) {
@@ -462,16 +524,22 @@ public class PainterInstructionsBuilder {
 	}
 
 	public void setPen(final JPen pen) {
+		Objects.requireNonNull(pen, "pen is null");
+
 		buffer.putInt(PainterFunction.setPen.ordinal());
 		pen.serialize(buffer);
 	}
 
 	public void setPen(final Color color) {
+		Objects.requireNonNull(color, "color is null");
+
 		buffer.putInt(PainterFunction.setPenColor.ordinal());
 		buffer.putInt(color.getRGB());
 	}
 
 	public void setRenderHint(final RenderHint hint, final boolean on) {
+		Objects.requireNonNull(hint, "hint is null");
+
 		buffer.putInt(PainterFunction.setRenderHint.ordinal());
 		buffer.putInt(hint.getMask());
 		buffer.putBoolean(on);
