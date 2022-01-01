@@ -1363,8 +1363,15 @@ public class JVariant {
 	 * @return This JVariant's value cast to type T wrapped in an Optional or
 	 *         Optional.empty().
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> Optional<T> asType(final Class<T> c) {
-		if (c.isInstance(obj)) {
+		if (Point2D.class.equals(c) && type == Type.POINT) {
+			final JPoint p = (JPoint) obj;
+			return (Optional<T>) Optional.of(new Point2D.Double(p.x(), p.y()));
+		} else if (Rectangle2D.class.equals(c) && type == Type.RECTANGLE) {
+			final JRect r = (JRect) obj;
+			return (Optional<T>) Optional.of(new Rectangle2D.Double(r.x(), r.y(), r.width(), r.height()));
+		} else if (c.isInstance(obj)) {
 			return Optional.of(c.cast(obj));
 		} else {
 			return Optional.empty();
@@ -1377,8 +1384,15 @@ public class JVariant {
 	 * @return This JVariant's value cast to type T or the defaultValue if unable to
 	 *         cast.
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> T asType(final Class<T> c, final T defaultValue) {
-		if (c.isInstance(obj)) {
+		if (Point2D.class.equals(c) && type == Type.POINT) {
+			final JPoint p = (JPoint) obj;
+			return (T) new Point2D.Double(p.x(), p.y());
+		} else if (Rectangle2D.class.equals(c) && type == Type.RECTANGLE) {
+			final JRect r = (JRect) obj;
+			return (T) new Rectangle2D.Double(r.x(), r.y(), r.width(), r.height());
+		} else if (c.isInstance(obj)) {
 			return c.cast(obj);
 		} else {
 			return defaultValue;

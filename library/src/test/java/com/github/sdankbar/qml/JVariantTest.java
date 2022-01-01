@@ -185,8 +185,8 @@ public class JVariantTest {
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asPoint());
 		assertEquals(new JVariant(3).asPoint(v), v);
-		assertEquals(JPoint.point(33, 29), v1.asType(JPoint.class).get());
-		assertEquals(JPoint.point(33, 29), v1.asType(JPoint.class, JPoint.point(0, 0)));
+		assertEquals(v, v1.asType(Point2D.class).get());
+		assertEquals(v, v1.asType(Point2D.class, new Point2D.Double()));
 	}
 
 	/**
@@ -266,8 +266,8 @@ public class JVariantTest {
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asRectangle());
 		assertEquals(new JVariant(3).asRectangle(v), v);
-		assertEquals(JRect.rect(33, 29, 34, 30), v1.asType(JRect.class).get());
-		assertEquals(JRect.rect(33, 29, 34, 30), v1.asType(JRect.class, JRect.NULL));
+		assertEquals(v, v1.asType(Rectangle2D.class).get());
+		assertEquals(v, v1.asType(Rectangle2D.class, new Rectangle2D.Double()));
 	}
 
 	/**
