@@ -35,6 +35,10 @@ import java.time.Instant;
 import java.util.Objects;
 
 import com.github.sdankbar.qml.exceptions.QMLException;
+import com.github.sdankbar.qml.painting.JPoint;
+import com.github.sdankbar.qml.painting.JPointReal;
+import com.github.sdankbar.qml.painting.JRect;
+import com.github.sdankbar.qml.painting.JRectReal;
 
 /**
  * The QMLRequestParser class allows for the extraction of a QML request's
@@ -116,10 +120,39 @@ public class QMLRequestParser {
 	}
 
 	/**
+	 * @return The next 8 bytes as a JPoint.
+	 */
+	public JPoint getJPoint() {
+		return JPoint.point(buffer.getInt(), buffer.getInt());
+	}
+
+
+	/**
+	 * @return The next 16 bytes as a JPointReal.
+	 */
+	public JPointReal getJPointReal() {
+		return JPointReal.point(buffer.getDouble(), buffer.getDouble());
+	}
+
+	/**
 	 * @return The next 16 bytes as a Rectangle2D.
 	 */
 	public Rectangle2D getRectangle() {
 		return new Rectangle(buffer.getInt(), buffer.getInt(), buffer.getInt(), buffer.getInt());
+	}
+
+	/**
+	 * @return The next 16 bytes as a JRect.
+	 */
+	public JRect getJRectangle() {
+		return JRect.rect(buffer.getInt(), buffer.getInt(), buffer.getInt(), buffer.getInt());
+	}
+
+	/**
+	 * @return The next 32 bytes as a JRectReal.
+	 */
+	public JRectReal getJRectangleReal() {
+		return JRectReal.rect(buffer.getDouble(), buffer.getDouble(), buffer.getDouble(), buffer.getDouble());
 	}
 
 	/**
@@ -161,8 +194,16 @@ public class QMLRequestParser {
 			return Long.valueOf(getLong());
 		} else if (c.equals(Point2D.class)) {
 			return getPoint();
+		} else if (c.equals(JPoint.class)) {
+			return getJPoint();
+		} else if (c.equals(JPointReal.class)) {
+			return getJPointReal();
 		} else if (c.equals(Rectangle2D.class)) {
 			return getRectangle();
+		} else if (c.equals(JRect.class)) {
+			return getJRectangle();
+		} else if (c.equals(JRectReal.class)) {
+			return getJRectangleReal();
 		} else if (c.equals(String.class)) {
 			return getString();
 		} else if (c.equals(QMLRequestParser.class)) {

@@ -44,6 +44,10 @@ import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.fonts.JFont;
+import com.github.sdankbar.qml.painting.JPoint;
+import com.github.sdankbar.qml.painting.JPointReal;
+import com.github.sdankbar.qml.painting.JRect;
+import com.github.sdankbar.qml.painting.JRectReal;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -181,8 +185,36 @@ public class JVariantTest {
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asPoint());
 		assertEquals(new JVariant(3).asPoint(v), v);
-		assertEquals(v, v1.asType(Point2D.class).get());
-		assertEquals(v, v1.asType(Point2D.class, new Point2D.Double(0, 0)));
+		assertEquals(JPoint.point(33, 29), v1.asType(JPoint.class).get());
+		assertEquals(JPoint.point(33, 29), v1.asType(JPoint.class, JPoint.point(0, 0)));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void jpoint() {
+		final JPoint v = JPoint.point(33, 29);
+
+		final JVariant v1 = new JVariant(v);
+		assertEquals(v, v1.asJPoint());
+		assertEquals(new JVariant(3).asJPoint(v), v);
+		assertEquals(v, v1.asType(JPoint.class).get());
+		assertEquals(v, v1.asType(JPoint.class, JPoint.ZERO));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void jpointreal() {
+		final JPointReal v = JPointReal.point(33.5, 29);
+
+		final JVariant v1 = new JVariant(v);
+		assertEquals(v, v1.asJPointReal());
+		assertEquals(new JVariant(3).asJPointReal(v), v);
+		assertEquals(v, v1.asType(JPointReal.class).get());
+		assertEquals(v, v1.asType(JPointReal.class, JPointReal.ZERO));
 	}
 
 	/**
@@ -234,8 +266,36 @@ public class JVariantTest {
 		final JVariant v1 = new JVariant(v);
 		assertEquals(v, v1.asRectangle());
 		assertEquals(new JVariant(3).asRectangle(v), v);
-		assertEquals(v, v1.asType(Rectangle2D.class).get());
-		assertEquals(v, v1.asType(Rectangle2D.class, new Rectangle2D.Double()));
+		assertEquals(JRect.rect(33, 29, 34, 30), v1.asType(JRect.class).get());
+		assertEquals(JRect.rect(33, 29, 34, 30), v1.asType(JRect.class, JRect.NULL));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void jrectangle() {
+		final JRect v = JRect.rect(33, 29, 34, 30);
+
+		final JVariant v1 = new JVariant(v);
+		assertEquals(v, v1.asJRect());
+		assertEquals(new JVariant(3).asJRect(v), v);
+		assertEquals(v, v1.asType(JRect.class).get());
+		assertEquals(v, v1.asType(JRect.class, JRect.NULL));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void jrectreal() {
+		final JRectReal v = JRectReal.rect(33.5, 29, 34, 30);
+
+		final JVariant v1 = new JVariant(v);
+		assertEquals(v, v1.asJRectReal());
+		assertEquals(new JVariant(3).asJRectReal(v), v);
+		assertEquals(v, v1.asType(JRectReal.class).get());
+		assertEquals(v, v1.asType(JRectReal.class, JRectReal.NULL));
 	}
 
 	/**

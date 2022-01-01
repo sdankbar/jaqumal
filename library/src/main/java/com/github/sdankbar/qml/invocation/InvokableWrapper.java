@@ -45,6 +45,10 @@ import com.github.sdankbar.qml.JInvokable;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.exceptions.QMLException;
 import com.github.sdankbar.qml.fonts.JFont;
+import com.github.sdankbar.qml.painting.JPoint;
+import com.github.sdankbar.qml.painting.JPointReal;
+import com.github.sdankbar.qml.painting.JRect;
+import com.github.sdankbar.qml.painting.JRectReal;
 import com.github.sdankbar.qml.utility.QMLRequestParser;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -55,13 +59,14 @@ public class InvokableWrapper {
 	private static final Logger log = LoggerFactory.getLogger(InvokableWrapper.class);
 	private static Set<Class<?>> ALLOWED_PARAM_TYPE_SET = ImmutableSet.of(boolean.class, Boolean.class, Color.class,
 			Dimension.class, double.class, Double.class, float.class, Float.class, Instant.class, int.class,
-			Integer.class, long.class, Long.class, Point2D.class, Rectangle2D.class, String.class);
+			Integer.class, long.class, Long.class, Point2D.class, Rectangle2D.class, JPoint.class, JPointReal.class,
+			JRect.class, JRectReal.class, String.class);
 
 	private static Set<Class<?>> ALLOWED_RETURN_TYPE_SET = ImmutableSet.of(boolean.class, Boolean.class,
 			BufferedImage.class, byte[].class, Color.class, Dimension.class, double.class, Double.class, float.class,
 			Float.class, Instant.class, int.class, Integer.class, JFont.class, long.class, Long.class, Line2D.class,
-			Pattern.class, Point2D.class, Rectangle2D.class, String.class, URL.class, UUID.class, void.class,
-			JVariant.class);
+			Pattern.class, Point2D.class, Rectangle2D.class, JPoint.class, JPointReal.class, JRect.class,
+			JRectReal.class, String.class, URL.class, UUID.class, void.class, JVariant.class);
 
 	private static Map<String, Method> findAnnotatedFunctions(final Object invokable) {
 		final Map<String, Method> methodMap = new HashMap<>();
@@ -167,8 +172,16 @@ public class InvokableWrapper {
 			return new JVariant((Pattern) obj);
 		} else if (obj instanceof Point2D) {
 			return new JVariant((Point2D) obj);
+		} else if (obj instanceof JPoint) {
+			return new JVariant((JPoint) obj);
+		} else if (obj instanceof JPointReal) {
+			return new JVariant((JPointReal) obj);
 		} else if (obj instanceof Rectangle2D) {
 			return new JVariant((Rectangle2D) obj);
+		} else if (obj instanceof JRect) {
+			return new JVariant((JRect) obj);
+		} else if (obj instanceof JRectReal) {
+			return new JVariant((JRectReal) obj);
 		} else if (obj instanceof String) {
 			return new JVariant((String) obj);
 		} else if (obj instanceof URL) {

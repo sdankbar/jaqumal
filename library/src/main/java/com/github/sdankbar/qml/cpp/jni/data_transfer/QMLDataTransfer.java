@@ -41,9 +41,13 @@ public class QMLDataTransfer {
 
 	public static native void setPoint(int x, int y, int roleIndex);
 
+	public static native void setPointReal(double x, double y, int roleIndex);
+
 	public static native void setLine(int x1, int y1, int x2, int y2, int roleIndex);
 
 	public static native void setRectangle(int x, int y, int w, int h, int roleIndex);
+
+	public static native void setRectangleReal(double x, double y, double w, double h, int roleIndex);
 
 	public static native void setString(String v, int roleIndex);
 

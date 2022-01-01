@@ -90,6 +90,11 @@ JNICALL void setPoint(JNIEnv*, jclass, jint x, jint y, jint roleIndex)
     QMLDataTransfer::storeRef(QPoint(x, y), roleIndex);
 }
 
+JNICALL void setPointReal(JNIEnv*, jclass, jdouble x, jdouble y, jint roleIndex)
+{
+    QMLDataTransfer::storeRef(QPointF(x, y), roleIndex);
+}
+
 JNICALL void setLine(JNIEnv*, jclass, jint x1, jint y1, jint x2, jint y2, jint roleIndex)
 {
     QMLDataTransfer::storeRef(QLine(x1, y1, x2, y2), roleIndex);
@@ -98,6 +103,11 @@ JNICALL void setLine(JNIEnv*, jclass, jint x1, jint y1, jint x2, jint y2, jint r
 JNICALL void setRectangle(JNIEnv*, jclass, jint x, jint y, jint w, jint h, jint roleIndex)
 {
     QMLDataTransfer::storeRef(QRect(x, y, w, h), roleIndex);
+}
+
+JNICALL void setRectangleReal(JNIEnv*, jclass, jdouble x, jdouble y, jdouble w, jdouble h, jint roleIndex)
+{
+    QMLDataTransfer::storeRef(QRectF(x, y, w, h), roleIndex);
 }
 
 JNICALL void setString(JNIEnv* env, jclass, jstring v, jint roleIndex)
@@ -262,8 +272,10 @@ void QMLDataTransfer::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("setDouble",    "(DI)V",    (void *)&setDouble),
         JNIUtilities::createJNIMethod("setSize",    "(III)V",    (void *)&setSize),
         JNIUtilities::createJNIMethod("setPoint",    "(III)V",    (void *)&setPoint),
+        JNIUtilities::createJNIMethod("setPointReal",    "(DDI)V",    (void *)&setPointReal),
         JNIUtilities::createJNIMethod("setLine",    "(IIIII)V",    (void *)&setLine),
         JNIUtilities::createJNIMethod("setRectangle",    "(IIIII)V",    (void *)&setRectangle),
+        JNIUtilities::createJNIMethod("setRectangleReal",    "(DDDDI)V",    (void *)&setRectangleReal),
         JNIUtilities::createJNIMethod("setString",    "(Ljava/lang/String;I)V",    (void *)&setString),
         JNIUtilities::createJNIMethod("setRegularExpression",    "(Ljava/lang/String;I)V",    (void *)&setRegularExpression),
         JNIUtilities::createJNIMethod("setURL",    "(Ljava/lang/String;I)V",    (void *)&setURL),

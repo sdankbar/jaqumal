@@ -50,6 +50,10 @@ import org.slf4j.LoggerFactory;
 
 import com.github.sdankbar.qml.cpp.jni.data_transfer.QMLDataTransfer;
 import com.github.sdankbar.qml.fonts.JFont;
+import com.github.sdankbar.qml.painting.JPoint;
+import com.github.sdankbar.qml.painting.JPointReal;
+import com.github.sdankbar.qml.painting.JRect;
+import com.github.sdankbar.qml.painting.JRectReal;
 import com.github.sdankbar.qml.painting.PainterInstructions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -164,11 +168,17 @@ public class JVariant {
 		 */
 		SIZE,
 		/**
-		 * Point2D
+		 * JPoint
+		 *
+		 * 4 native endian order bytes for x, 4 native endian order bytes for y
+		 */
+		POINT,
+		/**
+		 * JPointReal
 		 *
 		 * 8 native endian order bytes for x, 8 native endian order bytes for y
 		 */
-		POINT,
+		POINT_REAL,
 		/**
 		 * Line2D
 		 *
@@ -177,12 +187,19 @@ public class JVariant {
 		 */
 		LINE,
 		/**
-		 * Rectangle2D
+		 * JRect
+		 *
+		 * 4 native endian order bytes for x, 4 native endian order bytes for y, 4
+		 * native endian order bytes for width, 4 native endian order bytes for height
+		 */
+		RECTANGLE,
+		/**
+		 * JRectReal
 		 *
 		 * 8 native endian order bytes for x, 8 native endian order bytes for y, 8
 		 * native endian order bytes for width, 8 native endian order bytes for height
 		 */
-		RECTANGLE,
+		RECTANGLE_REAL,
 		/**
 		 * Color
 		 *
@@ -313,13 +330,13 @@ public class JVariant {
 	// Used by JNI
 	@SuppressWarnings("unused")
 	private static JVariant fromPoint(final int x, final int y) {
-		return new JVariant(new Point2D.Double(x, y));
+		return new JVariant(JPoint.point(x, y));
 	}
 
 	// Used by JNI
 	@SuppressWarnings("unused")
 	private static JVariant fromRectangle(final int x, final int y, final int w, final int h) {
-		return new JVariant(new Rectangle2D.Double(x, y, w, h));
+		return new JVariant(JRect.rect(x, y, w, h));
 	}
 
 	// Used by JNI
@@ -436,7 +453,13 @@ public class JVariant {
 			final JSONObject sub = json.getJSONObject("value");
 			final int x = sub.getInt("x");
 			final int y = sub.getInt("y");
-			return Optional.of(new JVariant(new Point2D.Double(x, y)));
+			return Optional.of(new JVariant(JPoint.point(x, y)));
+		}
+		case POINT_REAL: {
+			final JSONObject sub = json.getJSONObject("value");
+			final double x = sub.getDouble("x");
+			final double y = sub.getDouble("y");
+			return Optional.of(new JVariant(JPointReal.point(x, y)));
 		}
 		case RECTANGLE: {
 			final JSONObject sub = json.getJSONObject("value");
@@ -444,7 +467,15 @@ public class JVariant {
 			final int y = sub.getInt("y");
 			final int w = sub.getInt("w");
 			final int h = sub.getInt("h");
-			return Optional.of(new JVariant(new Rectangle2D.Double(x, y, w, h)));
+			return Optional.of(new JVariant(JRect.rect(x, y, w, h)));
+		}
+		case RECTANGLE_REAL: {
+			final JSONObject sub = json.getJSONObject("value");
+			final double x = sub.getDouble("x");
+			final double y = sub.getDouble("y");
+			final double w = sub.getDouble("w");
+			final double h = sub.getDouble("h");
+			return Optional.of(new JVariant(JRectReal.rect(x, y, w, h)));
 		}
 		case REGULAR_EXPRESSION: {
 			final String v = json.getString("value");
@@ -702,6 +733,27 @@ public class JVariant {
 	 */
 	public JVariant(final Point2D v) {
 		type = Type.POINT;
+		Objects.requireNonNull(v, "v is null");
+		obj = JPoint.point((int) v.getX(), (int) v.getY());
+	}
+
+	/**
+	 * Constructs a new JVariant from a JPoint.
+	 *
+	 * @param v The variant's value.
+	 */
+	public JVariant(final JPoint v) {
+		type = Type.POINT;
+		obj = Objects.requireNonNull(v, "v is null");
+	}
+
+	/**
+	 * Constructs a new JVariant from a JPointReal.
+	 *
+	 * @param v The variant's value.
+	 */
+	public JVariant(final JPointReal v) {
+		type = Type.POINT_REAL;
 		obj = Objects.requireNonNull(v, "v is null");
 	}
 
@@ -712,6 +764,27 @@ public class JVariant {
 	 */
 	public JVariant(final Rectangle2D v) {
 		type = Type.RECTANGLE;
+		Objects.requireNonNull(v, "v is null");
+		obj = JRect.rect((int) v.getX(), (int) v.getY(), (int) v.getWidth(), (int) v.getHeight());
+	}
+
+	/**
+	 * Constructs a new JVariant from a JRect.
+	 *
+	 * @param v The variant's value.
+	 */
+	public JVariant(final JRect v) {
+		type = Type.RECTANGLE;
+		obj = Objects.requireNonNull(v, "v is null");
+	}
+
+	/**
+	 * Constructs a new JVariant from a JRectReal.
+	 *
+	 * @param v The variant's value.
+	 */
+	public JVariant(final JRectReal v) {
+		type = Type.RECTANGLE_REAL;
 		obj = Objects.requireNonNull(v, "v is null");
 	}
 
@@ -1015,7 +1088,8 @@ public class JVariant {
 	 */
 	public Point2D asPoint() {
 		Preconditions.checkArgument(type == Type.POINT, "Wrong type, type is {}", type);
-		return (Point2D) obj;
+		final JPoint p = (JPoint) obj;
+		return new Point2D.Double(p.x(), p.y());
 	}
 
 	/**
@@ -1025,7 +1099,52 @@ public class JVariant {
 	 */
 	public Point2D asPoint(final Point2D defaultValue) {
 		if (type == Type.POINT) {
-			return (Point2D) obj;
+			final JPoint p = (JPoint) obj;
+			return new Point2D.Double(p.x(), p.y());
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * @return The JVariant's value as a JPoint.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not POINT
+	 */
+	public JPoint asJPoint() {
+		Preconditions.checkArgument(type == Type.POINT, "Wrong type, type is {}", type);
+		return (JPoint) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a POINT
+	 * @return The JVariant's value as a JPoint or the defaultValue if not the
+	 *         correct type.
+	 */
+	public JPoint asJPoint(final JPoint defaultValue) {
+		if (type == Type.POINT) {
+			return (JPoint) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * @return The JVariant's value as a JPointReal.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not POINT
+	 */
+	public JPointReal asJPointReal() {
+		Preconditions.checkArgument(type == Type.POINT_REAL, "Wrong type, type is {}", type);
+		return (JPointReal) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a POINT
+	 * @return The JVariant's value as a JPoint or the defaultValue if not the
+	 *         correct type.
+	 */
+	public JPointReal asJPointReal(final JPointReal defaultValue) {
+		if (type == Type.POINT_REAL) {
+			return (JPointReal) obj;
 		} else {
 			return defaultValue;
 		}
@@ -1063,7 +1182,8 @@ public class JVariant {
 	 */
 	public Rectangle2D asRectangle() {
 		Preconditions.checkArgument(type == Type.RECTANGLE, "Wrong type, type is {}", type);
-		return (Rectangle2D) obj;
+		final JRect r = (JRect) obj;
+		return new Rectangle2D.Double(r.x(), r.y(), r.width(), r.height());
 	}
 
 	/**
@@ -1073,7 +1193,54 @@ public class JVariant {
 	 */
 	public Rectangle2D asRectangle(final Rectangle2D defaultValue) {
 		if (type == Type.RECTANGLE) {
-			return (Rectangle2D) obj;
+			final JRect r = (JRect) obj;
+			return new Rectangle2D.Double(r.x(), r.y(), r.width(), r.height());
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * @return The JVariant's value as a Rectangle2D.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not
+	 *                                  RECTANGLE
+	 */
+	public JRect asJRect() {
+		Preconditions.checkArgument(type == Type.RECTANGLE, "Wrong type, type is {}", type);
+		return (JRect) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a RECTANGLE
+	 * @return The JVariant's value as a Rectangle2D or the defaultValue if not the
+	 *         correct type.
+	 */
+	public JRect asJRect(final JRect defaultValue) {
+		if (type == Type.RECTANGLE) {
+			return (JRect) obj;
+		} else {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * @return The JVariant's value as a Rectangle2D.
+	 * @throws IllegalArgumentException Thrown if the JVariant's Type is not
+	 *                                  RECTANGLE
+	 */
+	public JRectReal asJRectReal() {
+		Preconditions.checkArgument(type == Type.RECTANGLE_REAL, "Wrong type, type is {}", type);
+		return (JRectReal) obj;
+	}
+
+	/**
+	 * @param defaultValue Value to return if JVariant is not a RECTANGLE
+	 * @return The JVariant's value as a Rectangle2D or the defaultValue if not the
+	 *         correct type.
+	 */
+	public JRectReal asJRectReal(final JRectReal defaultValue) {
+		if (type == Type.RECTANGLE_REAL) {
+			return (JRectReal) obj;
 		} else {
 			return defaultValue;
 		}
@@ -1376,13 +1543,23 @@ public class JVariant {
 			break;
 		}
 		case POINT: {
-			final Point2D p = (Point2D) obj;
-			QMLDataTransfer.setPoint((int) p.getX(), (int) p.getY(), role);
+			final JPoint p = (JPoint) obj;
+			QMLDataTransfer.setPoint(p.x(), p.y(), role);
+			break;
+		}
+		case POINT_REAL: {
+			final JPointReal p = (JPointReal) obj;
+			QMLDataTransfer.setPointReal(p.x(), p.y(), role);
 			break;
 		}
 		case RECTANGLE: {
-			final Rectangle2D r = (Rectangle2D) obj;
-			QMLDataTransfer.setRectangle((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight(), role);
+			final JRect r = (JRect) obj;
+			QMLDataTransfer.setRectangle(r.x(), r.y(), r.width(), r.height(), role);
+			break;
+		}
+		case RECTANGLE_REAL: {
+			final JRectReal r = (JRectReal) obj;
+			QMLDataTransfer.setRectangleReal(r.x(), r.y(), r.width(), r.height(), role);
 			break;
 		}
 		case REGULAR_EXPRESSION: {
@@ -1527,20 +1704,38 @@ public class JVariant {
 			break;
 		}
 		case POINT: {
-			final Point2D p = (Point2D) obj;
+			final JPoint p = (JPoint) obj;
 			final JSONObject sub = new JSONObject();
-			sub.put("x", Integer.valueOf((int) p.getX()));
-			sub.put("y", Integer.valueOf((int) p.getY()));
+			sub.put("x", Integer.valueOf(p.x()));
+			sub.put("y", Integer.valueOf(p.y()));
+			json.put("value", sub);
+			break;
+		}
+		case POINT_REAL: {
+			final JPointReal p = (JPointReal) obj;
+			final JSONObject sub = new JSONObject();
+			sub.put("x", Double.valueOf(p.x()));
+			sub.put("y", Double.valueOf(p.y()));
 			json.put("value", sub);
 			break;
 		}
 		case RECTANGLE: {
-			final Rectangle2D r = (Rectangle2D) obj;
+			final JRect r = (JRect) obj;
 			final JSONObject sub = new JSONObject();
-			sub.put("x", Integer.valueOf((int) r.getX()));
-			sub.put("y", Integer.valueOf((int) r.getY()));
-			sub.put("w", Integer.valueOf((int) r.getWidth()));
-			sub.put("h", Integer.valueOf((int) r.getHeight()));
+			sub.put("x", Integer.valueOf(r.x()));
+			sub.put("y", Integer.valueOf(r.y()));
+			sub.put("w", Integer.valueOf(r.width()));
+			sub.put("h", Integer.valueOf(r.height()));
+			json.put("value", sub);
+			break;
+		}
+		case RECTANGLE_REAL: {
+			final JRectReal r = (JRectReal) obj;
+			final JSONObject sub = new JSONObject();
+			sub.put("x", Double.valueOf(r.x()));
+			sub.put("y", Double.valueOf(r.y()));
+			sub.put("w", Double.valueOf(r.width()));
+			sub.put("h", Double.valueOf(r.height()));
 			json.put("value", sub);
 			break;
 		}
