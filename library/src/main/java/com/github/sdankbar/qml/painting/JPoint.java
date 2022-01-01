@@ -20,49 +20,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef JDEVELOPMENTTOOLS_H
-#define JDEVELOPMENTTOOLS_H
+package com.github.sdankbar.qml.painting;
 
-#include <QObject>
-#include <QQuickWindow>
-#include <QDateTime>
+import java.util.Objects;
 
-class JDevelopmentTools : public QQuickWindow
-{
-    Q_OBJECT
-    Q_PROPERTY(bool isRecording READ isRecording NOTIFY isRecordingChanged)
-public:
-    JDevelopmentTools(QWindow* parent = nullptr);
-    ~JDevelopmentTools();
+public final class JPoint {
 
-    bool eventFilter(QObject* watched, QEvent* event) override;
+	public static final JPoint ZERO = new JPoint(0, 0);
 
-    // Property Getters
-    bool isRecording() const;
+	public static JPoint point(final int x, final int y) {
+		if (x == 0 && y == 0) {
+			return ZERO;
+		} else {
+			return new JPoint(x, y);
+		}
+	}
 
-signals:
-    // Property Notify Signals
-    void isRecordingChanged();
-private:
+	private final int x;
+	private final int y;
 
-    struct RecordedEvent {
-        QEvent* m_event;
-        QDateTime m_eventTime;
-        QString m_screenshotFile;
-    };
+	private JPoint(final int x, final int y) {
+		this.x = x;
+		this.y = y;
+	}
 
-    static int32_t INSTANCE_COUNT;
+	public int x() {
+		return x;
+	}
 
-    void saveRecording(const QDateTime& recordingEndTime);
+	public int y() {
+		return y;
+	}
 
-    // Properties
-    bool m_isRecording;
+	public JPoint translate(final int dx, final int dy) {
+		return new JPoint(x + dx, y + dy);
+	}
 
-    // Recording variables
-    QDateTime m_startTime;
-    QDateTime m_lastMouseMoveTime;
-    std::vector<RecordedEvent> m_recordedEvents;
-    std::string m_recordingDirectory;
-};
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y);
+	}
 
-#endif // JDEVELOPMENTTOOLS_H
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final JPoint other = (JPoint) obj;
+		return x == other.x && y == other.y;
+	}
+
+	@Override
+	public String toString() {
+		return "JPoint [x=" + x + ", y=" + y + "]";
+	}
+
+}
