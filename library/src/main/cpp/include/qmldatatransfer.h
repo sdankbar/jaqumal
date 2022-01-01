@@ -96,7 +96,9 @@ private:
     static jmethodID fromLineMethod;
     static jmethodID fromPatternMethod;
     static jmethodID fromPointMethod;
+    static jmethodID fromPointFMethod;
     static jmethodID fromRectangleMethod;
+    static jmethodID fromRectangleFMethod;
     static jmethodID fromURLMethod;
     static jmethodID fromUUIDMethod;
     static jmethodID fromPainterInstructions;

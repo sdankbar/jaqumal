@@ -335,8 +335,20 @@ public class JVariant {
 
 	// Used by JNI
 	@SuppressWarnings("unused")
+	private static JVariant fromPoint(final double x, final double y) {
+		return new JVariant(JPointReal.point(x, y));
+	}
+
+	// Used by JNI
+	@SuppressWarnings("unused")
 	private static JVariant fromRectangle(final int x, final int y, final int w, final int h) {
 		return new JVariant(JRect.rect(x, y, w, h));
+	}
+
+	// Used by JNI
+	@SuppressWarnings("unused")
+	private static JVariant fromRectangle(final double x, final double y, final double w, final double h) {
+		return new JVariant(JRectReal.rect(x, y, w, h));
 	}
 
 	// Used by JNI

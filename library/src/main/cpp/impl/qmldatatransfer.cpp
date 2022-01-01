@@ -219,7 +219,9 @@ jmethodID QMLDataTransfer::fromJFontMethod;
 jmethodID QMLDataTransfer::fromLineMethod;
 jmethodID QMLDataTransfer::fromPatternMethod;
 jmethodID QMLDataTransfer::fromPointMethod;
+jmethodID QMLDataTransfer::fromPointFMethod;
 jmethodID QMLDataTransfer::fromRectangleMethod;
+jmethodID QMLDataTransfer::fromRectangleFMethod;
 jmethodID QMLDataTransfer::fromURLMethod;
 jmethodID QMLDataTransfer::fromUUIDMethod;
 jmethodID QMLDataTransfer::fromPainterInstructions;
@@ -249,7 +251,9 @@ void QMLDataTransfer::initialize(JNIEnv* env)
     fromLineMethod = env->GetStaticMethodID(jvariantClass, "fromLine", "(IIII)Lcom/github/sdankbar/qml/JVariant;");
     fromPatternMethod = env->GetStaticMethodID(jvariantClass, "fromPattern", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
     fromPointMethod = env->GetStaticMethodID(jvariantClass, "fromPoint", "(II)Lcom/github/sdankbar/qml/JVariant;");
+    fromPointFMethod = env->GetStaticMethodID(jvariantClass, "fromPoint", "(DD)Lcom/github/sdankbar/qml/JVariant;");
     fromRectangleMethod = env->GetStaticMethodID(jvariantClass, "fromRectangle", "(IIII)Lcom/github/sdankbar/qml/JVariant;");
+    fromRectangleFMethod = env->GetStaticMethodID(jvariantClass, "fromRectangle", "(DDDD)Lcom/github/sdankbar/qml/JVariant;");
     fromURLMethod = env->GetStaticMethodID(jvariantClass, "fromURL", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
     fromUUIDMethod = env->GetStaticMethodID(jvariantClass, "fromUUID", "(Ljava/lang/String;)Lcom/github/sdankbar/qml/JVariant;");
     fromPainterInstructions = env->GetStaticMethodID(jvariantClass, "fromPainterInstructions", "([B)Lcom/github/sdankbar/qml/JVariant;");
@@ -353,9 +357,17 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
         const QPoint p = value.toPoint();
         return env->CallStaticObjectMethod(jvariantClass, fromPointMethod, p.x(), p.y());
     }
+    case QVariant::PointF: {
+        const QPointF p = value.toPointF();
+        return env->CallStaticObjectMethod(jvariantClass, fromPointFMethod, p.x(), p.y());
+    }
     case QVariant::Rect: {
         const QRect r = value.toRect();
         return env->CallStaticObjectMethod(jvariantClass, fromRectangleMethod, r.x(), r.y(), r.width(), r.height());
+    }
+    case QVariant::RectF: {
+        const QRectF r = value.toRectF();
+        return env->CallStaticObjectMethod(jvariantClass, fromRectangleFMethod, r.x(), r.y(), r.width(), r.height());
     }
     case QVariant::RegExp: {
         const QString str = value.toRegExp().pattern();
