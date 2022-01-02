@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 #include "jdevelopmenttools.h"
-#include "applicationfunctions.h"
 #include "compareimage.h"
 
 #include <QDir>
@@ -44,7 +43,7 @@ JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
     ++INSTANCE_COUNT;
     if (INSTANCE_COUNT == 1)
     {
-        ApplicationFunctions::get()->installEventFilterToApplication(this);
+        QApplication::instance()->installEventFilter(this);
     }
     else
     {
@@ -54,7 +53,7 @@ JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
 
 JDevelopmentTools::~JDevelopmentTools()
 {
-    ApplicationFunctions::get()->removeEventFilterFromApplication(this);
+    QApplication::instance()->removeEventFilter(this);
 }
 
 bool JDevelopmentTools::isRecording() const
@@ -424,7 +423,7 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
 
         out << "#include <QTest>\n";
         out << "#include <QObject>\n";
-        out << "#include <ImageTest.h>\n";
+        out << "#include \"compareimage.h\"\n";
         out << "\n";
         out << "class IntegrationTest : public QObject {\n";
         out << "Q_OBJECT";
@@ -460,33 +459,33 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                 {
                     QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                    out << "\t\tqwait(" << milli << ");\n";
-                    out << "\t\tkeyPress(" <<
-                           QGuiApplication::focusWindow() << ", " <<
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::keyPress(" <<
+                           "getEventInjectionWindow()" << ", " <<
                            key->key() << ", " <<
-                           key->modifiers() << ");\n";
+                           "static_cast<Qt::KeyboardModifiers>(" << key->modifiers() << "));\n";
                     break;
                 }
                 case QEvent::KeyRelease:
                 {
                     QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                    out << "\t\tqwait(" << milli << ");\n";
-                    out << "\t\tkeyRelease(" <<
-                           QGuiApplication::focusWindow() << ", " <<
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::keyRelease(" <<
+                           "getEventInjectionWindow()" << ", " <<
                            key->key() << ", " <<
-                           key->modifiers() << ");\n";
+                           "static_cast<Qt::KeyboardModifiers>(" << key->modifiers() << "));\n";
                     break;
                 }
                 case QEvent::MouseButtonPress:
                 {
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                    out << "\t\tqwait(" << milli << ");\n";
-                    out << "\t\tmousePress("
-                        << QGuiApplication::focusWindow() << ", "
-                        << mouse->button() << ", "
-                        << mouse->modifiers() << ", QPoint("
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::mousePress("
+                        << "getEventInjectionWindow()" << ", "
+                        << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
+                        << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
                         << mouse->x() << ", "
                         << mouse->y() << "));\n";
                     break;
@@ -501,11 +500,11 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                 {
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                    out << "\t\tqwait(" << milli << ");\n";
-                    out << "\t\tmouseRelease("
-                        << QGuiApplication::focusWindow() << ", "
-                        << mouse->button() << ", "
-                        << mouse->modifiers() << ", QPoint("
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::mouseRelease("
+                        << "getEventInjectionWindow()" << ", "
+                        << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
+                        << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
                         << mouse->x() << ", "
                         << mouse->y() << "));\n";
                     break;
@@ -513,9 +512,9 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                 case QEvent::MouseMove: {
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                    out << "\t\tqwait(" << milli << ");\n";
-                    out << "\t\tmouseMove("
-                        << QGuiApplication::focusWindow() << ", QPoint("
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::mouseMove("
+                        << "getEventInjectionWindow()" << ", QPoint("
                         << mouse->x() << ", "
                         << mouse->y() << "));\n";
                     break;
@@ -524,7 +523,7 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                 //{
                 //    QWheelEvent* mouse = static_cast<QWheelEvent*>(e.m_event);
                 //    int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                //    out << "\t\tqwait(" << milli << ");\n";
+                //    out << "\t\tQTest::qWait(" << milli << ");\n";
                 //    out << "\t\ttools.wheel(" << mouse->x() << ", "
                 //        << mouse->y() << ", "
                 //        << mouse->pixelDelta().x() << ", "
@@ -553,7 +552,7 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
             else
             {
                 int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                out << "\t\tqwait(" << milli << ");\n";
+                out << "\t\tQTest::qWait(" << milli << ");\n";
                 out << "\t\tQIMAGECOMPARE(screenshotDir + \"/"
                     << e.m_screenshotFile << "\");\n";
                 workingTime = e.m_eventTime;
@@ -561,7 +560,7 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
         }
 
         int64_t milli = workingTime.msecsTo(recordingEndTime);
-        out << "\t\tqwait(" << milli << ");\n";
+        out << "\t\tQTest::qWait(" << milli << ");\n";
 
         out << "\t}\n";
         out << "\n";
