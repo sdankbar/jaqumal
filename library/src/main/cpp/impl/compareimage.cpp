@@ -1,4 +1,6 @@
 #include "compareimage.h"
+#include <QImage>
+#include <QTest>
 
 QWindow* getEventInjectionWindow()
 {
@@ -75,5 +77,20 @@ bool fuzzyEquals(const QImage& source, const QImage& target)
             double peakSignalToNoiseRatio = 10 * log10((255 * 255) / meanSquareError);
             return (peakSignalToNoiseRatio > 60);
         }
+    }
+}
+
+void QIMAGECOMPARE(const std::string& fileName)
+{
+    QImage target(QString::fromStdString(fileName));
+    if (target.isNull())
+    {
+        QFAIL(("Unable to read " + fileName).c_str());
+    }
+
+    QImage source = takeFocusedWindowScreenShot();
+    if (!fuzzyEquals(source, target))
+    {
+       QFAIL(("Image does not match "+ fileName).c_str());
     }
 }

@@ -448,6 +448,7 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
         out << "}\n";
 
         out << "void IntegrationTest::test() {\n";
+        out << "\t\tstd::string screenshotDir = \"TODO\";\n";
 
         QDateTime workingTime = m_startTime;
         for (const RecordedEvent& e: m_recordedEvents)
@@ -553,8 +554,8 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
             {
                 int64_t milli = workingTime.msecsTo(e.m_eventTime);
                 out << "\t\tqwait(" << milli << ");\n";
-                out << "\t\tcompareWindowToImage(new File(screenshotDir, \""
-                    << e.m_screenshotFile << "\"), Duration.ofMillis(" << milli << "));\n";
+                out << "\t\tQIMAGECOMPARE(screenshotDir + \"/"
+                    << e.m_screenshotFile << "\");\n";
                 workingTime = e.m_eventTime;
             }
         }

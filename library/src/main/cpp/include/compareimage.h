@@ -7,3 +7,5 @@
 QWindow* getEventInjectionWindow();
 QImage takeFocusedWindowScreenShot();
 bool fuzzyEquals(const QImage& source, const QImage& target);
+
+void QIMAGECOMPARE(const std::string& fileName);
