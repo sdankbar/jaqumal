@@ -160,7 +160,7 @@ public class JRectReal {
 		// cx = x + w / 2
 		// 2 * cx = 2 * x + w
 		// (2 * cx - w) / 2 = x
-		return new JRectReal((2 * center.x() - w) / 2, (2 * center.y() - h) / 2, w, h);
+		return new JRectReal(center.x() - w / 2, center.y() - h / 2, w, h);
 	}
 
 	public JRectReal moveTo(final JPointReal p) {
