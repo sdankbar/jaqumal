@@ -88,9 +88,30 @@ void QIMAGECOMPARE(const std::string& fileName)
         QFAIL(("Unable to read " + fileName).c_str());
     }
 
-    QImage source = takeFocusedWindowScreenShot();
-    if (!fuzzyEquals(source, target))
+    bool matches = false;
+    for (int i = 0; i < 10; ++i)
     {
-       QFAIL(("Image does not match "+ fileName).c_str());
+        QImage source = takeFocusedWindowScreenShot();
+        if (fuzzyEquals(source, target))
+        {
+            matches = true;
+            break;
+        }
+        else
+        {
+            QTest::qWait(100);
+        }
+    }
+
+    if (!matches)
+    {
+        if ("1" == qgetenv("RECAPTURE"))
+        {
+            takeFocusedWindowScreenShot().save(QString::fromStdString(fileName));
+        }
+        else
+        {
+            QFAIL(("Image does not match "+ fileName).c_str());
+        }
     }
 }
