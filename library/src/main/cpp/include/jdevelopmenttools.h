@@ -31,6 +31,8 @@ class JDevelopmentTools : public QQuickWindow
 {
     Q_OBJECT
     Q_PROPERTY(bool isRecording READ isRecording NOTIFY isRecordingChanged)
+    Q_PROPERTY(bool generateJUnit READ generateJUnit WRITE setGenerateJUnit NOTIFY generateJUnitChanged)
+    Q_PROPERTY(bool generateQTTest READ generateQTTest WRITE setGenerateQTTest NOTIFY generateQTTestChanged)
 public:
     JDevelopmentTools(QWindow* parent = nullptr);
     ~JDevelopmentTools();
@@ -39,10 +41,17 @@ public:
 
     // Property Getters
     bool isRecording() const;
+    bool generateJUnit() const;
+    bool generateQTTest() const;
+
+    void setGenerateJUnit(bool gen);
+    void setGenerateQTTest(bool gen);
 
 signals:
     // Property Notify Signals
     void isRecordingChanged();
+    void generateJUnitChanged();
+    void generateQTTestChanged();
 private:
 
     struct RecordedEvent {
@@ -55,6 +64,9 @@ private:
 
     void saveRecording(const QDateTime& recordingEndTime);
 
+    void saveJUnitRecording(const QDateTime& recordingEndTime);
+    void saveQTTestRecording(const QDateTime& recordingEndTime);
+
     // Properties
     bool m_isRecording;
 
@@ -63,6 +75,9 @@ private:
     QDateTime m_lastMouseMoveTime;
     std::vector<RecordedEvent> m_recordedEvents;
     std::string m_recordingDirectory;
+
+    bool m_generateJUnit;
+    bool m_generateQTTest;
 };
 
 #endif // JDEVELOPMENTTOOLS_H

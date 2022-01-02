@@ -44,6 +44,7 @@ win32 {
 }
 
 SOURCES += \
+    impl/compareimage.cpp \
     impl/dashedrectangle.cpp \
     impl/eventlogger.cpp \
     impl/applicationfunctions.cpp \
@@ -70,6 +71,7 @@ SOURCES += \
     impl/jdevelopmenttools.cpp
 
 HEADERS += \
+    include/compareimage.h \
     include/dashedrectangle.h \
     include/eventlogger.h \
     include/applicationfunctions.h \

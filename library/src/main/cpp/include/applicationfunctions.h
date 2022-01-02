@@ -79,8 +79,6 @@ public:
     void installEventFilterToApplication(QObject* obj);
     void removeEventFilterFromApplication(QObject* obj);
 
-    QImage takeFocusedWindowScreenShot() const;
-
     void injectMousePress(int32_t x, int32_t y, int32_t button, int32_t buttons, int32_t modifiers);
     void injectMouseRelease(int32_t x, int32_t y, int32_t button, int32_t buttons, int32_t modifiers);
     void injectMouseMove(int32_t x, int32_t y, int32_t button, int32_t buttons, int32_t modifiers);
@@ -122,8 +120,6 @@ private:
     static jmethodID bufferedImageGetWidth;
     static jmethodID bufferedImageGetHeight;
     static jmethodID bufferedImageGetRGB;
-
-    QWindow* getEventInjectionWindow() const;
 
     QApplication* m_qapp;
     QQmlApplicationEngine* m_qmlEngine;

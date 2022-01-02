@@ -22,6 +22,7 @@
  */
 #include "jdevelopmenttools.h"
 #include "applicationfunctions.h"
+#include "compareimage.h"
 
 #include <QDir>
 #include <QTextStream>
@@ -36,7 +37,9 @@ int32_t JDevelopmentTools::INSTANCE_COUNT = 0;
 JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
     QQuickWindow(parent),
     m_isRecording(false),
-    m_lastMouseMoveTime(QDateTime::fromMSecsSinceEpoch(0))
+    m_lastMouseMoveTime(QDateTime::fromMSecsSinceEpoch(0)),
+    m_generateJUnit(false),
+    m_generateQTTest(false)
 {
     ++INSTANCE_COUNT;
     if (INSTANCE_COUNT == 1)
@@ -57,6 +60,34 @@ JDevelopmentTools::~JDevelopmentTools()
 bool JDevelopmentTools::isRecording() const
 {
     return m_isRecording;
+}
+
+bool JDevelopmentTools::generateJUnit() const
+{
+    return m_generateJUnit;
+}
+
+bool JDevelopmentTools::generateQTTest() const
+{
+    return m_generateQTTest;
+}
+
+void JDevelopmentTools::setGenerateJUnit(bool gen)
+{
+    if (m_generateJUnit != gen)
+    {
+        m_generateJUnit = gen;
+        emit generateJUnitChanged();
+    }
+}
+
+void JDevelopmentTools::setGenerateQTTest(bool gen)
+{
+    if (m_generateQTTest != gen)
+    {
+        m_generateQTTest = gen;
+        emit generateQTTestChanged();
+    }
 }
 
 bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
@@ -119,7 +150,7 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         else if (key->key() == Qt::Key_F10 && m_isRecording)
         {
 
-            QImage windowImage = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
+            QImage windowImage = takeFocusedWindowScreenShot();
             if (!windowImage.isNull())
             {
                 QString now = QDateTime::currentDateTimeUtc().toString("hh_mm_ss_zzz");
@@ -219,6 +250,19 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
 }
 
 void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
+{
+    if (m_generateJUnit)
+    {
+        saveJUnitRecording(recordingEndTime);
+    }
+
+    if (m_generateQTTest)
+    {
+        saveQTTestRecording(recordingEndTime);
+    }
+}
+
+void JDevelopmentTools::saveJUnitRecording(const QDateTime& recordingEndTime)
 {
     QFile javaTestFile(QString::fromStdString(m_recordingDirectory) + "/IntegrationTest.java");
     if (javaTestFile.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -364,6 +408,159 @@ void JDevelopmentTools::saveRecording(const QDateTime& recordingEndTime)
 
         int64_t milli = workingTime.msecsTo(recordingEndTime);
         out << "\t\ttools.pollEventQueue(Duration.ofMillis(" << milli << "));\n";
+
+        out << "\t}\n";
+        out << "\n";
+        out << "}\n";
+        out.flush();
+    }
+}
+
+void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
+{
+    QFile cppTestFile(QString::fromStdString(m_recordingDirectory) + "/tst_integrationTest.cpp");
+    if (cppTestFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&cppTestFile);
+
+        out << "#include <QTest>\n";
+        out << "#include <QObject>\n";
+        out << "#include <ImageTest.h>\n";
+        out << "\n";
+        out << "class IntegrationTest : public QObject {\n";
+        out << "Q_OBJECT";
+        out << "\n";
+        out << "public:\n";
+        out << "\n";
+        out << "\tprivate slots:\n";
+        out << "\tvoid init();";
+        out << "\n";
+        out << "\tvoid cleanup();\n";
+        out << "\n";
+        out << "\tvoid test();\n";
+        out << "};\n";
+
+        out << "void IntegrationTest::init() {\n";
+        out << "\t\t//TODO\n";
+        out << "}\n";
+
+        out << "void IntegrationTest::cleanup() {\n";
+        out << "\t\t//TODO\n";
+        out << "}\n";
+
+        out << "void IntegrationTest::test() {\n";
+
+        QDateTime workingTime = m_startTime;
+        for (const RecordedEvent& e: m_recordedEvents)
+        {
+            if (e.m_event != nullptr)
+            {
+                switch (e.m_event->type()) {
+                case QEvent::KeyPress:
+                {
+                    QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tqwait(" << milli << ");\n";
+                    out << "\t\tkeyPress(" <<
+                           QGuiApplication::focusWindow() << ", " <<
+                           key->key() << ", " <<
+                           key->modifiers() << ");\n";
+                    break;
+                }
+                case QEvent::KeyRelease:
+                {
+                    QKeyEvent* key = static_cast<QKeyEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tqwait(" << milli << ");\n";
+                    out << "\t\tkeyRelease(" <<
+                           QGuiApplication::focusWindow() << ", " <<
+                           key->key() << ", " <<
+                           key->modifiers() << ");\n";
+                    break;
+                }
+                case QEvent::MouseButtonPress:
+                {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tqwait(" << milli << ");\n";
+                    out << "\t\tmousePress("
+                        << QGuiApplication::focusWindow() << ", "
+                        << mouse->button() << ", "
+                        << mouse->modifiers() << ", QPoint("
+                        << mouse->x() << ", "
+                        << mouse->y() << "));\n";
+                    break;
+                }
+                //case QEvent::MouseButtonDblClick:
+                //{
+                //    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                //
+                //    break;
+                //}
+                case QEvent::MouseButtonRelease:
+                {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tqwait(" << milli << ");\n";
+                    out << "\t\tmouseRelease("
+                        << QGuiApplication::focusWindow() << ", "
+                        << mouse->button() << ", "
+                        << mouse->modifiers() << ", QPoint("
+                        << mouse->x() << ", "
+                        << mouse->y() << "));\n";
+                    break;
+                }
+                case QEvent::MouseMove: {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tqwait(" << milli << ");\n";
+                    out << "\t\tmouseMove("
+                        << QGuiApplication::focusWindow() << ", QPoint("
+                        << mouse->x() << ", "
+                        << mouse->y() << "));\n";
+                    break;
+                }
+                //case QEvent::Wheel:
+                //{
+                //    QWheelEvent* mouse = static_cast<QWheelEvent*>(e.m_event);
+                //    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                //    out << "\t\tqwait(" << milli << ");\n";
+                //    out << "\t\ttools.wheel(" << mouse->x() << ", "
+                //        << mouse->y() << ", "
+                //        << mouse->pixelDelta().x() << ", "
+                //        << mouse->pixelDelta().y() << ", "
+                //        << mouse->angleDelta().x() << ", "
+                //        << mouse->angleDelta().y() << ", "
+                //        << mouse->buttons() << ", "
+                //        << mouse->modifiers() << ", "
+                //        << mouse->phase() << ", "
+                //        << (mouse->inverted() ? "true" : "false") << ", "
+                //        << "Duration.ofMillis(" << milli << "));\n";
+                //    break;
+                //}
+                case QEvent::TouchBegin:
+                {
+                    // TODO
+                    break;
+                }
+                default:
+                    // Ignore
+                    break;
+                }
+
+                workingTime = e.m_eventTime;
+            }
+            else
+            {
+                int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                out << "\t\tqwait(" << milli << ");\n";
+                out << "\t\tcompareWindowToImage(new File(screenshotDir, \""
+                    << e.m_screenshotFile << "\"), Duration.ofMillis(" << milli << "));\n";
+                workingTime = e.m_eventTime;
+            }
+        }
+
+        int64_t milli = workingTime.msecsTo(recordingEndTime);
+        out << "\t\tqwait(" << milli << ");\n";
 
         out << "\t}\n";
         out << "\n";

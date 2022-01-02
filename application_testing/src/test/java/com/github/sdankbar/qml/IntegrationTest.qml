@@ -39,6 +39,8 @@ Window {
 
     JDevToolsGUI {
         mainWindow: root
+        generateJUnit: true
+        generateQTTest: true
     }
 
     Grid {

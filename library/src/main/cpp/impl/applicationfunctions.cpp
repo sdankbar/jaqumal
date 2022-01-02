@@ -23,6 +23,7 @@
 #include "applicationfunctions.h"
 
 #include "jniutilities.h"
+#include <compareimage.h>
 
 #include <eventbuilder.h>
 #include <eventdispatcher.h>
@@ -316,50 +317,9 @@ JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage)
     if (ApplicationFunctions::check(env))
     {
         QImage target = ApplicationFunctions::get()->toQImage(env, jImage);
-        QImage source = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
+        QImage source = takeFocusedWindowScreenShot();
 
-        if (source.isNull() || target.isNull())
-        {
-            return false;
-        }
-        else if (source.width() != target.width())
-        {
-            return false;
-        }
-        else if (source.height() != target.height())
-        {
-            return false;
-        }
-        else
-        {
-            uint64_t sqSum = 0;
-            const int32_t pixelCount = source.width() * source.height();
-            const QRgb* sourcePixels = (const QRgb*)source.constBits();
-            const QRgb* targetPixels = (const QRgb*)target.constBits();
-            for (int i = 0; i < pixelCount; ++i)
-            {
-                const QRgb sColor = sourcePixels[i];
-                const QRgb tColor = targetPixels[i];
-                const int deltaR = qRed(sColor) - qRed(tColor);
-                const int deltaG = qGreen(sColor) - qGreen(tColor);
-                const int deltaB = qBlue(sColor)- qBlue(tColor);
-                sqSum += (deltaR * deltaR) +
-                        (deltaG * deltaG) +
-                        (deltaB * deltaB);
-            }
-
-            double meanSquareError = sqSum / (3.0 * pixelCount);
-            if (meanSquareError == 0)
-            {
-                // Avoid division by 0.
-                return true;
-            }
-            else
-            {
-                double peakSignalToNoiseRatio = 10 * log10((255 * 255) / meanSquareError);
-                return (peakSignalToNoiseRatio > 60);
-            }
-        }
+        return fuzzyEquals(source, target);
     }
     else
     {
@@ -372,7 +332,7 @@ JNICALL void saveScreenshot(JNIEnv* env, jclass, jstring path)
     if (ApplicationFunctions::check(env))
     {
         QString qpath = JNIUtilities::toQString(env, path);
-        QImage source = ApplicationFunctions::get()->takeFocusedWindowScreenShot();
+        QImage source = takeFocusedWindowScreenShot();
         source.save(qpath);
     }
 }
@@ -733,38 +693,6 @@ void ApplicationFunctions::installEventFilterToApplication(QObject* obj)
 void ApplicationFunctions::removeEventFilterFromApplication(QObject* obj)
 {
     m_qapp->removeEventFilter(obj);
-}
-
-QWindow* ApplicationFunctions::getEventInjectionWindow() const
-{
-    QWindow* w = QApplication::focusWindow();
-    if (w != nullptr)
-    {
-        return w;
-    }
-    QWindowList topLevel = QApplication::topLevelWindows();
-    if (!topLevel.isEmpty())
-    {
-        return topLevel[0];
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-QImage ApplicationFunctions::takeFocusedWindowScreenShot() const
-{
-    QWindow* w = getEventInjectionWindow();
-    QQuickWindow* quickWindow = dynamic_cast<QQuickWindow*>(w);
-    if (quickWindow != nullptr)
-    {
-        return quickWindow->grabWindow();
-    }
-    else
-    {
-        return QImage();
-    }
 }
 
 void ApplicationFunctions::injectMousePress(int32_t x, int32_t y,
