@@ -207,7 +207,6 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
     }
     case QEvent::TouchBegin:
     case QEvent::TouchEnd:
-    case QEvent::TouchCancel:
     {
         if ((watched->parent() == nullptr) && m_isRecording)
         {
@@ -443,6 +442,7 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
         out << "void IntegrationTest::test() {\n";
         out << "\t\tstd::string screenshotDir = \"TODO\";\n";
 
+        bool createdTouchDevice = false;
         QDateTime workingTime = m_startTime;
         for (const RecordedEvent& e: m_recordedEvents)
         {
@@ -535,6 +535,47 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                         << mouse->modifiers() << ", "
                         << mouse->phase() << ", "
                         << (mouse->inverted() ? "true" : "false") << ");\n";
+                    break;
+                }
+                case QEvent::TouchBegin:
+                {
+                    if (!createdTouchDevice)
+                    {
+                       out << "\t\tQTouchDevice* touchDevice = QTest::createTouchDevice();\n";
+                    }
+                    createdTouchDevice = true;
+                    QTouchEvent* t = static_cast<QTouchEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::touchEvent(getEventInjectionWindow(), touchDevice).press(" <<
+                        t->touchPoints()[0].id() << ", "
+                        << "QPoint(" << t->touchPoints()[0].pos().x()
+                        << ", " << t->touchPoints()[0].pos().y()
+                        << "));\n";
+                    break;
+                }
+                case QEvent::TouchUpdate:
+                {
+                    QTouchEvent* t = static_cast<QTouchEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::touchEvent(getEventInjectionWindow(), touchDevice).move(" <<
+                        t->touchPoints()[0].id() << ", "
+                        << "QPoint(" << t->touchPoints()[0].pos().x()
+                        << ", " << t->touchPoints()[0].pos().y()
+                        << "));\n";
+                    break;
+                }
+                case QEvent::TouchEnd:
+                {
+                    QTouchEvent* t = static_cast<QTouchEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::touchEvent(getEventInjectionWindow(), touchDevice).release(" <<
+                        t->touchPoints()[0].id() << ", "
+                        << "QPoint(" << t->touchPoints()[0].pos().x()
+                        << ", " << t->touchPoints()[0].pos().y()
+                        << "));\n";
                     break;
                 }
                 default:
