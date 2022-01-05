@@ -177,27 +177,9 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         break;
     }
     case QEvent::MouseButtonPress:
-    {
-        if ((watched->parent() == nullptr) && m_isRecording)
-        {
-            RecordedEvent rec;
-            rec.m_event = new QMouseEvent(*static_cast<QMouseEvent*>(event));
-            rec.m_eventTime = QDateTime::currentDateTimeUtc();
-            m_recordedEvents.push_back(rec);
-        }
-        m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
-        break;
-    }
-        //case QEvent::MouseButtonDblClick:
-        //{
-        //    QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        //    RecordedEvent rec;
-        //    rec.m_event = new QMouseEvent(*mouse);
-        //    rec.m_eventTime = QDateTime::currentDateTimeUtc();
-        //    m_recordedEvents.push_back(rec);
-        //    break;
-        //}
     case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonDblClick:
+    case QEvent::Wheel:
     {
         if ((watched->parent() == nullptr) && m_isRecording)
         {
@@ -223,21 +205,32 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         }
         break;
     }
-    case QEvent::Wheel:
+    case QEvent::TouchBegin:
+    case QEvent::TouchEnd:
+    case QEvent::TouchCancel:
     {
         if ((watched->parent() == nullptr) && m_isRecording)
         {
             RecordedEvent rec;
-            rec.m_event = new QWheelEvent(*static_cast<QWheelEvent*>(event));
+            rec.m_event = new QTouchEvent(*static_cast<QTouchEvent*>(event));
             rec.m_eventTime = QDateTime::currentDateTimeUtc();
             m_recordedEvents.push_back(rec);
         }
         m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
         break;
     }
-    case QEvent::TouchBegin:
+    case QEvent::TouchUpdate:
     {
-        // TODO
+        QDateTime now = QDateTime::currentDateTimeUtc();
+        int64_t milli = m_lastMouseMoveTime.msecsTo(now);
+        if ((watched->parent() == nullptr) && (milli > MOVE_SAMPLE_RATE) && m_isRecording)
+        {
+            RecordedEvent rec;
+            rec.m_event = new QTouchEvent(*static_cast<QTouchEvent*>(event));
+            rec.m_eventTime = now;
+            m_lastMouseMoveTime = now;
+            m_recordedEvents.push_back(rec);
+        }
         break;
     }
     default:
@@ -338,12 +331,18 @@ void JDevelopmentTools::saveJUnitRecording(const QDateTime& recordingEndTime)
                         << "Duration.ofMillis(" << milli << "));\n";
                     break;
                 }
-                //case QEvent::MouseButtonDblClick:
-                //{
-                //    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
-                //
-                //    break;
-                //}
+                case QEvent::MouseButtonDblClick:
+                {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\ttools.mouseDoubleClick(" << mouse->x() << ", "
+                        << mouse->y() << ", "
+                        << mouse->button() << ", "
+                        << mouse->buttons() << ", "
+                        << mouse->modifiers() << ", "
+                        << "Duration.ofMillis(" << milli << "));\n";
+                    break;
+                }
                 case QEvent::MouseButtonRelease:
                 {
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
@@ -382,11 +381,6 @@ void JDevelopmentTools::saveJUnitRecording(const QDateTime& recordingEndTime)
                         << mouse->phase() << ", "
                         << (mouse->inverted() ? "true" : "false") << ", "
                         << "Duration.ofMillis(" << milli << "));\n";
-                    break;
-                }
-                case QEvent::TouchBegin:
-                {
-                    // TODO
                     break;
                 }
                 default:
@@ -490,18 +484,25 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                         << mouse->y() << "));\n";
                     break;
                 }
-                //case QEvent::MouseButtonDblClick:
-                //{
-                //    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
-                //
-                //    break;
-                //}
                 case QEvent::MouseButtonRelease:
                 {
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\tQTest::qWait(" << milli << ");\n";
                     out << "\t\tQTest::mouseRelease("
+                        << "getEventInjectionWindow()" << ", "
+                        << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
+                        << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
+                        << mouse->x() << ", "
+                        << mouse->y() << "));\n";
+                    break;
+                }
+                case QEvent::MouseButtonDblClick:
+                {
+                    QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tQTest::mousePress("
                         << "getEventInjectionWindow()" << ", "
                         << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
                         << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
@@ -519,27 +520,21 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                         << mouse->y() << "));\n";
                     break;
                 }
-                //case QEvent::Wheel:
-                //{
-                //    QWheelEvent* mouse = static_cast<QWheelEvent*>(e.m_event);
-                //    int64_t milli = workingTime.msecsTo(e.m_eventTime);
-                //    out << "\t\tQTest::qWait(" << milli << ");\n";
-                //    out << "\t\ttools.wheel(" << mouse->x() << ", "
-                //        << mouse->y() << ", "
-                //        << mouse->pixelDelta().x() << ", "
-                //        << mouse->pixelDelta().y() << ", "
-                //        << mouse->angleDelta().x() << ", "
-                //        << mouse->angleDelta().y() << ", "
-                //        << mouse->buttons() << ", "
-                //        << mouse->modifiers() << ", "
-                //        << mouse->phase() << ", "
-                //        << (mouse->inverted() ? "true" : "false") << ", "
-                //        << "Duration.ofMillis(" << milli << "));\n";
-                //    break;
-                //}
-                case QEvent::TouchBegin:
+                case QEvent::Wheel:
                 {
-                    // TODO
+                    QWheelEvent* mouse = static_cast<QWheelEvent*>(e.m_event);
+                    int64_t milli = workingTime.msecsTo(e.m_eventTime);
+                    out << "\t\tQTest::qWait(" << milli << ");\n";
+                    out << "\t\tmouseWheel(" << mouse->x() << ", "
+                        << mouse->y() << ", "
+                        << mouse->pixelDelta().x() << ", "
+                        << mouse->pixelDelta().y() << ", "
+                        << mouse->angleDelta().x() << ", "
+                        << mouse->angleDelta().y() << ", "
+                        << mouse->buttons() << ", "
+                        << mouse->modifiers() << ", "
+                        << mouse->phase() << ", "
+                        << (mouse->inverted() ? "true" : "false") << ");\n";
                     break;
                 }
                 default:

@@ -115,3 +115,21 @@ void QIMAGECOMPARE(const std::string& fileName)
         }
     }
 }
+
+void mouseWheel(int32_t x, int32_t y, int32_t pixelX, int32_t pixelY, int32_t angleX, int32_t angleY,
+                int32_t buttons, int32_t modifiers, int32_t phase, bool inverted)
+{
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QWheelEvent* w = new QWheelEvent(QPointF(x, y), QPointF(x + window->x(), y + window->y()),
+                                         QPoint(pixelX, pixelY),
+                                         QPoint(angleX, angleY),
+                                         static_cast<Qt::MouseButtons>(buttons),
+                                         static_cast<Qt::KeyboardModifiers>(modifiers),
+                                         static_cast<Qt::ScrollPhase>(phase),
+                                         inverted,
+                                         Qt::MouseEventSynthesizedByApplication);
+        QCoreApplication::instance()->sendEvent(window, w);
+    }
+}

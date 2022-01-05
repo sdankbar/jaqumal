@@ -120,6 +120,16 @@ JNICALL void injectMouseReleaseIntoApplication(JNIEnv* env, jclass, jint x, jint
     }
 }
 
+JNICALL void injectMouseDoubleClickIntoApplication(JNIEnv* env, jclass, jint x, jint y,
+                                               jint button, jint buttons,
+                                               jint modifiers)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->injectMouseDoubleClick(x, y, button, buttons, modifiers);
+    }
+}
+
 JNICALL void injectMouseMoveIntoApplication(JNIEnv* env, jclass, jint x, jint y,
                                             jint button, jint buttons,
                                             jint modifiers)
@@ -444,6 +454,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("registerResource", "(I[BLjava/lang/String;)Z", (void *)&registerResourceData),
         JNIUtilities::createJNIMethod("injectMousePressIntoApplication", "(IIIII)V", (void *)&injectMousePressIntoApplication),
         JNIUtilities::createJNIMethod("injectMouseReleaseIntoApplication", "(IIIII)V", (void *)&injectMouseReleaseIntoApplication),
+        JNIUtilities::createJNIMethod("injectMouseDoubleClickIntoApplication", "(IIIII)V", (void *)&injectMouseDoubleClickIntoApplication),
         JNIUtilities::createJNIMethod("injectMouseMoveIntoApplication", "(IIIII)V", (void *)&injectMouseMoveIntoApplication),
         JNIUtilities::createJNIMethod("injectKeyPressIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyPressIntoApplication),
         JNIUtilities::createJNIMethod("injectKeyReleaseIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyReleaseIntoApplication),
@@ -735,6 +746,24 @@ void ApplicationFunctions::injectMouseRelease(int32_t x, int32_t y,
     }
 }
 
+void ApplicationFunctions::injectMouseDoubleClick(int32_t x, int32_t y, int32_t button, int32_t buttons, int32_t modifiers)
+{
+    QWindow* window = getEventInjectionWindow();
+    if (window != nullptr)
+    {
+        QMouseEvent* event = new QMouseEvent(
+                    QEvent::MouseButtonDblClick,
+                    QPointF(x, y),
+                    QPointF(x, y),
+                    QPointF(x + window->x(), y + window->y()),
+                    static_cast<Qt::MouseButton>(button),
+                    static_cast<Qt::MouseButtons>(buttons),
+                    static_cast<Qt::KeyboardModifiers>(modifiers),
+                    Qt::MouseEventSynthesizedByApplication);
+        QCoreApplication::postEvent(window, event);
+    }
+}
+
 void ApplicationFunctions::injectMouseMove(int32_t x, int32_t y,
                                            int32_t button, int32_t buttons,
                                            int32_t modifiers)
@@ -803,7 +832,6 @@ void ApplicationFunctions::injectWheel(int32_t x, int32_t y,
     QWindow* window = getEventInjectionWindow();
     if (window != nullptr)
     {
-        QWindow* window = QGuiApplication::focusWindow();
         QWheelEvent* event = new QWheelEvent(
                     QPointF(x, y),
                     QPointF(x + window->x(), y + window->y()),

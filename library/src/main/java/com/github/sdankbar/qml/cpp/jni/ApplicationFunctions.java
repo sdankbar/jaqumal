@@ -153,6 +153,9 @@ public final class ApplicationFunctions {
 
 	public static native void injectMouseReleaseIntoApplication(int x, int y, int button, int buttons, int modifiers);
 
+	public static native void injectMouseDoubleClickIntoApplication(int x, int y, int button, int buttons,
+			int modifiers);
+
 	public static native void injectMouseMoveIntoApplication(int x, int y, int button, int buttons, int modifiers);
 
 	public static native void injectWheelIntoApplication(int x, int y, int pixelX, int pixelY, int angleX, int angleY,

@@ -72,6 +72,12 @@ public class JQMLDevelopmentTools {
 		ApplicationFunctions.injectMouseReleaseIntoApplication(x, y, button, buttons, modifiers);
 	}
 
+	public void mouseDoubleClick(final int x, final int y, final int button, final int buttons, final int modifiers,
+			final Duration delay) {
+		pollEventQueue(delay);
+		ApplicationFunctions.injectMouseDoubleClickIntoApplication(x, y, button, buttons, modifiers);
+	}
+
 	public void mouseMove(final int x, final int y, final int button, final int buttons, final int modifiers,
 			final Duration delay) {
 		pollEventQueue(delay);
