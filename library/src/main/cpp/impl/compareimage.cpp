@@ -122,7 +122,7 @@ QImage generateDelta(const QImage& source, const QImage& target)
         const int32_t pixelCount = source.width() * source.height();
         const QRgb* sourcePixels = (const QRgb*)source.constBits();
         const QRgb* targetPixels = (const QRgb*)target.constBits();
-        QRgb* outputPixels = (QRgb*)target.bits();
+        QRgb* outputPixels = (QRgb*)output.bits();
         for (int i = 0; i < pixelCount; ++i)
         {
             const QRgb sColor = sourcePixels[i];
