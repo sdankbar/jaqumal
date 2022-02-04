@@ -172,8 +172,8 @@ void QIMAGECOMPARE(const std::string& fileName, double ratiodB)
             QImage delta = generateDelta(source, target);
             if (!delta.isNull())
             {
-                QString diffFile = QString::fromStdString("delta_"+fileName);
-                delta.save(diffFile);
+                QString diffFile = QString::fromStdString(fileName).replace(".png",".delta.png");
+                delta.save(diffFile, "png");
                 QVERIFY2(false, ("Image does not match " + fileName + ". See " + diffFile.toStdString()).c_str());
             }
             else

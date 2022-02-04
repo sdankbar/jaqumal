@@ -344,7 +344,8 @@ JNICALL void generateDeltaBetweenImageAndActiveWindow(JNIEnv* env, jclass, jstri
         QImage target = ApplicationFunctions::get()->toQImage(env, jImage);
         QImage source = takeFocusedWindowScreenShot();
 
-        generateDelta(source, target).save(JNIUtilities::toQString(env, fileName));
+        QImage output = generateDelta(source, target);
+        output.save(JNIUtilities::toQString(env, fileName), "png");
     }
 }
 

@@ -111,8 +111,9 @@ public class JQMLDevelopmentTools {
 			if ("1".equals(System.getenv("RECAPTURE"))) {
 				ApplicationFunctions.saveScreenshot(path.getAbsolutePath());
 			} else {
-				ApplicationFunctions.generateDeltaBetweenImageAndActiveWindow("delta_" + path.getPath(), i);
-				throw new AssertionError("Active window does not match " + path);
+				final String deltaPath = path.getPath().replaceAll(".png", ".delta.png");
+				ApplicationFunctions.generateDeltaBetweenImageAndActiveWindow(deltaPath, i);
+				throw new AssertionError("Active window does not match " + path + ", check " + deltaPath);
 			}
 		} catch (final IOException e) {
 			throw new AssertionError("Unable to load comparison image", e);
