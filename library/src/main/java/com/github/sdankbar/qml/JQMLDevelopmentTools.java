@@ -92,12 +92,16 @@ public class JQMLDevelopmentTools {
 	}
 
 	public void compareWindowToImage(final File path, final Duration delay) {
+		compareWindowToImage(path, delay, 50);
+	}
+
+	public void compareWindowToImage(final File path, final Duration delay, final double ratiodB) {
 		pollEventQueue(delay);
 
 		try {
 			final BufferedImage i = ImageIO.read(path);
 			for (int j = 0; j < 10; ++j) {
-				if (ApplicationFunctions.compareImageToActiveWindow(i)) {
+				if (ApplicationFunctions.compareImageToActiveWindow(i, ratiodB)) {
 					return;
 				} else {
 					pollEventQueue(Duration.ofMillis(100));
@@ -107,6 +111,7 @@ public class JQMLDevelopmentTools {
 			if ("1".equals(System.getenv("RECAPTURE"))) {
 				ApplicationFunctions.saveScreenshot(path.getAbsolutePath());
 			} else {
+				ApplicationFunctions.generateDeltaBetweenImageAndActiveWindow("delta_" + path.getPath(), i);
 				throw new AssertionError("Active window does not match " + path);
 			}
 		} catch (final IOException e) {

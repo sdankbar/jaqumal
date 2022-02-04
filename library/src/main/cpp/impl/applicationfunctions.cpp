@@ -322,18 +322,29 @@ JNICALL jboolean registerResourceData(JNIEnv* env, jclass, jint length, jbyteArr
     return QResource::registerResource(copy, JNIUtilities::toQString(env, mapRoot));
 }
 
-JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage)
+JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage, jdouble ratiodB)
 {
     if (ApplicationFunctions::check(env))
     {
         QImage target = ApplicationFunctions::get()->toQImage(env, jImage);
         QImage source = takeFocusedWindowScreenShot();
 
-        return fuzzyEquals(source, target);
+        return fuzzyEquals(source, target, ratiodB);
     }
     else
     {
         return false;
+    }
+}
+
+JNICALL void generateDeltaBetweenImageAndActiveWindow(JNIEnv* env, jclass, jstring fileName, jobject jImage)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        QImage target = ApplicationFunctions::get()->toQImage(env, jImage);
+        QImage source = takeFocusedWindowScreenShot();
+
+        generateDelta(source, target).save(JNIUtilities::toQString(env, fileName));
     }
 }
 
@@ -449,7 +460,8 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("invoke",    "(Lcom/github/sdankbar/qml/cpp/jni/interfaces/InvokeCallback;)V",    (void *)&invoke),
         JNIUtilities::createJNIMethod("enableEventLogging", "()V", (void *)&enableEventLogging),
         JNIUtilities::createJNIMethod("setWindowsIcon", "(Ljava/awt/image/BufferedImage;)V", (void *)&setWindowsIcon),
-        JNIUtilities::createJNIMethod("compareImageToActiveWindow", "(Ljava/awt/image/BufferedImage;)Z", (void *)&compareImageToActiveWindow),
+        JNIUtilities::createJNIMethod("compareImageToActiveWindow", "(Ljava/awt/image/BufferedImage;D)Z", (void *)&compareImageToActiveWindow),
+        JNIUtilities::createJNIMethod("generateDeltaBetweenImageAndActiveWindow", "(Ljava/lang/String;Ljava/awt/image/BufferedImage;)V", (void *)&generateDeltaBetweenImageAndActiveWindow),
         JNIUtilities::createJNIMethod("registerResource", "(Ljava/lang/String;Ljava/lang/String;)Z", (void *)&registerResourceFile),
         JNIUtilities::createJNIMethod("registerResource", "(I[BLjava/lang/String;)Z", (void *)&registerResourceData),
         JNIUtilities::createJNIMethod("injectMousePressIntoApplication", "(IIIII)V", (void *)&injectMousePressIntoApplication),

@@ -56,7 +56,7 @@ QImage takeFocusedWindowScreenShot()
     }
 }
 
-bool fuzzyEquals(const QImage& source, const QImage& target)
+bool fuzzyEquals(const QImage& source, const QImage& target, double ratiodB)
 {
     if (source.isNull() || target.isNull())
     {
@@ -97,12 +97,47 @@ bool fuzzyEquals(const QImage& source, const QImage& target)
         else
         {
             double peakSignalToNoiseRatio = 10 * log10((255 * 255) / meanSquareError);
-            return (peakSignalToNoiseRatio > 60);
+            return (peakSignalToNoiseRatio > ratiodB);
         }
     }
 }
 
-void QIMAGECOMPARE(const std::string& fileName)
+QImage generateDelta(const QImage& source, const QImage& target)
+{
+    if (source.isNull() || target.isNull())
+    {
+        return QImage();
+    }
+    else if (source.width() != target.width())
+    {
+        return QImage();
+    }
+    else if (source.height() != target.height())
+    {
+        return QImage();
+    }
+    else
+    {
+        QImage output(source.width(), source.height(), QImage::Format_ARGB32);
+        const int32_t pixelCount = source.width() * source.height();
+        const QRgb* sourcePixels = (const QRgb*)source.constBits();
+        const QRgb* targetPixels = (const QRgb*)target.constBits();
+        QRgb* outputPixels = (QRgb*)target.bits();
+        for (int i = 0; i < pixelCount; ++i)
+        {
+            const QRgb sColor = sourcePixels[i];
+            const QRgb tColor = targetPixels[i];
+            const int deltaR = std::abs(qRed(sColor) - qRed(tColor));
+            const int deltaG = std::abs(qGreen(sColor) - qGreen(tColor));
+            const int deltaB = std::abs(qBlue(sColor)- qBlue(tColor));
+            outputPixels[i] = qRgb(deltaR, deltaG, deltaB);
+        }
+
+        return output;
+    }
+}
+
+void QIMAGECOMPARE(const std::string& fileName, double ratiodB)
 {
     QImage target(QString::fromStdString(fileName));
     if (target.isNull())
@@ -111,10 +146,11 @@ void QIMAGECOMPARE(const std::string& fileName)
     }
 
     bool matches = false;
+    QImage source;
     for (int i = 0; i < 10; ++i)
     {
-        QImage source = takeFocusedWindowScreenShot();
-        if (fuzzyEquals(source, target))
+        source = takeFocusedWindowScreenShot();
+        if (fuzzyEquals(source, target, ratiodB))
         {
             matches = true;
             break;
@@ -133,7 +169,17 @@ void QIMAGECOMPARE(const std::string& fileName)
         }
         else
         {
-            QFAIL(("Image does not match "+ fileName).c_str());
+            QImage delta = generateDelta(source, target);
+            if (!delta.isNull())
+            {
+                QString diffFile = QString::fromStdString("delta_"+fileName);
+                delta.save(diffFile);
+                QVERIFY2(false, ("Image does not match " + fileName + ". See " + diffFile.toStdString()).c_str());
+            }
+            else
+            {
+                QVERIFY2(false, ("Image does not match "+ fileName).c_str());
+            }
         }
     }
 }

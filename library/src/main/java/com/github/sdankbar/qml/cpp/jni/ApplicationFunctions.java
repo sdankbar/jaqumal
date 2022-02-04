@@ -167,7 +167,9 @@ public final class ApplicationFunctions {
 	public static native void injectKeyReleaseIntoApplication(int key, int modifiers, String text, boolean autoRep,
 			int count);
 
-	public static native boolean compareImageToActiveWindow(BufferedImage i);
+	public static native boolean compareImageToActiveWindow(BufferedImage i, double ratiodB);
+
+	public static native void generateDeltaBetweenImageAndActiveWindow(String fileName, BufferedImage i);
 
 	public static native void saveScreenshot(String path);
 }
