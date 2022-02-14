@@ -50,7 +50,7 @@ public enum MouseButton {
 	 * @return MouseButton for the flag, in an Optional, or Optional.empty() if
 	 *         unable to convert.
 	 */
-	static Optional<MouseButton> fromFlag(final int flag) {
+	public static Optional<MouseButton> fromFlag(final int flag) {
 		for (final MouseButton b : MouseButton.values()) {
 			if (b.mask == flag) {
 				return Optional.of(b);
@@ -66,7 +66,7 @@ public enum MouseButton {
 	 * @return A Set of MouseButtons containing all of the MouseButton's contained
 	 *         in the mask.
 	 */
-	static Set<MouseButton> fromMask(final int mask) {
+	public static Set<MouseButton> fromMask(final int mask) {
 		final Set<MouseButton> set = EnumSet.noneOf(MouseButton.class);
 		for (final MouseButton b : MouseButton.values()) {
 			if ((b.mask & mask) != 0) {
@@ -78,7 +78,7 @@ public enum MouseButton {
 
 	private final int mask;
 
-	private MouseButton(final int mask) {
+	MouseButton(final int mask) {
 		this.mask = mask;
 	}
 }
