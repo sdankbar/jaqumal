@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QtQuick/QQuickPaintedItem>
 #include <QPen>
+#include <QTimer>
 
 class DashedRectangle : public QQuickPaintedItem
 {
@@ -34,6 +35,13 @@ class DashedRectangle : public QQuickPaintedItem
     Q_PROPERTY(qint32 strokeWidth READ strokeWidth WRITE setStrokeWidth NOTIFY strokeWidthChanged)
     Q_PROPERTY(QVariantList dashPattern READ dashPattern WRITE setDashPattern NOTIFY dashPatternChanged)
     Q_PROPERTY(qreal dashOffset READ dashOffset WRITE setDashOffset NOTIFY dashOffsetChanged)
+
+    Q_PROPERTY(bool animate READ isAnimated WRITE setAnimated NOTIFY animatedChanged)
+    Q_PROPERTY(qint32 animationPeriodMilliseconds READ animationPeriodMilliseconds WRITE setAnimationPeriodMilliseconds NOTIFY animationPeriodMillisecondsChanged)
+    Q_PROPERTY(qint32 animationMaxPixelOffset READ animationMaxPixelOffset WRITE setAnimationMaxPixelOffset NOTIFY animationMaxPixelOffsetChanged)
+    Q_PROPERTY(bool animateClockwise READ animateClockwise WRITE setAnimateClockwise NOTIFY animateClockwiseChanged)
+
+
 public:
 
     DashedRectangle(QQuickItem* parent = nullptr);
@@ -53,15 +61,41 @@ public:
     qreal dashOffset() const;
     void setDashOffset(qreal offset);
 
+    bool isAnimated() const;
+    void setAnimated(bool animated);
+
+    qint32 animationPeriodMilliseconds() const;
+    void setAnimationPeriodMilliseconds(qint32 period);
+
+    qint32 animationMaxPixelOffset() const;
+    void setAnimationMaxPixelOffset(qint32 offset);
+
+    bool animateClockwise() const;
+    void setAnimateClockwise(bool clockwise);
+
 signals:
 
     void strokeColorChanged(const QColor& strokeColor);
     void strokeWidthChanged(qint32 strokeWidth);
     void dashPatternChanged(const QVariantList& pattern);
     void dashOffsetChanged(qreal offset);
+    void animatedChanged(bool animated);
+    void animationPeriodMillisecondsChanged(qint32 period);
+    void animationMaxPixelOffsetChanged(qint32 offset);
+    void animateClockwiseChanged(bool clockWise);
+
+private slots:
+    void animationTimerTriggered();
 
 private:
 
     QPen m_stroke;
+    qreal m_offset;
+
+    QTimer m_animationTimer;
+    qint32 m_animationPeriod;// Milliseconds
+    qreal m_animationOffset;
+    qint32 m_animationMaxPixelOffset;
+    qreal m_direction;// 1 == counter clockwise, -1 == clockwise
 };
 
