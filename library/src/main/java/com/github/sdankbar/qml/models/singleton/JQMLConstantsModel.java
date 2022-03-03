@@ -24,7 +24,6 @@ package com.github.sdankbar.qml.models.singleton;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Map;
 import java.util.Objects;
 
 import com.github.sdankbar.qml.JQMLModelFactory;
@@ -34,11 +33,13 @@ import com.google.common.collect.ImmutableMap;
 
 public class JQMLConstantsModel {
 
-	private static String getName(final Class<?> source) {
-		return source.getSimpleName();
+	private static String getName(final Class<?> c) {
+		Objects.requireNonNull(c, "c is null");
+		return c.getSimpleName();
 	}
 
-	public static Map<String, JVariant> getValues(final Class<?> c) {
+	public static ImmutableMap<String, JVariant> getValues(final Class<?> c) {
+		Objects.requireNonNull(c, "c is null");
 		final ImmutableMap.Builder<String, JVariant> builder = ImmutableMap.builder();
 
 		for (final Field f : c.getDeclaredFields()) {
@@ -66,13 +67,18 @@ public class JQMLConstantsModel {
 
 	private final JQMLSingletonModel<String> model;
 
-	public JQMLConstantsModel(final JQMLModelFactory factory, final Class<?> constants) {
+	public JQMLConstantsModel(final JQMLModelFactory factory, final String name,
+			final ImmutableMap<String, JVariant> values) {
 		Objects.requireNonNull(factory, "factory is null");
-		Objects.requireNonNull(constants, "constants is null");
+		Objects.requireNonNull(name, "name is null");
+		Objects.requireNonNull(values, "values is null");
 
-		final Map<String, JVariant> values = getValues(constants);
-		model = factory.createSingletonModel(getName(constants), values.keySet(), PutMode.RETURN_NULL);
+		model = factory.createSingletonModel(name, values.keySet(), PutMode.RETURN_NULL);
 		model.putAll(values);
+	}
+
+	public JQMLConstantsModel(final JQMLModelFactory factory, final Class<?> constants) {
+		this(factory, getName(constants), getValues(constants));
 	}
 
 	public String getModelName() {

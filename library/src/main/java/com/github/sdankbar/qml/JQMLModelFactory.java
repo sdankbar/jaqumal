@@ -257,4 +257,11 @@ public interface JQMLModelFactory {
 	 */
 	JQMLConstantsModel createConstantModel(Class<?> constant);
 
+	/**
+	 *
+	 * @param constant Class for an Enum that is to be shared with QML.
+	 * @return
+	 */
+	JQMLConstantsModel createEnumModel(Class<? extends Enum<?>> enumClass);
+
 }

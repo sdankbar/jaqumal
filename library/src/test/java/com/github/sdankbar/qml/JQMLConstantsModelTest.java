@@ -36,7 +36,7 @@ import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 /**
  * Tests the JQMLConstantModel class.
  */
-public class JQMLConstantModelTest {
+public class JQMLConstantsModelTest {
 
 	/**
 	 *
@@ -52,6 +52,10 @@ public class JQMLConstantModelTest {
 		public static final Point2D d = new Point2D.Double(1, 2);
 	}
 
+	public enum TestEnum {
+		MY_VALUE1, MY_VALUE2, ANOTHER;
+	}
+
 	/**
 	 *
 	 */
@@ -61,10 +65,10 @@ public class JQMLConstantModelTest {
 	}
 
 	/**
-	 * @throws InterruptedException
+	 *
 	 */
 	@Test
-	public void model() throws InterruptedException {
+	public void staticClass() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLConstantsModel model = app.getModelFactory().createConstantModel(Constants.class);
@@ -75,6 +79,22 @@ public class JQMLConstantModelTest {
 		assertEquals(Constants.b, inner.get("b").asDouble(), 0.0001);
 		assertEquals(Constants.c, inner.get("c").asString());
 		assertEquals(Constants.d, inner.get("d").asPoint());
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void enumClass() {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLConstantsModel model = app.getModelFactory().createEnumModel(TestEnum.class);
+
+		assertEquals("TestEnum", model.getModelName());
+		final JQMLSingletonModel<Object> inner = app.getModelFactory().getSingletonModel("TestEnum").get();
+		assertEquals(0, inner.get("MY_VALUE1").asInteger());
+		assertEquals(1, inner.get("MY_VALUE2").asInteger());
+		assertEquals(2, inner.get("ANOTHER").asInteger());
 	}
 
 }

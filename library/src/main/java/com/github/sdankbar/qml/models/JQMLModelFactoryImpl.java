@@ -416,4 +416,17 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		constantsModels.put(model.getModelName(), model);
 		return model;
 	}
+
+	@Override
+	public JQMLConstantsModel createEnumModel(final Class<? extends Enum<?>> enumClass) {
+		Objects.requireNonNull(enumClass, "enumClass is null");
+		final ImmutableMap.Builder<String, JVariant> builder = ImmutableMap.builder();
+		for (final Enum<?> s : enumClass.getEnumConstants()) {
+			builder.put(s.name(), new JVariant(s.ordinal()));
+		}
+
+		final JQMLConstantsModel model = new JQMLConstantsModel(this, enumClass.getSimpleName(), builder.build());
+		constantsModels.put(model.getModelName(), model);
+		return model;
+	}
 }

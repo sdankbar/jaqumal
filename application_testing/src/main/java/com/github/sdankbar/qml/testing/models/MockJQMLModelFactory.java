@@ -313,4 +313,10 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		return null;
 	}
 
+	@Override
+	public JQMLConstantsModel createEnumModel(final Class<? extends Enum<?>> enumClass) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
