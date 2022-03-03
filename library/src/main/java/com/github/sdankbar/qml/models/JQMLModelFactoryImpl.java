@@ -48,6 +48,7 @@ import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
 import com.github.sdankbar.qml.models.list.ListAccessor;
+import com.github.sdankbar.qml.models.singleton.JQMLConstantsModel;
 import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModelImpl;
@@ -90,6 +91,7 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 	private final Map<String, JQMLListViewModel<?>> listViewModels = new HashMap<>();
 	private final Map<String, JQMLFlatTreeModel<?>> flatTreeModels = new HashMap<>();
 	private final Map<String, JQMLTableModel<?>> tableModels = new HashMap<>();
+	private final Map<String, JQMLConstantsModel> constantsModels = new HashMap<>();
 
 	/**
 	 * Constructs a new factory.
@@ -406,5 +408,12 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		} catch (final ClassCastException e) {
 			return Optional.empty();
 		}
+	}
+
+	@Override
+	public JQMLConstantsModel createConstantModel(final Class<?> constant) {
+		final JQMLConstantsModel model = new JQMLConstantsModel(this, constant);
+		constantsModels.put(model.getModelName(), model);
+		return model;
 	}
 }

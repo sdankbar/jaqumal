@@ -24,6 +24,7 @@ package com.github.sdankbar.qml;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -391,6 +392,66 @@ public class JVariant {
 			return TRUE;
 		} else {
 			return FALSE;
+		}
+	}
+
+	public static JVariant toVariant(final Object o) {
+		// final ImmutableList<Point2D> v
+
+		if (o instanceof Boolean) {
+			return valueOf((Boolean) o);
+		} else if (o instanceof BufferedImage) {
+			return new JVariant((BufferedImage) o);
+		} else if (o instanceof byte[]) {
+			return new JVariant((byte[]) o);
+		} else if (o instanceof Color) {
+			return new JVariant((Color) o);
+		} else if (o instanceof Dimension) {
+			return new JVariant((Dimension) o);
+		} else if (o instanceof Double) {
+			return new JVariant((Double) o);
+		} else if (o instanceof Float) {
+			return new JVariant((Float) o);
+		} else if (o instanceof Instant) {
+			return new JVariant((Instant) o);
+		} else if (o instanceof Integer) {
+			return new JVariant((Integer) o);
+		} else if (o instanceof JFont) {
+			return new JVariant((JFont) o);
+		} else if (o instanceof Line2D) {
+			return new JVariant((Line2D) o);
+		} else if (o instanceof Long) {
+			return new JVariant((Long) o);
+		} else if (o instanceof Pattern) {
+			return new JVariant((Pattern) o);
+		} else if (o instanceof Point2D) {
+			return new JVariant((Point2D) o);
+		} else if (o instanceof Point) {
+			return new JVariant((Point) o);
+		} else if (o instanceof JPoint) {
+			return new JVariant((JPoint) o);
+		}  else if (o instanceof JPointReal) {
+			return new JVariant((JPointReal) o);
+		} else if (o instanceof Rectangle2D) {
+			return new JVariant((Rectangle2D) o);
+		} else if (o instanceof JRect) {
+			return new JVariant((JRect) o);
+		} else if (o instanceof JRect) {
+			return new JVariant((JRect) o);
+		} else if (o instanceof JRectReal) {
+			return new JVariant((JRectReal) o);
+		} else if (o instanceof String) {
+			return new JVariant((String) o);
+		} else if (o instanceof URL) {
+			return new JVariant((URL) o);
+		} else if (o instanceof UUID) {
+			return new JVariant((UUID) o);
+		} else if (o instanceof PainterInstructions) {
+			return new JVariant((PainterInstructions) o);
+		} else if (o instanceof Storable) {
+			return new JVariant((Storable) o);
+		} else {
+			return null;
 		}
 	}
 

@@ -36,6 +36,7 @@ import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
+import com.github.sdankbar.qml.models.singleton.JQMLConstantsModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.google.common.collect.ImmutableMap;
@@ -247,5 +248,13 @@ public interface JQMLModelFactory {
 	<K> Optional<JQMLFlatTreeModel<K>> getFlatTreeModel(final String name);
 
 	<K> Optional<JQMLTableModel<K>> getTableModel(final String name);
+
+	/**
+	 *
+	 * @param constant Class containing public static final fields that are to be
+	 *                 shared with QML.
+	 * @return
+	 */
+	JQMLConstantsModel createConstantModel(Class<?> constant);
 
 }

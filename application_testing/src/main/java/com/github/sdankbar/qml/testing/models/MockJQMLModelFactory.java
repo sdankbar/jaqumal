@@ -44,6 +44,7 @@ import com.github.sdankbar.qml.models.list.JQMLListModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel;
 import com.github.sdankbar.qml.models.list.JQMLListViewModel.SelectionMode;
 import com.github.sdankbar.qml.models.list.JQMLXYSeriesModel;
+import com.github.sdankbar.qml.models.singleton.JQMLConstantsModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModelImpl;
@@ -304,6 +305,12 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 	@Override
 	public <K> Optional<JQMLTableModel<K>> getTableModel(final String name) {
 		return Optional.ofNullable((JQMLTableModel<K>) tableModels.get(name));
+	}
+
+	@Override
+	public JQMLConstantsModel createConstantModel(final Class<?> constant) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
