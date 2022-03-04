@@ -52,6 +52,7 @@ import com.github.sdankbar.qml.models.singleton.JQMLConstantsModel;
 import com.github.sdankbar.qml.models.singleton.JQMLPerformanceModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModelImpl;
+import com.github.sdankbar.qml.models.singleton.SingletonInvocationHandler;
 import com.github.sdankbar.qml.models.singleton.SingletonMapAccessor;
 import com.github.sdankbar.qml.models.table.JQMLTableModel;
 import com.github.sdankbar.qml.models.table.JQMLTableModelImpl;
@@ -428,5 +429,10 @@ public class JQMLModelFactoryImpl implements JQMLModelFactory {
 		final JQMLConstantsModel model = new JQMLConstantsModel(this, enumClass.getSimpleName(), builder.build());
 		constantsModels.put(model.getModelName(), model);
 		return model;
+	}
+
+	@Override
+	public <K> K createWrapperSingletonModel(final String name, final Class<K> c) {
+		return SingletonInvocationHandler.createWrapper(name, c, this);
 	}
 }

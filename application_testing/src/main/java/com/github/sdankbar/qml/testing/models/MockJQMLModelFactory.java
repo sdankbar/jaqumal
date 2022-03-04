@@ -319,4 +319,10 @@ public class MockJQMLModelFactory implements JQMLModelFactory {
 		return null;
 	}
 
+	@Override
+	public <K> K createWrapperSingletonModel(final String name, final Class<K> c) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

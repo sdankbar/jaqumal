@@ -264,4 +264,6 @@ public interface JQMLModelFactory {
 	 */
 	JQMLConstantsModel createEnumModel(Class<? extends Enum<?>> enumClass);
 
+	<K> K createWrapperSingletonModel(final String name, Class<K> c);
+
 }
