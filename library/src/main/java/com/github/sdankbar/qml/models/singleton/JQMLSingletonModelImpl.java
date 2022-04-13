@@ -25,6 +25,7 @@ package com.github.sdankbar.qml.models.singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -152,7 +153,7 @@ public class JQMLSingletonModelImpl<K> extends AbstractJQMLMapModel<K> implement
 		}
 
 		final String s = root.toString(1);
-		stream.write(s.getBytes());
+		stream.write(s.getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Override

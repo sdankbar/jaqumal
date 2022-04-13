@@ -25,6 +25,7 @@ package com.github.sdankbar.qml.models.list;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -864,7 +865,7 @@ public class JQMLListModelImpl<K> extends AbstractJQMLModel implements JQMLListM
 		}
 
 		final String s = root.toString(1);
-		stream.write(s.getBytes());
+		stream.write(s.getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Override
