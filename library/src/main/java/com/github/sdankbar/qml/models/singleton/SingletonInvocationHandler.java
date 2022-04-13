@@ -64,13 +64,11 @@ public class SingletonInvocationHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(final Object proxy, final Method m, final Object[] args) throws Throwable {
-		final boolean isGetter = m.getName().startsWith("get");
-		final boolean isSetter = m.getName().startsWith("set");
 		final String key = m.getName().substring(3);
 
-		if (isGetter) {
+		if (m.getName().startsWith("get")) {
 			return model.get(key).asType(m.getReturnType()).orElse(null);
-		} else if (isSetter) {
+		} else if (m.getName().startsWith("set")) {
 			final JVariant v = JVariant.toVariant(args[0]);
 			if (v != null) {
 				model.put(key, v);

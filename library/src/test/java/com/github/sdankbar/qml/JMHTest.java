@@ -71,6 +71,12 @@ public class JMHTest {
 		}
 	}
 
+	public interface TestInterface {
+		String getString();
+
+		void setString(String s);
+	}
+
 	/**
 	 * Shared state.
 	 */
@@ -80,6 +86,7 @@ public class JMHTest {
 		JQMLSingletonModel<Role> singletonModel;
 		JQMLListModel<Role> listModel;
 		JFont defaultFont;
+		TestInterface wrappedModel;
 
 		InvokableWrapper wrapper = new InvokableWrapper(new InvokeObject());
 
@@ -94,6 +101,8 @@ public class JMHTest {
 			listModel = app.getModelFactory().createListModel("list_model", Role.class, PutMode.RETURN_NULL);
 			listModel.add(new JVariant(1), Role.R1);
 			listModel.add(new JVariant("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), Role.R2);
+			wrappedModel = app.getModelFactory().createWrapperSingletonModel("proxy_model", TestInterface.class);
+			wrappedModel.setString("ABCDEFGHIJKLMN");
 			defaultFont = JFont.builder().build();
 		}
 
@@ -193,6 +202,22 @@ public class JMHTest {
 		final QMLRequestParser parser = new QMLRequestParser(buffer);
 
 		state.wrapper.invoke("call3", parser);
+	}
+
+	/**
+	 * @param state
+	 */
+	@Benchmark
+	public void benchmark_modelWrapper(final BenchmarkState state) {
+		state.wrappedModel.setString("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	}
+	
+	/**
+	 * @param state
+	 */
+	@Benchmark
+	public void benchmark_modelWrapper2(final BenchmarkState state) {
+		state.wrappedModel.getString();
 	}
 
 	/**
