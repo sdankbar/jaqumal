@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -58,9 +59,9 @@ public class ModelPersistence {
 
 	private final Map<String, QMLThreadPersistanceTask> taskMap = new HashMap<>();
 
-	private final Map<JQMLSingletonModel<?>, ChangeListener> autoPersistedSingletonModels = new HashMap<>();
-	private final Map<JQMLListModel<?>, Runnable> autoPersistedListModels = new HashMap<>();
-	private final Map<JQMLTableModel<?>, Runnable> autoPersistedTableModels = new HashMap<>();
+	private final Map<JQMLSingletonModel<?>, ChangeListener> autoPersistedSingletonModels = new IdentityHashMap<>();
+	private final Map<JQMLListModel<?>, Runnable> autoPersistedListModels = new IdentityHashMap<>();
+	private final Map<JQMLTableModel<?>, Runnable> autoPersistedTableModels = new IdentityHashMap<>();
 
 	public ModelPersistence(final ScheduledExecutorService qtExecutor, final Duration writeDelay,
 			final File persistenceDirectory) {
@@ -83,6 +84,10 @@ public class ModelPersistence {
 		}
 
 		flush();
+
+		autoPersistedListModels.clear();
+		autoPersistedSingletonModels.clear();
+		autoPersistedTableModels.clear();
 	}
 
 	@QtThread
