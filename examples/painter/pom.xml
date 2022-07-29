@@ -22,9 +22,7 @@
     THE SOFTWARE.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -79,7 +77,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>RCC-Linux-64bit</id>
@@ -105,6 +103,23 @@
 											failonerror="true">
 										</exec>
 									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>com.github.sdankbar.jaqumal</groupId>
+						<artifactId>rcc-maven-plugin</artifactId>
+						<version>0.5.2-SNAPSHOT</version>
+						<executions>
+							<execution>
+								<configuration>
+									<qrcFile>${project.basedir}/src/main/resources/data.xml</qrcFile>
+									<outputRccFile>${project.basedir}/src/main/resources/data.json</outputRccFile>
 								</configuration>
 								<goals>
 									<goal>run</goal>

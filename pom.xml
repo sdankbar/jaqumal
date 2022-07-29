@@ -22,9 +22,7 @@
     THE SOFTWARE.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.sdankbar.jaqumal</groupId>
@@ -43,6 +41,7 @@
 	</licenses>
 
 	<modules>
+		<module>rccPlugin</module>
 		<module>library</module>
 		<module>application_testing</module>
 		<module>examples</module>
@@ -67,6 +66,11 @@
 		<maven.compiler.version>3.8.1</maven.compiler.version>
 		<maven.javadoc.version>2.10.4</maven.javadoc.version>
 		<maven.source.version>3.0.1</maven.source.version>
+		
+		<maven.project.version>2.2.1</maven.project.version>
+		<maven.plugin.annotations.version>3.6.4</maven.plugin.annotations.version>
+		<maven.plugin.api.version>3.8.6</maven.plugin.api.version>
+		
 		<license.plugin.version>3.0</license.plugin.version>
 	</properties>
 
@@ -107,6 +111,22 @@
 				<artifactId>junit</artifactId>
 				<version>${junit.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-plugin-api</artifactId>
+				<version>${maven.plugin.api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.plugin-tools</groupId>
+				<artifactId>maven-plugin-annotations</artifactId>
+				<version>${maven.plugin.annotations.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-project</artifactId>
+				<version>${maven.project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -193,7 +213,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>Build-Linux-64bit</id>
@@ -204,8 +224,8 @@
 				</os>
 			</activation>
 			<properties>
-                <os.classifier>linux</os.classifier>
-            </properties>
+				<os.classifier>linux</os.classifier>
+			</properties>
 		</profile>
 		<profile>
 			<activation>
@@ -215,8 +235,8 @@
 				</os>
 			</activation>
 			<properties>
-                <os.classifier>windows</os.classifier>
-            </properties>
+				<os.classifier>windows</os.classifier>
+			</properties>
 		</profile>
 	</profiles>
 </project>
