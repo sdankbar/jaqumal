@@ -52,6 +52,24 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>com.github.sdankbar.jaqumal</groupId>
+				<artifactId>rcc-maven-plugin</artifactId>
+				<version>${project.parent.version}</version>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>rcc_plugin</goal>
+						</goals>
+						<configuration>
+							<qrcFile>painter.qrc</qrcFile>
+							<outputRccFile>src/main/resources/painter.rcc</outputRccFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
@@ -77,93 +95,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>RCC-Linux-64bit</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<os>
-					<family>Linux</family>
-				</os>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<id>rcc</id>
-								<phase>initialize</phase>
-								<configuration>
-									<target>
-										<exec dir="${project.basedir}/src/main/cpp"
-											executable="${project.basedir}/src/main/cpp/painter.sh"
-											failonerror="true">
-										</exec>
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>com.github.sdankbar.jaqumal</groupId>
-						<artifactId>rcc-maven-plugin</artifactId>
-						<version>0.5.2-SNAPSHOT</version>
-						<executions>
-							<execution>
-								<configuration>
-									<qrcFile>${project.basedir}/src/main/resources/data.xml</qrcFile>
-									<outputRccFile>${project.basedir}/src/main/resources/data.json</outputRccFile>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>Build-Windows-64bit</id>
-
-			<activation>
-				<activeByDefault>true</activeByDefault>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<id>rcc</id>
-								<phase>initialize</phase>
-								<configuration>
-									<target>
-										<exec dir="${project.basedir}"
-											executable="${project.basedir}/painter.bat"
-											failonerror="true">
-										</exec>
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

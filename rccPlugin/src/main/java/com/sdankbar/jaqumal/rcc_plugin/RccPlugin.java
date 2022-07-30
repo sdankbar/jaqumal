@@ -32,16 +32,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * Goal which touches a timestamp file.
- *
- * @goal touch
- *
- * @phase process-sources
+ * Runs rcc on the provided qrc file.
  */
-@Mojo(name = "RccPlugin", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Mojo(name = "rcc_plugin", defaultPhase = LifecyclePhase.COMPILE)
 public class RccPlugin extends AbstractMojo {
 	/**
-	 * Location of qrc file.
+	 * Location of input qrc file.
 	 *
 	 * @required
 	 */
@@ -49,7 +45,7 @@ public class RccPlugin extends AbstractMojo {
 	private File qrcFile;
 
 	/**
-	 * Location to write the rcc file.
+	 * Location to write the rcc file to.
 	 *
 	 * @required
 	 */
@@ -58,10 +54,15 @@ public class RccPlugin extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		final ProcessBuilder b = new ProcessBuilder("rcc -binary -o src/main/resources/painter.rcc painter2.qrc");
+		final ProcessBuilder b = new ProcessBuilder("rcc", "-binary", "-o", outputRccFile.getAbsolutePath(),
+				qrcFile.getAbsolutePath());
+		b.inheritIO();
 		try {
 			final Process p = b.start();
 			final int result = p.waitFor();
+			if (result != 0) {
+				throw new MojoExecutionException("Error generating rcc file");
+			}
 		} catch (final IOException | InterruptedException e) {
 			throw new MojoExecutionException("Error generating rcc file", e);
 		}

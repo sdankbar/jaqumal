@@ -70,6 +70,7 @@
 		<maven.project.version>2.2.1</maven.project.version>
 		<maven.plugin.annotations.version>3.6.4</maven.plugin.annotations.version>
 		<maven.plugin.api.version>3.8.6</maven.plugin.api.version>
+		<maven.plugin.plugin.version>3.6.0</maven.plugin.plugin.version>
 		
 		<license.plugin.version>3.0</license.plugin.version>
 	</properties>
@@ -132,6 +133,22 @@
 	</dependencyManagement>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-plugin-plugin</artifactId>
+					<version>${maven.plugin.plugin.version}</version>
+					<executions>
+						<execution>
+							<id>default-descriptor</id>
+							<phase>process-classes</phase>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
