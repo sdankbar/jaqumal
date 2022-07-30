@@ -34,7 +34,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * Runs rcc on the provided qrc file.
  */
-@Mojo(name = "rcc_plugin", defaultPhase = LifecyclePhase.COMPILE)
+@Mojo(name = "rcc_plugin", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class RccPlugin extends AbstractMojo {
 	/**
 	 * Location of input qrc file.
