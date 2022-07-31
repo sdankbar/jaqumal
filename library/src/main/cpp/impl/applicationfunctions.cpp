@@ -322,6 +322,14 @@ JNICALL jboolean registerResourceData(JNIEnv* env, jclass, jint length, jbyteArr
     return QResource::registerResource(copy, JNIUtilities::toQString(env, mapRoot));
 }
 
+JNICALL void addImportPath(JNIEnv* env, jclass, jstring importPath)
+{
+    if (ApplicationFunctions::check(env))
+    {
+        ApplicationFunctions::get()->addPathToImportPath(JNIUtilities::toQString(env, importPath));
+    }
+}
+
 JNICALL jboolean compareImageToActiveWindow(JNIEnv* env, jclass, jobject jImage, jdouble ratiodB)
 {
     if (ApplicationFunctions::check(env))
@@ -465,6 +473,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("generateDeltaBetweenImageAndActiveWindow", "(Ljava/lang/String;Ljava/awt/image/BufferedImage;)V", (void *)&generateDeltaBetweenImageAndActiveWindow),
         JNIUtilities::createJNIMethod("registerResource", "(Ljava/lang/String;Ljava/lang/String;)Z", (void *)&registerResourceFile),
         JNIUtilities::createJNIMethod("registerResource", "(I[BLjava/lang/String;)Z", (void *)&registerResourceData),
+        JNIUtilities::createJNIMethod("addImportPath", "(Ljava/lang/String;)V", (void *)&addImportPath),
         JNIUtilities::createJNIMethod("injectMousePressIntoApplication", "(IIIII)V", (void *)&injectMousePressIntoApplication),
         JNIUtilities::createJNIMethod("injectMouseReleaseIntoApplication", "(IIIII)V", (void *)&injectMouseReleaseIntoApplication),
         JNIUtilities::createJNIMethod("injectMouseDoubleClickIntoApplication", "(IIIII)V", (void *)&injectMouseDoubleClickIntoApplication),
@@ -697,6 +706,11 @@ void ApplicationFunctions::addToContext(const QString& name, const QVariant& val
     m_objectLookupMap.insert(name, value);
     emit modelMapChanged();
     m_qmlEngine->rootContext()->setContextProperty(name, value);
+}
+
+void ApplicationFunctions::addPathToImportPath(const QString& path)
+{
+    m_qmlEngine->addImportPath(path);
 }
 
 QVariant ApplicationFunctions::lookup(const QString& objectName) const

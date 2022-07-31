@@ -149,6 +149,8 @@ public final class ApplicationFunctions {
 	 */
 	public static native boolean registerResource(int length, byte[] rccData, String mapRoot);
 
+	public static native void addImportPath(String importPath);
+
 	public static native void injectMousePressIntoApplication(int x, int y, int button, int buttons, int modifiers);
 
 	public static native void injectMouseReleaseIntoApplication(int x, int y, int button, int buttons, int modifiers);

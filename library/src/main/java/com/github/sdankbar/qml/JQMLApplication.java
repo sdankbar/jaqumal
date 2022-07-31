@@ -474,4 +474,11 @@ public class JQMLApplication<EType> {
 		return devTools;
 	}
 
+	@QtThread
+	public void addImportPath(final String path) {
+		verifyEventLoopThread();
+		Objects.requireNonNull(path, "path is null");
+		ApplicationFunctions.addImportPath(path);
+	}
+
 }

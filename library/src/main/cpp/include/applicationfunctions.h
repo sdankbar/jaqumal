@@ -70,6 +70,8 @@ public:
         addToContext(name, QVariant::fromValue(ptr));
     }
 
+    void addPathToImportPath(const QString& path);
+
     Q_INVOKABLE QVariant lookup(const QString& objectName) const;
 
     const QVariantMap& modelMap() const;

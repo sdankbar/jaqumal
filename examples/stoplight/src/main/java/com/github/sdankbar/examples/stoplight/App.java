@@ -100,7 +100,7 @@ public class App {
 		final JQMLSingletonModel<StopLightRoles> model = app.getModelFactory().createSingletonModel("model",
 				StopLightRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
 
-		QMLResourceLoader.loadResources();
+		QMLResourceLoader.loadResources(app);
 
 		final TestInvokable invokable = new TestInvokable();
 		app.getInvokableDispatcher().registerInvokable("test_invokable", invokable);
