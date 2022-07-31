@@ -26,6 +26,7 @@ import QtQuick.Window 2.10
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
 import QtQuick.Controls 1.4
+import src.main.qml 1.0
 import com.github.sdankbar.jaqumal 0.4
 
 Window {
@@ -80,12 +81,9 @@ Window {
                 MouseArea {
                     width: 100
                     height: 100
-                    Rectangle {
-                        width: 100
-                        height: 100
+                    Circle {
                         color: "red"
                         opacity: model.lightColor === "red" ? 1 : 0.2
-                        radius: 50
                     }
                     onClicked: {
                         log.info("USER INPUT- clicked RED light")

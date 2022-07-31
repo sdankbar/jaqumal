@@ -1,5 +1,6 @@
 <RCC>
-    <qresource>
-        <file alias="Circle.qml">src/main/qml/Circle.qml</file>
+    <qresource prefix="/qt-project.org/imports">
+        <file>src/main/qml/Circle.qml</file>
+        <file>src/main/qml/qmldir</file>
     </qresource>
 </RCC>
