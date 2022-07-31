@@ -1,0 +1,18 @@
+Instructions for making a jar file containing QML files for use in other projects.
+
+1. Create directory with the name of the module.  In this example, the module name will be
+"SharedComponents".
+2. Place all QML files into this new directory.
+3. Create qmldir file in the new directory.  List each qml file in the qmldir and specify the module name.
+4. Create a qrc file.  List each qml file in the new directory as well as the qmldir.  Specify a unique prefix.  
+   Used "/shared_qml" in this example. (/ before shared_qml required)
+5. In the pom.xml for this project, add rcc-maven-plugin instance, specifying the location of the qrc file as
+   well as the name of the rcc file to generate.  The rcc file will be placed into the src/main/resources directory
+   so it is included in the resulting jar.
+6. Create a Java class with a single static method that takes a JQMLApplication<?> as its only argument.
+   In this static method, call registerResourceFromSystemResource() with the name of the rcc file and the
+   empty string as the second argument.  Also call addImportPath() on the provided JQMLApplication with
+   the prefix specified in qrc, prefix with ":/", ex ":/shared_qml". 
+7. Build the project.
+8. Add a dependency to the project and call the static method created in step 6.  Do so before loading any QML.
+9. Add "import <module> version" to QML intending to use the QML files in the shared library, ex "import SharedComponents 1.0".

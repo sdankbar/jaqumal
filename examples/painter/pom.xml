@@ -62,7 +62,7 @@
 						</goals>
 						<configuration>
 							<qrcFile>painter.qrc</qrcFile>
-							<outputRccFile>src/main/resources/painter.rcc</outputRccFile>
+							<outputRccFile>painter.rcc</outputRccFile>
 						</configuration>
 					</execution>
 				</executions>

@@ -57,7 +57,7 @@
 						</goals>
 						<configuration>
 							<qrcFile>shared.qrc</qrcFile>
-							<outputRccFile>src/main/resources/shared.rcc</outputRccFile>
+							<outputRccFile>shared.rcc</outputRccFile>
 						</configuration>
 					</execution>
 				</executions>

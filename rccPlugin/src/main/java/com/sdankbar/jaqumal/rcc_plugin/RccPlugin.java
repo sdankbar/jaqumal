@@ -50,12 +50,18 @@ public class RccPlugin extends AbstractMojo {
 	 * @required
 	 */
 	@Parameter(required = true)
-	private File outputRccFile;
+	private String outputRccFile;
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		final ProcessBuilder b = new ProcessBuilder("rcc", "-binary", "-o", outputRccFile.getAbsolutePath(),
-				qrcFile.getAbsolutePath());
+		final File resourcesDir = new File("src/main/resources");
+		if (!resourcesDir.exists()) {
+			System.out.println(resourcesDir.getPath() + " does not exist");
+			throw new MojoExecutionException("Must manuall create " + resourcesDir.getPath());
+		}
+
+		final ProcessBuilder b = new ProcessBuilder("rcc", "-binary", "-o",
+				new File(resourcesDir, outputRccFile).getAbsolutePath(), qrcFile.getAbsolutePath());
 		b.inheritIO();
 		try {
 			final Process p = b.start();
