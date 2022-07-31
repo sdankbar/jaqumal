@@ -22,9 +22,7 @@
     THE SOFTWARE.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -32,10 +30,10 @@
 		<artifactId>examples</artifactId>
 		<version>0.5.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>stoplight</artifactId>
+	<artifactId>shared_qml</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Stoplight Example</name>
+	<name>Shared QML Example</name>
 
 	<dependencies>
 		<dependency>
@@ -44,40 +42,22 @@
 			<version>${project.parent.version}</version>
 			<classifier>${os.classifier}</classifier>
 		</dependency>
-		<dependency>
-			<groupId>com.github.sdankbar.jaqumal</groupId>
-			<artifactId>shared_qml</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<groupId>com.github.sdankbar.jaqumal</groupId>
+				<artifactId>rcc-maven-plugin</artifactId>
+				<version>${project.parent.version}</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>rcc_plugin</goal>
 						</goals>
 						<configuration>
-							<archive>
-								<manifest>
-									<mainClass>
-										com.github.sdankbar.examples.stoplight.App
-									</mainClass>
-								</manifest>
-							</archive>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
+							<qrcFile>shared.qrc</qrcFile>
+							<outputRccFile>src/main/resources/shared.rcc</outputRccFile>
 						</configuration>
 					</execution>
 				</executions>

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource>
+        <file alias="Circle.qml">src/main/qml/Circle.qml</file>
+    </qresource>
+</RCC>

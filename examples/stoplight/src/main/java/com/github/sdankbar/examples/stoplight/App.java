@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.github.sdankbar.examples.shared_qml.QMLResourceLoader;
 import com.github.sdankbar.qml.JInvokable;
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
@@ -98,6 +99,8 @@ public class App {
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final JQMLSingletonModel<StopLightRoles> model = app.getModelFactory().createSingletonModel("model",
 				StopLightRoles.class, PutMode.RETURN_PREVIOUS_VALUE);
+
+		QMLResourceLoader.loadResources();
 
 		final TestInvokable invokable = new TestInvokable();
 		app.getInvokableDispatcher().registerInvokable("test_invokable", invokable);
