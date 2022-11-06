@@ -406,6 +406,20 @@ bool ApplicationFunctions::check(JNIEnv* env)
     }
 }
 
+void ApplicationFunctions::incrementAndCheckRecursionDepth(JNIEnv* env)
+{
+    ++recursionDepth;
+    if (recursionDepth > 1)
+    {
+        JNIUtilities::throwQMLException(env, "Unallowed recursion detected");
+    }
+}
+
+void ApplicationFunctions::decrementRecursionDepth()
+{
+    --recursionDepth;
+}
+
 void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const std::string& msg)
 {
     JNIEnv* threadEnv = JNIUtilities::attachThread();
@@ -496,6 +510,8 @@ void ApplicationFunctions::uninitialize(JNIEnv* env)
 }
 
 ApplicationFunctions* ApplicationFunctions::SINGLETON = nullptr;
+
+int32_t ApplicationFunctions::recursionDepth = 0;
 
 void signal_handler(int)
 {

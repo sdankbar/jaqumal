@@ -44,6 +44,9 @@ public:
     static bool check(JNIEnv* env);
     static void invokeLoggingCallback(jobject obj, int type, const std::string& msg);
 
+    static void incrementAndCheckRecursionDepth(JNIEnv* env);
+    static void decrementRecursionDepth();
+
     static JNIEnv* mainEnv;
 
     void exec();
@@ -123,6 +126,8 @@ private:
     static jmethodID bufferedImageGetWidth;
     static jmethodID bufferedImageGetHeight;
     static jmethodID bufferedImageGetRGB;
+
+    static int32_t recursionDepth;
 
     QApplication* m_qapp;
     QQmlApplicationEngine* m_qmlEngine;

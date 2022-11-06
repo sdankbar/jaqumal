@@ -396,8 +396,6 @@ public class JVariant {
 	}
 
 	public static JVariant toVariant(final Object o) {
-		// final ImmutableList<Point2D> v
-
 		if (o instanceof Boolean) {
 			return valueOf((Boolean) o);
 		} else if (o instanceof BufferedImage) {
@@ -430,7 +428,7 @@ public class JVariant {
 			return new JVariant((Point) o);
 		} else if (o instanceof JPoint) {
 			return new JVariant((JPoint) o);
-		}  else if (o instanceof JPointReal) {
+		} else if (o instanceof JPointReal) {
 			return new JVariant((JPointReal) o);
 		} else if (o instanceof Rectangle2D) {
 			return new JVariant((Rectangle2D) o);
