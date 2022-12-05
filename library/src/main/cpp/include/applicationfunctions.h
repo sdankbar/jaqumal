@@ -44,10 +44,14 @@ public:
     static bool check(JNIEnv* env);
     static void invokeLoggingCallback(jobject obj, int type, const std::string& msg);
 
-    static void incrementAndCheckRecursionDepth(JNIEnv* env);
-    static void decrementRecursionDepth();
-
     static JNIEnv* mainEnv;
+
+    class RecursionChecker
+    {
+    public:
+        RecursionChecker(JNIEnv* env);
+        ~RecursionChecker();
+    };
 
     void exec();
     void pollEvents();
@@ -109,6 +113,10 @@ public slots:
     void invokeCallback(JNIEnv* env, jobject c);
 
 private:
+
+    static void incrementAndCheckRecursionDepth(JNIEnv* env);
+    static void decrementRecursionDepth();
+
     ApplicationFunctions(int32_t& argc, char** argv);
     ~ApplicationFunctions();
 

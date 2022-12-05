@@ -30,7 +30,7 @@
 	<parent>
 		<groupId>com.github.sdankbar.jaqumal</groupId>
 		<artifactId>examples</artifactId>
-		<version>0.5.2-SNAPSHOT</version>
+		<version>0.5.3</version>
 	</parent>
 	<artifactId>image_provider</artifactId>
 	<packaging>jar</packaging>
@@ -40,7 +40,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.sdankbar.jaqumal</groupId>
-			<artifactId>library</artifactId>
+			<artifactId>library_jaqumal</artifactId>
 			<version>${project.parent.version}</version>
 			<classifier>${os.classifier}</classifier>
 		</dependency>

@@ -420,6 +420,16 @@ void ApplicationFunctions::decrementRecursionDepth()
     --recursionDepth;
 }
 
+ApplicationFunctions::RecursionChecker::RecursionChecker(JNIEnv* env)
+{
+    incrementAndCheckRecursionDepth(env);
+}
+
+ApplicationFunctions::RecursionChecker::~RecursionChecker()
+{
+    decrementRecursionDepth();
+}
+
 void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const std::string& msg)
 {
     JNIEnv* threadEnv = JNIUtilities::attachThread();

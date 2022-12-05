@@ -58,7 +58,7 @@ Then add the following to the pom.xml to be able to use Jaqumal.
 ```
 <dependency>
 	<groupId>com.github.sdankbar.jaqumal</groupId>
-	<artifactId>library</artifactId>
+	<artifactId>library_jaqumal</artifactId>
 	<version>${current.version}</version>
 </dependency>
 ```
@@ -88,7 +88,7 @@ Then add the following to the pom.xml to be able to use Jaqumal.
 ```
 <dependency>
 	<groupId>com.github.sdankbar.jaqumal</groupId>
-	<artifactId>library</artifactId>
+	<artifactId>library_jaqumal</artifactId>
 	<version>${current.version}</version>
 </dependency>
 ```

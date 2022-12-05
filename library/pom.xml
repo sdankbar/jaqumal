@@ -30,9 +30,9 @@
 	<parent>
 		<groupId>com.github.sdankbar.jaqumal</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.5.2-SNAPSHOT</version>
+		<version>0.5.3</version>
 	</parent>
-	<artifactId>library</artifactId>
+	<artifactId>library_jaqumal</artifactId>
 	<packaging>jar</packaging>
 
 	<dependencies>
