@@ -22,7 +22,6 @@
  */
 package com.github.sdankbar.qml.utility;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -30,17 +29,23 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+/**
+ * Does not allow the null key or value.
+ *
+ * @param <K> Type of the key in the map.
+ * @param <V> Type of the value in the map.
+ */
 public class IndexedMap<K, V> {
 
 	private static class Entry<K, V> {
 		private final int index;
-		private final K key;
+		private K key;
 		private V value;
 
-		public Entry(final int index, final K key, final V value) {
+		public Entry(final int index) {
 			this.index = index;
-			this.key = key;
-			this.value = value;
+			this.key = null;
+			this.value = null;
 		}
 
 		public V getValue() {
@@ -60,6 +65,20 @@ public class IndexedMap<K, V> {
 		public K getKey() {
 			return key;
 		}
+
+		public void setKeyAndValue(final K newKey, final V newValue) {
+			this.key = newKey;
+			this.value = newValue;
+		}
+
+		public boolean isPopulated() {
+			return key != null;
+		}
+
+		public void reset() {
+			key = null;
+			value = null;
+		}
 	}
 
 	private final Entry<K, V>[] table;
@@ -68,6 +87,9 @@ public class IndexedMap<K, V> {
 	@SuppressWarnings("unchecked")
 	public IndexedMap(final int totalIndices) {
 		table = new Entry[totalIndices];
+		for (int i = 0; i < totalIndices; ++i) {
+			table[i] = new Entry<>(i);
+		}
 		keyMap = new HashMap<>(totalIndices);
 	}
 
@@ -86,7 +108,7 @@ public class IndexedMap<K, V> {
 
 	public boolean containsIndex(final int index) {
 		Preconditions.checkArgument(0 <= index && index < table.length, "Index is outside value range %s", index);
-		return table[index] != null;
+		return table[index].isPopulated();
 	}
 
 	public ImmutableSet<K> keySet() {
@@ -113,12 +135,7 @@ public class IndexedMap<K, V> {
 
 	public V atIndex(final int index) {
 		Preconditions.checkArgument(0 <= index && index < table.length, "Index is outside value range %s", index);
-		final Entry<K, V> item = table[index];
-		if (item != null) {
-			return item.getValue();
-		} else {
-			return null;
-		}
+		return table[index].getValue();
 	}
 
 	public int getIndexForKey(final K key) {
@@ -137,14 +154,13 @@ public class IndexedMap<K, V> {
 		Objects.requireNonNull(value, "value is null");
 
 		final Entry<K, V> existingItem = table[index];
-		if (existingItem != null) {
+		if (existingItem.isPopulated()) {
 			Preconditions.checkArgument(key.equals(existingItem.getKey()),
-					"Existing key/index does not match new mapping");
+					"Existing key/index does not match new mapping %s %s", key, existingItem.getKey());
 			return existingItem.setValue(value);
 		} else {
-			final Entry<K, V> newItem = new Entry<>(index, key, value);
-			table[index] = newItem;
-			keyMap.put(key, newItem);
+			existingItem.setKeyAndValue(key, value);
+			keyMap.put(key, existingItem);
 			return null;
 		}
 	}
@@ -154,7 +170,7 @@ public class IndexedMap<K, V> {
 		final Entry<K, V> item = keyMap.remove(key);
 		if (item != null) {
 			final V oldValue = item.getValue();
-			table[item.getIndex()] = null;
+			item.reset();
 			return oldValue;
 		} else {
 			return null;
@@ -164,10 +180,11 @@ public class IndexedMap<K, V> {
 	public V removeIndex(final int index) {
 		Preconditions.checkArgument(0 <= index && index < table.length, "Index is outside value range %s", index);
 		final Entry<K, V> item = table[index];
-		table[index] = null;
-		if (item != null) {
+		if (item.isPopulated()) {
 			keyMap.remove(item.getKey());
-			return item.getValue();
+			final V oldValue = item.getValue();
+			item.reset();
+			return oldValue;
 		} else {
 			return null;
 		}
@@ -175,7 +192,9 @@ public class IndexedMap<K, V> {
 
 	public void clear() {
 		keyMap.clear();
-		Arrays.setAll(table, v -> null);
+		for (int i = 0; i < table.length; ++i) {
+			table[i].reset();
+		}
 	}
 
 }
