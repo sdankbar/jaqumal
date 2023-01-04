@@ -42,23 +42,25 @@ public class TextWrapper {
 
     public static String wrap(String input, int lineWidth, List<String> wordSeparators) {
         Objects.requireNonNull(input, "input is null");
-        Objects.requireNonNull(wordSeparators, "wordSeparators is null");
-        Preconditions.checkArgument(lineWidth > 0, "lineWidth must be > 0");
         if (input.length() <= lineWidth) {
             return input;
         }
 
+        Objects.requireNonNull(wordSeparators, "wordSeparators is null");
+        Preconditions.checkArgument(lineWidth > 0, "lineWidth must be > 0 for non-empty string input");
+
         StringBuilder output = new StringBuilder(input.length() + input.length() / lineWidth);
         int nextIndexIntoInput = 0;
         int currentLineLength = 0;
+        AtomicReference<String> foundWordSeparator = new AtomicReference<>();
 
         while (nextIndexIntoInput < input.length()) {
-            int nextWordLength = getNextWordLength(input, nextIndexIntoInput, wordSeparators);
+            int nextWordLength = getNextWordLength(input, nextIndexIntoInput, wordSeparators, foundWordSeparator);
             if (currentLineLength + nextWordLength > lineWidth) {
                 output.append('\n');
                 currentLineLength = 0;
             } else {
-                output.append(input.substring(nextIndexIntoInput, nextIndexIntoInput + nextWordLength));
+                output.append(input, nextIndexIntoInput, nextIndexIntoInput + nextWordLength);
                 currentLineLength += nextWordLength;
                 nextIndexIntoInput += nextWordLength;
             }
@@ -67,9 +69,14 @@ public class TextWrapper {
         return output.toString();
     }
 
-    private static int getNextWordLength(String input, int startIndex, List<String> wordSeparators) {
-        AtomicReference<String> foundWordSeparator = new AtomicReference<>();
-        int nextWordStart = findIndexOfString(input, startIndex, wordSeparators, foundWordSeparator);
+    private static int getNextWordLength(String input, int startIndex, List<String> wordSeparators, AtomicReference<String> foundWordSeparator) {
+        int nextWordStart;
+        if (wordSeparators.size() > 1) {
+            nextWordStart = findIndexOfString(input, startIndex, wordSeparators, foundWordSeparator);
+        } else {
+            nextWordStart = input.indexOf(wordSeparators.get(0), startIndex);
+            foundWordSeparator.set(wordSeparators.get(0));
+        }
         if (nextWordStart == -1) {
             return input.length() - startIndex;
         } else {
