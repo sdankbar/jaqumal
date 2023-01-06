@@ -27,7 +27,7 @@
 
 	<groupId>com.github.sdankbar.jaqumal</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.5.3</version>
+	<version>0.5.4</version>
 	<packaging>pom</packaging>
 
 	<name>Jaqumal</name>

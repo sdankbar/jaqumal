@@ -28,7 +28,7 @@
 	<parent>
 		<groupId>com.github.sdankbar.jaqumal</groupId>
 		<artifactId>examples</artifactId>
-		<version>0.5.3</version>
+		<version>0.5.4</version>
 	</parent>
 	<artifactId>shared_qml</artifactId>
 	<packaging>jar</packaging>
