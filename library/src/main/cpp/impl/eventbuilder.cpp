@@ -69,6 +69,7 @@ QVariant EventBuilder::fireEvent(const QString& type)
         if (env->ExceptionCheck())
         {
             std::cerr << "Exception when calling event handler" << std::endl;
+            env->ExceptionDescribe();
             env->ExceptionClear();
         }
         env->DeleteLocalRef(typeStr);

@@ -149,8 +149,10 @@ void JNIUtilities::throwQMLException(JNIEnv* env, const char* msg)
 void JNIUtilities::invokeCallback(JNIEnv* env, jobject callbackObject)
 {
     env->CallVoidMethod(callbackObject, callbackMethod, 0);
-    if (env->ExceptionCheck()) {
+    if (env->ExceptionCheck())
+    {
         std::cerr << "Exception while calling invoke()" << std::endl;
+        env->ExceptionDescribe();
         env->ExceptionClear();
     }
 }

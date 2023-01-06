@@ -206,6 +206,7 @@ void SingletonModelFunctions::invokeMapChangedCallback(jobject callback, jstring
     if (env->ExceptionCheck())
     {
         std::cerr << "Exception when calling MapChangedCallback" << std::endl;
+        env->ExceptionDescribe();
         env->ExceptionClear();
     }
 }

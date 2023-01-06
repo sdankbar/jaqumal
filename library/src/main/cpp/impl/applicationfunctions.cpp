@@ -438,6 +438,7 @@ void ApplicationFunctions::invokeLoggingCallback(jobject obj, int type, const st
     threadEnv->CallVoidMethod(obj, loggingCallbackMethod, type, javaStr);
     if (threadEnv->ExceptionCheck()) {
         std::cerr << "Exception while logging: " << msg << std::endl;
+        threadEnv->ExceptionDescribe();
         threadEnv->ExceptionClear();
     }
     threadEnv->DeleteLocalRef(javaStr);
@@ -670,6 +671,7 @@ std::function<QImage(const QString&,int32_t,int32_t)> ApplicationFunctions::crea
         if (env->ExceptionCheck())
         {
             std::cerr << "Exception when calling image provider" << std::endl;
+            env->ExceptionDescribe();
             env->ExceptionClear();
             return QImage();
         }
@@ -696,6 +698,7 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
     if (env->ExceptionCheck())
     {
         std::cerr << "Exception when calling converting buffered image to QImage (getWidth)" << std::endl;
+        env->ExceptionDescribe();
         env->ExceptionClear();
         return QImage();
     }
@@ -704,6 +707,7 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
     if (env->ExceptionCheck())
     {
         std::cerr << "Exception when calling converting buffered image to QImage (getHeight)" << std::endl;
+        env->ExceptionDescribe();
         env->ExceptionClear();
         return QImage();
     }
@@ -714,6 +718,7 @@ QImage ApplicationFunctions::toQImage(JNIEnv* env, jobject bufferedImage)
     if (env->ExceptionCheck())
     {
         std::cerr << "Exception when calling converting buffered image to QImage (getRGB)" << std::endl;
+        env->ExceptionDescribe();
         env->ExceptionClear();
         return QImage();
     }

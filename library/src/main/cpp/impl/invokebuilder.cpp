@@ -118,6 +118,7 @@ QVariant InvokeBuilder::invoke(const QString& funcName)
         if (env->ExceptionCheck())
         {
             std::cerr << "Exception when calling invokable" << std::endl;
+            env->ExceptionDescribe();
             env->ExceptionClear();
         }
         env->DeleteLocalRef(invokableName);
