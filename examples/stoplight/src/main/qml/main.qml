@@ -23,7 +23,7 @@
  */
 import QtQuick 2.10
 import QtQuick.Window 2.10
-import QtQuick.Controls 1.4
+import QtQuick.Controls 6.0
 import SharedComponents 1.0
 import com.github.sdankbar.jaqumal 0.4
 

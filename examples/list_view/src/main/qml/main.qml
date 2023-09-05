@@ -23,7 +23,7 @@
 import QtQuick 2.11
 import QtQuick.Window 2.10
 import QtQuick.Controls 6.5
-import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs
 import com.github.sdankbar.jaqumal 0.4
 
 Window {
