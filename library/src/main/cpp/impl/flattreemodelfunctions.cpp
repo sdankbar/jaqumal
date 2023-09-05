@@ -707,7 +707,14 @@ void GenericFlatTreeModel::erase(std::deque<int32_t>& indicies)
     std::deque<int32_t> indiciesCopy = indicies;
     if (indicies.size() == 1)
     {
-        m_rowData.removeAt(indicies[0]);
+        if (indicies[0] < m_rowData.size())
+        {
+            m_rowData.removeAt(indicies[0]);
+        }
+        else
+        {
+            // TODO throw exception?
+        }
     }
     else
     {
