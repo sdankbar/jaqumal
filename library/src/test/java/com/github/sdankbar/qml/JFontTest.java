@@ -46,7 +46,7 @@ public class JFontTest {
 	public void builder() {
 		{
 			final JFont f = JFont.builder().build();
-			assertEquals(",12,-1,5,50,0,0,0,0,0", f.toString());
+			assertEquals(",12,-1,5,50,0,0,0,0,0,0,1,0,0,100,0", f.toString());
 			assertEquals(f.getFamily(), "");
 			assertEquals(f.getPointSize(), 12);
 			assertEquals(f.getPixelSize(), -1);
@@ -55,7 +55,7 @@ public class JFontTest {
 		}
 		{
 			final JFont f = JFont.builder().setFamily("Arial").setPointSize(20).setWeight(Weight.ExtraBold).build();
-			assertEquals("Arial,20,-1,5,81,0,0,0,0,0", f.toString());
+			assertEquals("Arial,20,-1,5,81,0,0,0,0,0,0,1,0,0,100,0", f.toString());
 			assertEquals(f.getFamily(), "Arial");
 			assertEquals(f.getPointSize(), 20);
 			assertEquals(f.getPixelSize(), -1);
@@ -63,7 +63,7 @@ public class JFontTest {
 		}
 		{
 			final JFont f = JFont.builder().setFamily("Arial").setPixelSize(19).setWeight(Weight.ExtraBold).build();
-			assertEquals("Arial,-1,19,5,81,0,0,0,0,0", f.toString());
+			assertEquals("Arial,-1,19,5,81,0,0,0,0,0,0,1,0,0,100,0", f.toString());
 			assertEquals(f.getFamily(), "Arial");
 			assertEquals(f.getPointSize(), -1);
 			assertEquals(f.getPixelSize(), 19);
@@ -91,9 +91,9 @@ public class JFontTest {
 	 */
 	@Test
 	public void fromStringSuccess() {
-		assertNotNull(JFont.fromString("Arial,20,-1,5,81,0,0,0,0,0"));
-		assertNotNull(JFont.fromString(",20,-1,5,81,0,0,0,0,0"));
-		assertNotNull(JFont.fromString("Roboto Mono,20,-1,5,81,0,0,0,0,0"));
+		assertNotNull(JFont.fromString("Arial,20,-1,5,81,0,0,0,0,0,0,1,0,0,100,0"));
+		assertNotNull(JFont.fromString(",20,-1,5,81,0,0,0,0,0,0,1,0,0,100,0"));
+		assertNotNull(JFont.fromString("Roboto Mono,20,-1,5,81,0,0,0,0,0,0,1,0,0,100,0"));
 	}
 
 	/**

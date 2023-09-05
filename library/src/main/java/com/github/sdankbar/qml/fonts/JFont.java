@@ -328,128 +328,136 @@ public class JFont {
 	}
 
 	public enum Capitalization {
+
 		MixedCase(0), AllUppercase(1), AllLowercase(2), SmallCaps(3), Capitalize(4);
 
 		private int value;
 
-		private Capitalization(final int v) {
+		Capitalization(final int v) {
 			value = v;
 		}
 	}
 
 	public enum HintingPreference {
+
 		PreferDefaultHinting(0), PreferNoHinting(1), PreferVerticalHinting(2), PreferFullHinting(3);
 
 		private int value;
 
-		private HintingPreference(final int v) {
+		HintingPreference(final int v) {
 			value = v;
 		}
 
 	}
 
 	public enum SpacingType {
+
 		PercentageSpacing(0), AbsoluteSpacing(1);
 
 		private int value;
 
-		private SpacingType(final int v) {
+		SpacingType(final int v) {
 			value = v;
 		}
 	}
 
 	public enum Stretch {
-		AnyStretch(0), UltraCondensed(50), ExtraCondensed(62), Condensed(75), SemiCondensed(87), Unstretched(100),
-		SemiExpanded(112), Expanded(125), ExtraExpanded(150), UltraExpanded(200);
+
+		AnyStretch(0), UltraCondensed(50), ExtraCondensed(62), Condensed(75), SemiCondensed(87), Unstretched(
+				100), SemiExpanded(112), Expanded(125), ExtraExpanded(150), UltraExpanded(200);
 
 		private int value;
 
-		private Stretch(final int v) {
+		Stretch(final int v) {
 			value = v;
 		}
 
 	}
 
 	public enum Style {
+
 		StyleNormal(0), StyleItalic(1), StyleOblique(2);
 
 		static Style fromValue(final int v) {
 			switch (v) {
-			case 0:
-				return StyleNormal;
-			case 1:
-				return StyleItalic;
-			case 2:
-				return StyleOblique;
-			default:
-				throw new IllegalArgumentException();
+				case 0:
+					return StyleNormal;
+				case 1:
+					return StyleItalic;
+				case 2:
+					return StyleOblique;
+				default:
+					throw new IllegalArgumentException();
 			}
 		}
 
 		private int value;
 
-		private Style(final int v) {
+		Style(final int v) {
 			value = v;
 		}
 
 	}
 
 	public enum StyleHint {
-		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(3),
-		Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
+
+		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(
+				3), Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
 
 		static StyleHint fromValue(final int v) {
 			switch (v) {
-			case 0:
-				return SansSerif;
-			case 1:
-				return Serif;
-			case 2:
-				return Courier;
-			case 3:
-				return Decorative;
-			case 4:
-				return System;
-			case 5:
-				return AnyStyle;
-			case 6:
-				return Cursive;
-			case 7:
-				return Monospace;
-			case 8:
-				return Fantasy;
-			default:
-				throw new IllegalArgumentException();
+				case 0:
+					return SansSerif;
+				case 1:
+					return Serif;
+				case 2:
+					return Courier;
+				case 3:
+					return Decorative;
+				case 4:
+					return System;
+				case 5:
+					return AnyStyle;
+				case 6:
+					return Cursive;
+				case 7:
+					return Monospace;
+				case 8:
+					return Fantasy;
+				default:
+					throw new IllegalArgumentException();
 			}
 		}
 
 		private int value;
 
-		private StyleHint(final int v) {
+		StyleHint(final int v) {
 			value = v;
 		}
 
 	}
 
 	public enum StyleStrategy {
-		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(0x0010),
-		NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), OpenGLCompatible(0x0200),
-		NoFontMerging(0x8000), PreferNoShaping(0x1000), PreferMatch(0x0020), PreferQuality(0x0040),
-		ForceIntegerMetrics(0x0400);
+
+		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(
+				0x0010), NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), OpenGLCompatible(
+						0x0200), NoFontMerging(0x8000), PreferNoShaping(
+								0x1000), PreferMatch(0x0020), PreferQuality(0x0040), ForceIntegerMetrics(0x0400);
 
 		private int value;
 
-		private StyleStrategy(final int v) {
+		StyleStrategy(final int v) {
 			value = v;
 		}
 	}
 
 	public enum Weight {
+
 		Thin(0), ExtraLight(12), Light(25), Normal(50), Medium(57), DemiBold(63), Bold(75), ExtraBold(81), Black(87);
 
 		private final int value;
 
-		private Weight(final int v) {
+		Weight(final int v) {
 			value = v;
 		}
 	}
@@ -466,8 +474,8 @@ public class JFont {
 	static Builder builder(final String fontStr) {
 		Objects.requireNonNull(fontStr, "fontStr is null");
 		final String[] tokens = fontStr.split(",");
-		Preconditions.checkArgument(tokens.length == 10 || tokens.length == 11,
-				"FontToString is not 10 or 11 comma separated values");
+		Preconditions.checkArgument(tokens.length == 16 || tokens.length == 17,
+				"FontToString is not 16 or 17 comma separated values");
 		final Builder builder = new Builder();
 		builder.setFamily(tokens[0]);
 		final int point = Integer.parseInt(tokens[1]);
@@ -483,8 +491,14 @@ public class JFont {
 		builder.setStrikeout(tokens[7].equals("1"));
 		builder.setFixedPitch(tokens[8].equals("1"));
 		// token[9] always false
-		if (tokens.length == 11) {
-			builder.setStyleName(tokens[10]);
+		// token[10] capitalization
+		// token[11] lettering spacing type
+		// token[12] lettering spacing
+		// token[13] word spacing
+		// token[14] stretch
+		// token[15] style strategy
+		if (tokens.length == 17) {
+			builder.setStyleName(tokens[16]);
 		}
 		return builder;
 	}
@@ -492,7 +506,8 @@ public class JFont {
 	public static JFont fromString(final String str) {
 		Objects.requireNonNull(str, "str is null");
 
-		if (str.matches("[^,]*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
+		if (str.matches(
+				"[^,]*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
 			return cache.getFont(str);
 		} else {
 			throw new IllegalArgumentException(str + " is not a valid font string");
@@ -521,7 +536,8 @@ public class JFont {
 	private final boolean underline;// 6
 	private final boolean strikeOut;// 7
 	private final boolean fixedPitch;// 8
-	private final Optional<String> styleName;
+	// TODO add additional fields
+	private final Optional<String> styleName;// 16
 
 	private final int fontIndex;
 	private JFontInfo cachedInfo = null;
@@ -532,8 +548,8 @@ public class JFont {
 		fontToString = Objects.requireNonNull(toStr, "toStr is null");
 		this.fontIndex = fontIndex;
 		final String[] tokens = fontToString.split(",");
-		Preconditions.checkArgument(tokens.length == 10 || tokens.length == 11,
-				"FontToString is not 10 or 11 comma separated values");
+		Preconditions.checkArgument(tokens.length == 16 || tokens.length == 17,
+				"FontToString is not 16 or 17 comma separated values");
 		family = tokens[0];
 		pointSize = Integer.parseInt(tokens[1]);
 		pixelSize = Integer.parseInt(tokens[2]);
@@ -544,8 +560,14 @@ public class JFont {
 		strikeOut = tokens[7].equals("1");
 		fixedPitch = tokens[8].equals("1");
 		// token[9] always false
-		if (tokens.length == 11) {
-			styleName = Optional.of(tokens[10]);
+		// token[10] capitalization
+		// token[11] lettering spacing type
+		// token[12] lettering spacing
+		// token[13] word spacing
+		// token[14] stretch
+		// token[15] style strategy
+		if (tokens.length == 17) {
+			styleName = Optional.of(tokens[16]);
 		} else {
 			styleName = Optional.empty();
 		}
@@ -636,14 +658,14 @@ public class JFont {
 		b.setStrikeout(strikeOut);// 7
 		b.setFixedPitch(fixedPitch);// 8
 		if (styleName.isPresent()) {
-			b.setStyleName(styleName.get());// 10
+			b.setStyleName(styleName.get());// 16
 		}
 		return b;
 	}
 
 	/**
-	 * @return This JFont's index. Can be used for fast lookups. Guaranteed to be
-	 *         unique for a given set of font settings.
+	 * @return This JFont's index. Can be used for fast lookups. Guaranteed to be unique for a given set of font
+	 *         settings.
 	 */
 	public int getFontIndex() {
 		return fontIndex;
