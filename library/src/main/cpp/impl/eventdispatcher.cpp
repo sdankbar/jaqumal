@@ -53,7 +53,7 @@ void EventDispatcher::setAllowedEvents(const QStringList& newAllowedEvents)
     if (m_allowedEvents != newAllowedEvents)
     {
         m_allowedEvents = newAllowedEvents;
-        m_fastAllowedEvents = QSet<QString>::fromList(newAllowedEvents);
+        m_fastAllowedEvents = QSet(newAllowedEvents.begin(), newAllowedEvents.end());
         emit allowedEventsChanged();
     }
 }

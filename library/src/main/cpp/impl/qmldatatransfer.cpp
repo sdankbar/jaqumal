@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 #include "qmldatatransfer.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QUrl>
 #include <QUuid>
 #include <QSize>
@@ -119,7 +119,7 @@ JNICALL void setString(JNIEnv* env, jclass, jstring v, jint roleIndex)
 JNICALL void setRegularExpression(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
     QString res = JNIUtilities::toQString(env, v);
-    QMLDataTransfer::storeRef(QRegExp(res), roleIndex);
+    QMLDataTransfer::storeRef(QRegularExpression(res), roleIndex);
 }
 
 JNICALL void setURL(JNIEnv* env, jclass, jstring v, jint roleIndex)
@@ -369,8 +369,8 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
         const QRectF r = value.toRectF();
         return env->CallStaticObjectMethod(jvariantClass, fromRectangleFMethod, r.x(), r.y(), r.width(), r.height());
     }
-    case QVariant::RegExp: {
-        const QString str = value.toRegExp().pattern();
+    case QVariant::RegularExpression: {
+        const QString str = value.toRegularExpression().pattern();
         jstring jStr = env->NewString(
                     reinterpret_cast<const jchar*>(str.constData()),
                     str.length());

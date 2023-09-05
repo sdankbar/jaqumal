@@ -25,6 +25,7 @@ package com.github.sdankbar.qml.cpp.jni;
 import java.awt.Rectangle;
 
 public class FontFunctions {
+
 	public static native Rectangle getBoundingRect(String fontToString, String text);
 
 	public static native Rectangle getBoundingRect2(String fontToString, int x, int y, int w, int h, int alignFlags,
@@ -35,8 +36,8 @@ public class FontFunctions {
 	public static native String getQFontMetrics(String fontToString);
 
 	/**
-	 * \return The value of QFront::toString() after returning QFont constructed
-	 * from the various parameters passed to this function.
+	 * \return The value of QFont::toString() after returning QFont constructed from the various parameters passed to
+	 * this function.
 	 */
 	public static native String getQFontToString(int fontIndex, String family, int pointSize, int pixelSize,
 			boolean bold, boolean italic, boolean overline, boolean strikeout, boolean underline, boolean fixedPitch,
@@ -44,13 +45,13 @@ public class FontFunctions {
 			int capitalization, int hintingPreference, int stretch, int style, String styleName, int styleHint,
 			int styleStrategy);
 
-	public static native int getStringWidth(String fontToString, String text);
+	public static native int getStringHorizontalAdvance(String fontToString, String text);
 
 	public static native Rectangle getTightBoundingRect(String fontToString, String text);
 
 	/**
 	 * @param fontToString Serialized font to test.
-	 * @param character    The character to test.
+	 * @param character The character to test.
 	 * @return True if the font contains the character.
 	 */
 	public static native boolean inFont(String fontToString, int character);

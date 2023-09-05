@@ -52,27 +52,27 @@ bool EventLogger::eventFilter(QObject* obj, QEvent* event)
     case QEvent::MouseButtonPress:
     {
         QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        m_log.info(QString("MouseButtonPress btn=%1 x=%2 y=%3").arg(mouse->button()).arg(mouse->x()).arg(mouse->y()));
+        m_log.info(QString("MouseButtonPress btn=%1 x=%2 y=%3").arg(mouse->button()).arg(mouse->position().x()).arg(mouse->position().y()));
         break;
     }
     case QEvent::MouseButtonDblClick:
     {
         QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        m_log.info(QString("MouseButtonDblClick btn=%1 x=%2 y=%3").arg(mouse->button()).arg(mouse->x()).arg(mouse->y()));
+        m_log.info(QString("MouseButtonDblClick btn=%1 x=%2 y=%3").arg(mouse->button()).arg(mouse->position().x()).arg(mouse->position().y()));
         break;
     }
     case QEvent::MouseButtonRelease:
     {
         QMouseEvent* mouse = static_cast<QMouseEvent*>(event);
-        m_log.info(QString("MouseButtonRelease btn=%1 x=%2 y=%3").arg(mouse->button()).arg(mouse->x()).arg(mouse->y()));
+        m_log.info(QString("MouseButtonRelease btn=%1 x=%2 y=%3").arg(mouse->button()).arg(mouse->position().x()).arg(mouse->position().y()));
         break;
     }
     case QEvent::Wheel:
     {
         QWheelEvent* mouse = static_cast<QWheelEvent*>(event);
         m_log.info(QString("Wheel x=%1 y=%2 angleX=%3 angleY=%4").
-                   arg(mouse->x()).
-                   arg(mouse->y()).
+                   arg(mouse->position().x()).
+                   arg(mouse->position().y()).
                    arg(mouse->angleDelta().x()).
                    arg(mouse->angleDelta().y()));
         break;
@@ -81,9 +81,9 @@ bool EventLogger::eventFilter(QObject* obj, QEvent* event)
     {
         QTouchEvent* touch = static_cast<QTouchEvent*>(event);
         std::stringstream str;
-        for (const QTouchEvent::TouchPoint& p : touch->touchPoints())
+        for (const QTouchEvent::TouchPoint& p : touch->points())
         {
-            str << p.id() << "=(" << p.pos().x() << ", " << p.pos().y() << ") ";
+            str << p.id() << "=(" << p.position().x() << ", " << p.position().y() << ") ";
         }
         m_log.info(QString("Touch begin points=%1").arg(QString::fromStdString(str.str())));
         break;
@@ -92,9 +92,9 @@ bool EventLogger::eventFilter(QObject* obj, QEvent* event)
     {
         QTouchEvent* touch = static_cast<QTouchEvent*>(event);
         std::stringstream str;
-        for (const QTouchEvent::TouchPoint& p : touch->touchPoints())
+        for (const QTouchEvent::TouchPoint& p : touch->points())
         {
-            str << p.id() << "=(" << p.pos().x() << ", " << p.pos().y() << ") ";
+            str << p.id() << "=(" << p.position().x() << ", " << p.position().y() << ") ";
         }
         m_log.info(QString("Touch end points=%1").arg(QString::fromStdString(str.str())));
         break;
@@ -103,9 +103,9 @@ bool EventLogger::eventFilter(QObject* obj, QEvent* event)
     {
         QTouchEvent* touch = static_cast<QTouchEvent*>(event);
         std::stringstream str;
-        for (const QTouchEvent::TouchPoint& p : touch->touchPoints())
+        for (const QTouchEvent::TouchPoint& p : touch->points())
         {
-            str << p.id() << "=(" << p.pos().x() << ", " << p.pos().y() << ") ";
+            str << p.id() << "=(" << p.position().x() << ", " << p.position().y() << ") ";
         }
         m_log.info(QString("Touch update points=%1").arg(QString::fromStdString(str.str())));
         break;
