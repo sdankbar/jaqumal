@@ -49,11 +49,11 @@ public class JFontMetricsTest {
 		{
 			final JFont f = JFont.builder().setFamily("Arial").setPointSize(20).setWeight(Weight.ExtraBold).build();
 			final JFontMetrics metrics = f.getJFontMetrics();
-			assertEquals(new Rectangle(0, 0, 19, 32), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
+			assertEquals(new Rectangle(0, 0, 18, 30), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
 					ImmutableSet.of(), ImmutableSet.of(), "A"));
-			assertEquals(new Rectangle(0, 0, 20, 65), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
+			assertEquals(new Rectangle(0, 0, 18, 60), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
 					ImmutableSet.of(), ImmutableSet.of(), "A\nB"));
-			assertEquals(new Rectangle(0, 0, 39, 98), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
+			assertEquals(new Rectangle(0, 0, 36, 90), metrics.getBoundingRect(new Rectangle(0, 0, 1000, 1000),
 					ImmutableSet.of(), ImmutableSet.of(), "AB\nC\nD"));
 		}
 	}

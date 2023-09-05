@@ -507,7 +507,7 @@ public class JFont {
 		Objects.requireNonNull(str, "str is null");
 
 		if (str.matches(
-				"[^,]*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
+				"[^,]*,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+,-?\\d+(,-?\\d+)?")) {
 			return cache.getFont(str);
 		} else {
 			throw new IllegalArgumentException(str + " is not a valid font string");
