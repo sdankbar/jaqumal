@@ -30,7 +30,7 @@
 	<parent>
 		<groupId>com.github.sdankbar.jaqumal</groupId>
 		<artifactId>examples</artifactId>
-		<version>0.5.4</version>
+		<version>0.5.5</version>
 	</parent>
 	<artifactId>list_view</artifactId>
 	<packaging>jar</packaging>
