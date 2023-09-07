@@ -22,11 +22,19 @@
  */
 package com.github.sdankbar.qml;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -34,15 +42,23 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Test;
 
 import com.github.sdankbar.qml.eventing.NullEventFactory;
 import com.github.sdankbar.qml.exceptions.IllegalKeyException;
+import com.github.sdankbar.qml.fonts.JFont;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.singleton.JQMLSingletonModel;
+import com.github.sdankbar.qml.painting.JPoint;
+import com.github.sdankbar.qml.painting.JPointReal;
+import com.github.sdankbar.qml.painting.JRect;
+import com.github.sdankbar.qml.painting.PainterInstructions;
+import com.github.sdankbar.qml.painting.PainterInstructionsBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -59,11 +75,7 @@ public class JQMLSingletonModelTest {
 	}
 
 	private enum Roles {
-		R1,
-		R2,
-		R3,
-		R4,
-		R5;
+		R1, R2, R3, R4, R5;
 	}
 
 	/**
@@ -82,8 +94,8 @@ public class JQMLSingletonModelTest {
 	public void getSetValues() throws InterruptedException {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.R1, new JVariant(1));
 		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
@@ -115,8 +127,8 @@ public class JQMLSingletonModelTest {
 	public void assignValues() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.R1, new JVariant(1));
 		model.put(Roles.R3, new JVariant(ImmutableList.of(new Point2D.Double(1, 2), new Point2D.Double(3, 4))));
@@ -139,8 +151,8 @@ public class JQMLSingletonModelTest {
 	public void testChangeListener() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final AtomicInteger calls = new AtomicInteger();
 		model.registerChangeListener((k, v) -> calls.incrementAndGet());
@@ -158,8 +170,8 @@ public class JQMLSingletonModelTest {
 	public void testClear() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.R2, new JVariant(2));
 		model.put(Roles.R4, new JVariant(4));
@@ -176,13 +188,13 @@ public class JQMLSingletonModelTest {
 	/**
 	 *
 	 */
-	@SuppressWarnings({ "unlikely-arg-type", "boxing" })
+	@SuppressWarnings({"unlikely-arg-type", "boxing"})
 	@Test
 	public void testContainsKey() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.R1, new JVariant(1));
 		model.put(Roles.R5, new JVariant(5));
@@ -203,8 +215,8 @@ public class JQMLSingletonModelTest {
 	public void testContainsValue() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model.put(Roles.R1, new JVariant(1));
 		model.put(Roles.R3, new JVariant(3));
@@ -222,8 +234,8 @@ public class JQMLSingletonModelTest {
 	public void testEntrySet() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Set<Map.Entry<Roles, JVariant>> set = model.entrySet();
 
@@ -258,14 +270,14 @@ public class JQMLSingletonModelTest {
 	public void testEquals() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model1 = app.getModelFactory().createSingletonModel("other1",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
-		final JQMLSingletonModel<Roles> model2 = app.getModelFactory().createSingletonModel("other2",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
-		final JQMLSingletonModel<Roles> model3 = app.getModelFactory().createSingletonModel("other3",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
-		final JQMLSingletonModel<Roles> model4 = app.getModelFactory().createSingletonModel("other4",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model1 = app.getModelFactory()
+				.createSingletonModel("other1", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model2 = app.getModelFactory()
+				.createSingletonModel("other2", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model3 = app.getModelFactory()
+				.createSingletonModel("other3", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model4 = app.getModelFactory()
+				.createSingletonModel("other4", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model1.put(Roles.R1, new JVariant(1));
 		model1.put(Roles.R3, new JVariant(3));
@@ -291,8 +303,8 @@ public class JQMLSingletonModelTest {
 	public void testGetModelName() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		assertEquals("other", model.getModelName());
 	}
@@ -304,10 +316,10 @@ public class JQMLSingletonModelTest {
 	public void testHashcode() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model1 = app.getModelFactory().createSingletonModel("other1",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
-		final JQMLSingletonModel<Roles> model2 = app.getModelFactory().createSingletonModel("other2",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model1 = app.getModelFactory()
+				.createSingletonModel("other1", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model2 = app.getModelFactory()
+				.createSingletonModel("other2", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		model1.put(Roles.R1, new JVariant(1));
 		model1.put(Roles.R3, new JVariant(3));
@@ -325,8 +337,8 @@ public class JQMLSingletonModelTest {
 	public void testKeySet() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Set<Roles> set = model.keySet();
 
@@ -362,8 +374,8 @@ public class JQMLSingletonModelTest {
 	public void testPutAll() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> all = new HashMap<>();
 		all.put(Roles.R1, new JVariant(1));
@@ -391,8 +403,8 @@ public class JQMLSingletonModelTest {
 	public void testRemove() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> all = new HashMap<>();
 		all.put(Roles.R1, new JVariant(1));
@@ -429,8 +441,8 @@ public class JQMLSingletonModelTest {
 	public void testSize() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Map<Roles, JVariant> all = new HashMap<>();
 		all.put(Roles.R1, new JVariant(1));
@@ -454,8 +466,8 @@ public class JQMLSingletonModelTest {
 	public void testValues() {
 		final String[] args = new String[0];
 		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
-		final JQMLSingletonModel<Roles> model = app.getModelFactory().createSingletonModel("other",
-				EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
 
 		final Collection<JVariant> values = model.values();
 
@@ -474,6 +486,61 @@ public class JQMLSingletonModelTest {
 		assertEquals(new JVariant(1), iter.next());
 		assertEquals(new JVariant(3), iter.next());
 		assertFalse(iter.hasNext());
+	}
+
+	/**
+	 * @throws MalformedURLException
+	 *
+	 */
+	@Test
+	public void testGetPutAllTypes() throws MalformedURLException {
+		final String[] args = new String[0];
+		final JQMLApplication<EventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
+		final JQMLSingletonModel<Roles> model = app.getModelFactory()
+				.createSingletonModel("other", EnumSet.allOf(Roles.class), PutMode.RETURN_PREVIOUS_VALUE);
+		model.put(Roles.R1, new JVariant(true));
+		assertEquals(true, model.get(Roles.R1).asBoolean());
+		model.put(Roles.R1, new JVariant(new byte[122]));
+		assertArrayEquals(new byte[122], model.get(Roles.R1).asByteArray());
+		model.put(Roles.R1, new JVariant(new Color(1, 2, 3)));
+		assertEquals(new Color(1, 2, 3), model.get(Roles.R1).asColor());
+		model.put(Roles.R1, new JVariant(Instant.ofEpochSecond(123)));
+		assertEquals(Instant.ofEpochSecond(123), model.get(Roles.R1).asDateTime());
+		model.put(Roles.R1, new JVariant(1.23));
+		assertEquals(1.23, model.get(Roles.R1).asDouble(), 0.001);
+		// TODO BUFFERED IMAGE
+		model.put(Roles.R1, new JVariant(33));
+		assertEquals(33, model.get(Roles.R1).asInteger());
+		model.put(Roles.R1, new JVariant(new Line2D.Double(1, 2, 3, 4)));
+		assertEquals(new Line2D.Double(1, 2, 3, 4).y2, model.get(Roles.R1).asLine().getY2(), 0.001);
+		model.put(Roles.R1, new JVariant(Long.MAX_VALUE));
+		assertEquals(Long.MAX_VALUE, model.get(Roles.R1).asLong());
+		model.put(Roles.R1, new JVariant(new Point(1, 2)));
+		assertEquals(new Point(1, 2), model.get(Roles.R1).asPoint());
+		model.put(Roles.R1, new JVariant(new Point2D.Double(1, 2)));
+		assertEquals(JPoint.point(1, 2), model.get(Roles.R1).asJPoint());
+		model.put(Roles.R1, new JVariant(JPointReal.point(1, 2)));
+		assertEquals(JPointReal.point(1, 2), model.get(Roles.R1).asJPointReal());
+		model.put(Roles.R1, new JVariant(new Rectangle(1, 2, 3, 4)));
+		assertEquals(JRect.rect(1, 2, 3, 4), model.get(Roles.R1).asJRect());
+		model.put(Roles.R1, new JVariant(Pattern.compile(".*")));
+		assertEquals(Pattern.compile(".*").pattern(), model.get(Roles.R1).asRegularExpression().pattern());
+		model.put(Roles.R1, new JVariant("ABCXYZ"));
+		assertEquals("ABCXYZ", model.get(Roles.R1).asString());
+		model.put(Roles.R1, new JVariant(new URL("https://doc.qt.io/qt-5/qdatetime.html")));
+		assertEquals(new URL("https://doc.qt.io/qt-5/qdatetime.html"), model.get(Roles.R1).asURL());
+
+		final UUID id = UUID.randomUUID();
+		model.put(Roles.R1, new JVariant(id));
+		assertEquals(id, model.get(Roles.R1).asUUID());
+		model.put(Roles.R1, new JVariant(JFont.builder().build()));
+		assertEquals(JFont.builder().build(), model.get(Roles.R1).asFont());
+
+		final PainterInstructionsBuilder b = new PainterInstructionsBuilder();
+		b.drawText(1, 2, "345");
+		final PainterInstructions instr = b.build();
+		model.put(Roles.R1, new JVariant(instr));
+		assertEquals(instr, model.get(Roles.R1).asPainterInstructions());
 	}
 
 }

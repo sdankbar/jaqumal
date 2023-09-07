@@ -98,8 +98,7 @@ HEADERS += \
     include/jdevelopmenttools.h
 
 DISTFILES += \
-    resources/qmldir \
-    resources/UtilFunc.js
+    resources/qmldir
 
 RESOURCES += \
     resources/jaqumal.qrc

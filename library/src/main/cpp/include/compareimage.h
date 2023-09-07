@@ -29,6 +29,7 @@
 QWindow* getEventInjectionWindow();
 QImage takeFocusedWindowScreenShot();
 bool fuzzyEquals(const QImage& source, const QImage& target, double ratiodB = 50);
+double getPeakSignalToNoiseRatio(const QImage& source, const QImage& target);
 
 QImage generateDelta(const QImage& source, const QImage& target);
 
