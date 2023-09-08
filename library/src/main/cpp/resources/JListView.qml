@@ -36,7 +36,7 @@ ListView {
         id: dispatch
         allowedEvents: ["RequestScrollListToPositionEvent"]
 
-        onEventReceived: {
+        onEventReceived: function(eventName, args) {
             if (model !== null && model.modelName === args.model_name) {
                 switch (args.position_mode) {
                 case 0:

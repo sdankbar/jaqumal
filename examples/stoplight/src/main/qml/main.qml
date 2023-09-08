@@ -44,7 +44,7 @@ Window {
         id: dispatch
         allowedEvents: ["TestQMLEvent"]
 
-        onEventReceived: {
+        onEventReceived: function(eventName, args) {
             log.info("TEST EVENT: " + args.time)
         }
     }
