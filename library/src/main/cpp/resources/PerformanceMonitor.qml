@@ -46,19 +46,19 @@ Item {
     Connections {
         target: window
 
-        onBeforeSynchronizing: {
+        function onBeforeSynchronizing() {
             eventing.perfEvent(EventBuilder.BEFORE_SYNC)
         }
 
-        onBeforeRendering: {
+        function onBeforeRendering() {
             eventing.perfEvent(EventBuilder.BEFORE_RENDER)
         }
 
-        onAfterRendering: {
+        function onAfterRendering() {
             eventing.perfEvent(EventBuilder.AFTER_RENDER)
         }
 
-        onFrameSwapped: {
+        function onFrameSwapped() {
             eventing.perfEvent(EventBuilder.FRAME_SWAP)
         }
     }
