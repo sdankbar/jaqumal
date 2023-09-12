@@ -440,9 +440,8 @@ public class JFont {
 	public enum StyleStrategy {
 
 		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(
-				0x0010), NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), OpenGLCompatible(
-						0x0200), NoFontMerging(0x8000), PreferNoShaping(
-								0x1000), PreferMatch(0x0020), PreferQuality(0x0040), ForceIntegerMetrics(0x0400);
+				0x0010), NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), NoFontMerging(
+						0x8000), PreferNoShaping(0x1000), PreferMatch(0x0020), PreferQuality(0x0040);
 
 		private int value;
 
@@ -453,7 +452,8 @@ public class JFont {
 
 	public enum Weight {
 
-		Thin(0), ExtraLight(12), Light(25), Normal(50), Medium(57), DemiBold(63), Bold(75), ExtraBold(81), Black(87);
+		Thin(100), ExtraLight(200), Light(300), Normal(400), Medium(500), DemiBold(600), Bold(700), ExtraBold(
+				800), Black(900);
 
 		private final int value;
 
