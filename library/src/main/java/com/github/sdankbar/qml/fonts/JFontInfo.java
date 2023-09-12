@@ -30,7 +30,7 @@ public class JFontInfo {
 
 	static JFontInfo fromString(final String serializedFormat) {
 		final String[] tokens = serializedFormat.split(",");
-		Preconditions.checkArgument(tokens.length == 12, "Not formatted into 12 tokens");
+		Preconditions.checkArgument(tokens.length == 11, "Not formatted into 11 tokens (%s)", serializedFormat);
 		return new JFontInfo(tokens[0], // Family
 				Integer.parseInt(tokens[1]), // point size
 				Integer.parseInt(tokens[2]), // pixel size
