@@ -278,7 +278,7 @@ public class JVariant {
 				++i;
 			}
 		}
-		return null;
+		return new JVariant(v);
 	}
 
 	// Used by JNI
