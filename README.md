@@ -7,8 +7,8 @@ It does this by providing generic model types that are then available to QML scr
 
 ##### C++ Dependencies
 
-* g++ 4.8.5 or newer
-* Qt 5.11 or newer
+* g++ 7.3.0 or newer
+* Qt 6.5 or newer
 
 ##### Java Dependencies
 
@@ -40,7 +40,7 @@ following must be installed/configured before building.
      * Select java 8 or newer
 * sudo yum install gcc-c++
 * sudo yum install mesa-libGL-devel
-* Download Qt 5.11 or newer from https://www.qt.io/download and install it
+* Download Qt 6.5 or newer.  May need to build from source.
 * export JAVA_HOME=<path to JDK>
 * Add the path to the Qt binaries, such as qmake, to the PATH variable
      * May need to add the path to the Qt libraries to the LD_LIBRARY_PATH variable 
@@ -70,7 +70,7 @@ following must be installed/configured before building.
 
 * Install JDK 8 or newer
 * Install maven
-* Download Qt 5.11 or newer from https://www.qt.io/download and install the MinGW 64 bit version.  Also install MinGW 64 compiler as well.
+* Download Qt 6.5 or newer from https://www.qt.io/download and install the MinGW 64 bit version.  Also install MinGW 64 compiler as well.
 * Add the path to the Qt binaries and libaries, such as qmake and Qt's dlls, to the Path variable
 * Add the path to the MinGW64 bit binaries, such as g++, to the Path variable.
 * Set the JAVA_HOME environment variable to the path to the Java JDK.
