@@ -711,10 +711,6 @@ void GenericFlatTreeModel::erase(std::deque<int32_t>& indicies)
         {
             m_rowData.removeAt(indicies[0]);
         }
-        else
-        {
-            // TODO throw exception?
-        }
     }
     else
     {

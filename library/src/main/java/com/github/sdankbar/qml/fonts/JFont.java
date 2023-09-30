@@ -363,8 +363,17 @@ public class JFont {
 
 	public enum Stretch {
 
-		AnyStretch(0), UltraCondensed(50), ExtraCondensed(62), Condensed(75), SemiCondensed(87), Unstretched(
-				100), SemiExpanded(112), Expanded(125), ExtraExpanded(150), UltraExpanded(200);
+		AnyStretch(0), UltraCondensed(50), ExtraCondensed(62), Condensed(75), SemiCondensed(87), //
+		Unstretched(100), SemiExpanded(112), Expanded(125), ExtraExpanded(150), UltraExpanded(200);
+
+		static Stretch fromValue(final int value) {
+			for (final Stretch s : values()) {
+				if (s.value == value) {
+					return s;
+				}
+			}
+			return AnyStretch;
+		}
 
 		private int value;
 
@@ -380,14 +389,14 @@ public class JFont {
 
 		static Style fromValue(final int v) {
 			switch (v) {
-				case 0:
-					return StyleNormal;
-				case 1:
-					return StyleItalic;
-				case 2:
-					return StyleOblique;
-				default:
-					throw new IllegalArgumentException();
+			case 0:
+				return StyleNormal;
+			case 1:
+				return StyleItalic;
+			case 2:
+				return StyleOblique;
+			default:
+				throw new IllegalArgumentException();
 			}
 		}
 
@@ -401,31 +410,31 @@ public class JFont {
 
 	public enum StyleHint {
 
-		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(
-				3), Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
+		AnyStyle(5), SansSerif(0), Helvetica(0), Serif(1), Times(1), TypeWriter(2), Courier(2), OldEnglish(3),
+		Decorative(3), Monospace(7), Fantasy(8), Cursive(6), System(4);
 
 		static StyleHint fromValue(final int v) {
 			switch (v) {
-				case 0:
-					return SansSerif;
-				case 1:
-					return Serif;
-				case 2:
-					return Courier;
-				case 3:
-					return Decorative;
-				case 4:
-					return System;
-				case 5:
-					return AnyStyle;
-				case 6:
-					return Cursive;
-				case 7:
-					return Monospace;
-				case 8:
-					return Fantasy;
-				default:
-					throw new IllegalArgumentException();
+			case 0:
+				return SansSerif;
+			case 1:
+				return Serif;
+			case 2:
+				return Courier;
+			case 3:
+				return Decorative;
+			case 4:
+				return System;
+			case 5:
+				return AnyStyle;
+			case 6:
+				return Cursive;
+			case 7:
+				return Monospace;
+			case 8:
+				return Fantasy;
+			default:
+				throw new IllegalArgumentException();
 			}
 		}
 
@@ -439,9 +448,19 @@ public class JFont {
 
 	public enum StyleStrategy {
 
-		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(
-				0x0010), NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), NoFontMerging(
-						0x8000), PreferNoShaping(0x1000), PreferMatch(0x0020), PreferQuality(0x0040);
+		PreferDefault(0x0001), PreferBitmap(0x0002), PreferDevice(0x0004), PreferOutline(0x0008), ForceOutline(0x0010),
+		NoAntialias(0x0100), NoSubpixelAntialias(0x0800), PreferAntialias(0x0080), NoFontMerging(0x8000),
+		PreferNoShaping(0x1000), PreferMatch(0x0020), PreferQuality(0x0040);
+
+		static ImmutableSet<StyleStrategy> fromMask(final int mask) {
+			final ImmutableSet.Builder<StyleStrategy> builder = ImmutableSet.builder();
+			for (final StyleStrategy s : values()) {
+				if ((mask & s.value) != 0) {
+					builder.add(s);
+				}
+			}
+			return builder.build();
+		}
 
 		private int value;
 
@@ -452,8 +471,8 @@ public class JFont {
 
 	public enum Weight {
 
-		Thin(100), ExtraLight(200), Light(300), Normal(400), Medium(500), DemiBold(600), Bold(700), ExtraBold(
-				800), Black(900);
+		Thin(100), ExtraLight(200), Light(300), Normal(400), Medium(500), DemiBold(600), Bold(700), ExtraBold(800),
+		Black(900);
 
 		private final int value;
 
@@ -484,19 +503,18 @@ public class JFont {
 		} else {
 			builder.setPixelSize(Integer.parseInt(tokens[2]));
 		}
-		builder.setStyleHint(StyleHint.fromValue(Integer.parseInt(tokens[3])), ImmutableSet.of());
+		builder.setStyleHint(StyleHint.fromValue(Integer.parseInt(tokens[3])),
+				StyleStrategy.fromMask(Integer.parseInt(tokens[15])));
 		builder.setWeight(Integer.parseInt(tokens[4]));
 		builder.setStyle(Style.fromValue(Integer.parseInt(tokens[5])));
 		builder.setUnderline(tokens[6].equals("1"));
 		builder.setStrikeout(tokens[7].equals("1"));
 		builder.setFixedPitch(tokens[8].equals("1"));
 		// token[9] always false
-		// token[10] capitalization
-		// token[11] lettering spacing type
-		// token[12] lettering spacing
-		// token[13] word spacing
-		// token[14] stretch
-		// token[15] style strategy
+		builder.setCapitalization(Capitalization.values()[Integer.parseInt(tokens[10])]);
+		builder.setLetterSpacing(SpacingType.values()[Integer.parseInt(tokens[11])], Double.parseDouble(tokens[12]));
+		builder.setWordSpacing(Double.parseDouble(tokens[13]));
+		builder.setStretch(Stretch.fromValue(Integer.parseInt(tokens[14])));
 		if (tokens.length == 17) {
 			builder.setStyleName(tokens[16]);
 		}
@@ -536,7 +554,13 @@ public class JFont {
 	private final boolean underline;// 6
 	private final boolean strikeOut;// 7
 	private final boolean fixedPitch;// 8
-	// TODO add additional fields
+	private final Capitalization capitalization; // 10
+	private final SpacingType letterSpacingType;// 11
+	private final double letterSpacing;// 12
+	private final double wordSpacing;// 13
+	private final Stretch stretch;// 14
+	private final ImmutableSet<StyleStrategy> styleStrategy;// 15
+
 	private final Optional<String> styleName;// 16
 
 	private final int fontIndex;
@@ -560,12 +584,12 @@ public class JFont {
 		strikeOut = tokens[7].equals("1");
 		fixedPitch = tokens[8].equals("1");
 		// token[9] always false
-		// token[10] capitalization
-		// token[11] lettering spacing type
-		// token[12] lettering spacing
-		// token[13] word spacing
-		// token[14] stretch
-		// token[15] style strategy
+		capitalization = Capitalization.values()[Integer.parseInt(tokens[10])];
+		letterSpacingType = SpacingType.values()[Integer.parseInt(tokens[11])];
+		letterSpacing = Double.parseDouble(tokens[12]);
+		wordSpacing = Double.parseDouble(tokens[13]);
+		stretch = Stretch.fromValue(Integer.parseInt(tokens[14]));
+		styleStrategy = StyleStrategy.fromMask(Integer.parseInt(tokens[15]));
 		if (tokens.length == 17) {
 			styleName = Optional.of(tokens[16]);
 		} else {
@@ -651,12 +675,16 @@ public class JFont {
 		} else {
 			b.setPixelSize(pixelSize); // 2
 		}
-		b.setStyleHint(styleHint, ImmutableSet.of()); // 3
+		b.setStyleHint(styleHint, styleStrategy); // 3, 15
 		b.setWeight(weight); // 4
 		b.setStyle(style);// 5
 		b.setUnderline(underline);// 6
 		b.setStrikeout(strikeOut);// 7
 		b.setFixedPitch(fixedPitch);// 8
+		b.setCapitalization(capitalization);// 10
+		b.setLetterSpacing(letterSpacingType, letterSpacing);// 11, 12
+		b.setWordSpacing(wordSpacing);// 13
+		b.setStretch(stretch);// 14
 		if (styleName.isPresent()) {
 			b.setStyleName(styleName.get());// 16
 		}
@@ -664,8 +692,8 @@ public class JFont {
 	}
 
 	/**
-	 * @return This JFont's index. Can be used for fast lookups. Guaranteed to be unique for a given set of font
-	 *         settings.
+	 * @return This JFont's index. Can be used for fast lookups. Guaranteed to be
+	 *         unique for a given set of font settings.
 	 */
 	public int getFontIndex() {
 		return fontIndex;
