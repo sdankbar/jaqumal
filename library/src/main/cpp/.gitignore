@@ -10,3 +10,4 @@ qrc_*.cpp
 /target_wrapper.sh
 /target_wrapper.bat
 /release/
+/.qtc_clangd/

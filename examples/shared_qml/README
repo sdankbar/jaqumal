@@ -12,7 +12,9 @@ Instructions for making a jar file containing QML files for use in other project
 6. Create a Java class with a single static method that takes a JQMLApplication<?> as its only argument.
    In this static method, call registerResourceFromSystemResource() with the name of the rcc file and the
    empty string as the second argument.  Also call addImportPath() on the provided JQMLApplication with
-   the prefix specified in qrc, prefix with ":/", ex ":/shared_qml". 
+   the prefix specified in qrc, prefix with ":/", ex ":/shared_qml". Check the return value from
+   registerResourceFromSystemResource() and if false, registration was not successful and an
+   exception or other error handling feature used.
 7. Build the project.
 8. Add a dependency to the project and call the static method created in step 6.  Do so before loading any QML.
 9. Add "import <module> version" to QML intending to use the QML files in the shared library, ex "import SharedComponents 1.0".

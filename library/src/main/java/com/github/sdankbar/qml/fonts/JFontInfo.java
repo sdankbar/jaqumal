@@ -22,12 +22,15 @@
  */
 package com.github.sdankbar.qml.fonts;
 
+import java.util.Objects;
+
 import com.google.common.base.Preconditions;
 
 public class JFontInfo {
+
 	static JFontInfo fromString(final String serializedFormat) {
 		final String[] tokens = serializedFormat.split(",");
-		Preconditions.checkArgument(tokens.length == 12, "Not formatted into 12 tokens");
+		Preconditions.checkArgument(tokens.length == 11, "Not formatted into 11 tokens (%s)", serializedFormat);
 		return new JFontInfo(tokens[0], // Family
 				Integer.parseInt(tokens[1]), // point size
 				Integer.parseInt(tokens[2]), // pixel size
@@ -35,11 +38,10 @@ public class JFontInfo {
 				"1".equals(tokens[4]), // exact match
 				"1".equals(tokens[5]), // fixedPitch
 				"1".equals(tokens[6]), // italic
-				"1".equals(tokens[7]), // rawMode
-				JFont.Style.fromValue(Integer.parseInt(tokens[8])), // Style
-				JFont.StyleHint.fromValue(Integer.parseInt(tokens[9])), // Style Hint
-				tokens[10], // Style Name
-				Integer.parseInt(tokens[11])); // Weight
+				JFont.Style.fromValue(Integer.parseInt(tokens[7])), // Style
+				JFont.StyleHint.fromValue(Integer.parseInt(tokens[8])), // Style Hint
+				tokens[9], // Style Name
+				Integer.parseInt(tokens[10])); // Weight
 	}
 
 	private final String family;
@@ -49,15 +51,14 @@ public class JFontInfo {
 	private final boolean exactMatch;
 	private final boolean fixedPitch;
 	private final boolean italic;
-	private final boolean rawMode;
 	private final JFont.Style style;
 	private final JFont.StyleHint hint;
 	private final String styleName;
 	private final int weight;
 
 	private JFontInfo(final String family, final int pointSize, final int pixelSize, final boolean bold,
-			final boolean exactMatch, final boolean fixedPitch, final boolean italic, final boolean rawMode,
-			final JFont.Style style, final JFont.StyleHint hint, final String styleName, final int weight) {
+			final boolean exactMatch, final boolean fixedPitch, final boolean italic, final JFont.Style style,
+			final JFont.StyleHint hint, final String styleName, final int weight) {
 		this.family = family;
 		this.pointSize = pointSize;
 		this.pixelSize = pixelSize;
@@ -65,18 +66,12 @@ public class JFontInfo {
 		this.exactMatch = exactMatch;
 		this.fixedPitch = fixedPitch;
 		this.italic = italic;
-		this.rawMode = rawMode;
 		this.style = style;
 		this.hint = hint;
 		this.styleName = styleName;
 		this.weight = weight;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -89,51 +84,10 @@ public class JFontInfo {
 			return false;
 		}
 		final JFontInfo other = (JFontInfo) obj;
-		if (bold != other.bold) {
-			return false;
-		}
-		if (exactMatch != other.exactMatch) {
-			return false;
-		}
-		if (family == null) {
-			if (other.family != null) {
-				return false;
-			}
-		} else if (!family.equals(other.family)) {
-			return false;
-		}
-		if (fixedPitch != other.fixedPitch) {
-			return false;
-		}
-		if (hint != other.hint) {
-			return false;
-		}
-		if (italic != other.italic) {
-			return false;
-		}
-		if (pixelSize != other.pixelSize) {
-			return false;
-		}
-		if (pointSize != other.pointSize) {
-			return false;
-		}
-		if (rawMode != other.rawMode) {
-			return false;
-		}
-		if (style != other.style) {
-			return false;
-		}
-		if (styleName == null) {
-			if (other.styleName != null) {
-				return false;
-			}
-		} else if (!styleName.equals(other.styleName)) {
-			return false;
-		}
-		if (weight != other.weight) {
-			return false;
-		}
-		return true;
+		return bold == other.bold && exactMatch == other.exactMatch && Objects.equals(family, other.family)
+				&& fixedPitch == other.fixedPitch && hint == other.hint && italic == other.italic
+				&& pixelSize == other.pixelSize && pointSize == other.pointSize && style == other.style
+				&& Objects.equals(styleName, other.styleName) && weight == other.weight;
 	}
 
 	/**
@@ -185,28 +139,10 @@ public class JFontInfo {
 		return weight;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (bold ? 1231 : 1237);
-		result = prime * result + (exactMatch ? 1231 : 1237);
-		result = prime * result + ((family == null) ? 0 : family.hashCode());
-		result = prime * result + (fixedPitch ? 1231 : 1237);
-		result = prime * result + ((hint == null) ? 0 : hint.hashCode());
-		result = prime * result + (italic ? 1231 : 1237);
-		result = prime * result + pixelSize;
-		result = prime * result + pointSize;
-		result = prime * result + (rawMode ? 1231 : 1237);
-		result = prime * result + ((style == null) ? 0 : style.hashCode());
-		result = prime * result + ((styleName == null) ? 0 : styleName.hashCode());
-		result = prime * result + weight;
-		return result;
+		return Objects.hash(bold, exactMatch, family, fixedPitch, hint, italic, pixelSize, pointSize, style, styleName,
+				weight);
 	}
 
 	/**
@@ -237,23 +173,10 @@ public class JFontInfo {
 		return italic;
 	}
 
-	/**
-	 * @return the rawMode
-	 */
-	public boolean isRawMode() {
-		return rawMode;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "JFontInfo [family=" + family + ", pointSize=" + pointSize + ", pixelSize=" + pixelSize + ", bold="
-				+ bold + ", exactMatch=" + exactMatch + ", fixedPitch=" + fixedPitch + ", italic=" + italic
-				+ ", rawMode=" + rawMode + ", style=" + style + ", hint=" + hint + ", styleName=" + styleName
-				+ ", weight=" + weight + "]";
+				+ bold + ", exactMatch=" + exactMatch + ", fixedPitch=" + fixedPitch + ", italic=" + italic + ", style="
+				+ style + ", hint=" + hint + ", styleName=" + styleName + ", weight=" + weight + "]";
 	}
 }

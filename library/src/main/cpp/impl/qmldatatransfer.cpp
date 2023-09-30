@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 #include "qmldatatransfer.h"
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QUrl>
 #include <QUuid>
 #include <QSize>
@@ -119,7 +119,7 @@ JNICALL void setString(JNIEnv* env, jclass, jstring v, jint roleIndex)
 JNICALL void setRegularExpression(JNIEnv* env, jclass, jstring v, jint roleIndex)
 {
     QString res = JNIUtilities::toQString(env, v);
-    QMLDataTransfer::storeRef(QRegExp(res), roleIndex);
+    QMLDataTransfer::storeRef(QRegularExpression(res), roleIndex);
 }
 
 JNICALL void setURL(JNIEnv* env, jclass, jstring v, jint roleIndex)
@@ -150,7 +150,7 @@ JNICALL void setColor(JNIEnv*, jclass, jint v, jint roleIndex)
 
 JNICALL void setDateTime(JNIEnv*, jclass, jlong seconds, jint nanos, jint roleIndex)
 {
-    QMLDataTransfer::storeRef(QDateTime::fromMSecsSinceEpoch(seconds * 1000 + nanos / 1000000), roleIndex);
+    QMLDataTransfer::storeRef(QDateTime::fromMSecsSinceEpoch(seconds * 1000L + nanos / 1000000L), roleIndex);
 }
 
 void cleanupMemory(void* ptr)
@@ -310,11 +310,11 @@ void QMLDataTransfer::setJVariantConverter(
 
 jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
 {
-    switch (value.type()) {
-    case QVariant::Bool: {
+    switch (value.typeId()) {
+    case qMetaTypeId<bool>(): {
         return env->NewObject(jvariantClass, booleanConstructor, value.toBool());
     }
-    case QVariant::ByteArray: {
+    case qMetaTypeId<QByteArray>(): {
         const QByteArray a = value.toByteArray();
         jbyteArray arrayObj = env->NewByteArray(a.length());
         jbyte* array = env->GetByteArrayElements(arrayObj, nullptr);
@@ -322,20 +322,21 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
         env->ReleaseByteArrayElements(arrayObj, array, 0);// Commit and release
         return env->NewObject(jvariantClass, byteArrayConstructor, arrayObj);
     }
-    case QVariant::Color: {
+    case qMetaTypeId<QColor>(): {
         const QColor c = value.value<QColor>();
         return env->CallStaticObjectMethod(jvariantClass, fromColorMethod, c.rgba());
     }
-    case QVariant::DateTime: {
+    case qMetaTypeId<QDateTime>(): {
         const QDateTime d = value.toDateTime();
-        const int64_t seconds = d.toSecsSinceEpoch();
-        const int32_t nanos = d.toMSecsSinceEpoch() * 1000000;
+        const int64_t millis = d.toMSecsSinceEpoch();
+        const int64_t seconds = millis / 1000L;
+        const int64_t nanos = (millis - (seconds * 1000L)) * 1000000L;
         return env->CallStaticObjectMethod(jvariantClass, fromInstanteMethod, seconds, nanos);
     }
-    case QVariant::Double: {
+    case qMetaTypeId<double>(): {
         return env->NewObject(jvariantClass, doubleConstructor, value.toDouble());
     }
-    case QVariant::Image: {
+    case qMetaTypeId<QImage>(): {
         const QImage i = value.value<QImage>();
         jbyteArray arrayObj = env->NewByteArray(i.sizeInBytes());
         jbyte* array = env->GetByteArrayElements(arrayObj, nullptr);
@@ -343,65 +344,65 @@ jobject QMLDataTransfer::toJVariant(JNIEnv* env, const QVariant& value)
         env->ReleaseByteArrayElements(arrayObj, array, 0);// Commit and release
         return env->CallStaticObjectMethod(jvariantClass, fromBufferedImageMethod, i.width(), i.height(), arrayObj);
     }
-    case QVariant::Int: {
+    case qMetaTypeId<int>(): {
         return env->NewObject(jvariantClass, integerConstructor, value.toInt());
     }
-    case QVariant::Line: {
+    case qMetaTypeId<QLine>(): {
         const QLine l = value.toLine();
         return env->CallStaticObjectMethod(jvariantClass, fromLineMethod, l.x1(), l.y1(), l.x2(), l.y2());
     }
-    case QVariant::LongLong: {
+    case qMetaTypeId<qlonglong>(): {
         return env->NewObject(jvariantClass, longConstructor, value.toLongLong());
     }
-    case QVariant::Point: {
+    case qMetaTypeId<QPoint>(): {
         const QPoint p = value.toPoint();
         return env->CallStaticObjectMethod(jvariantClass, fromPointMethod, p.x(), p.y());
     }
-    case QVariant::PointF: {
+    case qMetaTypeId<QPointF>(): {
         const QPointF p = value.toPointF();
         return env->CallStaticObjectMethod(jvariantClass, fromPointFMethod, p.x(), p.y());
     }
-    case QVariant::Rect: {
+    case qMetaTypeId<QRect>(): {
         const QRect r = value.toRect();
         return env->CallStaticObjectMethod(jvariantClass, fromRectangleMethod, r.x(), r.y(), r.width(), r.height());
     }
-    case QVariant::RectF: {
+    case qMetaTypeId<QRectF>(): {
         const QRectF r = value.toRectF();
         return env->CallStaticObjectMethod(jvariantClass, fromRectangleFMethod, r.x(), r.y(), r.width(), r.height());
     }
-    case QVariant::RegExp: {
-        const QString str = value.toRegExp().pattern();
+    case qMetaTypeId<QRegularExpression>(): {
+        const QString str = value.toRegularExpression().pattern();
         jstring jStr = env->NewString(
                     reinterpret_cast<const jchar*>(str.constData()),
                     str.length());
         return env->CallStaticObjectMethod(jvariantClass, fromPatternMethod, jStr);
     }
-    case QVariant::Size: {
+    case qMetaTypeId<QSize>(): {
         const QSize s = value.toSize();
         return env->CallStaticObjectMethod(jvariantClass, fromDimensionMethod, s.width(), s.height());
     }
-    case QVariant::String: {
+    case qMetaTypeId<QString>(): {
         const QString str = value.toString();
         jstring jStr = env->NewString(
                     reinterpret_cast<const jchar*>(str.constData()),
                     str.length());
         return env->NewObject(jvariantClass, stringConstructor, jStr);
     }
-    case QVariant::Url: {
+    case qMetaTypeId<QUrl>(): {
         const QString str = value.toUrl().toString();
         jstring jStr = env->NewString(
                     reinterpret_cast<const jchar*>(str.constData()),
                     str.length());
         return env->CallStaticObjectMethod(jvariantClass, fromURLMethod, jStr);
     }
-    case QVariant::Uuid: {
-        const QString str = value.toUuid().toString();
+    case qMetaTypeId<QUuid>(): {
+        const QString str = value.toUuid().toString(QUuid::WithoutBraces);
         jstring jStr = env->NewString(
                     reinterpret_cast<const jchar*>(str.constData()),
                     str.length());
         return env->CallStaticObjectMethod(jvariantClass, fromUUIDMethod, jStr);
     }
-    case QVariant::Font: {
+    case qMetaTypeId<QFont>(): {
         const QString str = value.value<QFont>().toString();
         jstring jStr = env->NewString(
                     reinterpret_cast<const jchar*>(str.constData()),

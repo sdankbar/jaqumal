@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 import QtQuick 2.11
-import QtQuick.Controls 1.4
+import QtQuick.Controls 6.5
 import com.github.sdankbar.jaqumal 0.4
 
 ListView {
@@ -36,7 +36,7 @@ ListView {
         id: dispatch
         allowedEvents: ["RequestScrollListToPositionEvent"]
 
-        onEventReceived: {
+        onEventReceived: function(eventName, args) {
             if (model !== null && model.modelName === args.model_name) {
                 switch (args.position_mode) {
                 case 0:

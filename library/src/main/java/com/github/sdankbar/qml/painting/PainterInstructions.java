@@ -26,17 +26,19 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class PainterInstructions {
+
 	public enum FillMode {
 		OddEvenFill, WindingFill
 	}
 
 	public enum RenderHint {
-		Antialiasing(0x01), TextAntialiasing(0x02), SmoothPixmapTransform(0x04), HighQualityAntialiasing(0x08),
-		NonCosmeticDefaultPen(0x10), Qt4CompatiblePainting(0x20), LosslessImageRendering(0x40);
+
+		Antialiasing(0x01), TextAntialiasing(0x02), SmoothPixmapTransform(0x04), VerticalSubpixelPositioning(
+				0x08), LosslessImageRendering(0x40), NonCosmeticBrushPatterns(0x80);
 
 		private final int mask;
 
-		private RenderHint(final int mask) {
+		RenderHint(final int mask) {
 			this.mask = mask;
 		}
 

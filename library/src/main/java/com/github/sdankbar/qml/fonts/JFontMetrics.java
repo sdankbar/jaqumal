@@ -161,9 +161,9 @@ public class JFontMetrics {
 		return underlinePos;
 	}
 
-	public int getWidth(final String text) {
+	public int getHorizontalAdvance(final String text) {
 		Objects.requireNonNull(text, "text is null");
-		return FontFunctions.getStringWidth(fontToString, text);
+		return FontFunctions.getStringHorizontalAdvance(fontToString, text);
 	}
 
 	public int getXHeight() {

@@ -23,9 +23,7 @@
  */
 import QtQuick 2.10
 import QtQuick.Window 2.10
-import QtQuick.Controls.Styles 1.4
-import QtGraphicalEffects 1.0
-import QtQuick.Controls 1.4
+import QtQuick.Controls 6.0
 import SharedComponents 1.0
 import com.github.sdankbar.jaqumal 0.4
 
@@ -46,7 +44,7 @@ Window {
         id: dispatch
         allowedEvents: ["TestQMLEvent"]
 
-        onEventReceived: {
+        onEventReceived: function(eventName, args) {
             log.info("TEST EVENT: " + args.time)
         }
     }
@@ -87,7 +85,6 @@ Window {
                     }
                     onClicked: {
                         log.info("USER INPUT- clicked RED light")
-                        UtilFunc.fireMouseClick("RED", mouse, eventing)
                         test_invokable.addString("RED INVOKED")
                         test_invokable.invoke("function1")
                         test_invokable.addInteger(3)

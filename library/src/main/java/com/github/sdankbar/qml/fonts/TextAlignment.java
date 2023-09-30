@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 public enum TextAlignment {
+
 	AlignLeft(0x0001), //
 	AlignRight(0x0002), //
 	AlignHCenter(0x0004), //
@@ -34,6 +35,7 @@ public enum TextAlignment {
 	AlignTop(0x0020), //
 	AlignBottom(0x0040), //
 	AlignVCenter(0x0080), //
+	AlignBaseline(0x0100), //
 
 	AlignCenter(AlignHCenter.flag | AlignVCenter.flag);
 
@@ -49,7 +51,7 @@ public enum TextAlignment {
 
 	private final int flag;
 
-	private TextAlignment(final int flag) {
+	TextAlignment(final int flag) {
 		this.flag = flag;
 	}
 

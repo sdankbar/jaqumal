@@ -48,7 +48,7 @@
  */
 jobject JNICALL getBoundingRect(JNIEnv* env, jstring fontToString, jstring text)
 {
-    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    if (ApplicationFunctions::check(env))
     {
         QFont f;
         f.fromString(JNIUtilities::toQString(env, fontToString));
@@ -70,7 +70,7 @@ jobject JNICALL getBoundingRect(JNIEnv* env, jstring fontToString, jstring text)
  */
 jobject JNICALL getBoundingRect2(JNIEnv* env, jclass, jstring fontToString, jint x, jint y, jint w, jint h, jint alignFlags, jint textFlags, jstring text)
 {
-    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    if (ApplicationFunctions::check(env))
     {
         QFont f;
         f.fromString(JNIUtilities::toQString(env, fontToString));
@@ -93,21 +93,20 @@ jobject JNICALL getBoundingRect2(JNIEnv* env, jclass, jstring fontToString, jint
  */
 jstring JNICALL getQFontInfo(JNIEnv* env, jclass, jstring fontToString)
 {
-    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    if (ApplicationFunctions::check(env))
     {
         QFont f;
         f.fromString(JNIUtilities::toQString(env, fontToString));
         const QFontInfo info(f);
-        //  0         1         2         3        4          5           6      7        8     9             10       11
-        // Family, pointSize, pixelSize, bold, exactMatch, fixedPitch, italic, rawMode, style, styleHint, styleName, weight
+        //  0         1         2         3        4          5           6      7        8          9       10
+        // Family, pointSize, pixelSize, bold, exactMatch, fixedPitch, italic, style, styleHint, styleName, weight
 
-        const QString temp("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12");
+        const QString temp("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11");
         QString ret = temp.arg(info.family()).arg(info.pointSize()).arg(info.pixelSize())
                 .arg(info.bold())
                 .arg(info.exactMatch())
                 .arg(info.fixedPitch())
                 .arg(info.italic())
-                .arg(info.rawMode())
                 .arg(info.style())
                 .arg(info.styleHint())
                 .arg(info.styleName())
@@ -128,7 +127,7 @@ jstring JNICALL getQFontInfo(JNIEnv* env, jclass, jstring fontToString)
  */
 jstring JNICALL getQFontMetrics(JNIEnv* env, jclass, jstring fontToString)
 {
-    if (ApplicationFunctions::check(env)) // QTBUG-27024
+    if (ApplicationFunctions::check(env))
     {
         QFont f;
         f.fromString(JNIUtilities::toQString(env, fontToString));
@@ -187,7 +186,7 @@ jstring JNICALL getQFontToString(JNIEnv* env, jclass, jint fontIndex, jstring fa
         f.setOverline(overline);
         f.setStrikeOut(strikeout);
         f.setUnderline(underline);
-        f.setWeight(fontWeight);
+        f.setWeight((QFont::Weight) fontWeight);
 
         f.setWordSpacing(wordSpacing);
         f.setLetterSpacing(static_cast<QFont::SpacingType>(letterSpacingType), letteringSpacing);
@@ -211,17 +210,17 @@ jstring JNICALL getQFontToString(JNIEnv* env, jclass, jint fontIndex, jstring fa
 
 /*
  * Class:     com_github_sdankbar_qml_cpp_jni_FontFunctions
- * Method:    getStringWidth
+ * Method:    getStringHorizontalAdvance
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-jint JNICALL getStringWidth(JNIEnv* env, jclass, jstring fontToString, jstring text)
+jint JNICALL getStringHorizontalAdvance(JNIEnv* env, jclass, jstring fontToString, jstring text)
 {
     if (ApplicationFunctions::check(env)) // QTBUG-27024
     {
         QFont f;
         f.fromString(JNIUtilities::toQString(env, fontToString));
         const QFontMetrics metrics(f);
-        return metrics.width(JNIUtilities::toQString(env, text));
+        return metrics.horizontalAdvance(JNIUtilities::toQString(env, text));
     }
     else
     {
@@ -333,7 +332,7 @@ void FontFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("getQFontMetrics",    "(Ljava/lang/String;)Ljava/lang/String;",    (void *)&getQFontMetrics),
         JNIUtilities::createJNIMethod("getQFontToString",    "(ILjava/lang/String;IIZZZZZZZIDDIIIIILjava/lang/String;II)Ljava/lang/String;",    (void *)&getQFontToString),
         JNIUtilities::createJNIMethod("getQFontInfo",    "(Ljava/lang/String;)Ljava/lang/String;",    (void *)&getQFontInfo),
-        JNIUtilities::createJNIMethod("getStringWidth",    "(Ljava/lang/String;Ljava/lang/String;)I",    (void *)&getStringWidth),
+        JNIUtilities::createJNIMethod("getStringHorizontalAdvance",    "(Ljava/lang/String;Ljava/lang/String;)I",    (void *)&getStringHorizontalAdvance),
         JNIUtilities::createJNIMethod("getTightBoundingRect",    "(Ljava/lang/String;Ljava/lang/String;)Ljava/awt/Rectangle;",    (void *)&getTightBoundingRect),
         JNIUtilities::createJNIMethod("inFont",    "(Ljava/lang/String;I)Z",    (void *)&inFont),
         JNIUtilities::createJNIMethod("scaleToFit",    "(IILjava/lang/String;II)I",    (void *)&scaleToFit),

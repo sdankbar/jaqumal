@@ -23,6 +23,7 @@
 #include "keyeventpreprocessor.h"
 #include <QEvent>
 #include <QKeyEvent>
+#include <QCoreApplication>
 
 KeyEventPreProcessor::KeyEventPreProcessor(QObject* parent) :
     QObject(parent),
@@ -78,17 +79,40 @@ bool KeyEventPreProcessor::eventFilter(QObject* obj, QEvent* event)
         QKeyEvent* cast = dynamic_cast<QKeyEvent*>(event);
         if (m_mode == UPPER)
         {
-            *cast = QKeyEvent(cast->type(), cast->key(), cast->modifiers(),
+            if (!cast->text().isUpper())
+            {
+                QKeyEvent* upperEvent = new QKeyEvent(cast->type(), cast->key(), cast->modifiers(),
                               cast->nativeScanCode(), cast->nativeVirtualKey(),
                               cast->nativeModifiers(), cast->text().toUpper(), cast->isAutoRepeat(),
                               cast->count());
+
+                // Turn key event being sent into upper case letters
+                QCoreApplication::postEvent(obj, upperEvent);
+                return true;
+            }
+            else
+            {
+                // Is already upper case
+                return false;
+            }
         }
         else if (m_mode == LOWER)
         {
-            *cast = QKeyEvent(cast->type(), cast->key(), cast->modifiers(),
-                              cast->nativeScanCode(), cast->nativeVirtualKey(),
-                              cast->nativeModifiers(), cast->text().toLower(), cast->isAutoRepeat(),
-                              cast->count());
+            if (!cast->text().isLower())
+            {
+                QKeyEvent* lowerEvent = new QKeyEvent(cast->type(), cast->key(), cast->modifiers(),
+                                  cast->nativeScanCode(), cast->nativeVirtualKey(),
+                                  cast->nativeModifiers(), cast->text().toLower(), cast->isAutoRepeat(),
+                                  cast->count());
+
+                // Turn key event being sent into lower case letters
+                QCoreApplication::postEvent(obj, lowerEvent);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
     return QObject::eventFilter(obj, event);

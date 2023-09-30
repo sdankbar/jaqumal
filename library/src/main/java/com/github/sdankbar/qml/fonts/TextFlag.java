@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 public enum TextFlag {
+
 	TextSingleLine(0x0100), //
 	TextDontClip(0x0200), //
 	TextExpandTabs(0x0400), //
@@ -35,7 +36,6 @@ public enum TextFlag {
 	TextHideMnemonic(0x8000), //
 	TextDontPrint(0x4000), //
 	TextIncludeTrailingSpaces(0x08000000), //
-	IncludeTrailingSpaces(TextFlag.TextIncludeTrailingSpaces.flag), //
 	TextJustificationForced(0x10000);
 
 	public static int setToFlags(final Collection<TextFlag> set) {
@@ -50,7 +50,7 @@ public enum TextFlag {
 
 	private final int flag;
 
-	private TextFlag(final int flag) {
+	TextFlag(final int flag) {
 		this.flag = flag;
 	}
 

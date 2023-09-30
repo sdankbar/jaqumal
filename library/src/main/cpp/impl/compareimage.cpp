@@ -48,7 +48,9 @@ QImage takeFocusedWindowScreenShot()
     QQuickWindow* quickWindow = dynamic_cast<QQuickWindow*>(w);
     if (quickWindow != nullptr)
     {
-        return quickWindow->grabWindow();
+        QImage temp = quickWindow->grabWindow();
+        temp.convertTo(QImage::Format_ARGB32);
+        return temp;
     }
     else
     {
@@ -56,50 +58,56 @@ QImage takeFocusedWindowScreenShot()
     }
 }
 
-bool fuzzyEquals(const QImage& source, const QImage& target, double ratiodB)
+double getPeakSignalToNoiseRatio(const QImage& source, const QImage& target)
 {
-    if (source.isNull() || target.isNull())
+  if (source.isNull() || target.isNull())
+  {
+    return 0;
+  }
+  else if (source.width() != target.width())
+  {
+    return 0;
+  }
+  else if (source.height() != target.height())
+  {
+    return 0;
+  }
+  else
+  {
+    uint64_t sqSum = 0;
+    const int32_t pixelCount = source.width() * source.height();
+    const QRgb* sourcePixels = (const QRgb*)source.constBits();
+    const QRgb* targetPixels = (const QRgb*)target.constBits();
+    for (int i = 0; i < pixelCount; ++i)
     {
-        return false;
+      const QRgb sColor = sourcePixels[i];
+      const QRgb tColor = targetPixels[i];
+      const int deltaR = qRed(sColor) - qRed(tColor);
+      const int deltaG = qGreen(sColor) - qGreen(tColor);
+      const int deltaB = qBlue(sColor)- qBlue(tColor);
+      sqSum += (deltaR * deltaR) +
+        (deltaG * deltaG) +
+        (deltaB * deltaB);
     }
-    else if (source.width() != target.width())
+
+    double meanSquareError = sqSum / (3.0 * pixelCount);
+    if (meanSquareError == 0)
     {
-        return false;
-    }
-    else if (source.height() != target.height())
-    {
-        return false;
+      // Avoid division by 0.
+      return 1000;
     }
     else
     {
-        uint64_t sqSum = 0;
-        const int32_t pixelCount = source.width() * source.height();
-        const QRgb* sourcePixels = (const QRgb*)source.constBits();
-        const QRgb* targetPixels = (const QRgb*)target.constBits();
-        for (int i = 0; i < pixelCount; ++i)
-        {
-            const QRgb sColor = sourcePixels[i];
-            const QRgb tColor = targetPixels[i];
-            const int deltaR = qRed(sColor) - qRed(tColor);
-            const int deltaG = qGreen(sColor) - qGreen(tColor);
-            const int deltaB = qBlue(sColor)- qBlue(tColor);
-            sqSum += (deltaR * deltaR) +
-                    (deltaG * deltaG) +
-                    (deltaB * deltaB);
-        }
-
-        double meanSquareError = sqSum / (3.0 * pixelCount);
-        if (meanSquareError == 0)
-        {
-            // Avoid division by 0.
-            return true;
-        }
-        else
-        {
-            double peakSignalToNoiseRatio = 10 * log10((255 * 255) / meanSquareError);
-            return (peakSignalToNoiseRatio > ratiodB);
-        }
+      double peakSignalToNoiseRatio = 10 * log10((255 * 255) / meanSquareError);
+      return std::min(peakSignalToNoiseRatio, 1000.0);
     }
+  }
+}
+
+bool fuzzyEquals(const QImage& source, const QImage& target, double ratiodB)
+{
+  double peakSignalToNoiseRatio = getPeakSignalToNoiseRatio(source, target);
+  return (peakSignalToNoiseRatio > ratiodB);
 }
 
 QImage generateDelta(const QImage& source, const QImage& target)
@@ -118,6 +126,7 @@ QImage generateDelta(const QImage& source, const QImage& target)
     }
     else
     {
+        const bool whiteEquals = ("1" == qgetenv("WHITE_EQUALS"));
         QImage output(source.width(), source.height(), QImage::Format_ARGB32);
         const int32_t pixelCount = source.width() * source.height();
         const QRgb* sourcePixels = (const QRgb*)source.constBits();
@@ -130,7 +139,14 @@ QImage generateDelta(const QImage& source, const QImage& target)
             const int deltaR = std::abs(qRed(sColor) - qRed(tColor));
             const int deltaG = std::abs(qGreen(sColor) - qGreen(tColor));
             const int deltaB = std::abs(qBlue(sColor)- qBlue(tColor));
-            outputPixels[i] = qRgb(deltaR, deltaG, deltaB);
+            if (whiteEquals && deltaR == 0 && deltaG == 0 && deltaB == 0)
+            {
+              outputPixels[i] = qRgb(255, 255, 255);
+            }
+            else
+            {
+              outputPixels[i] = qRgb(deltaR, deltaG, deltaB);
+            }
         }
 
         return output;
@@ -144,6 +160,7 @@ void QIMAGECOMPARE(const std::string& fileName, double ratiodB)
     {
         QFAIL(("Unable to read " + fileName).c_str());
     }
+    target.convertTo(QImage::Format_ARGB32);
 
     bool matches = false;
     QImage source;
@@ -163,9 +180,45 @@ void QIMAGECOMPARE(const std::string& fileName, double ratiodB)
 
     if (!matches)
     {
-        if ("1" == qgetenv("RECAPTURE"))
+        if ("1" == qgetenv("RECAPTURE_CONDITIONALLY") &&
+            !qgetenv("RECAPTURE_LOWER_BOUND").isEmpty())
         {
-            takeFocusedWindowScreenShot().save(QString::fromStdString(fileName));
+          double ratio = getPeakSignalToNoiseRatio(source, target);
+          double lowerBound = std::stold(qgetenv("RECAPTURE_LOWER_BOUND").toStdString());
+          if (ratio >= lowerBound)
+          {
+            QImage delta = generateDelta(source, target);
+            if (!delta.isNull())
+            {
+              QString diffFile = QString::fromStdString(fileName).replace(".png",".delta.png");
+              delta.save(diffFile, "png");
+            }
+            source.save(QString::fromStdString(fileName));
+          }
+          else
+          {
+            QImage delta = generateDelta(source, target);
+            if (!delta.isNull())
+            {
+              QString diffFile = QString::fromStdString(fileName).replace(".png",".delta.png");
+              delta.save(diffFile, "png");
+              QVERIFY2(false, ("Image does not match " + fileName + " and not eligible for recapture. See " + diffFile.toStdString()).c_str());
+            }
+            else
+            {
+              QVERIFY2(false, ("Image does not match "+ fileName + " and not eligible for recapture").c_str());
+            }
+          }
+        }
+        else if ("1" == qgetenv("RECAPTURE"))
+        {
+          QImage delta = generateDelta(source, target);
+          if (!delta.isNull())
+          {
+            QString diffFile = QString::fromStdString(fileName).replace(".png",".delta.png");
+            delta.save(diffFile, "png");
+          }
+          source.save(QString::fromStdString(fileName));
         }
         else
         {

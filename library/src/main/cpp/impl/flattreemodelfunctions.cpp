@@ -678,7 +678,7 @@ void GenericFlatTreeModel::insertRowData(std::deque<int32_t>& indicies, const st
     if (indicies.size() == 1)
     {
         int32_t row = indicies[0];
-        int32_t actualRow = std::min(row, m_rowData.size());
+        int32_t actualRow = std::min((qsizetype) row, m_rowData.size());
         QHash<int32_t, QVariant> map;
         for (int32_t i = 0; i < roleIndex.size(); ++i)
         {
@@ -707,7 +707,10 @@ void GenericFlatTreeModel::erase(std::deque<int32_t>& indicies)
     std::deque<int32_t> indiciesCopy = indicies;
     if (indicies.size() == 1)
     {
-        m_rowData.removeAt(indicies[0]);
+        if (indicies[0] < m_rowData.size())
+        {
+            m_rowData.removeAt(indicies[0]);
+        }
     }
     else
     {

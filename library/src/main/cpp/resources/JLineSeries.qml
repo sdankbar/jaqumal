@@ -38,13 +38,13 @@ LineSeries {
         target: model
         ignoreUnknownSignals: true
 
-        onDataChanged: {
+        function onDataChanged() {
             internal.populateSeries()
         }
-        onRowsInserted: {
+        function onRowsInserted() {
             internal.populateSeries()
         }
-        onRowsRemoved: {
+        function onRowsRemoved() {
             internal.populateSeries()
         }
     }

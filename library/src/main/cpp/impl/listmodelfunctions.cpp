@@ -529,7 +529,7 @@ int32_t GenericListModel::appendRowData(std::vector<QVariant>& data, const QVect
 
 void GenericListModel::insertRowData(qint32 row, std::vector<QVariant>& data, QVector<int32_t> roleIndex)
 {
-    int32_t actualRow = std::min(row, m_rowData.size());
+    int32_t actualRow = std::min((qsizetype)row, m_rowData.size());
     beginInsertRows(QModelIndex(), actualRow, actualRow);
     QVector<QVariant> map;
     map.resize(m_stringToIndexRoleMap.size());

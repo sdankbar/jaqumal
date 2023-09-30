@@ -67,13 +67,13 @@ public class IntegrationTest {
 		tools.mouseMove(52, 34, 0, 0, 0, Duration.ofMillis(193));
 		tools.mouseMove(292, 83, 0, 0, 0, Duration.ofMillis(317));
 		tools.mouseMove(247, 100, 0, 0, 0, Duration.ofMillis(251));
-		tools.mousePress(240, 92, 1, 1, 0, Duration.ofMillis(304));
-		tools.mouseRelease(240, 92, 1, 0, 0, Duration.ofMillis(74));
+		tools.mousePress(250, 86, 1, 1, 0, Duration.ofMillis(304));
+		tools.mouseRelease(250, 86, 1, 0, 0, Duration.ofMillis(74));
 		tools.compareWindowToImage(new File(screenshotDir, "screenshot_20_08_04_233.png"), Duration.ofMillis(783));
 		tools.mouseMove(240, 90, 0, 0, 0, Duration.ofMillis(244));
 		tools.mouseMove(240, 65, 0, 0, 0, Duration.ofMillis(266));
-		tools.mousePress(241, 64, 1, 1, 0, Duration.ofMillis(328));
-		tools.mouseRelease(241, 64, 1, 0, 0, Duration.ofMillis(93));
+		tools.mousePress(250, 60, 1, 1, 0, Duration.ofMillis(328));
+		tools.mouseRelease(250, 60, 1, 0, 0, Duration.ofMillis(93));
 		tools.compareWindowToImage(new File(screenshotDir, "screenshot_20_08_05_949.png"), Duration.ofMillis(785));
 		tools.mouseMove(236, 67, 0, 0, 0, Duration.ofMillis(379));
 		tools.mouseMove(89, 186, 0, 0, 0, Duration.ofMillis(253));
@@ -93,8 +93,8 @@ public class IntegrationTest {
 		tools.mouseMove(73, 181, 0, 0, 0, Duration.ofMillis(909));
 		tools.mouseMove(139, 85, 0, 0, 0, Duration.ofMillis(259));
 		tools.mouseMove(157, 91, 0, 0, 0, Duration.ofMillis(266));
-		tools.mousePress(158, 91, 1, 1, 0, Duration.ofMillis(221));
-		tools.mouseRelease(158, 91, 1, 0, 0, Duration.ofMillis(114));
+		tools.mousePress(170, 85, 1, 1, 0, Duration.ofMillis(221));
+		tools.mouseRelease(170, 85, 1, 0, 0, Duration.ofMillis(114));
 		tools.compareWindowToImage(new File(screenshotDir, "screenshot_20_08_12_508.png"), Duration.ofMillis(1007));
 		tools.mouseMove(155, 94, 0, 0, 0, Duration.ofMillis(561));
 		tools.mouseMove(50, 183, 0, 0, 0, Duration.ofMillis(259));
