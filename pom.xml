@@ -60,7 +60,7 @@
 		<commons.lang.version>3.9</commons.lang.version>
 		<commons.math.version>3.6.1</commons.math.version>
 		<log4j.version>2.12.4</log4j.version>
-		<json.version>20190722</json.version>
+		<json.version>20230227</json.version>
 		<junit.version>4.12</junit.version>
 
 		<maven.compiler.version>3.8.1</maven.compiler.version>
