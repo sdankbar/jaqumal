@@ -78,6 +78,7 @@ private:
 
     bool m_generateJUnit;
     bool m_generateQTTest;
+    bool m_mouseToTouch;
 };
 
 #endif // JDEVELOPMENTTOOLS_H

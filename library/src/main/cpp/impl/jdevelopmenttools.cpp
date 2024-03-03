@@ -38,7 +38,8 @@ JDevelopmentTools::JDevelopmentTools(QWindow* parent) :
     m_isRecording(false),
     m_lastMouseMoveTime(QDateTime::fromMSecsSinceEpoch(0)),
     m_generateJUnit(false),
-    m_generateQTTest(false)
+    m_generateQTTest(false),
+    m_mouseToTouch(false)
 {
     ++INSTANCE_COUNT;
     if (INSTANCE_COUNT == 1)
@@ -109,6 +110,10 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
         {
             // Ignore
         }
+        else if (key->key() == Qt::Key_F9)
+        {
+            // Ignore
+        }
         else if ((watched->parent() == nullptr) && m_isRecording)
         {
             RecordedEvent rec;
@@ -163,6 +168,13 @@ bool JDevelopmentTools::eventFilter(QObject* watched, QEvent* event)
                 rec.m_screenshotFile = fileName;
                 m_recordedEvents.push_back(rec);
             }
+            m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
+            return true;
+        }
+        else if (key->key() == Qt::Key_F9)
+        {
+
+            m_mouseToTouch = !m_mouseToTouch;
             m_lastMouseMoveTime = QDateTime::fromMSecsSinceEpoch(0);
             return true;
         }
@@ -445,6 +457,7 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
         bool createdTouchDevice = false;
         QDateTime workingTime = m_startTime;
         bool sendDoubleClickAfterRelease = false;
+        bool isPressed = false;
         for (const RecordedEvent& e: m_recordedEvents)
         {
             if (e.m_event != nullptr)
@@ -477,12 +490,27 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\tQTest::qWait(" << milli << ");\n";
-                    out << "\t\tQTest::mousePress("
-                        << "getEventInjectionWindow()" << ", "
-                        << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
-                        << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
-                        << mouse->position().x() << ", "
-                        << mouse->position().y() << "));\n";
+                    isPressed = true;
+                    if (m_mouseToTouch)
+                    {
+                      if (!createdTouchDevice)
+                      {
+                         out << "\t\tQTouchDevice* touchDevice = QTest::createTouchDevice();\n";
+                      }
+                      createdTouchDevice = true;
+                      out << "\t\tQTest::touchEvent(getEventInjectionWindow(), touchDevice).press(0, QPoint("
+                          << mouse->position().x() << ", "
+                          << mouse->position().y() << "));\n";
+                    }
+                    else
+                    {
+                      out << "\t\tQTest::mousePress("
+                          << "getEventInjectionWindow()" << ", "
+                          << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
+                          << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
+                          << mouse->position().x() << ", "
+                          << mouse->position().y() << "));\n";
+                    }                        
                     break;
                 }
                 case QEvent::MouseButtonRelease:
@@ -490,22 +518,37 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\tQTest::qWait(" << milli << ");\n";
-                    out << "\t\tQTest::mouseRelease("
-                        << "getEventInjectionWindow()" << ", "
-                        << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
-                        << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
-                        << mouse->position().x() << ", "
-                        << mouse->position().y() << "));\n";
-                    if (sendDoubleClickAfterRelease)
+                    isPressed = false;
+                    if (m_mouseToTouch)
                     {
-                        sendDoubleClickAfterRelease = false;
-                        out << "\t\tQTest::mouseDClick("
+                      if (!createdTouchDevice)
+                      {
+                         out << "\t\tQTouchDevice* touchDevice = QTest::createTouchDevice();\n";
+                      }
+                      createdTouchDevice = true;
+                      out << "\t\tQTest::touchEvent(getEventInjectionWindow(), touchDevice).release(0, QPoint("
+                          << mouse->position().x() << ", "
+                          << mouse->position().y() << "));\n";
+                    }
+                    else
+                    {
+                      out << "\t\tQTest::mouseRelease("
                           << "getEventInjectionWindow()" << ", "
                           << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
                           << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
                           << mouse->position().x() << ", "
                           << mouse->position().y() << "));\n";
-                    }
+                      if (sendDoubleClickAfterRelease)
+                      {
+                          sendDoubleClickAfterRelease = false;
+                          out << "\t\tQTest::mouseDClick("
+                            << "getEventInjectionWindow()" << ", "
+                            << "static_cast<Qt::MouseButton>(" << mouse->button() << "), "
+                            << "static_cast<Qt::KeyboardModifiers>(" << mouse->modifiers() << "), QPoint("
+                            << mouse->position().x() << ", "
+                            << mouse->position().y() << "));\n";
+                      }
+                    }  
                     break;
                 }
                 case QEvent::MouseButtonDblClick:
@@ -517,10 +560,24 @@ void JDevelopmentTools::saveQTTestRecording(const QDateTime& recordingEndTime)
                     QMouseEvent* mouse = static_cast<QMouseEvent*>(e.m_event);
                     int64_t milli = workingTime.msecsTo(e.m_eventTime);
                     out << "\t\tQTest::qWait(" << milli << ");\n";
-                    out << "\t\tQTest::mouseMove("
-                        << "getEventInjectionWindow()" << ", QPoint("
-                        << mouse->position().x() << ", "
-                        << mouse->position().y() << "));\n";
+                    if (isPressed && m_mouseToTouch)
+                    {
+                      if (!createdTouchDevice)
+                      {
+                         out << "\t\tQTouchDevice* touchDevice = QTest::createTouchDevice();\n";
+                      }
+                      createdTouchDevice = true;
+                      out << "\t\tQTest::touchEvent(getEventInjectionWindow(), touchDevice).update(0, QPoint("
+                          << mouse->position().x() << ", "
+                          << mouse->position().y() << "));\n";
+                    }
+                    else if (!m_mouseToTouch)
+                    {
+                      out << "\t\tQTest::mouseMove("
+                          << "getEventInjectionWindow()" << ", QPoint("
+                          << mouse->position().x() << ", "
+                          << mouse->position().y() << "));\n";
+                    }
                     break;
                 }
                 case QEvent::Wheel:
