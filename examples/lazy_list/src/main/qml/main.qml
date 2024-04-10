@@ -66,23 +66,24 @@ Window {
                     anchors.fill: parent
                     Text {
                         text: model.text ? model.text : ""
+                        textFormat: Text.PlainText
                     }
-                    Text {
+                    Button {
                         text: model.text1 ? model.text1 : ""
                     }
-                    Text {
+                    TextInput {
                         text: model.text2 ? model.text2 : ""
                     }
-                    Text {
+                    Button {
                         text: model.text3 ? model.text3 : ""
                     }
-                    Text {
+                    TextInput {
                         text: model.text4 ? model.text4 : ""
                     }
-                    Text {
+                    Button {
                         text: model.text5 ? model.text5 : ""
                     }
-                    Text {
+                    TextInput {
                         text: model.text6 ? model.text6 : ""
                     }
                 }
