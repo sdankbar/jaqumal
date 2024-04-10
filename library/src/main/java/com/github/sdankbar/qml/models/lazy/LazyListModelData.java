@@ -27,29 +27,43 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.models.JQMLMapPool;
 import com.google.common.collect.ImmutableMap;
 
 class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	private static long NEXT_INDEX = 0;
 
-	private final Map<Q, JVariant> data = new HashMap<>();
+	private final Map<Q, JVariant> localData = new HashMap<>();
+	private Map<Q, JVariant> qmlData = null;
 	private final long index = ++NEXT_INDEX;
 	private JVariant sortValue;
 	private boolean isExcluded = false;
+	private final int itemHeight;
+	private boolean needsFlush = false;
 
 	private Q sortingKey;
 	private final Predicate<Map<Q, JVariant>> filterFunction = null;
 
-	public LazyListModelData(final Q sortingKey) {
+	public LazyListModelData(final Q sortingKey, final int itemHeight) {
 		this.sortingKey = sortingKey;
 		if (sortingKey == null) {
 			sortValue = new JVariant(index);
 		} else {
-			sortValue = data.get(sortingKey);
+			sortValue = localData.get(sortingKey);
 		}
+		this.itemHeight = itemHeight;
+	}
+
+	public int getItemHeight() {
+		return itemHeight;
+	}
+
+	public Map<Q, JVariant> getData() {
+		return localData;
 	}
 
 	public boolean applyFiltering(final Predicate<Map<Q, JVariant>> excludeFunction) {
@@ -57,7 +71,7 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 		if (filterFunction == null) {
 			isExcluded = false;
 		} else {
-			isExcluded = excludeFunction.test(Collections.unmodifiableMap(data));
+			isExcluded = excludeFunction.test(Collections.unmodifiableMap(localData));
 		}
 		return oldExclusion != isExcluded;
 	}
@@ -72,13 +86,14 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 		if (sortingKey == null) {
 			sortValue = new JVariant(index);
 		} else {
-			sortValue = data.get(sortingKey);
+			sortValue = localData.get(sortingKey);
 		}
 		return !Objects.equals(oldSort, sortValue);
 	}
 
 	public EnumSet<Task> upsert(final ImmutableMap<Q, JVariant> map) {
-		data.putAll(map);
+		needsFlush = true;
+		localData.putAll(map);
 		if (updateSortingValue(sortingKey)) {
 			return EnumSet.of(Task.SORT);
 		} else {
@@ -87,8 +102,9 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	}
 
 	public EnumSet<Task> set(final ImmutableMap<Q, JVariant> map) {
-		data.clear();
-		data.putAll(map);
+		needsFlush = true;
+		localData.clear();
+		localData.putAll(map);
 		if (updateSortingValue(sortingKey)) {
 			return EnumSet.of(Task.SORT);
 		} else {
@@ -99,5 +115,32 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	@Override
 	public int compareTo(final LazyListModelData<Q> arg) {
 		return sortValue.compareTo(arg.sortValue);
+	}
+
+	public void hide(final JQMLMapPool<Q> qmlModel) {
+		if (qmlData != null) {
+			qmlModel.release(qmlData);
+		}
+	}
+
+	public void show(final JQMLMapPool<Q> qmlModel, final int position, final Q positionKey) {
+		if (qmlData == null) {
+			qmlData = qmlModel.request();
+		}
+		final int oldPosition = Optional.ofNullable(localData.get(positionKey)).orElse(new JVariant(-1)).asInteger();
+
+		localData.put(positionKey, new JVariant(position));
+
+		if (oldPosition != position) {
+			needsFlush = true;
+		}
+	}
+
+	public void flush() {
+		if (needsFlush && qmlData != null) {
+			qmlData.clear();
+			qmlData.putAll(localData);
+			needsFlush = false;
+		}
 	}
 }

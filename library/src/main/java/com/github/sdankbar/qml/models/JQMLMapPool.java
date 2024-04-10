@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.IntFunction;
 
 import org.slf4j.Logger;
@@ -63,6 +64,26 @@ public class JQMLMapPool<K> {
 	public JQMLMapPool(final JQMLListModel<K> model, final ImmutableMap<K, JVariant> initialValue) {
 		this.model = Objects.requireNonNull(model, "model is null");
 		this.initialValue = Objects.requireNonNull(initialValue, "initialValue is null");
+	}
+
+	/**
+	 * Returns a value from the root value map.
+	 *
+	 * @param key Key of the value to return.
+	 * @return The key's value or Optional.empty().
+	 */
+	public Optional<JVariant> getRootValue(final String key) {
+		return model.getRootValue(key);
+	}
+
+	/**
+	 * Puts a value in the root value map.
+	 *
+	 * @param key  The value's key
+	 * @param data The new value.
+	 */
+	public void putRootValue(final String key, final JVariant data) {
+		model.putRootValue(key, data);
 	}
 
 	private void allocate(final int newSize) {
