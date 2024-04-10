@@ -22,6 +22,9 @@
  */
 package com.github.sdankbar.examples.lazy_list;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.github.sdankbar.qml.JQMLApplication;
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.eventing.NullEventFactory;
@@ -36,7 +39,7 @@ import com.google.common.collect.ImmutableMap;
 public class App {
 
 	public enum ListRole {
-		pos, text
+		pos, text, text1, text2, text3, text4, text5, text6;
 	}
 
 	/**
@@ -49,12 +52,23 @@ public class App {
 				app.getInvokableDispatcher(), "lazy_model", ListRole.class, 40, 600,
 				ImmutableMap.of(ListRole.pos, new JVariant(-100), ListRole.text, new JVariant("UNINITIALIZED")));
 
-		for (int i = 0; i < 20; ++i) {
-			model.upsert(Integer.toString(i),
-					ImmutableMap.of(ListRole.text, new JVariant("Test " + Integer.toString(i))));
+		final long s = System.currentTimeMillis();
+		final Map<String, ImmutableMap<ListRole, JVariant>> dataMap = new LinkedHashMap<>();
+		for (int i = 0; i < 20000; ++i) {
+			final ImmutableMap.Builder<ListRole, JVariant> b = ImmutableMap.builder();
+			b.put(ListRole.text, new JVariant("Test " + Integer.toString(i)));
+			b.put(ListRole.text1, new JVariant("Test " + Integer.toString(2 * i)));
+			b.put(ListRole.text2, new JVariant("Test " + Integer.toString(3 * i)));
+			b.put(ListRole.text3, new JVariant("Test " + Integer.toString(4 * i)));
+			b.put(ListRole.text4, new JVariant("Test " + Integer.toString(5 * i)));
+			b.put(ListRole.text5, new JVariant("Test " + Integer.toString(6 * i)));
+			b.put(ListRole.text6, new JVariant("Test " + Integer.toString(7 * i)));
+			dataMap.put(Integer.toString(i), b.build());
 		}
+		model.upsertAll(dataMap);
+		System.out.println("Took " + (System.currentTimeMillis() - s));
 
-		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
+		app.loadQMLFile("./src/main/qml/main.qml");
 
 		app.execute();
 	}

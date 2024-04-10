@@ -54,15 +54,37 @@ Window {
             model: lazy_model
 
             delegate: Rectangle {
-                width: 50
+                width: 700
                 height: 40
                 x: 0
                 y: model.pos || model.pos === 0 ? model.pos : -1
                 visible: y >= 0
                 border.color: "black"
-                Text {
+
+                Row{
+                    spacing: 30
                     anchors.fill: parent
-                    text: model.text ? model.text : ""
+                    Text {
+                        text: model.text ? model.text : ""
+                    }
+                    Text {
+                        text: model.text1 ? model.text1 : ""
+                    }
+                    Text {
+                        text: model.text2 ? model.text2 : ""
+                    }
+                    Text {
+                        text: model.text3 ? model.text3 : ""
+                    }
+                    Text {
+                        text: model.text4 ? model.text4 : ""
+                    }
+                    Text {
+                        text: model.text5 ? model.text5 : ""
+                    }
+                    Text {
+                        text: model.text6 ? model.text6 : ""
+                    }
                 }
             }
         }

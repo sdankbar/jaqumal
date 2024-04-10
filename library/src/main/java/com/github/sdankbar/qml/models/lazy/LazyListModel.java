@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -147,13 +148,18 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		}
 	}
 
+	private int getTotalSize() {
+		int totalSize = 0;
+		for (final LazyListModelData<Q> entry : sortedValues) {
+			totalSize += entry.getItemSize();
+		}
+		return totalSize;
+	}
+
 	private void layout(final EnumSet<Task> tasks) {
 		if (tasks.contains(Task.LAYOUT)) {
 			final int oldSize = qmlModel.getRootValue(SIZE_KEY).orElse(JVariant.NULL_INT).asInteger();
-			int totalSize = 0;
-			for (final LazyListModelData<Q> entry : sortedValues) {
-				totalSize += entry.getItemSize();
-			}
+			final int totalSize = getTotalSize();
 
 			if (oldSize != totalSize) {
 				qmlModel.putRootValue(SIZE_KEY, new JVariant(totalSize));
@@ -187,8 +193,8 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	}
 
 	private void flush() {
-		for (final Map.Entry<K, LazyListModelData<Q>> entry : unsortedValues.entrySet()) {
-			entry.getValue().flush();
+		for (final LazyListModelData<Q> entry : sortedValues) {
+			entry.flush();
 		}
 	}
 
@@ -208,6 +214,33 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 
 		// Apply any filtering
 		if (d.applyFiltering(exclusionFunction)) {
+			tasks.add(Task.LAYOUT);
+		}
+
+		layout(tasks);
+		flush();
+	}
+
+	public void upsertAll(final Map<K, ImmutableMap<Q, JVariant>> values) {
+		final EnumSet<Task> tasks = EnumSet.noneOf(Task.class);
+		final List<LazyListModelData<Q>> modifiedData = new ArrayList<>(values.size());
+		for (final Entry<K, ImmutableMap<Q, JVariant>> entry : values.entrySet()) {
+			final LazyListModelData<Q> d = getData(entry.getKey(), tasks);
+			tasks.addAll(d.upsert(entry.getValue()));
+			modifiedData.add(d);
+		}
+
+		sort(tasks);
+
+		// Apply any filtering
+		boolean filterApplied = false;
+		for (final LazyListModelData<Q> d : modifiedData) {
+			if (d.applyFiltering(exclusionFunction)) {
+				filterApplied = true;
+			}
+		}
+
+		if (filterApplied) {
 			tasks.add(Task.LAYOUT);
 		}
 
@@ -235,6 +268,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		final LazyListModelData<Q> old = unsortedValues.remove(key);
 		if (old != null) {
 			// Not necessary to resort or filter when removing an entry
+			sortedValues.remove(old);
 			old.hide(qmlModel);
 			layout(EnumSet.of(Task.LAYOUT));
 			flush();
