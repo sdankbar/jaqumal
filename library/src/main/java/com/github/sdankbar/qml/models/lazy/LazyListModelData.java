@@ -129,9 +129,8 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 		}
 		final int oldPosition = Optional.ofNullable(localData.get(positionKey)).orElse(new JVariant(-1)).asInteger();
 
-		localData.put(positionKey, new JVariant(position));
-
 		if (oldPosition != position) {
+			localData.put(positionKey, new JVariant(position));
 			needsFlush = true;
 		}
 	}

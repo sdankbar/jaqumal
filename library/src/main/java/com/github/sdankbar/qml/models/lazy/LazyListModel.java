@@ -31,8 +31,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.github.sdankbar.qml.JInvokable;
 import com.github.sdankbar.qml.JQMLModelFactory;
 import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.invocation.InvokableDispatcher;
 import com.github.sdankbar.qml.models.AbstractJQMLMapModel.PutMode;
 import com.github.sdankbar.qml.models.JQMLMapPool;
 import com.google.common.base.Preconditions;
@@ -50,7 +52,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	}
 
 	private static boolean isBetween(final int v, final int l, final int h) {
-		return l <= v && v <= h;
+		return l <= v && v < h;
 	}
 
 	private static final String SIZE_KEY = "totalSize";
@@ -64,10 +66,10 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	private Predicate<Map<Q, JVariant>> exclusionFunction = null;
 	private final int defaultItemHeight;
 	private final int windowSizePixels;
-	private final int scrollPosition = 0;
+	private int scrollPosition = 0;
 
-	public LazyListModel(final JQMLModelFactory factory, final String modelName, final Class<Q> enumKeyClass,
-			final int defaultItemHeight, final int windowSizePixels) {
+	public LazyListModel(final JQMLModelFactory factory, final InvokableDispatcher dispatch, final String modelName,
+			final Class<Q> enumKeyClass, final int defaultItemHeight, final int windowSizePixels) {
 		Objects.requireNonNull(factory, "factory is null");
 		Objects.requireNonNull(enumKeyClass, "enumKeyClass is null");
 		positionKey = getKey(EnumSet.allOf(enumKeyClass), "pos");
@@ -79,6 +81,8 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 
 		Preconditions.checkArgument(windowSizePixels > 0, "windowSizePixels is <= 0");
 		this.windowSizePixels = windowSizePixels;
+
+		dispatch.registerInvokable(modelName + "_invoke", this);
 	}
 
 	public void setExclusionFunction(final Predicate<Map<Q, JVariant>> exclusionFunction) {
@@ -145,8 +149,8 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		if (tasks.contains(Task.LAYOUT)) {
 			final int oldSize = qmlModel.getRootValue(SIZE_KEY).orElse(JVariant.NULL_INT).asInteger();
 			int totalSize = 0;
-			for (final Map.Entry<K, LazyListModelData<Q>> entry : unsortedValues.entrySet()) {
-				totalSize += entry.getValue().getItemHeight();
+			for (final LazyListModelData<Q> entry : sortedValues) {
+				totalSize += entry.getItemHeight();
 			}
 
 			if (oldSize != totalSize) {
@@ -229,6 +233,15 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		if (old != null) {
 			// Not necessary to resort or filter when removing an entry
 			old.hide(qmlModel);
+			layout(EnumSet.of(Task.LAYOUT));
+			flush();
+		}
+	}
+
+	@JInvokable
+	public void setScrollPosition(final int scrollPosition) {
+		if (this.scrollPosition != scrollPosition) {
+			this.scrollPosition = scrollPosition;
 			layout(EnumSet.of(Task.LAYOUT));
 			flush();
 		}
