@@ -67,6 +67,22 @@ public class JQMLMapPool<K> {
 	}
 
 	/**
+	 * @return The number of items that can be requested without triggering an
+	 *         allocation.
+	 */
+	public int getAvailable() {
+		return (int) inUse.stream().filter(a -> !a.booleanValue()).count();
+	}
+
+	/**
+	 * @return Total number of items allocated. Allocated - available = number in
+	 *         use.
+	 */
+	public int getAllocated() {
+		return model.size();
+	}
+
+	/**
 	 * Returns a value from the root value map.
 	 *
 	 * @param key Key of the value to return.
@@ -171,5 +187,10 @@ public class JQMLMapPool<K> {
 	 */
 	public void setAllocationStrategy(final IntFunction<Integer> growthFunction) {
 		this.growthFunction = Objects.requireNonNull(growthFunction, "growthFunction is null");
+	}
+
+	@Override
+	public String toString() {
+		return model.toString();
 	}
 }

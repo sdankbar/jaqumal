@@ -39,12 +39,8 @@ Window {
         id: flickable
         anchors.fill: parent
         clip: true
+        boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: ScrollBar {
-            parent: flickable.parent
-            anchors.top: flickable.top
-            anchors.left: flickable.right
-            anchors.bottom: flickable.bottom
-            policy: ScrollBar.AlwaysOn
         }
         contentHeight: lazy_model.root.totalSize
         onContentYChanged: {
@@ -61,12 +57,12 @@ Window {
                 width: 50
                 height: 40
                 x: 0
-                y: model.pos !== -100 ? model.pos : -1
+                y: model.pos || model.pos === 0 ? model.pos : -1
                 visible: y >= 0
                 border.color: "black"
                 Text {
                     anchors.fill: parent
-                    text: model.text !== "UNINITIALIZED" ? model.text : ""
+                    text: model.text ? model.text : ""
                 }
             }
         }

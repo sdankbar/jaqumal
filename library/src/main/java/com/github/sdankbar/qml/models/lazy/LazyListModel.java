@@ -67,7 +67,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	private final int defaultItemHeight;
 	private final int windowSizePixels;
 	private int scrollPosition = 0;
-	private final int pixelBuffer = 200;
+	private final int pixelBuffer = 0;
 
 	public LazyListModel(final JQMLModelFactory factory, final InvokableDispatcher dispatch, final String modelName,
 			final Class<Q> enumKeyClass, final int defaultItemHeight, final int windowSizePixels,
@@ -75,7 +75,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		Objects.requireNonNull(factory, "factory is null");
 		Objects.requireNonNull(enumKeyClass, "enumKeyClass is null");
 		positionKey = getKey(EnumSet.allOf(enumKeyClass), "pos");
-		this.qmlModel = new JQMLMapPool(factory.createListModel(modelName, enumKeyClass, PutMode.RETURN_NULL),
+		this.qmlModel = new JQMLMapPool<>(factory.createListModel(modelName, enumKeyClass, PutMode.RETURN_NULL),
 				defaultValues);
 		Preconditions.checkArgument(defaultItemHeight > 0, "defaultItemHeight is <= 0");
 		this.defaultItemHeight = defaultItemHeight;
@@ -152,7 +152,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 			final int oldSize = qmlModel.getRootValue(SIZE_KEY).orElse(JVariant.NULL_INT).asInteger();
 			int totalSize = 0;
 			for (final LazyListModelData<Q> entry : sortedValues) {
-				totalSize += entry.getItemHeight();
+				totalSize += entry.getItemSize();
 			}
 
 			if (oldSize != totalSize) {
@@ -162,26 +162,26 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 			// Perform hide and visible in 2 passes to minimize memory usage
 			int currentPosition = 0;
 			for (final LazyListModelData<Q> entry : sortedValues) {
-				final int itemEnd = currentPosition + entry.getItemHeight();
+				final int itemEnd = currentPosition + entry.getItemSize();
 				final boolean isVisible = isItemVisible(currentPosition, itemEnd);
 
 				if (!isVisible) {
 					entry.hide(qmlModel);
 				}
 
-				currentPosition += entry.getItemHeight();
+				currentPosition += entry.getItemSize();
 			}
 
 			currentPosition = 0;
 			for (final LazyListModelData<Q> entry : sortedValues) {
-				final int itemEnd = currentPosition + entry.getItemHeight();
+				final int itemEnd = currentPosition + entry.getItemSize();
 				final boolean isVisible = isItemVisible(currentPosition, itemEnd);
 
 				if (isVisible) {
 					entry.show(qmlModel, currentPosition, positionKey);
 				}
 
-				currentPosition += entry.getItemHeight();
+				currentPosition += entry.getItemSize();
 			}
 		}
 	}

@@ -27,7 +27,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.github.sdankbar.qml.JVariant;
@@ -36,30 +35,31 @@ import com.google.common.collect.ImmutableMap;
 
 class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	private static long NEXT_INDEX = 0;
+	private static final JVariant UNINITIALIZED_POS = new JVariant(-1);
 
 	private final Map<Q, JVariant> localData = new HashMap<>();
 	private Map<Q, JVariant> qmlData = null;
 	private final long index = ++NEXT_INDEX;
 	private JVariant sortValue;
 	private boolean isExcluded = false;
-	private final int itemHeight;
+	private final int itemSize;
 	private boolean needsFlush = false;
 
 	private Q sortingKey;
 	private final Predicate<Map<Q, JVariant>> filterFunction = null;
 
-	public LazyListModelData(final Q sortingKey, final int itemHeight) {
+	public LazyListModelData(final Q sortingKey, final int itemSize) {
 		this.sortingKey = sortingKey;
 		if (sortingKey == null) {
 			sortValue = new JVariant(index);
 		} else {
 			sortValue = localData.get(sortingKey);
 		}
-		this.itemHeight = itemHeight;
+		this.itemSize = itemSize;
 	}
 
-	public int getItemHeight() {
-		return itemHeight;
+	public int getItemSize() {
+		return itemSize;
 	}
 
 	public Map<Q, JVariant> getData() {
@@ -120,15 +120,17 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	public void hide(final JQMLMapPool<Q> qmlModel) {
 		if (qmlData != null) {
 			qmlModel.release(qmlData);
+			qmlData = null;
 		}
 	}
 
 	public void show(final JQMLMapPool<Q> qmlModel, final int position, final Q positionKey) {
 		if (qmlData == null) {
 			qmlData = qmlModel.request();
+			needsFlush = true;
 		}
-		final int oldPosition = Optional.ofNullable(localData.get(positionKey)).orElse(new JVariant(-1)).asInteger();
 
+		final int oldPosition = localData.getOrDefault(positionKey, UNINITIALIZED_POS).asInteger();
 		if (oldPosition != position) {
 			localData.put(positionKey, new JVariant(position));
 			needsFlush = true;
