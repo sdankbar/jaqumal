@@ -46,9 +46,10 @@ public class App {
 	public static void main(final String[] args) throws Exception {
 		final JQMLApplication<NullEventProcessor> app = JQMLApplication.create(args, new NullEventFactory<>());
 		final LazyListModel<String, ListRole> model = new LazyListModel<>(app.getModelFactory(),
-				app.getInvokableDispatcher(), "lazy_model", ListRole.class, 40, 600);
+				app.getInvokableDispatcher(), "lazy_model", ListRole.class, 40, 600,
+				ImmutableMap.of(ListRole.pos, new JVariant(-100), ListRole.text, new JVariant("UNINITIALIZED")));
 
-		for (int i = 0; i < 1000; ++i) {
+		for (int i = 0; i < 20; ++i) {
 			model.upsert(Integer.toString(i),
 					ImmutableMap.of(ListRole.text, new JVariant("Test " + Integer.toString(i))));
 		}

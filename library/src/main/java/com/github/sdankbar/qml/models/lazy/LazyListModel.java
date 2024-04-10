@@ -67,14 +67,16 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	private final int defaultItemHeight;
 	private final int windowSizePixels;
 	private int scrollPosition = 0;
+	private final int pixelBuffer = 200;
 
 	public LazyListModel(final JQMLModelFactory factory, final InvokableDispatcher dispatch, final String modelName,
-			final Class<Q> enumKeyClass, final int defaultItemHeight, final int windowSizePixels) {
+			final Class<Q> enumKeyClass, final int defaultItemHeight, final int windowSizePixels,
+			final ImmutableMap<Q, JVariant> defaultValues) {
 		Objects.requireNonNull(factory, "factory is null");
 		Objects.requireNonNull(enumKeyClass, "enumKeyClass is null");
 		positionKey = getKey(EnumSet.allOf(enumKeyClass), "pos");
 		this.qmlModel = new JQMLMapPool(factory.createListModel(modelName, enumKeyClass, PutMode.RETURN_NULL),
-				ImmutableMap.of(positionKey, new JVariant(-1)));
+				defaultValues);
 		Preconditions.checkArgument(defaultItemHeight > 0, "defaultItemHeight is <= 0");
 		this.defaultItemHeight = defaultItemHeight;
 		qmlModel.putRootValue(SIZE_KEY, JVariant.NULL_INT);
@@ -192,7 +194,8 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 
 	private boolean isItemVisible(final int currentPosition, final int itemEnd) {
 		final int windowEnd = scrollPosition + windowSizePixels;
-		return isBetween(currentPosition, scrollPosition, windowEnd) || isBetween(itemEnd, scrollPosition, windowEnd)
+		return isBetween(currentPosition, scrollPosition - pixelBuffer, windowEnd + pixelBuffer)
+				|| isBetween(itemEnd, scrollPosition - pixelBuffer, windowEnd + pixelBuffer)
 				|| isBetween(scrollPosition, currentPosition, itemEnd);
 	}
 

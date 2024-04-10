@@ -61,12 +61,12 @@ Window {
                 width: 50
                 height: 40
                 x: 0
-                y: model.pos ? model.pos : -1
-                visible: model.pos ? model.pos >= 0 : false
+                y: model.pos !== -100 ? model.pos : -1
+                visible: y >= 0
                 border.color: "black"
                 Text {
                     anchors.fill: parent
-                    text: model.text ? model.text : ""
+                    text: model.text !== "UNINITIALIZED" ? model.text : ""
                 }
             }
         }
