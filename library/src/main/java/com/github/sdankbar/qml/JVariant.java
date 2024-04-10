@@ -37,6 +37,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,7 +76,7 @@ import com.google.common.collect.ImmutableList;
  * strings are stored in UTF-8. For more details and for how complex types line
  * Point2D are stored, see the documentation for Type.
  */
-public class JVariant {
+public class JVariant implements Comparable<JVariant> {
 
 	/**
 	 * Interface that custom types must implement to be stored inside JVariant.
@@ -1892,6 +1893,100 @@ public class JVariant {
 			array.put(b);
 		}
 		return array;
+	}
+
+	@Override
+	public int compareTo(final JVariant arg) {
+		Objects.requireNonNull(arg, "arg is null");
+		if (type == arg.type) {
+			switch (type) {
+			case BOOL: {
+				return Boolean.compare(asBoolean(), arg.asBoolean());
+			}
+			case BYTE_ARRAY: {
+				return Arrays.compare(asByteArray(), arg.asByteArray());
+			}
+			case COLOR: {
+				return Integer.compare(asColor().getRGB(), arg.asColor().getRGB());
+			}
+			case DATE_TIME: {
+				return asDateTime().compareTo(arg.asDateTime());
+			}
+			case DOUBLE: {
+				return Double.compare(asDouble(), arg.asDouble());
+			}
+			case FLOAT: {
+				return Float.compare(asFloat(), arg.asFloat());
+			}
+			case IMAGE: {
+				return Arrays.compare(bufferedImageToArray(asImage()), bufferedImageToArray(arg.asImage()));
+			}
+			case INT: {
+				return Integer.compare(asInteger(), arg.asInteger());
+			}
+			case LINE: {
+				// TODO how to compare lines?
+				return 0;
+			}
+			case LONG: {
+				return Long.compare(asLong(), arg.asLong());
+			}
+			case POINT: {
+				// TODO how to compare
+				return 0;
+			}
+			case POINT_REAL: {
+				// TODO how to compare
+				return 0;
+			}
+			case RECTANGLE: {
+				// TODO how to compare
+				return 0;
+			}
+			case RECTANGLE_REAL: {
+				// TODO how to compare
+				return 0;
+			}
+			case REGULAR_EXPRESSION: {
+				return asRegularExpression().pattern().compareTo(arg.asRegularExpression().pattern());
+			}
+			case SIZE: {
+				// TODO how to compare
+				return 0;
+			}
+			case STRING: {
+				return asString().compareTo(arg.asString());
+			}
+			case URL: {
+				return asURL().toExternalForm().compareTo(arg.asURL().toExternalForm());
+			}
+			case UUID: {
+				return asUUID().toString().compareTo(arg.asUUID().toString());
+			}
+			case FONT: {
+				// TODO how to compare fonts
+				return Integer.compare(asFont().getFontIndex(), arg.asFont().getFontIndex());
+			}
+			case POLYLINE: {
+				// TODO how to compare
+				return 0;
+			}
+			case PAINTER_INSTRUCTIONS: {
+				// TODO how to compare
+				return 0;
+			}
+			case CUSTOM: {
+				// TODO how to compare
+				return 0;
+			}
+			default: {
+				logger.error("Unkonwn type {}", type);
+				throw new IllegalStateException("Unkonwn type " + type);
+			}
+			}// end switch
+		} else {
+			return type.compareTo(arg.type);
+		}
 	}
 
 }

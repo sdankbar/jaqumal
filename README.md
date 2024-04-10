@@ -137,6 +137,3 @@ Provides an example of a basic application that uses a singleton model and the J
 
 Provides an example of defining new Event types and sending and receiving those event to update a list model.
 
-# Future Work
-
-* Java enums available in QML
