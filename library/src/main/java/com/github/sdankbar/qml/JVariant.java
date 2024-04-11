@@ -38,6 +38,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -267,6 +268,31 @@ public class JVariant implements Comparable<JVariant> {
 	 * Immutable JVariant containing false.
 	 */
 	public static final JVariant FALSE = new JVariant(false);
+
+	private static final Comparator<Line2D> LINE_COMPARATOR = Comparator.comparingDouble((final Line2D l) -> l.getX1())
+			.thenComparingDouble((final Line2D l) -> l.getX2()).thenComparingDouble((final Line2D l) -> l.getY1())
+			.thenComparingDouble((final Line2D l) -> l.getY2());
+
+	private static final Comparator<JPoint> POINT_COMPARATOR = Comparator.comparingInt((final JPoint l) -> l.x())
+			.thenComparingInt((final JPoint l) -> l.y());
+
+	private static final Comparator<JPointReal> REAL_POINT_COMPARATOR = Comparator
+			.comparingDouble((final JPointReal l) -> l.x()).thenComparingDouble((final JPointReal l) -> l.y());
+
+	private static final Comparator<Point2D> POINT2D_COMPARATOR = Comparator
+			.comparingDouble((final Point2D l) -> l.getX()).thenComparingDouble((final Point2D l) -> l.getY());
+
+	private static final Comparator<JRect> RECT_COMPARATOR = Comparator.comparingInt((final JRect l) -> l.x())
+			.thenComparingInt((final JRect l) -> l.y()).thenComparingInt((final JRect l) -> l.width())
+			.thenComparingInt((final JRect l) -> l.height());
+
+	private static final Comparator<JRectReal> REAL_RECT_COMPARATOR = Comparator
+			.comparingDouble((final JRectReal l) -> l.x()).thenComparingDouble((final JRectReal l) -> l.y())
+			.thenComparingDouble((final JRectReal l) -> l.width())
+			.thenComparingDouble((final JRectReal l) -> l.height());
+
+	private static final Comparator<Dimension> SIZE_COMPARATOR = Comparator.comparingInt((final Dimension l) -> l.width)
+			.thenComparingInt((final Dimension l) -> l.height);
 
 	// Used by JNI
 	@SuppressWarnings("unused")
@@ -1925,34 +1951,28 @@ public class JVariant implements Comparable<JVariant> {
 				return Integer.compare(asInteger(), arg.asInteger());
 			}
 			case LINE: {
-				// TODO how to compare lines?
-				return 0;
+				return LINE_COMPARATOR.compare(asLine(), arg.asLine());
 			}
 			case LONG: {
 				return Long.compare(asLong(), arg.asLong());
 			}
 			case POINT: {
-				// TODO how to compare
-				return 0;
+				return POINT_COMPARATOR.compare(asJPoint(), arg.asJPoint());
 			}
 			case POINT_REAL: {
-				// TODO how to compare
-				return 0;
+				return REAL_POINT_COMPARATOR.compare(asJPointReal(), arg.asJPointReal());
 			}
 			case RECTANGLE: {
-				// TODO how to compare
-				return 0;
+				return RECT_COMPARATOR.compare(asJRect(), arg.asJRect());
 			}
 			case RECTANGLE_REAL: {
-				// TODO how to compare
-				return 0;
+				return REAL_RECT_COMPARATOR.compare(asJRectReal(), arg.asJRectReal());
 			}
 			case REGULAR_EXPRESSION: {
 				return asRegularExpression().pattern().compareTo(arg.asRegularExpression().pattern());
 			}
 			case SIZE: {
-				// TODO how to compare
-				return 0;
+				return SIZE_COMPARATOR.compare(asSize(), arg.asSize());
 			}
 			case STRING: {
 				return asString().compareTo(arg.asString());
@@ -1964,20 +1984,30 @@ public class JVariant implements Comparable<JVariant> {
 				return asUUID().toString().compareTo(arg.asUUID().toString());
 			}
 			case FONT: {
-				// TODO how to compare fonts
 				return Integer.compare(asFont().getFontIndex(), arg.asFont().getFontIndex());
 			}
 			case POLYLINE: {
-				// TODO how to compare
-				return 0;
+				final ImmutableList<Point2D> thisLine = asPolyline();
+				final ImmutableList<Point2D> argLine = arg.asPolyline();
+				final int lengthComp = Integer.compare(thisLine.size(), argLine.size());
+				if (lengthComp == 0) {
+					for (int i = 0; i < thisLine.size(); ++i) {
+						final int pComp = POINT2D_COMPARATOR.compare(thisLine.get(i), argLine.get(i));
+						if (pComp != 0) {
+							return pComp;
+						}
+					}
+					return 0;
+				} else {
+					return lengthComp;
+				}
 			}
 			case PAINTER_INSTRUCTIONS: {
-				// TODO how to compare
-				return 0;
+				return Arrays.compare(asPainterInstructions().getArray(), arg.asPainterInstructions().getArray());
 			}
 			case CUSTOM: {
-				// TODO how to compare
-				return 0;
+				logger.error("Custom type {} is not known how to compare", type);
+				throw new IllegalStateException("Comparing on custom type " + type + " is not supported");
 			}
 			default: {
 				logger.error("Unkonwn type {}", type);
