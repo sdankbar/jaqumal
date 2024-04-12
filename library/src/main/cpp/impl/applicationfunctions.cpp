@@ -50,6 +50,7 @@
 #include <jdevelopmenttools.h>
 
 #include "qmlimageprovider.h"
+#include "qmldatatransfer.h"
 #include <QQmlContext>
 #include <QResource>
 #include <QQuickWindow>
@@ -367,6 +368,20 @@ JNICALL void saveScreenshot(JNIEnv* env, jclass, jstring path)
     }
 }
 
+JNICALL jobject renderPainterInstructionsToImage(JNIEnv* env, jint length, jbyteArray data, jint w, jint h)
+{
+    jbyte* array = env->GetByteArrayElements(data, NULL);
+
+    unsigned char* copy = new unsigned char[length];
+    memcpy(copy, array, length);
+    PainterInstructions instr(length, copy);
+    QImage ret = instr.toImage(w, h);
+
+    env->ReleaseByteArrayElements(data, array, JNI_ABORT);
+
+    return QMLDataTransfer::toJVariant(env, ret);
+}
+
 void ApplicationFunctions::create(int* argc, char** argv)
 {
     qmlRegisterType<EventBuilder>("com.github.sdankbar.jaqumal", 0, 4, "EventBuilder");
@@ -506,6 +521,7 @@ void ApplicationFunctions::initialize(JNIEnv* env)
         JNIUtilities::createJNIMethod("injectKeyPressIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyPressIntoApplication),
         JNIUtilities::createJNIMethod("injectKeyReleaseIntoApplication", "(IILjava/lang/String;ZI)V", (void *)&injectKeyReleaseIntoApplication),
         JNIUtilities::createJNIMethod("saveScreenshot", "(Ljava/lang/String;)V", (void *)&saveScreenshot),
+        JNIUtilities::createJNIMethod("renderPainterInstructionsToImage", "(I[BII)Lcom/github/sdankbar/qml/JVariant;", (void *)&renderPainterInstructionsToImage),
     };
     jclass javaClass = env->FindClass("com/github/sdankbar/qml/cpp/jni/ApplicationFunctions");
     env->RegisterNatives(javaClass, methods, sizeof(methods) / sizeof(methods[0]));

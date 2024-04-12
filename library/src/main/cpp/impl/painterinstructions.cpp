@@ -663,3 +663,11 @@ jbyteArray PainterInstructions::cloneIntoJavaArray(JNIEnv* env) const
     env->ReleaseByteArrayElements(javaObject, mem, 0);
     return javaObject;
 }
+
+QImage PainterInstructions::toImage(int32_t width, int32_t height)
+{
+    QImage ret(width, height, QImage::Format_ARGB32);
+    QPainter painter(&ret);
+    paint(painter);
+    return ret;
+}

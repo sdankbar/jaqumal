@@ -22,8 +22,12 @@
  */
 package com.github.sdankbar.qml.painting;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Objects;
+
+import com.github.sdankbar.qml.JVariant;
+import com.github.sdankbar.qml.cpp.jni.ApplicationFunctions;
 
 public class PainterInstructions {
 
@@ -87,6 +91,15 @@ public class PainterInstructions {
 
 	public byte[] getArray() {
 		return data;
+	}
+
+	public BufferedImage render(final int width, final int height) {
+		final JVariant ret = ApplicationFunctions.renderPainterInstructionsToImage(data.length, data, width, height);
+		if (ret != null) {
+			return ret.asImage(null);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
