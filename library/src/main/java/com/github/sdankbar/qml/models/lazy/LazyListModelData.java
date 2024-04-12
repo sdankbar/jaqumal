@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 
 import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.models.JQMLMapPool;
+import com.github.sdankbar.qml.models.lazy.LazyListModel.SortDirection;
 import com.google.common.collect.ImmutableMap;
 
 class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
@@ -41,6 +42,7 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	private Map<Q, JVariant> qmlData = null;
 	private final long index = ++NEXT_INDEX;
 	private JVariant sortValue;
+	private SortDirection sortDirection;
 	private boolean isExcluded = false;
 	private final int itemSize;
 	private boolean needsFlush = false;
@@ -48,13 +50,14 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	private Q sortingKey;
 	private final Predicate<Map<Q, JVariant>> filterFunction = null;
 
-	public LazyListModelData(final Q sortingKey, final int itemSize) {
+	public LazyListModelData(final Q sortingKey, final SortDirection direction, final int itemSize) {
 		this.sortingKey = sortingKey;
 		if (sortingKey == null) {
 			sortValue = new JVariant(index);
 		} else {
 			sortValue = localData.get(sortingKey);
 		}
+		sortDirection = Objects.requireNonNull(direction, "direction is null");
 		this.itemSize = itemSize;
 	}
 
@@ -80,7 +83,7 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	 * @param sortingKey
 	 * @return True if the sorting value changed.
 	 */
-	public boolean updateSortingValue(final Q sortingKey) {
+	public boolean updateSortingValue(final Q sortingKey, final SortDirection direction) {
 		this.sortingKey = sortingKey;
 		final JVariant oldSort = sortValue;
 		if (sortingKey == null) {
@@ -88,13 +91,14 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 		} else {
 			sortValue = localData.get(sortingKey);
 		}
+		sortDirection = direction;
 		return !Objects.equals(oldSort, sortValue);
 	}
 
 	public EnumSet<Task> upsert(final ImmutableMap<Q, JVariant> map) {
 		needsFlush = true;
 		localData.putAll(map);
-		if (updateSortingValue(sortingKey)) {
+		if (updateSortingValue(sortingKey, sortDirection)) {
 			return EnumSet.of(Task.SORT);
 		} else {
 			return EnumSet.noneOf(Task.class);
@@ -105,7 +109,7 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 		needsFlush = true;
 		localData.clear();
 		localData.putAll(map);
-		if (updateSortingValue(sortingKey)) {
+		if (updateSortingValue(sortingKey, sortDirection)) {
 			return EnumSet.of(Task.SORT);
 		} else {
 			return EnumSet.noneOf(Task.class);
@@ -114,7 +118,11 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 
 	@Override
 	public int compareTo(final LazyListModelData<Q> arg) {
-		return sortValue.compareTo(arg.sortValue);
+		if (sortDirection == SortDirection.ASCENDING) {
+			return sortValue.compareTo(arg.sortValue);
+		} else {
+			return -sortValue.compareTo(arg.sortValue);
+		}
 	}
 
 	public void hide(final JQMLMapPool<Q> qmlModel) {

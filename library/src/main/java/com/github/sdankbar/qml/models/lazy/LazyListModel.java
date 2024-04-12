@@ -43,6 +43,10 @@ import com.google.common.collect.ImmutableMap;
 
 public class LazyListModel<K, Q extends Enum<Q>> {
 
+	public enum SortDirection {
+		ASCENDING, DESCENDING;
+	}
+
 	private static <K> K getKey(final Set<K> keys, final String keyName) {
 		for (final K v : keys) {
 			if (v.toString().equals(keyName)) {
@@ -64,6 +68,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 
 	private final Q positionKey;
 	private Q sortingKey = null;
+	private SortDirection sortDirection = SortDirection.ASCENDING;
 	private Predicate<Map<Q, JVariant>> exclusionFunction = null;
 	private final int defaultItemHeight;
 	private final int windowSizePixels;
@@ -104,12 +109,13 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		}
 	}
 
-	public void setSortingKey(final Q sortingKey) {
+	public void setSortingKey(final Q sortingKey, final SortDirection direction) {
 		this.sortingKey = sortingKey;
+		this.sortDirection = Objects.requireNonNull(direction, "direction is null");
 
 		boolean needsSort = false;
 		for (final Map.Entry<K, LazyListModelData<Q>> entry : unsortedValues.entrySet()) {
-			if (entry.getValue().updateSortingValue(sortingKey)) {
+			if (entry.getValue().updateSortingValue(sortingKey, sortDirection)) {
 				needsSort = true;
 			}
 		}
@@ -126,7 +132,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		if (d == null) {
 			tasks.add(Task.LAYOUT);
 			tasks.add(Task.SORT);
-			d = new LazyListModelData<>(sortingKey, defaultItemHeight);
+			d = new LazyListModelData<>(sortingKey, sortDirection, defaultItemHeight);
 			unsortedValues.put(key, d);
 			sortedValues.add(d);
 		}
@@ -156,14 +162,18 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		return totalSize;
 	}
 
+	private void updateTotalSize() {
+		final int oldSize = qmlModel.getRootValue(SIZE_KEY).orElse(JVariant.NULL_INT).asInteger();
+		final int totalSize = getTotalSize();
+
+		if (oldSize != totalSize) {
+			qmlModel.putRootValue(SIZE_KEY, new JVariant(totalSize));
+		}
+	}
+
 	private void layout(final EnumSet<Task> tasks) {
 		if (tasks.contains(Task.LAYOUT)) {
-			final int oldSize = qmlModel.getRootValue(SIZE_KEY).orElse(JVariant.NULL_INT).asInteger();
-			final int totalSize = getTotalSize();
-
-			if (oldSize != totalSize) {
-				qmlModel.putRootValue(SIZE_KEY, new JVariant(totalSize));
-			}
+			updateTotalSize();
 
 			// Perform hide and visible in 2 passes to minimize memory usage
 			int currentPosition = 0;
@@ -273,6 +283,15 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 			layout(EnumSet.of(Task.LAYOUT));
 			flush();
 		}
+	}
+
+	public void clear() {
+		for (final LazyListModelData<Q> d : sortedValues) {
+			d.hide(qmlModel);
+		}
+		unsortedValues.clear();
+		sortedValues.clear();
+		updateTotalSize();
 	}
 
 	@JInvokable
