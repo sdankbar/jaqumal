@@ -368,15 +368,13 @@ JNICALL void saveScreenshot(JNIEnv* env, jclass, jstring path)
     }
 }
 
-JNICALL jobject renderPainterInstructionsToImage(JNIEnv* env, jint length, jbyteArray data, jint w, jint h)
+JNICALL jobject renderPainterInstructionsToImage(JNIEnv* env, jclass, jint length, jbyteArray data, jint w, jint h)
 {
     jbyte* array = env->GetByteArrayElements(data, NULL);
-
     unsigned char* copy = new unsigned char[length];
     memcpy(copy, array, length);
     PainterInstructions instr(length, copy);
     QImage ret = instr.toImage(w, h);
-
     env->ReleaseByteArrayElements(data, array, JNI_ABORT);
 
     return QMLDataTransfer::toJVariant(env, ret);
