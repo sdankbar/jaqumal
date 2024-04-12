@@ -48,6 +48,7 @@ public class ResizableByteBuffer {
 			final int newSize = Math.max(minSize, 2 * b.capacity());
 			final ByteBuffer temp = ByteBuffer.allocate(newSize).order(ByteOrder.nativeOrder());
 			System.arraycopy(b.array(), 0, temp.array(), 0, b.capacity());
+			temp.position(b.position());
 			b = temp;
 		}
 	}

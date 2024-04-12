@@ -35,9 +35,22 @@ Window {
     title: qsTr("Painter")
     id: mainWindow
 
-   
+
     Painter {
-       anchors.fill: parent
-       instructions: drawModel.drawable
+        anchors.fill: parent
+        instructions: drawModel.drawable
+    }
+    
+    Painter {
+        anchors.fill: parent
+        anchors.leftMargin: 200
+        instructions: drawModel.drawable2
+    }
+    
+    Image {
+        y: 200
+        width: 300
+        height: 300
+        source: "image://imageGetter/example"
     }
 }
