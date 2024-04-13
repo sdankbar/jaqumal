@@ -157,7 +157,9 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	private int getTotalSize() {
 		int totalSize = 0;
 		for (final LazyListModelData<Q> entry : sortedValues) {
-			totalSize += entry.getItemSize();
+			if (!entry.isExcluded()) {
+				totalSize += entry.getItemSize();
+			}
 		}
 		return totalSize;
 	}
@@ -178,26 +180,30 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 			// Perform hide and visible in 2 passes to minimize memory usage
 			int currentPosition = 0;
 			for (final LazyListModelData<Q> entry : sortedValues) {
-				final int itemEnd = currentPosition + entry.getItemSize();
-				final boolean isVisible = isItemVisible(currentPosition, itemEnd);
+				if (!entry.isExcluded()) {
+					final int itemEnd = currentPosition + entry.getItemSize();
+					final boolean isVisible = isItemVisible(currentPosition, itemEnd);
 
-				if (!isVisible) {
-					entry.hide(qmlModel);
+					if (!isVisible) {
+						entry.hide(qmlModel);
+					}
+
+					currentPosition += entry.getItemSize();
 				}
-
-				currentPosition += entry.getItemSize();
 			}
 
 			currentPosition = 0;
 			for (final LazyListModelData<Q> entry : sortedValues) {
-				final int itemEnd = currentPosition + entry.getItemSize();
-				final boolean isVisible = isItemVisible(currentPosition, itemEnd);
+				if (!entry.isExcluded()) {
+					final int itemEnd = currentPosition + entry.getItemSize();
+					final boolean isVisible = isItemVisible(currentPosition, itemEnd);
 
-				if (isVisible) {
-					entry.show(qmlModel, currentPosition, positionKey);
+					if (isVisible) {
+						entry.show(qmlModel, currentPosition, positionKey);
+					}
+
+					currentPosition += entry.getItemSize();
 				}
-
-				currentPosition += entry.getItemSize();
 			}
 		}
 	}

@@ -48,7 +48,6 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	private boolean needsFlush = false;
 
 	private Q sortingKey;
-	private final Predicate<Map<Q, JVariant>> filterFunction = null;
 
 	public LazyListModelData(final Q sortingKey, final SortDirection direction, final int itemSize) {
 		this.sortingKey = sortingKey;
@@ -69,9 +68,13 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 		return localData;
 	}
 
+	public boolean isExcluded() {
+		return isExcluded;
+	}
+
 	public boolean applyFiltering(final Predicate<Map<Q, JVariant>> excludeFunction) {
 		final boolean oldExclusion = isExcluded;
-		if (filterFunction == null) {
+		if (excludeFunction == null) {
 			isExcluded = false;
 		} else {
 			isExcluded = excludeFunction.test(Collections.unmodifiableMap(localData));

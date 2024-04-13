@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableMap;
 public class App {
 
 	public enum ListRole {
-		pos, text, text1, text2, text3, text4, text5, text6;
+		pos, temp, text, text1, text2, text3, text4, text5, text6;
 	}
 
 	/**
@@ -52,10 +52,13 @@ public class App {
 				app.getInvokableDispatcher(), "lazy_model", ListRole.class, 40, 600,
 				ImmutableMap.of(ListRole.pos, new JVariant(-100), ListRole.text, new JVariant("UNINITIALIZED")));
 
+		model.setExclusionFunction(m -> (m.get(ListRole.temp).asInteger() % 3 == 0));
+
 		final long s = System.currentTimeMillis();
 		final Map<String, ImmutableMap<ListRole, JVariant>> dataMap = new LinkedHashMap<>();
 		for (int i = 0; i < 20000; ++i) {
 			final ImmutableMap.Builder<ListRole, JVariant> b = ImmutableMap.builder();
+			b.put(ListRole.temp, new JVariant(i));
 			b.put(ListRole.text, new JVariant("Test " + Integer.toString(i)));
 			b.put(ListRole.text1, new JVariant("Test " + Integer.toString(2 * i)));
 			b.put(ListRole.text2, new JVariant("Test " + Integer.toString(3 * i)));
