@@ -47,6 +47,10 @@ Window {
             lazy_model_invoke.addInteger(contentY)
             lazy_model_invoke.invoke("setScrollPosition")
         }
+        onHeightChanged: {
+            lazy_model_invoke.addInteger(height)
+            lazy_model_invoke.invoke("setWindowSize")
+        }
 
         Repeater {
             id: listView

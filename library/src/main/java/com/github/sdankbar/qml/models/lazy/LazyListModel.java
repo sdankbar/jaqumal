@@ -71,9 +71,9 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	private SortDirection sortDirection = SortDirection.ASCENDING;
 	private Predicate<Map<Q, JVariant>> exclusionFunction = null;
 	private final int defaultItemHeight;
-	private final int windowSizePixels;
+	private int windowSizePixels;
 	private int scrollPosition = 0;
-	private final int pixelBuffer = 0;
+	private int pixelBuffer = 0;
 
 	public LazyListModel(final JQMLModelFactory factory, final InvokableDispatcher dispatch, final String modelName,
 			final Class<Q> enumKeyClass, final int defaultItemHeight, final int windowSizePixels,
@@ -294,10 +294,27 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		updateTotalSize();
 	}
 
+	public void setPixelBuffer(final int bufferPixels) {
+		if (this.pixelBuffer != bufferPixels) {
+			this.pixelBuffer = bufferPixels;
+			layout(EnumSet.of(Task.LAYOUT));
+			flush();
+		}
+	}
+
 	@JInvokable
 	public void setScrollPosition(final int scrollPosition) {
 		if (this.scrollPosition != scrollPosition) {
 			this.scrollPosition = scrollPosition;
+			layout(EnumSet.of(Task.LAYOUT));
+			flush();
+		}
+	}
+
+	@JInvokable
+	public void setWindowSize(final int pixels) {
+		if (this.windowSizePixels != pixels) {
+			this.windowSizePixels = pixels;
 			layout(EnumSet.of(Task.LAYOUT));
 			flush();
 		}
