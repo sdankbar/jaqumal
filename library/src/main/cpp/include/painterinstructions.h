@@ -43,6 +43,8 @@ public:
 
     jbyteArray cloneIntoJavaArray(JNIEnv* env) const;
 
+    QImage toImage(int32_t width, int32_t height);
+
 private:
 
     enum PainterFunctions {

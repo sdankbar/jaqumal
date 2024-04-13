@@ -43,9 +43,12 @@ public class ResizableByteBuffer {
 
 	private void checkSize(final int increment) {
 		// 0 + 4 > 4
-		if ((b.position() + increment) > b.capacity()) {
-			final ByteBuffer temp = ByteBuffer.allocate(2 * b.capacity()).order(ByteOrder.nativeOrder());
+		final int minSize = b.position() + increment;
+		if (minSize > b.capacity()) {
+			final int newSize = Math.max(minSize, 2 * b.capacity());
+			final ByteBuffer temp = ByteBuffer.allocate(newSize).order(ByteOrder.nativeOrder());
 			System.arraycopy(b.array(), 0, temp.array(), 0, b.capacity());
+			temp.position(b.position());
 			b = temp;
 		}
 	}

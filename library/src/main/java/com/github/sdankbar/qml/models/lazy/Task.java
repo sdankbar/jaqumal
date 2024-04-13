@@ -1,4 +1,4 @@
-﻿/**
+/**
  * The MIT License
  * Copyright © 2020 Stephen Dankbar
  *
@@ -20,37 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import QtQuick 2.10
-import QtQuick.Window 2.10
-import QtQuick.Controls 6.5
-import QtQuick.Dialogs
-import com.github.sdankbar.jaqumal 0.4
+package com.github.sdankbar.qml.models.lazy;
 
-Window {
-    visible: true
-    width: 800
-    height: 600
-    x: 400
-    y: 400
-    title: qsTr("Painter")
-    id: mainWindow
-
-
-    Painter {
-        anchors.fill: parent
-        instructions: drawModel.drawable
-    }
-    
-    Painter {
-        anchors.fill: parent
-        anchors.leftMargin: 200
-        instructions: drawModel.drawable2
-    }
-    
-    Image {
-        y: 200
-        width: 300
-        height: 300
-        source: "image://imageGetter/example"
-    }
+enum Task {
+	SORT, LAYOUT;
 }

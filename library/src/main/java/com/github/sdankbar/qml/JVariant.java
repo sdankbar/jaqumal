@@ -37,6 +37,8 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,7 +77,7 @@ import com.google.common.collect.ImmutableList;
  * strings are stored in UTF-8. For more details and for how complex types line
  * Point2D are stored, see the documentation for Type.
  */
-public class JVariant {
+public class JVariant implements Comparable<JVariant> {
 
 	/**
 	 * Interface that custom types must implement to be stored inside JVariant.
@@ -266,6 +268,31 @@ public class JVariant {
 	 * Immutable JVariant containing false.
 	 */
 	public static final JVariant FALSE = new JVariant(false);
+
+	private static final Comparator<Line2D> LINE_COMPARATOR = Comparator.comparingDouble((final Line2D l) -> l.getX1())
+			.thenComparingDouble((final Line2D l) -> l.getX2()).thenComparingDouble((final Line2D l) -> l.getY1())
+			.thenComparingDouble((final Line2D l) -> l.getY2());
+
+	private static final Comparator<JPoint> POINT_COMPARATOR = Comparator.comparingInt((final JPoint l) -> l.x())
+			.thenComparingInt((final JPoint l) -> l.y());
+
+	private static final Comparator<JPointReal> REAL_POINT_COMPARATOR = Comparator
+			.comparingDouble((final JPointReal l) -> l.x()).thenComparingDouble((final JPointReal l) -> l.y());
+
+	private static final Comparator<Point2D> POINT2D_COMPARATOR = Comparator
+			.comparingDouble((final Point2D l) -> l.getX()).thenComparingDouble((final Point2D l) -> l.getY());
+
+	private static final Comparator<JRect> RECT_COMPARATOR = Comparator.comparingInt((final JRect l) -> l.x())
+			.thenComparingInt((final JRect l) -> l.y()).thenComparingInt((final JRect l) -> l.width())
+			.thenComparingInt((final JRect l) -> l.height());
+
+	private static final Comparator<JRectReal> REAL_RECT_COMPARATOR = Comparator
+			.comparingDouble((final JRectReal l) -> l.x()).thenComparingDouble((final JRectReal l) -> l.y())
+			.thenComparingDouble((final JRectReal l) -> l.width())
+			.thenComparingDouble((final JRectReal l) -> l.height());
+
+	private static final Comparator<Dimension> SIZE_COMPARATOR = Comparator.comparingInt((final Dimension l) -> l.width)
+			.thenComparingInt((final Dimension l) -> l.height);
 
 	// Used by JNI
 	@SuppressWarnings("unused")
@@ -1892,6 +1919,104 @@ public class JVariant {
 			array.put(b);
 		}
 		return array;
+	}
+
+	@Override
+	public int compareTo(final JVariant arg) {
+		Objects.requireNonNull(arg, "arg is null");
+		if (type == arg.type) {
+			switch (type) {
+			case BOOL: {
+				return Boolean.compare(asBoolean(), arg.asBoolean());
+			}
+			case BYTE_ARRAY: {
+				return Arrays.compare(asByteArray(), arg.asByteArray());
+			}
+			case COLOR: {
+				return Integer.compare(asColor().getRGB(), arg.asColor().getRGB());
+			}
+			case DATE_TIME: {
+				return asDateTime().compareTo(arg.asDateTime());
+			}
+			case DOUBLE: {
+				return Double.compare(asDouble(), arg.asDouble());
+			}
+			case FLOAT: {
+				return Float.compare(asFloat(), arg.asFloat());
+			}
+			case IMAGE: {
+				return Arrays.compare(bufferedImageToArray(asImage()), bufferedImageToArray(arg.asImage()));
+			}
+			case INT: {
+				return Integer.compare(asInteger(), arg.asInteger());
+			}
+			case LINE: {
+				return LINE_COMPARATOR.compare(asLine(), arg.asLine());
+			}
+			case LONG: {
+				return Long.compare(asLong(), arg.asLong());
+			}
+			case POINT: {
+				return POINT_COMPARATOR.compare(asJPoint(), arg.asJPoint());
+			}
+			case POINT_REAL: {
+				return REAL_POINT_COMPARATOR.compare(asJPointReal(), arg.asJPointReal());
+			}
+			case RECTANGLE: {
+				return RECT_COMPARATOR.compare(asJRect(), arg.asJRect());
+			}
+			case RECTANGLE_REAL: {
+				return REAL_RECT_COMPARATOR.compare(asJRectReal(), arg.asJRectReal());
+			}
+			case REGULAR_EXPRESSION: {
+				return asRegularExpression().pattern().compareTo(arg.asRegularExpression().pattern());
+			}
+			case SIZE: {
+				return SIZE_COMPARATOR.compare(asSize(), arg.asSize());
+			}
+			case STRING: {
+				return asString().compareTo(arg.asString());
+			}
+			case URL: {
+				return asURL().toExternalForm().compareTo(arg.asURL().toExternalForm());
+			}
+			case UUID: {
+				return asUUID().toString().compareTo(arg.asUUID().toString());
+			}
+			case FONT: {
+				return Integer.compare(asFont().getFontIndex(), arg.asFont().getFontIndex());
+			}
+			case POLYLINE: {
+				final ImmutableList<Point2D> thisLine = asPolyline();
+				final ImmutableList<Point2D> argLine = arg.asPolyline();
+				final int lengthComp = Integer.compare(thisLine.size(), argLine.size());
+				if (lengthComp == 0) {
+					for (int i = 0; i < thisLine.size(); ++i) {
+						final int pComp = POINT2D_COMPARATOR.compare(thisLine.get(i), argLine.get(i));
+						if (pComp != 0) {
+							return pComp;
+						}
+					}
+					return 0;
+				} else {
+					return lengthComp;
+				}
+			}
+			case PAINTER_INSTRUCTIONS: {
+				return Arrays.compare(asPainterInstructions().getArray(), arg.asPainterInstructions().getArray());
+			}
+			case CUSTOM: {
+				logger.error("Custom type {} is not known how to compare", type);
+				throw new IllegalStateException("Comparing on custom type " + type + " is not supported");
+			}
+			default: {
+				logger.error("Unkonwn type {}", type);
+				throw new IllegalStateException("Unkonwn type " + type);
+			}
+			}// end switch
+		} else {
+			return type.compareTo(arg.type);
+		}
 	}
 
 }

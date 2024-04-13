@@ -25,6 +25,7 @@ package com.github.sdankbar.qml.cpp.jni;
 import java.awt.image.BufferedImage;
 
 import com.github.sdankbar.qml.JScreen;
+import com.github.sdankbar.qml.JVariant;
 import com.github.sdankbar.qml.cpp.jni.interfaces.ImageProviderCallback;
 import com.github.sdankbar.qml.cpp.jni.interfaces.InvokeCallback;
 import com.github.sdankbar.qml.cpp.jni.interfaces.LoggingCallback;
@@ -174,4 +175,6 @@ public final class ApplicationFunctions {
 	public static native void generateDeltaBetweenImageAndActiveWindow(String fileName, BufferedImage i);
 
 	public static native void saveScreenshot(String path);
+
+	public static native JVariant renderPainterInstructionsToImage(int length, byte[] data, int width, int height);
 }

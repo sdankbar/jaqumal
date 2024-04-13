@@ -36,6 +36,10 @@ import org.apache.maven.plugins.annotations.Parameter;
  */
 @Mojo(name = "rcc_plugin", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class RccPlugin extends AbstractMojo {
+
+	@Parameter(defaultValue = "${basedir}", readonly = true)
+	private String projectBasedir;
+
 	/**
 	 * Location of input qrc file.
 	 *
@@ -54,7 +58,7 @@ public class RccPlugin extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		final File resourcesDir = new File("src/main/resources");
+		final File resourcesDir = new File(projectBasedir, "src/main/resources");
 		if (!resourcesDir.exists()) {
 			System.out.println(resourcesDir.getPath() + " does not exist");
 			throw new MojoExecutionException("Must manuall create " + resourcesDir.getPath());
