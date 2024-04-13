@@ -29,24 +29,54 @@
 
 	<parent>
 		<groupId>com.github.sdankbar.jaqumal</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>examples</artifactId>
 		<version>0.5.6</version>
 	</parent>
-	<artifactId>examples</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>lazy_table</artifactId>
+	<packaging>jar</packaging>
 
-	<modules>
-		<module>shared_qml</module>
-	    <module>color_editor</module>
-		<module>stoplight</module>
-		<module>line_chart</module>
-		<module>image_provider</module>
-		<module>list_view</module>
-		<module>table_view</module>
-		<module>throughput</module>
-		<module>new_type</module>
-		<module>painter</module>
-		<module>lazy_list</module>
-		<module>lazy_table</module>
-	</modules>
+	<name>LazyTable Example</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.sdankbar.jaqumal</groupId>
+			<artifactId>library_jaqumal</artifactId>
+			<version>${project.parent.version}</version>
+			<classifier>${os.classifier}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>
+										com.github.sdankbar.examples.lazy_table.App
+									</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
