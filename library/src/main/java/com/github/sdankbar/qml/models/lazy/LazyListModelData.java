@@ -88,14 +88,18 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 	 */
 	public boolean updateSortingValue(final Q sortingKey, final SortDirection direction) {
 		this.sortingKey = sortingKey;
+
 		final JVariant oldSort = sortValue;
 		if (sortingKey == null) {
 			sortValue = new JVariant(index);
 		} else {
 			sortValue = localData.get(sortingKey);
 		}
+
+		final SortDirection oldDirection = sortDirection;
 		sortDirection = direction;
-		return !Objects.equals(oldSort, sortValue);
+
+		return !Objects.equals(oldSort, sortValue) || (oldDirection != sortDirection);
 	}
 
 	public EnumSet<Task> upsert(final ImmutableMap<Q, JVariant> map) {
@@ -124,7 +128,7 @@ class LazyListModelData<Q> implements Comparable<LazyListModelData<Q>> {
 		if (sortDirection == SortDirection.ASCENDING) {
 			return sortValue.compareTo(arg.sortValue);
 		} else {
-			return -sortValue.compareTo(arg.sortValue);
+			return arg.sortValue.compareTo(sortValue);
 		}
 	}
 

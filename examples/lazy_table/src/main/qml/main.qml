@@ -39,9 +39,12 @@ Window {
         id: headerFlickable
         Row {
             Repeater {
+                id: headerRepeater
+                property int sortingIndex: -1
                 model: headers
                 delegate: ColumnHeader {
                     text: model.text
+                    sortActive: model.index === headerRepeater.sortingIndex
                 }
             }
         }

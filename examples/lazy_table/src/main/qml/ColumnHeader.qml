@@ -26,6 +26,8 @@ import QtQuick.Controls 6.5
 Rectangle {
     id: root
     property string text
+    property bool sortActive: false
+    property bool ascending: true
 
     border.color: "black"
     width: 150
@@ -34,13 +36,26 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         text: root.text
     }
+    Text {
+        visible: sortActive
+        text: ascending ? "▼" : "▲"
+        anchors.right: parent.right
+        anchors.rightMargin: 4
+    }
 
     MouseArea {
         anchors.fill: parent
 
         onClicked: {
+            if (!sortActive) {
+                headerRepeater.sortingIndex = model.index
+                ascending = true
+            } else {
+                ascending = !ascending
+            }
+
             lazy_model_invoke.addString(root.text)
-            lazy_model_invoke.addBoolean(true)
+            lazy_model_invoke.addBoolean(ascending)
             lazy_model_invoke.invoke("setSortingKey")
         }
     }
