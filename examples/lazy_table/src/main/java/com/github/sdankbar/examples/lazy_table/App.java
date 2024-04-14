@@ -85,7 +85,7 @@ public class App {
 			dataMap.put(Integer.toString(i), b.build());
 		}
 		model.upsertAll(dataMap);
-		System.out.println("Took " + (System.currentTimeMillis() - s));
+		System.out.println("Took " + (System.currentTimeMillis() - s) + " milliseconds");
 
 		app.loadAndWatchQMLFile("./src/main/qml/main.qml");
 

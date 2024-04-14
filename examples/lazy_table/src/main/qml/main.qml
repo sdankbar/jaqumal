@@ -40,11 +40,12 @@ Window {
         Row {
             Repeater {
                 id: headerRepeater
-                property int sortingIndex: -1
+                property int sortingIndex: 0
                 model: headers
                 delegate: ColumnHeader {
                     text: model.text
                     sortActive: model.index === headerRepeater.sortingIndex
+                    sortKey: model.index === 0 ? "temp" : ""
                 }
             }
         }

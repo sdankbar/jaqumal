@@ -28,6 +28,7 @@ Rectangle {
     property string text
     property bool sortActive: false
     property bool ascending: true
+    property string sortKey: ""
 
     border.color: "black"
     width: 150
@@ -54,7 +55,12 @@ Rectangle {
                 ascending = !ascending
             }
 
-            lazy_model_invoke.addString(root.text)
+            if (sortKey !== "") {
+                lazy_model_invoke.addString(sortKey)
+            } else {
+               lazy_model_invoke.addString(root.text)
+            }
+
             lazy_model_invoke.addBoolean(ascending)
             lazy_model_invoke.invoke("setSortingKey")
         }
