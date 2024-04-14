@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import com.github.sdankbar.qml.JInvokable;
@@ -47,13 +46,13 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 		ASCENDING, DESCENDING;
 	}
 
-	private static <K> K getKey(final Set<K> keys, final String keyName) {
-		for (final K v : keys) {
-			if (v.toString().equals(keyName)) {
-				return v;
-			}
+	private static <K> K getKey(final ImmutableMap<String, K> keys, final String keyName,
+			final boolean throwException) {
+		final K k = keys.get(keyName);
+		if (k == null && throwException) {
+			throw new IllegalArgumentException("Failed to find key: " + keyName);
 		}
-		throw new IllegalArgumentException("Failed to find key: " + keyName);
+		return k;
 	}
 
 	private static boolean isBetween(final int v, final int l, final int h) {
@@ -65,6 +64,7 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 	private final Map<K, LazyListModelData<Q>> unsortedValues = new HashMap<>();
 	private final List<LazyListModelData<Q>> sortedValues = new ArrayList<>();
 	private final JQMLMapPool<Q> qmlModel;
+	private final ImmutableMap<String, Q> allKeys;
 
 	private final Q positionKey;
 	private Q sortingKey = null;
@@ -80,7 +80,8 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 			final ImmutableMap<Q, JVariant> defaultValues) {
 		Objects.requireNonNull(factory, "factory is null");
 		Objects.requireNonNull(enumKeyClass, "enumKeyClass is null");
-		positionKey = getKey(EnumSet.allOf(enumKeyClass), "pos");
+		allKeys = EnumSet.allOf(enumKeyClass).stream().collect(ImmutableMap.toImmutableMap(Enum::name, k -> k));
+		positionKey = getKey(allKeys, "pos", true);
 		this.qmlModel = new JQMLMapPool<>(factory.createListModel(modelName, enumKeyClass, PutMode.RETURN_NULL),
 				defaultValues);
 		Preconditions.checkArgument(defaultItemHeight > 0, "defaultItemHeight is <= 0");
@@ -124,6 +125,16 @@ public class LazyListModel<K, Q extends Enum<Q>> {
 			sort(EnumSet.of(Task.SORT));
 			layout(EnumSet.of(Task.LAYOUT));
 			flush();
+		}
+	}
+
+	@JInvokable
+	public void setSortingKey(final String sortingKey, final boolean ascending) {
+		final Q key = getKey(allKeys, sortingKey, false);
+		if (ascending) {
+			setSortingKey(key, SortDirection.ASCENDING);
+		} else {
+			setSortingKey(key, SortDirection.DESCENDING);
 		}
 	}
 

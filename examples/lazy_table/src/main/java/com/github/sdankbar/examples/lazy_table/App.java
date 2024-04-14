@@ -60,14 +60,13 @@ public class App {
 
 		final JQMLListModel<ColumnHeaderRole> headers = app.getModelFactory().createListModel("headers",
 				ColumnHeaderRole.class, PutMode.RETURN_NULL);
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("A")));
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("B")));
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("C")));
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("D")));
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("E")));
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("F")));
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("G")));
-		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("H")));
+		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("text")));
+		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("text1")));
+		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("text2")));
+		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("text3")));
+		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("text4")));
+		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("text5")));
+		headers.add(ImmutableMap.of(ColumnHeaderRole.text, new JVariant("text6")));
 
 		model.setExclusionFunction(m -> (m.get(ListRole.temp).asInteger() % 3 == 0));
 
@@ -77,7 +76,7 @@ public class App {
 			final ImmutableMap.Builder<ListRole, JVariant> b = ImmutableMap.builder();
 			b.put(ListRole.temp, new JVariant(i));
 			b.put(ListRole.text, new JVariant("Test " + Integer.toString(i)));
-			b.put(ListRole.text1, new JVariant("Test " + Integer.toString(2 * i)));
+			b.put(ListRole.text1, new JVariant("Test " + Integer.toString(20000 - i)));
 			b.put(ListRole.text2, new JVariant("Test " + Integer.toString(3 * i)));
 			b.put(ListRole.text3, new JVariant("Test " + Integer.toString(4 * i)));
 			b.put(ListRole.text4, new JVariant("Test " + Integer.toString(5 * i)));

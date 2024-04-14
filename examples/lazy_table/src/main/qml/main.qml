@@ -40,14 +40,8 @@ Window {
         Row {
             Repeater {
                 model: headers
-                delegate: Rectangle {
-                    border.color: "black"
-                    width: 150
-                    height: 30
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: model.text
-                    }
+                delegate: ColumnHeader {
+                    text: model.text
                 }
             }
         }
