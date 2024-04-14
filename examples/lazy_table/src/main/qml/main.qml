@@ -90,75 +90,26 @@ Window {
 
                 Row {
                     anchors.fill: parent
-                    Rectangle {
-                        border.color: "black"
-                        width: 150
-                        height: parent.height
-
-                        Text {
-                            text: model.text ? model.text : ""
-                            textFormat: Text.PlainText
-                        }
+                    Cell {
+                        text:  model.text ? model.text : ""
                     }
-                    Rectangle {
-                        border.color: "black"
-                        width: 150
-                        height: parent.height
-
-                        Text {
-                            text: model.text1 ? model.text1 : ""
-                            textFormat: Text.PlainText
-                        }
+                    Cell {
+                        text:  model.text1 ? model.text1 : ""
                     }
-                    Rectangle {
-                        border.color: "black"
-                        width: 150
-                        height: parent.height
-
-                        Text {
-                            text: model.text2 ? model.text2 : ""
-                            textFormat: Text.PlainText
-                        }
+                    Cell {
+                        text:  model.text2 ? model.text2 : ""
                     }
-                    Rectangle {
-                        border.color: "black"
-                        width: 150
-                        height: parent.height
-
-                        Text {
-                            text: model.text3 ? model.text3 : ""
-                            textFormat: Text.PlainText
-                        }
+                    Cell {
+                        text:  model.text3 ? model.text3 : ""
                     }
-                    Rectangle {
-                        border.color: "black"
-                        width: 150
-                        height: parent.height
-
-                        Text {
-                            text: model.text4 ? model.text4 : ""
-                            textFormat: Text.PlainText
-                        }
+                    Cell {
+                        text:  model.text4 ? model.text4 : ""
                     }
-                    Rectangle {
-                        border.color: "black"
-                        width: 150
-                        height: parent.height
-
-                        Text {
-                            text: model.text5 ? model.text5 : ""
-                            textFormat: Text.PlainText
-                        }
+                    Cell {
+                        text:  model.text5 ? model.text5 : ""
                     }
-                    Rectangle {
-                        border.color: "black"
-                        width: 150
-                        height: parent.height
-
-                        Text {
-                            text: model.text6 ? model.text6 : ""
-                            textFormat: Text.PlainText
-                        }
+                    Cell {
+                        text:  model.text6 ? model.text6 : ""
                     }
                 }// end Row
             }
