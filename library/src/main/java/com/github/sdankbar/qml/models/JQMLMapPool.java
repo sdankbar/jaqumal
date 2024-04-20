@@ -164,6 +164,22 @@ public class JQMLMapPool<K> {
 	}
 
 	/**
+	 *
+	 * @param map Map to search for.
+	 * @return The index of the Map in the list model this pool model wraps.
+	 */
+	public int getIndex(final Map<K, JVariant> map) {
+		Objects.requireNonNull(map, "map is null");
+		for (int i = 0; i < model.size(); ++i) {
+			// Identity equality check
+			if (model.get(i) == map) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * Asks the pool to reserve items in the list model such that allocates won't be
 	 * necessary up to the newSize. Does not guarantee that allocates won't be
 	 * necessary if all items are already in use. Just guarantees that the list
