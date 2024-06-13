@@ -37,7 +37,6 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -1921,6 +1920,17 @@ public class JVariant implements Comparable<JVariant> {
 		return array;
 	}
 
+	private int compareByteArray(final byte[] l, final byte[] r) {
+		final int minLength = Math.min(l.length, r.length);
+		for (int i = 0; i < minLength; ++i) {
+			final int comp = Byte.compare(l[i], r[i]);
+			if (comp != 0) {
+				return comp;
+			}
+		}
+		return l.length - r.length;
+	}
+
 	@Override
 	public int compareTo(final JVariant arg) {
 		Objects.requireNonNull(arg, "arg is null");
@@ -1930,7 +1940,7 @@ public class JVariant implements Comparable<JVariant> {
 				return Boolean.compare(asBoolean(), arg.asBoolean());
 			}
 			case BYTE_ARRAY: {
-				return Arrays.compare(asByteArray(), arg.asByteArray());
+				return compareByteArray(asByteArray(), arg.asByteArray());
 			}
 			case COLOR: {
 				return Integer.compare(asColor().getRGB(), arg.asColor().getRGB());
@@ -1945,7 +1955,7 @@ public class JVariant implements Comparable<JVariant> {
 				return Float.compare(asFloat(), arg.asFloat());
 			}
 			case IMAGE: {
-				return Arrays.compare(bufferedImageToArray(asImage()), bufferedImageToArray(arg.asImage()));
+				return compareByteArray(bufferedImageToArray(asImage()), bufferedImageToArray(arg.asImage()));
 			}
 			case INT: {
 				return Integer.compare(asInteger(), arg.asInteger());
@@ -2003,7 +2013,7 @@ public class JVariant implements Comparable<JVariant> {
 				}
 			}
 			case PAINTER_INSTRUCTIONS: {
-				return Arrays.compare(asPainterInstructions().getArray(), arg.asPainterInstructions().getArray());
+				return compareByteArray(asPainterInstructions().getArray(), arg.asPainterInstructions().getArray());
 			}
 			case CUSTOM: {
 				logger.error("Custom type {} is not known how to compare", type);
